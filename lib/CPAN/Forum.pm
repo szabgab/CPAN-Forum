@@ -192,8 +192,9 @@ v0.10_03
   Enable <i>, <b> <br> and <a ..> with <p></p> pairs
   Remove the selection box from the post interface as it was not used there.
   Put the search form on the home page as well.
- 
   Admin can change e-mail address of any user
+
+
   Add paging
  
 
@@ -1875,15 +1876,29 @@ sub admin_edit_user_process {
 		return $self->internal_error("", "restricted_area");
 	}
 	my $q = $self->query;
+	my $email = $q->param('email');
+	my $uid   = $q->param('uid'); # TODO error checking here !
+
+	$self->log->debug("admin_edit_user_process uid: '$uid'");
+	my ($person) = CPAN::Forum::Users->retrieve($uid);
+	if (not $person) {
+		return $self->internal_error("", "no_such_user");
+	}
+	$person->email($email);
+	$person->update;
+
+	$self->admin_edit_user($person->username, ['done']);
 }
 
 sub admin_edit_user {
-	my ($self) = @_;
+	my ($self, $username, $errors) = @_;
 	if (not $self->session->param("admin")) {
 		return $self->internal_error("", "restricted_area");
 	}
 	my $q = $self->query;
-	my $username = ${$self->param("path_parameters")}[0] || '';
+	if (not $username) {
+		$username = ${$self->param("path_parameters")}[0] || '';
+	}
 	$self->log->debug("admin_edit_user username: '$username'");
 
 	my ($person) = CPAN::Forum::Users->search(username => $username);
@@ -1894,6 +1909,12 @@ sub admin_edit_user {
 	my $t = $self->load_tmpl("admin_edit_user.tmpl");
 	$t->param(this_username => $username);
 	$t->param(email => $person->email);
+	$t->param(uid   => $person->id);
+
+	if ($errors and ref($errors) eq "ARRAY") {
+		$t->param($_ => 1) foreach @$errors;
+	}
+
 	$t->output;
 
 }

@@ -7,6 +7,7 @@
 <TMPL_IF done>
 <p>
 The information was updated
+<a href="/admin_edit_user/<TMPL_VAR this_username>">see it again</a>
 </p>
 <TMPL_ELSE>
 <div class="error">
@@ -16,10 +17,11 @@ The information was updated
 <p>
 Username: <TMPL_VAR this_username>
 </p>
-<form method="post" action="/">
+<form method="post" action="/admin_edit_user_process/">
 <p>
 <input type="hidden" name="rm" value="admin_edit_user_process" />
-E-mail: <input name="email" value="<TMPL_VAR email>" />
+<input type="hidden" name="uid" value="<TMPL_VAR uid>" />
+E-mail: <input name="email" value="<TMPL_VAR email>" /><br />
 <input type="submit" value="Update user" />
 </p>
 </form>
