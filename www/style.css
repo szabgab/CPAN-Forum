@@ -10,7 +10,7 @@ body {
 	font-size: 20pt;
 }
 
-#pageHeader h1 { 
+#pageHeader { 
 	background: MidnightBlue; 
 	margin-top: 10px; 
 	margin-left: 25px; 
@@ -23,7 +23,7 @@ body {
 	color: white;
 }
 
-#pageHeader h2 { 
+#pageTitle { 
 	margin-top: 0px; 
 	background: white; 
 	height: 18px; 

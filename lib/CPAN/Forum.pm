@@ -2,7 +2,7 @@ package CPAN::Forum;
 use strict;
 use warnings;
 
-our $VERSION = "0.09_03";
+our $VERSION = "0.09_03_dev";
 
 use base "CGI::Application";
 use CGI::Application::Plugin::Session;
