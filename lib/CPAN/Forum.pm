@@ -16,7 +16,6 @@ use CGI ();
 
 use CPAN::Forum::INC;
 
-my $limit_rss   = 10;
 my $cookiename  = "cpanforum";
 my $SUBJECT = qr{[\w .:~!@#\$%^&*\()+?><,'";=-]+};
 
@@ -1945,9 +1944,12 @@ sub admin_process {
 		$self->log->fatal("Could not find from field !!");
 	}
 
-	if (my ($conf) = CPAN::Forum::Configure->find_or_create({field => 'per_page'})) {
-		$conf->value($q->param('per_page'));
-		$conf->update;
+	# fields that can have only one value
+	foreach my $field (qw(rss_size per_page)) {
+		if (my ($conf) = CPAN::Forum::Configure->find_or_create({field => $field})) {
+			$conf->value($q->param($field));
+			$conf->update;
+		}
 	}
 
 	my $t = $self->load_tmpl("admin.tmpl");
@@ -1981,9 +1983,8 @@ Provide RSS feed
 sub rss {
 	my $self = shift;
 	
-	my $cnt = $limit_rss;
+	my $cnt = $self->config("rss_size") || 10;
 	my @params = @{$self->param("path_parameters")};
-#	warn Dumper \@params;
 	my $it;
 	if (@params > 1 and $params[0] eq "dist") {
 		my $dist = $params[1];
@@ -1997,7 +1998,8 @@ sub rss {
 	my $rss = XML::RSS::SimpleGen->new( $url, "CPAN Forum", "Discussing Perl CPAN modules");
 	$rss->language( 'en' );
 
-	my $admin = CPAN::Forum::Users->retrieve(1);
+	my $admin = CPAN::Forum::Users->retrieve(1); # TODO this is a hard coded user id of the administrator !
+	# and this reveals the e-mail of the administrator. not a good idea I guess.
 	$rss->webmaster($admin->email);
 
 	my $prefix = "";
@@ -2011,7 +2013,6 @@ sub rss {
 	#$self->header_props(-type => 'application/xml');
 	
 	return $rss->as_string();
-	#$self->internal_error;
 }
 
 =head2 notify
