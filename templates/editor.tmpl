@@ -2,6 +2,8 @@
 <div class="error">
 	<TMPL_IF no_group>No distribution name provided<br /></TMPL_IF>
 	<TMPL_IF no_subject>No subject provided<br /></TMPL_IF>
+	<TMPL_IF invalid_subject>The subject contained and invalid character
+	<a href="/help/">help</a><br /></TMPL_IF>
 	<TMPL_IF no_text>No text provided<br /></TMPL_IF>
 	<TMPL_IF bad_group>Bad distribution name<br /></TMPL_IF>
 	<TMPL_IF bad_data>Bad data<br /></TMPL_IF>

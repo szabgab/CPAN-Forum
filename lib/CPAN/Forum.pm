@@ -464,6 +464,7 @@ my @free_modes = qw(home
 					about faq
 					posts threads dist users 
 					search all 
+					help
 					rss ); 
 my @restricted_modes = qw(
 			new_post process_post
@@ -473,6 +474,7 @@ my @restricted_modes = qw(
 			
 my @urls = qw(
 	logout 
+	help
 	new_post pwreminder 
 	login register 
 	posts about 
@@ -1152,6 +1154,9 @@ sub process_post {
 	my $new_text = $q->param("new_text"); 
 	
 	push @errors, "no_subject" if not $new_subject;
+	my $SUBJECT = qr{[\w .:~!@#\$%^&*\()+=-]+};
+	push @errors, "invalid_subject" if $new_subject and $new_subject !~ m{^$SUBJECT$};
+	
 	push @errors, "no_text"    if not $new_text;
 	push @errors, "subject_too_long" if $new_subject and length($new_subject) > 50;
 	return $self->posts(\@errors) if @errors;
@@ -1786,6 +1791,11 @@ replace the markup used in the posting by things we can use in e-mail messages.
 =cut
 sub _text2mail {
 	return $_[0];
+}
+
+
+sub help {
+	$_[0]->load_tmpl("help.tmpl")->output;
 }
 
 1;
