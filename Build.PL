@@ -33,6 +33,7 @@ my $builder = CPAN::Forum::Build->new(
 		'LWP::Simple'                           => 0,  # for populate
 		'XML::RSS::SimpleGen'                   => 0,  # for, well RSS generation
 		'Mail::Sendmail'                        => 0,  
+		'CGI::Session::SQLite'                  => 0,
     },
 	build_requires => {
 		'Test::WWW::Mechanize'       => 0.02,
