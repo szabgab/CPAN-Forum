@@ -1621,8 +1621,28 @@ sub dist {
 	$self->set_ratings($t, $group);
 	my $page = $q->param('page') || 1;
 	$self->_search_results($t, {where => {gid => $gid}, page => $page});
+	$self->_subscriptions($t, $gid);
 	$t->output;
 }
+
+
+sub _subscriptions {
+	my ($self, $t, $gid) = @_;
+
+
+	my @people;
+	my (@subs) = CPAN::Forum::Subscriptions->search(gid => $gid);
+	foreach my $s (@subs) {
+		push @people, {
+			username => $s->uid->username,
+		};
+	}
+	if (@people) {
+		$t->param(users => \@people);
+	}
+}
+
+
 
 =head2 users
 

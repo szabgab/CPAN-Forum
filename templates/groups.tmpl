@@ -27,5 +27,12 @@ distribution and get alerted when someone posts a new message.
 </p>
 <TMPL_INCLUDE NAME="listing.tmpl">
 
+<p>
+Users currently monitoring this forum:
+<TMPL_LOOP users>
+   <a href="/users/<TMPL_VAR username>"><TMPL_VAR username></a>, 
+</TMPL_LOOP>
+</p>
+
 <p><a href="/rss/dist/<TMPL_VAR group>"><img src="/img/rss1.gif" alt="RSS Feed" /></a></p>
 <TMPL_INCLUDE NAME="footer.tmpl">
