@@ -183,6 +183,7 @@ variable to the URL where you installed the forum.
 
 v0.10_02
   <p>, <br> enabled
+  Add link to Kobes Search
 
 v0.10
 - markup improved, bugs fixed
@@ -1744,6 +1745,7 @@ sub module_search {
 		return $self->module_serach_form(['invalid_search_term']);
 	}
 	$self->log->debug("group name search term: $txt");
+	$txt =~ s/::/-/g;
 	$txt = '%' . $txt . '%';
 	
 	my $it =  CPAN::Forum::Groups->search_like(name => $txt);
