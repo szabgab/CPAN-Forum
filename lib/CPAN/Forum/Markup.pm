@@ -18,6 +18,8 @@ sub new {
 	           | open_b text close_b              { join "", @item[1..$#item] }
 	           | open_i text close_i              { join "", @item[1..$#item] }
 	           | open_p text close_p              { join "", @item[1..$#item] }
+			   | br                               { "<br />" }
+	br         : m{<br( /)?>}
 	open_p     : m{<p>}
 	close_p    : m{</p>}
 	open_b     : m{<b>}

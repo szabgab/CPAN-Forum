@@ -177,7 +177,15 @@ Run:
 For some of the tests you'll have to set the CPAN_FORUM_URL environment 
 variable to the URL where you installed the forum.
 
+
+
 =head2 Changes
+
+v0.10_02
+  <p>, <br> enabled
+
+v0.10
+- markup improved, bugs fixed
 
 v0.09_05
 - POD cleanup (Shlomi Fish)

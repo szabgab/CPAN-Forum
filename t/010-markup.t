@@ -49,7 +49,9 @@ my %cases = (
 	'a<b>c</b>d<i>x</i>f'      => $TEXT . 'a<b>c</b>d<i>x</i>f' . $END,
 	'&lt;'                     => $TEXT . '&lt;' . $END,
 	'<p>text</p>'              => $TEXT . '<p>text</p>' . $END,
-
+	'<br />'                   => $TEXT . '<br />' . $END,
+	'<br />hello'              => $TEXT . '<br />hello' . $END,
+	'<br>hello'                => $TEXT . '<br />hello' . $END,
 
 );
 
