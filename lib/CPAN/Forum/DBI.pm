@@ -18,11 +18,7 @@ our @group_types = ("None", "Global", "Field", "Distribution", "Module");
 our %group_types;
 $group_types{$group_types[$_]} = $_ for (0..$#group_types);
 
-=head2 init_db
-
-Initialize the database
-
-=cut
+# Initialize the database
 sub init_db {
 	my $class = shift;
 	my $dbfile = shift;

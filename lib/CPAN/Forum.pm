@@ -28,7 +28,7 @@ my %errors = (
 
 =head1 NAME
 
-CPAN::Forum - Web forum appliation to discuss CPAN modules
+CPAN::Forum - Web forum application to discuss CPAN modules
 
 =head1 SYNOPSIS
 
@@ -117,16 +117,16 @@ pointed to your server.
 
 =head2 Install the perl code
 
-perl Build.PL
-./Build
-./Build test
-./Build install dir=/path/to/install
-cd /path/to/install
+ perl Build.PL
+ ./Build
+ ./Build test
+ ./Build install dir=/path/to/install
+ cd /path/to/install
 
-chmod a+x www/cgi/index.pl  (needed only if you work out of the repository)
-chmod a+x db/forum.db       (or whatever you need to make sure the database is writable by the web server.
+ chmod a+x www/cgi/index.pl  (needed only if you work out of the repository)
+ chmod a+x db/forum.db       (or whatever you need to make sure the database is writable by the web server.
 
-manually edit the www/cgi/index.pl file and set the sh-bang to the correct one
+ manually edit the www/cgi/index.pl file and set the sh-bang to the correct one
 
 
 =head2 Setup the database
@@ -134,30 +134,33 @@ manually edit the www/cgi/index.pl file and set the sh-bang to the correct one
 In the directory where you installed the modules create
 a file called CONFIG (see t/CONFIG for an example). 
 Having the following fileds:
-username=        the user name of the administrator
-email=           of the administrator
-password=        the password of the administrator
-from=            email address to be used as the from address in the messages sent
-                 by the system
+
+ username=        the user name of the administrator
+ email=           of the administrator
+ password=        the password of the administrator
+ from=            email address to be used as the from address in the messages sent
+                  by the system
 
 You will be able to change all these values later from the web interface but we need
 to have the first values.
 
-perl bin/setup.pl 
+ perl bin/setup.pl 
 
-    (you can now delete the CONFIG file)
+(you can now delete the CONFIG file)
 
-perl bin/populate.pl    (this will fetch a file from www.cpan.org and 
-                        might take a few minutes to run)
+ perl bin/populate.pl    (this will fetch a file from www.cpan.org and 
+                         might take a few minutes to run)
 
 
 
-CPAN_FORUM_URL
----------------
+=head2 CPAN_FORUM_URL
+
 For some of the tests you'll have to set the CPAN_FORUM_URL environment variable 
 to the URL where you installed the forum.
 
 =head2 Changes
+
+Will come here after we start to accumulate them
 
 =head2 TODO Critical for launching
 
@@ -202,7 +205,7 @@ Not nice, any better way ?
 - Finalize markup
 
   Subject field:
-  -  <= 70 chars
+  -  <= 50 chars
   -  Can contain any characters, we'll escape them when showing on the web site
  
   Text field:

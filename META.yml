@@ -1,9 +1,9 @@
 --- #YAML:1.0
 name: CPAN-Forum
-version: 0.09_02
+version: 0.09_03_dev
 author:
   - Gabor Szabo <gabor@pti.co.il>
-abstract: Web forum appliation to discuss CPAN modules
+abstract: Web forum application to discuss CPAN modules
 license: perl
 requires:
   CGI: 0
@@ -25,7 +25,7 @@ build_requires:
 provides:
   CPAN::Forum:
     file: lib/CPAN/Forum.pm
-    version: 0.09_02
+    version: 0.09_03_dev
   CPAN::Forum::Build:
     file: lib/CPAN/Forum/Build.pm
   CPAN::Forum::Configure:
