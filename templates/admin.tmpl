@@ -17,6 +17,11 @@ Data updated. <a href="/admin/">look it again</a>
 <tr><td>From address:</td><td><input name="from" value="<TMPL_VAR from>" size="50"></td></tr>
 <tr><td>Page size:</td><td><input name="per_page" value="<TMPL_VAR per_page>" size="5"></td></tr>
 <tr><td>RSS size:</td><td><input name="rss_size" value="<TMPL_VAR rss_size>" size="5"></td></tr>
+<tr><td>Status:</td><td><select name="status">
+                         <option value="open" <TMPL_IF status_open>SELECTED</TMPL_IF>>Open</option>
+                         <option value="readonly" <TMPL_IF status_readonly>SELECTED</TMPL_IF>>Read only</option>
+                         <option value="closed" <TMPL_IF status_closed>SELECTED</TMPL_IF>>Closed</option>
+						 </select></td></tr>
 </table>
 <p>
 <input type="submit" value="Update" />

@@ -18,6 +18,7 @@ use CPAN::Forum::INC;
 
 my $cookiename  = "cpanforum";
 my $SUBJECT = qr{[\w .:~!@#\$%^&*\()+?><,'";=-]+};
+my $STATUS_FILE;
 
 my %errors = (
 	"ERR no_less_sign"              => "No < sign in text",
@@ -184,6 +185,10 @@ v0.11_01
   Make CPAN::Forum::Configure an easy interface to the configuration table
   Give "no result" on no result
   Trim off leading and trailing spaces from the query. 
+  Hide distname from the listing when resticted to one distribution (the same with users)
+  Setup a "status" variable for the site that allows the administrator to lock the whole site.
+     Currently it does not let the admin outlock, s/he has to remove the db/status file for this.
+
 
 v0.11
   Search for users
@@ -571,6 +576,7 @@ sub cgiapp_init {
 	my $dbh = CPAN::Forum::DBI::db_Main();
 	
 	my $log = $self->param("ROOT") . "/db/messages.log";
+	$STATUS_FILE = $self->param("ROOT") . "/db/status";
 
 	$self->log_config(
 		LOG_DISPATCH_MODULES => [
@@ -630,6 +636,7 @@ my @free_modes = qw(home
 					about faq
 					posts threads dist users 
 					search all 
+					site_is_closed
 					help
 					rss ); 
 my @restricted_modes = qw(
@@ -683,6 +690,13 @@ sub cgiapp_prerun {
 	my $rm = $self->get_current_runmode();
 
 	$self->log->debug("Current runmode:  $rm");
+
+	my $status = $self->status();
+	if ($status ne "open" and not $self->session->param("admin")) {
+		$self->prerun_mode('site_is_closed');
+		return;	
+	}
+	$self->log->debug("Status:  $status"); 
 
 	$self->param(path_parameters => []);
 
@@ -967,6 +981,11 @@ sub logout {
 	my $session = $self->session;
 	$session->param(loggedin => 0);
 	$session->param(username => '');
+	$session->param(uid       => '');
+	$session->param(fname     => ''); 
+	$session->param(lname     => '');
+	$session->param(email     => '');
+	$session->param(admin     => '');
 
 	$self->redirect_home;
 }
@@ -1947,6 +1966,9 @@ sub admin_process {
 		}
 	}
 
+	$self->status($q->param('status'));
+	
+
 	my $t = $self->load_tmpl("admin.tmpl");
 	$t->param(updated => 1);
 	$t->output;
@@ -1963,6 +1985,7 @@ sub admin {
 		$data{$c->field} = $c->value;
 	}
 	my $t = $self->load_tmpl("admin.tmpl");
+	$t->param("status_" . $self->status() => 1);
 	$t->param(%data);
 	$t->output;
 }
@@ -2096,6 +2119,34 @@ sub _sendmail {
 	}
 }
 
+sub status {
+	my ($self, $value) = @_;
+	if ($value) {
+		if ($value eq "open") {
+			if (-e $STATUS_FILE) {
+				unlink $STATUS_FILE;
+				# TODO check if the file does not exist any more after this action?
+			}
+			return "open";
+		}
+
+		open my $fh, ">", $STATUS_FILE;
+		if (not $fh) {
+			warn "Could not open status file '$STATUS_FILE' $!\n";
+			return;
+		}
+		print $fh $value;
+		return $value;
+	} else {
+		return "open" if not -e $STATUS_FILE;
+		open my $fh, "<", $STATUS_FILE;
+		my $value = <$fh>;
+		chomp $value;
+		return $value;
+	}
+}
+
+
 =head2 _text2mail
 
 replace the markup used in the posting by things we can use in 
@@ -2112,6 +2163,9 @@ sub help {
 	$_[0]->load_tmpl("help.tmpl")->output;
 }
 
+sub site_is_closed {
+	$_[0]->load_tmpl("site_is_closed.tmpl")->output;
+}
 
 1;
 

@@ -67,3 +67,4 @@ www/cgi/index.pl
 www/robots.txt
 www/style.css
 
+templates/site_is_closed.tmpl
