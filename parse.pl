@@ -16,7 +16,7 @@ my $grammar = q {
 	code: opencode codetext closecode {$item[2] }
 	opencode:  m{<code>}
 	closecode: m{</code>}
-	codetext: m{[\w <\$]+(?=</code>)} { qq(<div class="code">) . CGI::escapeHTML($item[1]) . qq(</div>); }
+	codetext: m{[\w <>\$]+(?=</code>)} { qq(<div class="code">) . CGI::escapeHTML($item[1]) . qq(</div>); }
 	eodata:   m{^\Z}
 };
 	#codetext: m{[ -.0-~\s]+} { qq(<div class="code">$item[1]</div>); }
@@ -33,7 +33,7 @@ my %data = (
 	'apple<code><</code>'      => q(<div class="text">apple</div><div class="code">&lt;</div>),
 	'<code> $x < $y </code>'   => q(<div class="code"> $x &lt; $y </div>),
 	'<code extra><STD></code>' => undef,
-#	'<code><STD></code>'       => q(<div code extra>&lt;STD&gt;</code>), 
+	'<code><STD></code>'       => q(<div code extra>&lt;STD&gt;</code>), 
 );
 use Data::Dumper;
 #print Dumper $parser->entry($text);
