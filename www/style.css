@@ -103,18 +103,18 @@ TABLE.posts {
 	vertical-align: baseline;
 }
 
+/*
 .threads_odd TD {
 	background: #dddddd;
 	border-style: solid;
 	border-width: 2px;
-	border-color: yellow;
 }
 
 .threads_even TD {
 	border-style: solid;
 	border-width: 2px;
-	border-color: yellow;
 }
+*/
 
 TD {
 	margin:  0;

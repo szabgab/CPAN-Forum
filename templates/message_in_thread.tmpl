@@ -1,13 +1,13 @@
-
+<a name="<TMPL_VAR id>">
 <table class="message">
 <tr class="message_row_head"><td>
    Posted on <span class="date"><TMPL_VAR date></span> 
    by <span class="username"><a href="/users/<TMPL_VAR postername>"><TMPL_VAR postername></a></span>
   <TMPL_IF parentid>
-	<span class="inresponse">in response to <a href="/posts/<TMPL_VAR parentid>"><TMPL_VAR parentid></a></div>
-	<TMPL_IF thread_id>
-	  <span class="seethread">(See the whole <a href="/threads/<TMPL_VAR thread_id>">thread of <TMPL_VAR thread_count></a>)</div>
-	</TMPL_IF>
+	<span class="inresponse">in response to <a href="#<TMPL_VAR parentid>"><TMPL_VAR parentid></a></div>
+
+
+
   </TMPL_IF>
 </td></tr>
 <tr class="message_row_subject"><td><TMPL_VAR subject></span></td></tr>
@@ -18,7 +18,7 @@
 <TMPL_IF responses>
 	Direct Responses:
 	<TMPL_LOOP responses>
-	 <a href="/posts/<TMPL_VAR id>"><TMPL_VAR id></a> | 
+	 <a href="#<TMPL_VAR id>"><TMPL_VAR id></a> | 
 	</TMPL_LOOP>
 </TMPL_IF>
    <TMPL_UNLESS editor>
