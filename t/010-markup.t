@@ -70,7 +70,21 @@ foreach my $c (sort keys %fails) {
 }
 
 
-my $code = q(
+my $data = join "", <DATA>;
+foreach my $code (split /CODE/, $data) {
+	print STDERR $code;
+	my $out = $markup->posting_process($code);
+	ok(defined($out), "BIG CODE");
+	ok(length($out) > length ($code));
+}
+
+
+sub f {
+	$markup->posting_process(@_);
+}
+
+__DATA__
+<code>
 #!/usr/bin/perl
 
 open my $fh, ">>", "filename";
@@ -79,19 +93,16 @@ while (<$fh>) {
 	xxl
 }
 
-);
-$code = "<code>$code</code>";
+</code>
+CODE
+some
+<code>
+#!/usr/bin/perl
 
-my $out = $markup->posting_process($code);
-ok(defined($out), "BIG CODE");
-ok(length($out) > length ($code));
-
-
-
-
-
-sub f {
-	$markup->posting_process(@_);
+while (<qqrq>) {
+  more todo
 }
 
+1;
+</code>
 

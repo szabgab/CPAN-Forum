@@ -1225,7 +1225,7 @@ sub posts {
 		$t->param(preview_loop => [\%preview]);
 	}
 
-	$t->param(new_subject => _subject_escape($q->param("new_subject")));
+	#$t->param(new_subject => _subject_escape($q->param("new_subject")));
 	$t->param(group       => $new_group) if $new_group;
 
 	return $t->output;
@@ -1276,6 +1276,9 @@ sub process_post {
 	my $markup = CPAN::Forum::Markup->new();
 	my $result = $markup->posting_process($new_text) ;
 	if (not defined $result) {
+		$self->log->debug("--- BAD TEXT STARTS ---");
+		$self->log->debug($new_text);
+		$self->log->debug("--- BAD TEXT ENDS ---");
 		push @errors, "text_format";
 		return $self->posts(\@errors);
 	}
