@@ -449,6 +449,20 @@ someone else who used the same machine recently ?
 
 - favicon.ico and a banner image would be good
 
+
+Shlomi:
+The Forum uses cgiapp_prerun to set the mode according to the PATH_INFO instead of 
+using a mode_param code-reference. This causes a lot of warnings in the logs, 
+and doesn't really belong in cgiapp_prerun.
+
+It cannot be hosted on a URL except for its own virtual host, as it uses 
+absolute URLs. ("/login/", "/register/", etc.) A better idea would be to 
+track the path that the web-server gives (it's in one of the environment 
+variables) and then to construct a /cpan-forum/login/ /cpan-forum/register/ 
+etc. path. (or use relative URLs).
+
+
+
 =head1 METHODS
 
 =head2 cgiapp_init

@@ -15,7 +15,7 @@ my $builder = CPAN::Forum::Build->new(
 	requires            => {
 		'HTML::Template'                        => 2.6,
 		'CGI'                                   => 0,
-		'CGI::Application'                      => 3.22,
+		'CGI::Application'                      => 3.31,
 		'CGI::Application::Plugin::Session'     => 0,
 		'CGI::Application::Plugin::LogDispatch' => 0,
 		
