@@ -5,10 +5,19 @@
 <TMPL_INCLUDE NAME="links.tmpl">
 
 <p>
-This section of the site is for discussing the <TMPL_VAR group> CPAN distribution.<br />
-<a href="/mypan/dist/<TMPL_VAR group>">Manage my subscription to <TMPL_VAR group></a>
+This section of the site is for discussing the <TMPL_VAR group> CPAN distribution.
 </p>
+<TMPL_UNLESS messages>
+<p>
+The whole web site is new, so there are no posts in this section yet. 
+Visit the <a href="/">main page</a> to see more action.
+</p>
+</TMPL_UNLESS>
 
+<p>
+If you are <a href="/register/">registered</a> on the forum you can <a href="/mypan/dist/<TMPL_VAR group>">subscribe to e-mail notificatio<TMPL_VAR group></a> for this specific
+distribution and get alerted when someone posts a new message.
+</p>
 <TMPL_INCLUDE NAME="listing.tmpl">
 
 <TMPL_INCLUDE NAME="footer.tmpl">
