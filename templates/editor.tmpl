@@ -1,0 +1,45 @@
+
+<div class="error">
+	<TMPL_IF no_group>No distribution name provided<br></TMPL_IF>
+	<TMPL_IF no_subject>No subject provided<br></TMPL_IF>
+	<TMPL_IF no_text>No text provided<br></TMPL_IF>
+	<TMPL_IF bad_group>Bad distribution name<br></TMPL_IF>
+	<TMPL_IF bad_data>Bad data<br></TMPL_IF>
+	<TMPL_IF subject_too_long>Subject must be up to 70 characters.<br></TMPL_IF>
+	<TMPL_IF text_format>Text format is not correct.<br></TMPL_IF>
+
+	<TMPL_IF bad_thing>Bad thing<br></TMPL_IF>
+</div>
+
+<form method="POST" action="/">
+	<input type="hidden" name="rm" value="process_post">
+	<input type="hidden" name="new_parent" value="<TMPL_VAR id>">
+	
+	<TMPL_VAR group_selector><br>
+	Subject:<br><input name="new_subject" size="60" value="<TMPL_VAR new_subject>"><br>
+	Text:<br><textarea name="new_text" rows="15" cols="60"><TMPL_VAR new_text></textarea><br>
+	
+	<input type="submit" name="button" value="Preview">
+	<TMPL_IF preview>
+		<input type="submit" name="button" value="Submit">
+	</TMPL_IF>
+	<br />
+
+	<div id="posting_rules">Posting Rules:</div>
+	<ul class="postrules">
+		<li> Currently no HTML markup is allowed at all. If you'd like to show &lt; 
+			you'll have to type &amp;lt;</li>
+		<li> You can use a pseudo markup pair: &lt;code&gt; and &lt;/code&gt;. The idea is 
+			that you put your real code in such markup. Including plain &lt;STDIN&gt; 
+			as you like. Then when showing such parts of your posting we'll make 
+			sure it shows correctly. (If not, let us know and we'll fix it ASAP)</li>
+	</ul>
+	<!--
+	<li> HTML marup is allowed but all &lt; marks will be turned into &amp;lt; so they won't have an effect other than content
+	<li> http://www.blabla.com  things will be turned into links
+	<li> a@b.c strings will be left alone as they can be valid perl code
+	<li> mailto:a@b.c  will be be turned into mailto links (I think)
+	-->
+</form>
+
+

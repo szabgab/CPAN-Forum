@@ -1,0 +1,23 @@
+<!-- Post id <TMPL_VAR id><br> -->
+<TMPL_IF parentid>
+	In response to <a href="/posts/<TMPL_VAR parentid>"><TMPL_VAR parentid></a>
+	<TMPL_IF thread_id>
+	  (See the whole <a href="/threads/<TMPL_VAR thread_id>">thread of <TMPL_VAR thread_count></a>)
+	</TMPL_IF>
+	<br>
+</TMPL_IF>
+
+Posted on <span class="date"><TMPL_VAR date></span> by <a href="/users/<TMPL_VAR postername>"><TMPL_VAR postername></a> 
+
+<div class="subject"><TMPL_VAR subject></div>
+
+<TMPL_VAR text>
+
+<TMPL_IF responses>
+	Direct Responses:
+	<TMPL_LOOP responses>
+	 <a href="/posts/<TMPL_VAR id>"><TMPL_VAR id></a> | 
+	</TMPL_LOOP>
+</TMPL_IF>
+
+

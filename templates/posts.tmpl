@@ -1,0 +1,35 @@
+<TMPL_INCLUDE NAME="head.tmpl">
+<h2><TMPL_VAR group> - <TMPL_VAR subject></h2>
+<TMPL_INCLUDE NAME="navigation.tmpl">
+
+<TMPL_IF group>
+<TMPL_INCLUDE NAME="links.tmpl">
+</TMPL_IF>
+
+<TMPL_IF post>
+	<p>
+	<TMPL_INCLUDE NAME="message.tmpl">
+	</p>
+</TMPL_IF>
+
+
+<TMPL_IF preview>
+	<div class="preview">
+	<p>
+	<b>Preview</b><br>
+	<TMPL_LOOP preview_loop>
+	<TMPL_INCLUDE NAME="message.tmpl">
+	</TMPL_LOOP>
+	</p>
+	</div>
+</TMPL_IF>
+
+
+<TMPL_IF editor>
+	<TMPL_INCLUDE NAME="editor.tmpl">
+<TMPL_ELSE>
+	<a href="/response_form/<TMPL_VAR id>">Write a response</a>.
+</TMPL_IF>
+
+<TMPL_INCLUDE NAME="footer.tmpl">
+

@@ -1,0 +1,20 @@
+<TMPL_IF messages>
+<table id="posts_table">
+	<tr class="posts_head">
+		<th class="col1">Module</th>
+		<th class="col2">Title</th>
+		<th class="col3">Thread</th>
+		<th class="col4">Date</th>
+		<th class="col5">Posted by</th>
+	</tr>
+<TMPL_LOOP messages>
+	<tr class="<TMPL_IF NAME="__odd__">odd<TMPL_ELSE>even</TMPL_IF>">
+		<td class="col1"><a href="/dist/<TMPL_VAR group>"><TMPL_VAR group></a></td>
+		<td class="col2"><a href="/posts/<TMPL_VAR id>"><TMPL_VAR subject></a></td>
+		<td class="col3"><TMPL_IF thread><a href="/threads/<TMPL_VAR thread_id>">(+<TMPL_VAR thread_count>)</a></TMPL_IF></td>
+		<td class="col4"><TMPL_VAR date></td>
+		<td class="col5"><a href="/users/<TMPL_VAR postername>"><TMPL_VAR postername></a></td>
+	</tr>
+</TMPL_LOOP>
+</table>
+</TMPL_IF>

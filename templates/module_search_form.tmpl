@@ -1,0 +1,14 @@
+<TMPL_INCLUDE NAME="head.tmpl">
+<h2>Search for module name</h2>
+<TMPL_INCLUDE NAME="navigation.tmpl">
+
+Please type in the name of a module.
+You can use '%' signs as wide cards.
+<form method="POST" action="/module_search">
+<input type="hidden" name="rm" value="search">
+<input name="q" value="<TMPL_VAR q>">
+<input type="submit" value="Search">
+</form>
+
+<TMPL_INCLUDE NAME="footer.tmpl">
+

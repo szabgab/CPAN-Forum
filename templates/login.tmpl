@@ -1,0 +1,23 @@
+<TMPL_INCLUDE NAME="head.tmpl">
+<h2>Login</h2>
+<TMPL_INCLUDE NAME="navigation.tmpl">
+
+
+<div class="error">
+<TMPL_IF no_login_data>Need both nickname and password.<br></TMPL_IF>
+<TMPL_IF bad_login>Login failed.<br></TMPL_IF>
+</div>
+
+In order to post on this site first you'll have to <a href="/register">register</a>
+with a valid e-mail address.
+<form method="POST" action="/">
+	<input type="hidden" name="rm" value="login_process">
+	Nickname: <input name="nickname" value="<TMPL_VAR nickname>">
+	Password: <input name="password" type="password">
+	<input type="submit" value="Login">
+</form>
+To retrieve a lost password, please visit the
+<a href="/pwreminder">password reminder</a>.
+
+
+<TMPL_INCLUDE NAME="footer.tmpl">

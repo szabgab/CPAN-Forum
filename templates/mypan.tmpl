@@ -1,0 +1,47 @@
+<TMPL_INCLUDE NAME="head.tmpl">
+<h2>Personal configuration of <TMPL_VAR fullname> (<TMPL_VAR username>)</h2>
+<TMPL_INCLUDE NAME="navigation.tmpl">
+
+<form method="post" action="/">
+<input type="hidden" name="rm" value="update_subscription">
+<input type="hidden" name="gids" value="<TMPL_VAR gids>">
+<p>
+Subscriptions
+</p>
+<div class="subscription">
+<table>
+<tr>
+  <th>Distribution</th>
+  <th>All messages</th>
+  <th>Thread starters</th>
+  <th>Followups</th>
+</tr>
+<!--
+<tr>
+  <td>All</td>
+  <td><input type="checkbox" name="allposts" <TMPL_IF allposts>CHECKED</TMPL_IF>></td>
+  <td><input type="checkbox" name="starters" <TMPL_IF starters>CHECKED</TMPL_IF>></td>
+  <td><input type="checkbox" name="followups" <TMPL_IF followups>CHECKED</TMPL_IF>></td>
+</tr>
+-->
+<TMPL_LOOP subscriptions>
+<tr>
+  <td><TMPL_VAR group></td>
+  <td><input type="checkbox" name="allposts_<TMPL_VAR gid>"  <TMPL_IF allposts>CHECKED</TMPL_IF>></td>
+  <td><input type="checkbox" name="starters_<TMPL_VAR gid>"  <TMPL_IF starters>CHECKED</TMPL_IF>></td>
+  <td><input type="checkbox" name="followups_<TMPL_VAR gid>" <TMPL_IF followups>CHECKED</TMPL_IF>></td>
+</tr>
+</TMPL_LOOP>
+</table>
+</div>
+
+<p>
+Follow ups mean new messages in a thread you alread participated in. Not necesarily response to your message
+but probably a thread you are interested in.
+</p>
+
+<input type="submit" value="Update">
+</form>
+
+<TMPL_INCLUDE NAME="footer.tmpl">
+

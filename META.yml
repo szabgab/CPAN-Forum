@@ -1,0 +1,51 @@
+--- #YAML:1.0
+name: CPAN-Forum
+version: 0.09_02
+author:
+  - Gabor Szabo <gabor@pti.co.il>
+abstract: Web forum appliation to discuss CPAN modules
+license: perl
+requires:
+  CGI: 0
+  CGI::Application: 3.22
+  CGI::Application::Plugin::LogDispatch: 0
+  CGI::Application::Plugin::Session: 0
+  Class::DBI: 0.96
+  DBD::SQLite: 0.31
+  DBI: 0
+  HTML::Template: 2.6
+  LWP::Simple: 0
+  Mail::Sendmail: 0
+  Parse::CPAN::Packages: 0
+  Test::More: 0.47
+  WWW::Mechanize: 0
+  XML::RSS::SimpleGen: 0
+build_requires:
+  Test::WWW::Mechanize: 0.02
+provides:
+  CPAN::Forum:
+    file: lib/CPAN/Forum.pm
+    version: 0.09_02
+  CPAN::Forum::Build:
+    file: lib/CPAN/Forum/Build.pm
+  CPAN::Forum::Configure:
+    file: lib/CPAN/Forum/Configure.pm
+  CPAN::Forum::DBI:
+    file: lib/CPAN/Forum/DBI.pm
+  CPAN::Forum::GroupRelations:
+    file: lib/CPAN/Forum/GroupsRelations.pm
+  CPAN::Forum::Groups:
+    file: lib/CPAN/Forum/Groups.pm
+  CPAN::Forum::INC:
+    file: lib/CPAN/Forum/INC.pm
+  CPAN::Forum::Posts:
+    file: lib/CPAN/Forum/Posts.pm
+  CPAN::Forum::Subscriptions:
+    file: lib/CPAN/Forum/Subscriptions.pm
+  CPAN::Forum::UserInGroup:
+    file: lib/CPAN/Forum/UserInGroup.pm
+  CPAN::Forum::Usergroups:
+    file: lib/CPAN/Forum/Usergroups.pm
+  CPAN::Forum::Users:
+    file: lib/CPAN/Forum/Users.pm
+generated_by: Module::Build version 0.2604

@@ -1,0 +1,30 @@
+<TMPL_INCLUDE NAME="head.tmpl">
+<h2>Registration Page</h2>
+<TMPL_INCLUDE NAME="navigation.tmpl">
+
+<TMPL_IF done>
+   Thank you for registering. You are going to get your password in your mailbox.<br />
+   <a href="/login">login</a>
+<TMPL_ELSE>
+
+<div class="error">
+<TMPL_IF no_register_data>Need both nickname and password<br /></TMPL_IF>
+<TMPL_IF nickname_exists>Nickname or e-mail already in use<br /></TMPL_IF>
+</div>
+
+In order to post on this site first you'll have to register with a valid e-mail address.
+<form method="POST" action="/">
+	<input type="hidden" name="rm" value="register_process">
+	<table>
+	<tr><td>Nickname:</td><td><input name="nickname" value="<TMPL_VAR nickname>"></td></tr>
+	<tr><td>Email:</td><td><input name="email" value="<TMPL_VAR email>"></td></tr>
+	<tr><td></td><td><input type="submit" value="Regiser"></td></tr>
+	</table>
+</form>
+<!--
+To retrieve a lost password, please visit the
+<a href="pwreminder">password reminder</a>.
+-->
+</TMPL_IF>
+
+<TMPL_INCLUDE NAME="footer.tmpl">

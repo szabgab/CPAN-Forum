@@ -1,0 +1,116 @@
+<TMPL_INCLUDE NAME="head.tmpl">
+<h2>Frequently Asked Questions</h2>
+<TMPL_INCLUDE NAME="navigation.tmpl">
+<div class="faq">
+	<ol>
+		<li><a href="#self">Hey, the service has just been launched. How can be there any questions?</a></li>
+		<li><a href="#nologin">Why can't I login?</a></li>
+		<li><a href="#techo">I have some other technical problem with the site</a></li>
+		<li><a href="#howtolink">Can I link to a specific Module's page in the forum?</a></li>
+		<li><a href="#machine">I am a machine, do you have something for me too?</a></li>
+		<li><a href="#why">Why do I need this? We already have our mailing list!</a></li>
+		<li><a href="#whyweb">OK, but why web forum? Why not a mailing list with topics?</a></li>
+		<li><a href="#perlmonks">So what about Perl Monks? That is a web forum!</a></li>
+		<li><a href="#notify">Can I get notified when a new post arrives?</a></li>
+	</ol>
+<hr />
+<dl>
+	<dt><a name="#self">Hey, the service has just been launched. How can be there any questions?</a></dt>
+	<dd>I talk to myself and frequently ask questions... :-)</dd>
+	<dt><a name="nologin">Why can't I login?</a></dt>
+	<dd>
+		<ol>
+			<li> Can you login directly to <a href="http://auth.perl.org/">auth.perl.org</a> ? 
+				If not, take the issue up with them. We only use their services.</li>
+			<li> If you can login to auth.perl.org but cannot login here, please wait a few minutes,
+				we might be experiencing a network outage between the two machines.</li>
+			<li> After a few minutes, if you still cannot login, contact us.</li>
+		</ol>
+	</dd>
+	<dt><a name="techo">I have some other technical problem with the site</a></dt>
+	<dd>If you have technical problems please contact <a href="mailto:gabor@pti.co.il">Gabor Szabo</a></dd>
+	<dt><a name="howtolink">Can I link to a specific Module's page in the forum?</a></dt>
+	<dd>
+		To link to the forum of a specific distribution/module you can link to:<br />
+		http://cpan.pti.co.il/dist/Package-Name<br />
+	</dd>
+	<dt><a name="machine">I am a machine, do you have something for me too?</a></dt>
+	<dd>
+		Sure, we like machines. Currently you can get the following RSS feeds:
+		<ul>
+			<li> http://cpan.pti.co.il/rss/all 10 latest posts</li>
+			<li> http://cpan.pti.co.il/rss/dist/Distro-Name 10 latest posts in distro</li>
+		</ul>
+	</dd>
+	<dt><a name="why">Why do I need this? We already have our mailing list!</a></dt>
+	<dd>
+		Of course the established distribtions already have their mailing lists. This means 100-200 maybe 
+		even 500 distributions. But there are nearly 7000 on CPAN. Even if we say that half of them don't
+		need any kind of mailing list or forum and should not be there anyway it still leaves more than
+		3000 distributions that could do with a some kind of a forum.
+		<br />
+		You can also look at it from the other side. Someone who uses 30-50 modules on a regular basis, 
+		does s/he need to subscribe to 30-50 mailing lists? That's a nightmare.
+		What if I just want to ask one question about a module and I'd like to ask the most knowledgeable 
+		about this module? Should I subscribe to a mailing list and then unsubscribe from it after a 
+		few days?
+		<br />
+		On this forum people can have one centrally managed subscription and discuss all the modules they
+		use. Their mail boxes won't be flooded by messages (unless they really want it) and they can 
+		selectively view the discussions.
+	</dd>
+	<dt><a name="whyweb">OK, but why web forum? Why not a mailing list with topics or a news group?</a></dt>
+	<dd>
+		Although there are mailing lists that could be used to manage 3-6000 different subgroups, 
+		in my experience most people won't use them, for various reasons:
+		<br />
+		E-mail lists:
+		<ul>
+			<li> They don't know how to subscribe</li>
+			<li> They want to send HTML messages while most of the heavy users don't like that</li>
+			<li> People are afraid that their mail box will be filled with unnecessary messages or SPAM, 
+				or viruses</li>
+			<li> People are afraid that they won't be able to unsubscribe.</li>
+		</ul>
+		News groups:
+		<ul>
+			<li> No one really knows what is a news group any more. Unfortunately.</li>
+		</ul>
+		Web forums:
+		<ul>
+			<li> People are usually much more familiar with web forums than either e-mail lists or news groups</li>
+			<li> This is pull technology, they visit when they want.</li>
+			<li> They don't visit when the don't want.</li>
+		</ul>
+	</dd>
+	<dt><a name="perlmonks">So what about Perl Monks? That is a web forum!</a></dt>
+	<dd>
+		Yes, what about them?<br />
+		<a href="http://www.perlmonks.org/">Perl Monks</a> is a nice place with very good content, 
+		but we have nicer colors :-)<br /> 
+		And module categorizations.<br /> 
+		Besides, TMTOWTDI<br /> 
+		and yes, I do recommend them!<br /> 
+		You can find me on PerlMonks as <a href="http://www.perlmonks.org/?node_id=415035">SZABGAB</a>.<br/>
+		P.S. I just found this link on Perl Monks with a 
+		<a href="http://www.perlmonks.org/index.pl?node_id=196112">
+		similar idea</a> but appearently without implementation. It is a nice discussion though.
+	</dd>
+	<dt><a name="notify">Can I get notified when a new post arrives?</a></dt>
+	<dd>
+		Yes, you can subscribe to e-mail alerts for each distribution. You have 3 options:
+		<ol>
+			<li> All messages - you get notification about every message sent to this group </li>
+			<li> Thread starters - Whenever someone starts a new thread you get a notification.
+				On subsequent posts to the same thread you don't get any message.</li>
+			<li> Followups - You get all the messages sent to a certain thread that you have participated
+				in. These won't necessarily be responses tou your message but will be in the same thread
+				so presumably you are somewhat interested.</li>
+		</ol>
+		When looking at the page of each module (/dist/Module-Name) you'll see a link to configure
+		the notification level for that module. By default you don't get any mail. When you want to change
+		your subscription you can do it from <a href="/mypan">MyPAN</a>
+	</dd>
+</dl>
+</div>
+<TMPL_INCLUDE NAME="footer.tmpl">

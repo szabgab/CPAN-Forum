@@ -1,0 +1,15 @@
+File:         02packages.details.txt
+URL:          http://www.perl.com/CPAN/modules/02packages.details.txt
+Description:  Package names found in directory $CPAN/authors/id/
+Columns:      package name, version, path
+Intended-For: Automated fetch routines, namespace documentation.
+Written-By:   Id: mldistwatch 494 2004-05-04 06:34:08Z k 
+Line-Count:   5
+Last-Updated: Tue, 08 Jun 2004 16:32:54 GMT
+
+ABI                                0.01  M/MA/MALAY/ABI-0.01.tar.gz
+Acme::Bleach                       1.12  D/DC/DCONWAY/Acme-Bleach-1.12.tar.gz
+CGI::Application                   3.22  M/MA/MARKSTOS/CGI-Application-3.22.tar.gz
+CGI::Application::Session          0.03  C/CE/CEESHEK/CGI-Application-Session-0.03.tar.gz
+CGI::Application::ValidateRM       1.12  M/MA/MARKSTOS/CGI-Application-ValidateRM-1.12.tar.gz
+

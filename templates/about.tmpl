@@ -1,0 +1,74 @@
+<TMPL_INCLUDE NAME="head.tmpl">
+<h2>About CPAN::Forum</h2>
+<TMPL_INCLUDE NAME="navigation.tmpl">
+<div class="blurb">
+	The CPAN Forum is a web forum for discussing Perl's CPAN modules - asking questions, 
+	making comments, helping other users, etc. This is not a forum for generic Perl 
+	questions- for those, please visit the helpful  
+	<a href="http://www.perlmonks.org/">Perl Monks</a>, the mailing lists on 
+	<a href="http://learn.perl.org/">Learn Perl</a> or try out a local 
+	<a href="http://www.pm.org/">Perl Mongers</a> club. There are also subject 
+	specific mailing lists, a list of them is collected at 
+	<a href="http://lists.cpan.org/">Lists CPAN</a>. For even more resources visit 
+	<a href="http://www.perl.org/">Perl.org</a>.
+</div>
+<div id="about_list1">
+	<h2>Tools used</h2>
+	<ul>
+		<li><a href="/dist/CGI">CGI</a></li>
+		<li><a href="/dist/Test-More">Test::More</a></li>
+		<li><a href="/dist/DBI">DBI</a></li>
+		<li><a href="/dist/Parse-CPAN-Packages">Parse::CPAN::Packages</a></li>
+		<li><a href="/dist/LWP-Simple">LWP::Simple</a></li>
+		<li><a href="/dist/CGI-Application">CGI::Application</a></li>
+		<li><a href="/dist/CGI-Application-Plugin-Session">CGI::Application::Plugin::Session</a></li>
+		<li><a href="/dist/CGI-Application-Plugin-LogDispatch">CGI::Application::Plugin::LogDispatch</a></li>
+		<li><a href="/dist/CGI-Session">CGI::Session</a></li>
+		<li><a href="/dist/HTML-Template">HTML::Template</a></li>
+		<li><a href="/dist/Class-DBI">Class::DBI</a></li>
+		<li><a href="/dist/DBD-SQLite">DBD::SQLite</a></li>
+		<li><a href="/dist/WWW-Mechanize">WWW::Mechanize</a></li>
+		<li><a href="/dist/XML-RSS-SimpleGen">XML::RSS::SimpleGen</a></li>
+		<li><a href="/dist/Mail-Sendmail">Mail::Sendmail</a></li>
+	</ul>
+</div>
+<div id="about_list2">
+	<h2>Statistics:</h2>
+	<ul>
+		<li>Number of distributions: <TMPL_VAR distro_cnt></li>
+		<li>Number of posts: <TMPL_VAR posts_cnt></li>
+		<li>Number of people: <TMPL_VAR users_cnt></li>
+	</ul>
+	<p class="about_p">
+		If you have technical problems please contact 
+		<a href="mailto:gabor@pti.co.il">Gabor Szabo</a>.<br />
+		Current site version: <TMPL_VAR version>
+	</p>
+</div>
+<div id="about_list3">
+	<h2>News</h2>
+	<ul>
+		<li> 2004 June ?? - First public version.</li>
+	</ul>
+</div>
+<div id="about_list4">
+	<h2>TODO</h2>
+	<ul>
+		<li> Finalize the markup language</li>
+		<li> -----</li>
+		<li> Paging through all the messages </li>
+		<li> Enable module authors to configure some aspects of the section of their own module</li>
+		<li> Posting a message under more than one distribution</li>
+		<li> Create larger discussion groups (e.g. Web development and All)</li>
+		<li> Get a nice favicon.ico</li>
+		<li> xml version of the search results</li>
+		<li> Admin: hide a comment, disable posting to a distibution, hide a distribution and all 
+			its postings</li>
+		<li> Admin: disable user</li>
+		<li> Statistics on posts, views etc.</li>
+		<li> Other (human) languages (?)</li>
+		<li> Enable sending direct mail to a poster (?) (without disclosing e-mail address)</li>
+		<li> Better integration with search.cpan.org, cpanratings.perl.org, books.perl.org ?</li>
+	</ul>
+</div>
+<TMPL_INCLUDE NAME="footer.tmpl">

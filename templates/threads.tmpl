@@ -1,0 +1,34 @@
+<TMPL_INCLUDE NAME="head.tmpl">
+<h2>CPAN Forum - Thread</h2>
+<TMPL_INCLUDE NAME="navigation.tmpl">
+<TMPL_INCLUDE NAME="links.tmpl">
+
+<table class="threads">
+<TMPL_LOOP posts>
+<tr class="<TMPL_IF NAME="__odd__">threads_odd<TMPL_ELSE>threads_even</TMPL_IF>">
+<td>
+<a name="<TMPL_VAR id>">
+	<TMPL_IF parentid> 
+	In response to <a href="#<TMPL_VAR parentid>"><TMPL_VAR parentid></a>
+	</TMPL_IF>
+
+	Posted on <span class="date"><TMPL_VAR date></span> by <a href="/users/<TMPL_VAR postername>"><TMPL_VAR postername></a> 
+
+	<div class="subject"><TMPL_VAR subject></div>
+
+	<div class="text"><TMPL_VAR text></div>
+
+
+	<TMPL_IF responses>
+		Direct Responses:
+		<TMPL_LOOP responses>
+			<a href="#<TMPL_VAR id>"><TMPL_VAR id></a> &nbsp;   
+		</TMPL_LOOP>
+		<br>
+	</TMPL_IF>
+	<a href="/response_form/<TMPL_VAR id>">Write a response</a>.
+</td></tr>
+</TMPL_LOOP>
+</table>
+<TMPL_INCLUDE NAME="footer.tmpl">
+
