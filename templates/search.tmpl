@@ -5,9 +5,15 @@
 
 <form method="post" action="/search/">
 <p>
-<input type="hidden" name="rm" value="find_groups" />
-<input name="name" value="<TMPL_VAR name>" /><br />
-<input type="submit" value="Search Module names" />
+<input type="hidden" name="rm" value="search" />
+<select name="what">
+<option value="module"  <TMPL_IF module> SELECTED</TMPL_IF>>Module name</option>
+<option value="user"    <TMPL_IF user>   SELECTED</TMPL_IF>>User name</option>
+<option value="subject" <TMPL_IF subject>SELECTED</TMPL_IF>>Post by text in subject</option>
+<option value="text"    <TMPL_IF text>   SELECTED</TMPL_IF>>Post by text in body</option>
+</select>
+<input name="name" value="<TMPL_VAR name>" />
+<input type="submit" value="Search" />
 </p>
 </form>
 
@@ -15,22 +21,12 @@
    <a href="/dist/<TMPL_VAR name>"><TMPL_VAR name></a><br />
 </TMPL_LOOP>
 
-<hr />
-
-<form method="post" action="/search/">
-<p>
-<input type="hidden" name="rm" value="search" />
-</p>
-<table>
-<tr><td>Subject:</td><td><input name="subject" value="<TMPL_VAR subject>" /></td></tr>
-<tr><td>Text:</td><td><input name="text" value="<TMPL_VAR text>" /></td></tr>
-</table>
-<p>
-<input type="submit" value="Search Posts" />
-</p>
-</form>
+<TMPL_LOOP users>
+  <TMPL_VAR username><br />
+</TMPL_LOOP>
 
 <TMPL_INCLUDE NAME="listing.tmpl">
+
 
 <TMPL_INCLUDE NAME="footer.tmpl">
 

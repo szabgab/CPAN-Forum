@@ -10,10 +10,10 @@ use Test::Exception;
 use lib "blib/lib";
 use CPAN::Forum::Markup;
 
-my $long = "1234567890" x 6 . "qwertyuiop" x 4;
-my $long_new = "1234567890" x 6 . "\n" . "+" . "qwertyuiop" x 4;
-my $long2 = "1234567890" x 10 . "abcdef" x 20;
-my $long2_new = "1234567890" x 6 . "\n" . "+" . "1234567890" x 4 . "\n" . "+" . "abcdef" x 13 . "\n" . "+" . "abcdef" x 7;
+my $long = "x234567890" x 6 . "qwertyuiop" x 4;
+my $long_new = "x234567890" x 6 . "\n" . "+" . "qwertyuiop" x 4;
+my $long2 = "x234567890" x 10 . "abcdef" x 20;
+my $long2_new = "x234567890" x 6 . "\n" . "+" . "1234567890" x 4 . "\n" . "+" . "abcdef" x 13 . "\n" . "+" . "abcdef" x 7;
 is(CPAN::Forum::Markup::split_rows("some text", 60), "some text");
 #is(CPAN::Forum::Markup::split_rows($long, 61), $long_new);
 #is(CPAN::Forum::Markup::split_rows($long2, 61), $long2_new);
@@ -28,8 +28,8 @@ my %cases = (
 	'apple'                    => $TEXT . 'apple' . $END,
 	'apple<code><</code>'      => $TEXT . 'apple' . $END . $CODE . '&lt;' . $END,
 	'apple<code><code></code>' => $TEXT . 'apple' . $END . $CODE . '&lt;code&gt;' . $END,
-	'1234567890' x 7           => $TEXT . '1234567890' x 7   . $END,
-	'1234567890' x 100         => $TEXT . '1234567890' x 100 . $END,
+	'x234567890' x 7           => $TEXT . 'x234567890' x 7   . $END,
+	'x234567890' x 100         => $TEXT . 'x234567890' x 100 . $END,
 	'Hello world'              => $TEXT . 'Hello world' . $END,
 	'<code>program</code>'     => $CODE . 'program' . $END,
 	'<code><STD></code>'       => $CODE . '&lt;STD&gt;' . $END,
@@ -47,11 +47,22 @@ my %cases = (
 	'a<b>c</b><code>x</code>d<code>y</code>' => $TEXT . 'a<b>c</b>' . $END . $CODE . 'x' . $END . $TEXT . 'd' . $END . $CODE . 'y' . $END,
 	'a<i>c</i><code>x</code>d<code>y</code>' => $TEXT . 'a<i>c</i>' . $END . $CODE . 'x' . $END . $TEXT . 'd' . $END . $CODE . 'y' . $END,
 	'a<b>c</b>d<i>x</i>f'      => $TEXT . 'a<b>c</b>d<i>x</i>f' . $END,
+	'a<B>c</B>d<I>x</I>f'      => $TEXT . 'a<b>c</b>d<i>x</i>f' . $END,
 	'&lt;'                     => $TEXT . '&lt;' . $END,
 	'<p>text</p>'              => $TEXT . '<p>text</p>' . $END,
+	'<P>text</P>'              => $TEXT . '<p>text</p>' . $END,
+	'<P>text</p>'              => $TEXT . '<p>text</p>' . $END,
 	'<br />'                   => $TEXT . '<br />' . $END,
 	'<br />hello'              => $TEXT . '<br />hello' . $END,
 	'<br>hello'                => $TEXT . '<br />hello' . $END,
+	'<BR>hello'                => $TEXT . '<br />hello' . $END,
+	'<code><P></code>'         => $CODE . '&lt;P&gt;' . $END,
+	'<a href=http://bla>text</a>'   => $TEXT . '<a href="http://bla">text</a>' . $END,
+	'<A href=http://blb>text</a>'   => $TEXT . '<a href="http://blb">text</a>' . $END,
+	'<A HREF=http://blc>text</a>'   => $TEXT . '<a href="http://blc">text</a>' . $END,
+	'<A HREF="http://bld">text</a>' => $TEXT . '<a href="http://bld">text</a>' . $END,
+	'<A HREF=mailto:a@b.c>addr</a>' => $TEXT . '<a href="mailto:a@b.c">addr</a>' . $END,
+
 
 );
 
@@ -74,12 +85,14 @@ my %fails = (
 	'a<i>c'                    => undef,
 	'apple<'                   => undef,
 	'<p>text'                  => undef,
+	'<a href=htt://bla>text</a>' => undef,
+	'<a href=javascript>text</a>' => undef,
 );
 
 
 foreach my $c (sort keys %cases) {
 	lives_ok {f($c)} 'Expected to live';
-	is(f($c), $cases{$c});
+	is(f($c), $cases{$c}, $c);
 }
 
 foreach my $c (sort keys %fails) {

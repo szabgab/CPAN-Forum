@@ -2,7 +2,7 @@ package CPAN::Forum;
 use strict;
 use warnings;
 
-our $VERSION = "0.10_01";
+our $VERSION = "0.10_02";
 
 use base "CGI::Application";
 use CGI::Application::Plugin::Session;
@@ -180,6 +180,20 @@ variable to the URL where you installed the forum.
 
 
 =head2 Changes
+
+v0.10_03
+  Search for users
+  Unite the serch methods
+  Accept both upper-case and lower-case HTML tags and turn them all to lower 
+    case tags when displaying
+  Accept <a href=> tags for http and mailto
+  Admin page
+  Admin can change "From" e-address
+
+  
+  Admin can change e-mail address of any user
+  Add paging
+ 
 
 v0.10_02
   <p>, <br> enabled
@@ -595,11 +609,12 @@ my @free_modes = qw(home
 					posts threads dist users 
 					search all 
 					help
-					find_groups
 					rss ); 
 my @restricted_modes = qw(
 			new_post process_post
 			mypan 
+			admin
+			admin_process
 			response_form 
 			module_search
 			selfconfig change_password update_subscription); 
@@ -613,6 +628,7 @@ my @urls = qw(
 	threads dist users 
 	response_form 
 	faq 
+	admin
 	mypan selfconfig 
 	search all rss); 
 
@@ -667,7 +683,8 @@ sub cgiapp_prerun {
 		
 	}
 
-	$self->log->debug("Current runmode:  $rm");
+	$self->log->debug("Current runmode:  $rm"); 
+	$self->log->debug("Current user:  " . ($self->session->param("username") || ""));
 
 	return if grep {$rm eq $_} @free_modes;
 	#return if not grep {$rm eq $_} @restricted_modes;
@@ -822,6 +839,7 @@ sub internal_error {
 	}
 	my $t = $self->load_tmpl("internal_error.tmpl");
 	$t->param($tag => 1) if $tag;
+	$t->param(generic => 1) if not $tag;
 	$t->output;
 }
 
@@ -840,6 +858,7 @@ sub load_tmpl {
 	$t->param("loggedin" => $self->session->param("loggedin") || "");
 	$t->param("username" => $self->session->param("username") || "anonymous");
 	$t->param("test_site_warning" => -e $self->param("ROOT") . "/config_test_site");
+	$t->param("admin" => $self->session->param('admin'));
 	return $t;
 }
 # config_fake_login  (not used currently)
@@ -885,12 +904,20 @@ sub login_process {
 	}
 
 	my $session = $self->session;
+	$session->param(admin     => 0); # make sure it is clean
+
 	$session->param(loggedin  => 1);
 	$session->param(username  => $user->username);
 	$session->param(uid       => $user->id);
 	$session->param(fname     => $user->fname); # TODO
 	$session->param(lname     => $user->lname); # TODO
 	$session->param(email     => $user->email);
+	foreach my $g (CPAN::Forum::Usergroups->search_ugs($user->id)) {
+		$self->log->debug("UserGroups: " . $g->name);
+		if ($g->name eq "admin") {
+			$session->param(admin     => 1);
+		}
+	}
 
 	my $request = $session->param("request") || "";
 	$session->param("request" => "");
@@ -1795,65 +1822,86 @@ sub module_search {
 	$t->output;
 }
 
-=head2 search
+sub search {
+	my ($self) = @_;
+	my $q      = $self->query;
+	my $name   = $q->param("name")    || '';
+	my $what   = $q->param("what")    || 'module';
 
-Search form and processor.
-
-=cut
-# not in use
-sub find_groups {
-	my $self  = shift;
-	my $q     = $self->query;
-	my $name  = $q->param("name")    || '';
-
+	# kill the taint checking (why do I use taint checking if I kill it then ?)
 	if ($name =~ /(.*)/) { $name    = $1; }
-	$name =~ s/::/-/g;
+	$name =~ s/::/-/g if $what eq "module";
 	
 	my $t = $self->load_tmpl("search.tmpl",
 		associate => $q,
 		loop_context_vars => 1,
 	);
 	my $it;
-	my @groups;
-	if ($name) {
-		my $it =  CPAN::Forum::Groups->search_like(name => $name . '%');
-		while (my $group  = $it->next) {
-			push @groups, {name => $group->name};
+	if ($name and $what) {
+		if ($what eq "module") {
+			my @things;
+			my $it =  CPAN::Forum::Groups->search_like(name => $name . '%');
+			while (my $group  = $it->next) {
+				push @things, {name => $group->name};
+			}
+			$t->param(groups => \@things);
+			$t->param($what => 1);
+		}
+		if ($what eq "user") {
+			my @things;
+			my $it =  CPAN::Forum::Users->search_like(username => '%' . lc($name) . '%');
+			while (my $user  = $it->next) {
+				push @things, {username => $user->username};
+			}
+			$t->param(users => \@things);
+			$t->param($what => 1);
+		}
+		my %search;
+		if ($what eq "subject") { %search = (subject => '%' . $name . '%'); }
+		if ($what eq "text")    { %search = (text    => '%' . $name . '%'); }
+		if (%search) {
+			my $it =  CPAN::Forum::Posts->search_like(%search);
+			my $cnt = CPAN::Forum::Posts->sql_count_like(%search)->select_val;
+			$t->param(messages => $self->build_listing($it,$cnt));
+			$t->param($what => 1);
 		}
 	}
-	$t->param(groups => \@groups);
+	$t->output;
+}
 
+sub admin_process {
+	my ($self) = @_;
+	my $q = $self->query;
+	if (not $self->session->param("admin")) {
+		return $self->internal_error("", "restricted_area");
+	}
+
+	if (my ($conf) = CPAN::Forum::Configure->search(field => 'from')) {
+		$self->log->debug("Old FROM field was " . $conf->value);
+		$conf->value($q->param('from'));
+		$self->log->debug("New FROM field set to be " . $q->param('from'));
+		$conf->update;
+	} else {
+		$self->log->fatal("Could not find from field !!");
+	}
+
+	my $t = $self->load_tmpl("admin.tmpl");
+	$t->param(updated => 1);
 	$t->output;
 }
 
 
-sub search {
-	my $self = shift;
-
-	my $q       = $self->query;
-	my $subject = $q->param("subject") || '' ;
-	my $text    = $q->param("text")    || '';
-	
-	my $t = $self->load_tmpl("search.tmpl",
-		associate => $q,
-		loop_context_vars => 1,
-	);
-
-	# kill the taint checking (why do I use taint checking if I kill it then ?)
-	if ($text    =~ /(.*)/) { $text    = $1; }
-	if ($subject =~ /(.*)/) { $subject = $1; }
-
-	my %search;
-
-	if ($text)    { $search{text}    = '%' . $text    . '%'; }
-	if ($subject) { $search{subject} = '%' . $subject . '%'; }
-
-	if (%search) {
-		my $it =  CPAN::Forum::Posts->search_like(%search);
-		my $cnt = CPAN::Forum::Posts->sql_count_like(%search)->select_val;
-		$t->param(messages => $self->build_listing($it,$cnt));
+sub admin {
+	my ($self) = @_;
+	if (not $self->session->param("admin")) {
+		return $self->internal_error("", "restricted_area");
 	}
-
+	my %data;
+	foreach my $c (CPAN::Forum::Configure->retrieve_all()) {
+		$data{$c->field} = $c->value;
+	}
+	my $t = $self->load_tmpl("admin.tmpl");
+	$t->param(%data);
 	$t->output;
 }
 

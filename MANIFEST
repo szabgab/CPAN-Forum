@@ -59,6 +59,7 @@ templates/notes.tmpl
 templates/module_search_form.tmpl
 templates/module_select_form.tmpl
 templates/message_in_thread.tmpl
+templates/admin.tmpl
 
 www/cgi/index.pl
 www/robots.txt

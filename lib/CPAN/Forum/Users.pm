@@ -7,6 +7,7 @@ __PACKAGE__->table('users');
 __PACKAGE__->columns(All => qw/id username password email fname lname status
 							update_on_new_user/);
 __PACKAGE__->has_many(posts => "CPAN::Forum::Posts");
+#__PACKAGE__->has_many(usergroups => "CPAN::Forum::UserInGroup");
 
 
 __PACKAGE__->add_trigger(before_create => sub { 
@@ -23,6 +24,7 @@ sub _generate_pw {
 	$pw .= $c[rand @c] for 1..$n;
 	return $pw;
 }
+
 
 1;
 

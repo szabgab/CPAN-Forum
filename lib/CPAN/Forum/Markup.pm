@@ -18,14 +18,30 @@ sub new {
 	           | open_b text close_b              { join "", @item[1..$#item] }
 	           | open_i text close_i              { join "", @item[1..$#item] }
 	           | open_p text close_p              { join "", @item[1..$#item] }
-			   | br                               { "<br />" }
-	br         : m{<br( /)?>}
-	open_p     : m{<p>}
-	close_p    : m{</p>}
-	open_b     : m{<b>}
-	close_b    : m{</b>}
-	open_i     : m{<i>}
-	close_i    : m{</i>}
+			   | br                               { $item[1] }
+			   | open_a text close_a              { join "", @item[1..$#item] }
+	br         : m{<br( /)?>}i                    { "<br />" }
+	open_p     : m{<p>}i                          { "<p>"  }
+	close_p    : m{</p>}i                         { "</p>" }
+	open_b     : m{<b>}i                          { "<b>"  }
+	close_b    : m{</b>}i                         { "</b>" }
+	open_i     : m{<i>}i                          { "<i>"  }
+	close_i    : m{</i>}i                         { "</i>" }
+
+	open_a      : open_a_href urlx open_a_gt      { qq(<a href="$item[2]">) }
+	open_a_href : m{<a href=}i
+	urlx        : quote url quote                 {$item[2]}
+				| url                             {$item[1]}
+	url         : http
+	            | mailto
+	http        : m{http://[^">]+}i               { lc $item[1]  }
+	mailto      : m{mailto:[^">]+}i               { lc $item[1]  }   
+	open_a_gt   : m{>}     
+	quote       : m{"}
+
+	close_a    : m{</a>}i                         { "</a>" }
+
+
 	text       : m{[\r\t\n -;=?-~]+}              {$item[1] }
 
 	marked_code: open_code code close_code        { join("", @item[1..$#item]) }

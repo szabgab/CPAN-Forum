@@ -1,0 +1,25 @@
+<TMPL_INCLUDE NAME="head.tmpl">
+<p id="pageTitle">Admin interface</p>
+
+<TMPL_INCLUDE NAME="navigation.tmpl">
+
+
+<TMPL_IF updated>
+Data updated. <a href="/admin/">look it again</a>
+<TMPL_ELSE>
+
+<form method="POST" action="/admin/">
+<p>
+<input type="hidden" name="rm" value="admin_process" />
+</p>
+<table>
+<tr><td>From address:</td><td><input name="from" value="<TMPL_VAR from>" size="50"></td></tr>
+</table>
+<p>
+<input type="submit" value="Update" />
+</p>
+</form>
+
+</TMPL_IF>
+
+<TMPL_INCLUDE NAME="footer.tmpl">

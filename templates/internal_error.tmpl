@@ -14,7 +14,13 @@ of the distribution and maybe how did you get here.
 If you really have time, you could also look at <a href="/about/#development">the source code</a> 
 and let us know where is the bug.
 </p>
-<TMPL_ELSE>
+</TMPL_IF>
+
+<TMPL_IF restricted_area>
+Restricted area. How did you get here ?
+</TMPL_IF>
+
+<TMPL_IF generic>
 <p>
 Something went wrong here. The webmaster will be informed and will try to take action. 
 </p>

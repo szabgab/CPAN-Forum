@@ -9,6 +9,9 @@
 		  <a href="/mypan/">mypan</a> | 
 		  <a href="/selfconfig/">selfconfig</a> | 
 		  <a href="/logout/">logout</a> | 
+		  <TMPL_IF admin>
+		  <a href="/admin/">admin</a> | 
+		  </TMPL_IF>
 		<TMPL_ELSE>
 		  <a href="/login/">login</a> |
 		  <a href="/register/">register</a> |

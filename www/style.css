@@ -97,6 +97,19 @@ TABLE.posts {
 .even {
 	background: #aaaaaa;
 }
+.odd:hover {
+	background: yellow;
+}
+.even:hover {
+	background: yellow;
+}
+
+.odd TD:hover {
+	background: red;
+}
+.even TD:hover {
+	background: red;
+}
 
 .odd TD, .even TD {
 	padding: 0ex 0ex 0ex 1px;
