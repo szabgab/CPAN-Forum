@@ -62,6 +62,7 @@ my %cases = (
 	'<A HREF=http://blc>text</a>'   => $TEXT . '<a href="http://blc">text</a>' . $END,
 	'<A HREF="http://bld">text</a>' => $TEXT . '<a href="http://bld">text</a>' . $END,
 	'<A HREF=mailto:a@b.c>addr</a>' => $TEXT . '<a href="mailto:a@b.c">addr</a>' . $END,
+	'<p>bright <b>new</b> world</p>' => $TEXT . '<p>bright <b>new</b> world</p>' . $END, 
 
 
 );

@@ -15,11 +15,17 @@ sub new {
 
 	marked_html: html(s)                          { qq(<div class="text">) . join("", @{$item[1]}) . qq(</div>); }
 	html       : text                             { $item[1] } 
+	           | block                            { $item[1] }
+			   | inline                           { $item[1] }
+	block      : open_p inline(s) close_p         { "<p>" . join("", @{$item[2]}) . "</p>" } 
+
+
+	inline     : text                             { $item[1] }
 	           | open_b text close_b              { join "", @item[1..$#item] }
 	           | open_i text close_i              { join "", @item[1..$#item] }
-	           | open_p text close_p              { join "", @item[1..$#item] }
 			   | br                               { $item[1] }
 			   | open_a text close_a              { join "", @item[1..$#item] }
+
 	br         : m{<br( /)?>}i                    { "<br />" }
 	open_p     : m{<p>}i                          { "<p>"  }
 	close_p    : m{</p>}i                         { "</p>" }

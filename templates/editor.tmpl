@@ -31,7 +31,8 @@ Text:<br /><textarea name="new_text" rows="15" cols="60"><TMPL_VAR new_text></te
 
 <div class="posting_rules">Posting Rules:</div>
 <ul class="postrules">
-	<li> Accepted HTML tags are: &lt;b&gt;&lt;/b&gt;, &lt;i&gt;&lt;/i&gt;, &lt;p&gt;&lt;/p&gt;, &lt;br&gt; and &lt;br /&gt;</li>
+	<li> Accepted XHTML tags are: &lt;b&gt;&lt;/b&gt;, &lt;i&gt;&lt;/i&gt;, &lt;p&gt;&lt;/p&gt;, &lt;br /&gt;, &lt;a href=...&gt;...&lt;/a&gt;</li>
+	<li> The site also accepts the upper case versions of these tags and turns them into lower case. In addition we accept &lt;br&gt; and turn it into a  &lt;br /&gt; during display.</li>
 	<li> If you'd like to show &lt; &gt; you'll have to type &amp;lt; &amp;gt; repectively</li>
 	<li> You can use a pseudo markup pair: &lt;code&gt; and &lt;/code&gt;. The idea is 
 		that you put your real code in such markup. Including plain &lt;STDIN&gt; 

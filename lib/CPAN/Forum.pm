@@ -189,6 +189,7 @@ v0.10_03
   Accept <a href=> tags for http and mailto
   Admin page
   Admin can change "From" e-address
+  Enable <i>, <b> <br> and <a ..> with <p></p> pairs
 
   
   Admin can change e-mail address of any user
