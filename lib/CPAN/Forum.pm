@@ -1939,17 +1939,8 @@ sub admin_process {
 	}
 	my $q = $self->query;
 
-	if (my ($conf) = CPAN::Forum::Configure->search(field => 'from')) {
-		$self->log->debug("Old FROM field was " . $conf->value);
-		$conf->value($q->param('from'));
-		$self->log->debug("New FROM field set to be " . $q->param('from'));
-		$conf->update;
-	} else {
-		$self->log->fatal("Could not find from field !!");
-	}
-
 	# fields that can have only one value
-	foreach my $field (qw(rss_size per_page)) {
+	foreach my $field (qw(rss_size per_page from)) {
 		if (my ($conf) = CPAN::Forum::Configure->find_or_create({field => $field})) {
 			$conf->value($q->param($field));
 			$conf->update;
