@@ -1,38 +1,14 @@
 #!/usr/bin/perl
 use strict;
 use warnings;
-use CGI qw();
-
 
 # this script is only used to prepare the new parser behind the system.
 # It will be deleted once it is deployed
 
-use Parse::RecDescent;
-
-my $grammar = q {
-	entry      : chunk(s) eodata                  { $item[1] }
-	chunk      : marked_html | marked_code        { $item[1] }
-
-	marked_html: html(s)                          { qq(<div class="text">) . join("", @{$item[1]}) . qq(</div>); }
-	html       : text                             { $item[1] } 
-	           | open_b text close_b              { join "", @item[1..$#item] }
-	           | open_i text close_i              { join "", @item[1..$#item] }
-	open_b     : m{<b>}
-	close_b    : m{</b>}
-	open_i     : m{<i>}
-	close_i    : m{</i>}
-	text       : m{[\t\n -;=?-~]+}                {$item[1] }
-
-	marked_code: open_code code close_code        { join("", @item[1..$#item]) }
-	open_code  : m{<code>}                        { qq(<div class="code">) }
-	close_code : m{</code>}                       { qq(</div>) }
-	code       : m{[\t\n -~]+?(?=</code>)}        { CGI::escapeHTML($item[1]) }
-
-	eodata     : m{^\Z}
-};
-
-$Parse::RecDescent::skip = '';
-my $parser = new Parse::RecDescent ($grammar) or die "Bad Grammar\n";
+use lib "lib";
+use CPAN::Forum::Markup;
+my $markup = CPAN::Forum::Markup->new();
+my $parser = $markup->parser;
 
 my $code = q(
 #!/usr/bin/perl

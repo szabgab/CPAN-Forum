@@ -36,10 +36,15 @@ sub new {
 	return $self;
 }
 
+sub parser {
+	my ($self) = @_;
+	return Parse::RecDescent->new($self->{grammar});
+}
+
 sub posting_process {
 	my ($self, $text) = @_;
 
-	my $parser = new Parse::RecDescent ($self->{grammar});
+	my $parser = $self->parser;
 	if (not $parser) {
 		warn "Bad Grammar\n";
 		return;
