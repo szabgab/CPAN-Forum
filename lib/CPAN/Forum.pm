@@ -441,7 +441,7 @@ with the posting.
 This can be done by de-coupleing the name of the distribution from the posts table for all the distributions or we can add such an extra table for the additional distributions so there will be a leading distro of the thread.
 
 
-- Getting the listing of all ~7000 module names takes a long time.
+- Getting the listing of all ~8000 module names takes a long time.
 I should profile it.
 1) write a small script that will run the relevant code on the command line,
 2) time this
@@ -449,9 +449,6 @@ I should profile it.
 on the web. Other solutions: 
 - type in the name
 - search for the name
-- currently we'll keep a separate file called db/modules.txt with a listing of all
-the distros. This make page generation in 1-2 sec instead of 7-8. Obviously
-there is a problem we'll have to fix.
 
 
 - Create a group for 
@@ -557,13 +554,15 @@ Setup the Session object and the default HTTP headers
 sub cgiapp_init {
 	my $self = shift;
 	my $dbh = CPAN::Forum::DBI::db_Main();
+	
+	my $log = $self->param("ROOT") . "/db/messages.log";
 
 	$self->log_config(
 		LOG_DISPATCH_MODULES => [
 		{
 			module            => 'Log::Dispatch::File',
 			name              => 'messages',
-			filename          => '/tmp/messages.log',
+			filename          => $log,
 			min_level         => 'debug',
 			mode              => 'append',
 			close_after_write => 1,
@@ -1129,17 +1128,6 @@ sub _group_selector {
 		}
 	}
 
-
-	my $cache = $self->param("ROOT") . "/db/modules.txt";
-	if (not @group_ids and open my $fh, $cache) {
-		foreach my $line (<$fh>) {
-			chomp $line;
-			my ($id, $name) = split /:/, $line, 2;
-			push @group_ids, $id;
-			$group_labels{$id} = $name;
-		}
-	}
-
 	if (not @group_ids) {
 		my @groups = CPAN::Forum::Groups->search(gtype => $CPAN::Forum::DBI::group_types{Distribution});
 		foreach my $g (@groups) {
@@ -1161,17 +1149,9 @@ sub _group_selector {
 }
 
 
-
 sub new_post {
 	posts(@_);
 }
-
-
-=head2 response_form
-
-Probably obsolete.
-
-=cut
 
 sub response_form {
 	posts(@_);
