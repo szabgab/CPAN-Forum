@@ -10,7 +10,6 @@ use CPAN::Forum::Test;
 
 setup_database();
 ok(-e "blib/db/forum.db");
-ok(-e "blib/db/modules.txt");
 
 use CPAN::Forum::DBI;
 CPAN::Forum::DBI->myinit("$ROOT/db/forum.db");

@@ -2,7 +2,7 @@ package CPAN::Forum;
 use strict;
 use warnings;
 
-our $VERSION = "0.09_05";
+our $VERSION = "0.10";
 
 use base "CGI::Application";
 use CGI::Application::Plugin::Session;
@@ -16,7 +16,7 @@ use CGI ();
 
 use CPAN::Forum::INC;
 
-my $limit       = 3;
+my $limit       = 20;
 my $limit_rss   = 10;
 my $cookiename  = "cpanforum";
 my $SUBJECT = qr{[\w .:~!@#\$%^&*\()+?><,'";=-]+};
@@ -184,6 +184,8 @@ v0.09_05
 
 - More tests
 
+- Start using Parse::RecDescent
+
 v0.09_04
 
 - Before writing a new post instead of showing a list of all the modules now 
@@ -193,20 +195,18 @@ should be a restricted list with only a few module names in a pull-down menu
 like we have now.  The search is a regular SQL LIKE search and we add % signs
 at both ends of the typed in word.
 
-=head2 TODO Critical for launching
+
+=head2 TODO
 
 - Decide on Basic Markup language and how to extend for shortcuts opening tag
 for code:  <code[^>]*>  but right now only <code> should be accepted closing
 tag for code:  </code>
 
 - check all submitted fields (restrict posting size to 10.000 Kbyte ?
-
-
 - Make the site look nicer (HTML and css work)
 - Improve text and explanations.
 - Improve Legal statement, look at other sites.
 
-=head2 TODO other, TBD
 
 clean up documentation
 
