@@ -57,6 +57,12 @@ CREATE TABLE users (
 			lname            VARCHAR(255),
 			update_on_new_user VARCHAR(1),
 			status           INTEGER
+-- registration_date
+-- last_seen
+-- locaton
+-- user_localtime
+-- scratch_pad
+
 );
 
 CREATE TABLE usergroups (

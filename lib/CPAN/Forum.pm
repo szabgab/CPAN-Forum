@@ -641,7 +641,7 @@ my @restricted_modes = qw(
 			admin_edit_user_process
 			response_form 
 			module_search
-			selfconfig change_password update_subscription); 
+			selfconfig change_password change_info update_subscription); 
 			
 my @urls = qw(
 	logout 
@@ -1015,19 +1015,19 @@ sub register_process {
 		return $self->register({"bad_email" => 1});
 	}
 
-	if ($q->param('fname') !~ /^[a-zA-Z]*$/) {
-		return $self->register({"bad_fname" => 1});
-	}
-	if ($q->param('lname') !~ /^[a-zA-Z]*$/) {
-		return $self->register({"bad_lname" => 1});
-	}
+	#if ($q->param('fname') !~ /^[a-zA-Z]*$/) {
+	#	return $self->register({"bad_fname" => 1});
+	#}
+	#if ($q->param('lname') !~ /^[a-zA-Z]*$/) {
+	#	return $self->register({"bad_lname" => 1});
+	#}
 	
 	my $user = eval {
 		CPAN::Forum::Users->create({
 				username => $q->param('nickname'),
 				email    => $q->param('email'),
-				fname    => $q->param('fname'),
-				lname    => $q->param('lname'),
+	#			fname    => $q->param('fname'),
+	#			lname    => $q->param('lname'),
 			});
 	};
 	if ($@) {
@@ -1646,9 +1646,34 @@ sub users {
 sub selfconfig {
 	my ($self, $errs) = @_;
 	my $t = $self->load_tmpl("change_password.tmpl");
+	my ($user) = CPAN::Forum::Users->retrieve($self->session->param('uid'));
+	$t->param(fname => $user->fname);
+	$t->param(lname => $user->lname);
+
 	$t->param($errs) if $errs;
 	$t->output;
 }
+
+sub change_info {
+	my ($self) = @_;
+	my $q = $self->query;
+	
+	if ($q->param('fname') !~ /^[a-zA-Z]*$/) {
+		return $self->selfconfig({"bad_fname" => 1});
+	}
+	if ($q->param('lname') !~ /^[a-zA-Z]*$/) {
+		return $self->selfconfig({"bad_lname" => 1});
+	}
+
+	my ($user) = CPAN::Forum::Users->retrieve($self->session->param('uid'));
+	$user->fname($q->param('fname'));
+	$user->lname($q->param('lname'));
+	$user->update;
+
+	return $self->selfconfig({done => 1});
+
+}
+
 
 sub change_password {
 	my ($self) = @_;
