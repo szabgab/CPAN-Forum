@@ -1773,12 +1773,36 @@ sub module_search {
 Search form and processor.
 
 =cut
+# not in use
+sub small_search {
+	my $self = shift;
+	my $q       = $self->query;
+	my $name    = $q->param("name")    || '';
 
+	if ($name    =~ /(.*)/) { $name    = $1; }
+	
+	my $t = $self->load_tmpl("search.tmpl",
+		associate => $q,
+		loop_context_vars => 1,
+	);
+
+	if ($name) {
+		my $it =  CPAN::Forum::Groups->search_like(name => $name . '%');
+		my $cnt = CPAN::Forum::Groups->sql_count_like("name" =>  $name . '%')->select_val;
+		$t->param(messages => $self->build_listing($it,$cnt));
+	}
+
+	$t->output;
+}
+
+
+# not yet in use
 sub search {
 	my $self = shift;
 
-	my $q = $self->query;
-	my $txt = $q->param("q");
+	my $q       = $self->query;
+	my $subject = $q->param("subject") || '' ;
+	my $text    = $q->param("text")    || '';
 	
 	my $t = $self->load_tmpl("search.tmpl",
 		associate => $q,
@@ -1786,13 +1810,17 @@ sub search {
 	);
 
 	# kill the taint checking (why do I use taint checking if I kill it then ?)
-	if ($txt =~ /(.*)/) {
-		$txt = $1;
-	}
+	if ($text    =~ /(.*)/) { $text    = $1; }
+	if ($subject =~ /(.*)/) { $subject = $1; }
 
-	if ($txt) {
-		my $it =  CPAN::Forum::Posts->search_like(text => '%' . $txt . '%');
-		my $cnt = CPAN::Forum::Posts->sql_count_like("text", '%' . $txt . '%')->select_val;
+	my %search;
+
+	if ($text)    { $search{text}    = '%' . $text    . '%'; }
+	if ($subject) { $search{subject} = '%' . $subject . '%'; }
+
+	if (%search) {
+		my $it =  CPAN::Forum::Posts->search_like(%search);
+		my $cnt = CPAN::Forum::Posts->sql_count_like(%search)->select_val;
 		$t->param(messages => $self->build_listing($it,$cnt));
 	}
 

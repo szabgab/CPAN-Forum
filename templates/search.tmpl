@@ -6,8 +6,13 @@
 <form method="post" action="/search/">
 <p>
 <input type="hidden" name="rm" value="search" />
-<input name="q" value="<TMPL_VAR q>" />
-<input type="submit" value="Search" />
+</p>
+<table>
+<tr><td>Subject:</td><td><input name="subject" value="<TMPL_VAR subject>" /></td></tr>
+<tr><td>Text:</td><td><input name="text" value="<TMPL_VAR text>" /></td></tr>
+</table>
+<p>
+<input type="submit" value="Search Posts" />
 </p>
 </form>
 
