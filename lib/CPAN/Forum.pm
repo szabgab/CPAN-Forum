@@ -462,19 +462,19 @@ my @free_modes = qw(home
 					posts threads dist users 
 					search all 
 					rss ); 
-			#response_form 
 my @restricted_modes = qw(
 			new_post process_post
 			mypan 
+			response_form 
 			selfconfig change_password update_subscription); 
 			
-	#response_form 
 my @urls = qw(
 	logout 
 	new_post pwreminder 
 	login register 
 	posts about 
 	threads dist users 
+	response_form 
 	faq 
 	mypan selfconfig 
 	search all rss); 
