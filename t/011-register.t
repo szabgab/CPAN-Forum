@@ -47,16 +47,16 @@ my $cat = CGI::Application::Test->new({root => $ROOT, cookie => "cpanforum"});
 }
 
 {
-	my $r = $cat->cgiapp('/', '', {rm => 'register_process', nickname => 'xyz', email => 'a@com'});
+	my $r = $cat->cgiapp('/', '', {rm => 'register_process', nickname => 'xyzqwertyui', email => 'a@com'});
 	like($r, qr{Registration Page});
-	like($r, qr{Nickname must be lower case alphanumeric between 4-10 characters});
+	like($r, qr{Nickname must be lower case alphanumeric between 1-10 characters});
 }
 
 # reject bad usernames
-foreach my $username ("abc", "Abcde", "asd'er", "ab cd") {
+foreach my $username ("ab.c", "Abcde", "asd'er", "ab cd") {
 	my $r = $cat->cgiapp('/', '', {rm => 'register_process', nickname => $username, email => 'a@com'});
 	like($r, qr{Registration Page});
-	like($r, qr{Nickname must be lower case alphanumeric between 4-10 characters});
+	like($r, qr{Nickname must be lower case alphanumeric between 1-10 characters});
 }
 
 # reject bad usernames

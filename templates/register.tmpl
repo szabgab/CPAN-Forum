@@ -9,14 +9,14 @@
 <TMPL_ELSE>
 
 <div class="error">
-<TMPL_IF bad_nickname>Nickname must be lower case alphanumeric between 4-10 characters.<br /></TMPL_IF>
+<TMPL_IF bad_nickname>Nickname must be lower case alphanumeric between 1-10 characters.<br /></TMPL_IF>
 <TMPL_IF bad_email>Email must be a valid address writen in lower case letters<br /></TMPL_IF>
 <TMPL_IF no_register_data>Need both nickname and password<br /></TMPL_IF>
 <TMPL_IF nickname_exists>Nickname or e-mail already in use<br /></TMPL_IF>
 </div>
 
 In order to post on this site first you'll have to register with a valid e-mail address.<br />
-Username currently should be between 4-10 characters.
+Username currently should be between 1-10 characters.
 <form method="post" action="/">
 <p>
 <input type="hidden" name="rm" value="register_process" />
