@@ -2,7 +2,7 @@ package CPAN::Forum;
 use strict;
 use warnings;
 
-our $VERSION = "0.11";
+our $VERSION = "0.11_01";
 
 use base "CGI::Application";
 use CGI::Application::Plugin::Session;
@@ -16,7 +16,8 @@ use CGI ();
 
 use CPAN::Forum::INC;
 
-my $limit       = 20;
+my $limit;
+
 my $limit_rss   = 10;
 my $cookiename  = "cpanforum";
 my $SUBJECT = qr{[\w .:~!@#\$%^&*\()+?><,'";=-]+};
@@ -582,6 +583,9 @@ sub cgiapp_init {
 	);
 
 	$self->log->debug("--- START ---");
+	
+	my ($field) = CPAN::Forum::Configure->search({field => "per_page"});
+	$limit = $field->value if $field;
 
 	CGI::Session->name($cookiename);
 	$self->session_config(
@@ -1940,6 +1944,11 @@ sub admin_process {
 		$conf->update;
 	} else {
 		$self->log->fatal("Could not find from field !!");
+	}
+
+	if (my ($conf) = CPAN::Forum::Configure->find_or_create({field => 'per_page'})) {
+		$conf->value($q->param('per_page'));
+		$conf->update;
 	}
 
 	my $t = $self->load_tmpl("admin.tmpl");

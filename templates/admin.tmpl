@@ -3,6 +3,7 @@
 
 <TMPL_INCLUDE NAME="navigation.tmpl">
 
+<TMPL_INCLUDE NAME="search_form.tmpl">
 
 <TMPL_IF updated>
 Data updated. <a href="/admin/">look it again</a>
@@ -14,6 +15,7 @@ Data updated. <a href="/admin/">look it again</a>
 </p>
 <table>
 <tr><td>From address:</td><td><input name="from" value="<TMPL_VAR from>" size="50"></td></tr>
+<tr><td>Page size:</td><td><input name="per_page" value="<TMPL_VAR per_page>" size="5"></td></tr>
 </table>
 <p>
 <input type="submit" value="Update" />
