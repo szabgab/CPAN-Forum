@@ -26,7 +26,7 @@ sub new {
 	marked_code: open_code code close_code        { join("", @item[1..$#item]) }
 	open_code  : m{<code>}                        { qq(<div class="code">) }
 	close_code : m{</code>}                       { qq(</div>) }
-	code       : m{[\r\t\n -~]+?(?=</code>)}      { CGI::escapeHTML(CPAN::Forum::Markup::limit_rows($item[1])) }
+	code       : m{[\r\t\n -~]+?(?=</code>)}      { CPAN::Forum::Markup::split_rows(join "", @item[1..$#item]) }
 
 	eodata     : m{^\Z}
 	};
@@ -36,16 +36,29 @@ sub new {
 	return $self;
 }
 
+
+
 # takes a string
 # makes sure every line is max N characters long
-sub limit_rows {
-	my ($text) = @_;
-	my $N = 70;
-	
+sub split_rows {
+	my ($text, $N) = @_;
+	$N ||= 100;
+	my $NEXTMARK = '<span class="nextmark">+</span>';
+
 	my @text = split /\n/, $text;
 	my @new;
-	foreach my $row (@text) {
-		push @new, $row;
+	while (@text) {
+		my $row = shift @text;
+		if (length $row <= $N) {
+			push @new, CGI::escapeHTML($row);
+			next;
+		}
+		push @new, CGI::escapeHTML(substr($row, 0, $N-1, ""));
+		while (length $row > $N) {
+			push @new,  $NEXTMARK . CGI::escapeHTML(substr($row, 0, $N-2, ""));
+		}
+		push @new, $NEXTMARK . CGI::escapeHTML($row);
+		
 	}
 	return join "\n", @new;
 }

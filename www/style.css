@@ -220,11 +220,11 @@ INPUT {
 .code {
 	background: #dddddd;
 	white-space: pre;
-	width: 100px;
-/* for now I remove this, later we can implement some virtual line break as in the Monks */
-  
 }
 
+.nextmark {
+	color: red;
+}
 
 .preview  {
 	/*background: #444444;*/

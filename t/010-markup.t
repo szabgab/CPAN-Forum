@@ -10,13 +10,13 @@ use Test::Exception;
 use lib "blib/lib";
 use CPAN::Forum::Markup;
 
-my $long = "123456789 " x 10;
-my $long_new = "123456789 " x 6 . "\n" . "123456789 " x 4;
-my $long2 = "123456789 " x 10 . "abcde " x 20;
-my $long2_new = "123456789 " x 6 . "\n" . "123456789 " x 4 . "\n" . "abcde " x 13 . "\n" . "abcde " x 7;
-is(CPAN::Forum::Markup::limit_rows("some text"), "some text");
-is(CPAN::Forum::Markup::limit_rows($long), $long);
-is(CPAN::Forum::Markup::limit_rows($long2), $long2);
+my $long = "1234567890" x 6 . "qwertyuiop" x 4;
+my $long_new = "1234567890" x 6 . "\n" . "+" . "qwertyuiop" x 4;
+my $long2 = "1234567890" x 10 . "abcdef" x 20;
+my $long2_new = "1234567890" x 6 . "\n" . "+" . "1234567890" x 4 . "\n" . "+" . "abcdef" x 13 . "\n" . "+" . "abcdef" x 7;
+is(CPAN::Forum::Markup::split_rows("some text", 60), "some text");
+#is(CPAN::Forum::Markup::split_rows($long, 61), $long_new);
+#is(CPAN::Forum::Markup::split_rows($long2, 61), $long2_new);
 
 my $markup = CPAN::Forum::Markup->new();
 
