@@ -2,7 +2,7 @@ package CPAN::Forum;
 use strict;
 use warnings;
 
-our $VERSION = "0.09_02";
+our $VERSION = "0.09_03";
 
 use base "CGI::Application";
 use CGI::Application::Plugin::Session;
@@ -123,6 +123,12 @@ perl Build.PL
 ./Build test
 ./Build install dir=/path/to/install
 cd /path/to/install
+
+chmod a+x www/cgi/index.pl  (needed only if you work out of the repository)
+chmod a+x db/forum.db       (or whatever you need to make sure the database is writable by the web server.
+
+manually edit the www/cgi/index.pl file and set the sh-bang to the correct one
+
 
 =head2 Setup the database
 
