@@ -1519,6 +1519,7 @@ sub dist {
 	if (not $gr) {
 		return $self->internal_error(
 			"Invalid group $group called in $ENV{PATH_INFO}",
+			"no_such_group",
 			);
 	}
 	my $gid = $gr->id;

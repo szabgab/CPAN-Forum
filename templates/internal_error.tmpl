@@ -3,9 +3,18 @@
 
 <TMPL_INCLUDE NAME="navigation.tmpl">
 
+<TMPL_IF no_such_group>
+<p>
+We don't have such CPAN distribution in our database. Either the link that led you here
+is not correct or our database is missing this CPAN distribution. If you belive this
+one should be here, please <a href="/dist/CPAN-Forum">drop us a line</a> with the name 
+of the distribution and maybe how did you get here.
+</p>
+<TMPL_ELSE>
 <p>
 Something went wrong here. The webmaster will be informed and will try to take action. 
 </p>
+</TMPL_IF>
 
 <TMPL_INCLUDE NAME="footer.tmpl">
 
