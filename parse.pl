@@ -11,8 +11,13 @@ use Parse::RecDescent;
 
 my $grammar = q {
 	entry      : chunk(s) eodata                  { $item[1] }
-	chunk      : text | code                      { $item[1] }
-	text       : m{[\t\n -;=?-~]+}                { qq(<div class="text">$item[1]</div>); }
+	chunk      : marked_html | code               { $item[1] }
+	marked_html: html(s)                          { '<div class="text">' . join("", @{$item[1]}) . '</div>'; }
+	html       : text                             { $item[1] } 
+	           | open_b text close_b              { join "", @item[1..$#item] }
+	open_b     : m{<b>}
+	close_b    : m{</b>}
+	text       : m{[\t\n -;=?-~]+}                {$item[1] }
 	code       : code_open code_text code_close   {$item[2] }
 	code_open  : m{<code>}
 	code_text  : m{[\t\n -~]+(?=</code>)}         { qq(<div class="code">) . CGI::escapeHTML($item[1]) . qq(</div>); }
@@ -46,7 +51,7 @@ my %data = (
 	'<code> $x < $y </code>'   => q(<div class="code"> $x &lt; $y </div>),
 	'<code><STD></code>'       => q(<div class="code">&lt;STD&gt;</div>), 
 	'some; strange $%^& text'  => q(<div class="text">some; strange $%^& text</div>),
-#	'<b>bold</b> more text'    => q(<div class="text"><b>bold</b> more text</div>),
+	'<b>bold</b> more text'    => q(<div class="text"><b>bold</b> more text</div>),
 
 	'<code>'                   => undef,
 	'Hello<code>'              => undef,
