@@ -588,13 +588,6 @@ sub cgiapp_init {
 			mode              => 'append',
 			close_after_write => 1,
 		},
-#		{
-#			module  => 'Log::Dispatch::Email::MailSend',
-#			name    => 'email',
-#			to      => [ qw(foo@bar.org) ],
-#			subject => 'CPAN::Forum: Oh No!!!!!!!!!!',
-#			min_level => 'emerg'
-#		}
 		],
 		APPEND_NEWLINE => 1,
 	);
