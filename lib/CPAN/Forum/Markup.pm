@@ -40,8 +40,8 @@ sub new {
 				| url                             {$item[1]}
 	url         : http
 	            | mailto
-	http        : m{http://[^">]+}i               { lc $item[1]  }
-	mailto      : m{mailto:[^">]+}i               { lc $item[1]  }   
+	http        : m{http://[^">]+}i               { $item[1]  }
+	mailto      : m{mailto:[^">]+}i               { $item[1]  }   
 	open_a_gt   : m{>}     
 	quote       : m{"}
 
