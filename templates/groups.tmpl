@@ -1,6 +1,6 @@
 <TMPL_INCLUDE NAME="head.tmpl">
 <p id="pageTitle"><b><TMPL_VAR group></b></p>
-
+<link href="/rss/dist/<TMPL_VAR group>" rel="alternate" type="application/rss+xml" title ="CPAN::Forum <TMPL_VAR group> rss" />
 <TMPL_INCLUDE NAME="navigation.tmpl">
 <TMPL_INCLUDE NAME="links.tmpl">
 
@@ -20,4 +20,5 @@ distribution and get alerted when someone posts a new message.
 </p>
 <TMPL_INCLUDE NAME="listing.tmpl">
 
+<p><a href="/rss/dist/<TMPL_VAR group>"><img src="/rss1.gif" alt="RSS Feed" /></a></p>
 <TMPL_INCLUDE NAME="footer.tmpl">
