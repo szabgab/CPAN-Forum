@@ -25,37 +25,33 @@ $Parse::RecDescent::skip = '';
 my $parser = new Parse::RecDescent ($grammar) or die "Bad Grammar\n";
 
 my %data = (
-#	"Hello world"              => q(<div class="text">Hello world</div>),
-#	" World"              => q(<div class="text"> World</div>),
-#	"<code>"                   => undef,
-#	"Hello<code>"              => undef,
-#	"<code>program</code>"     => q(<div class="code">program</div>),
-#	'apple<code><</code>'      => q(<div class="text">apple</div><div class="code">&lt;</div>),
+	'Hello world'              => q(<div class="text">Hello world</div>),
+	' World'                   => q(<div class="text"> World</div>),
+	'<code>'                   => undef,
+	'Hello<code>'              => undef,
+	'<code>program</code>'     => q(<div class="code">program</div>),
+	'apple<code><</code>'      => q(<div class="text">apple</div><div class="code">&lt;</div>),
 	'<code> $x < $y </code>'   => q(<div class="code"> $x &lt; $y </div>),
-#	"<code extra><STD></code>" => "<code extra><STD></code>" => 
+	'<code extra><STD></code>' => undef,
+#	'<code><STD></code>'       => q(<div code extra>&lt;STD&gt;</code>), 
 );
 use Data::Dumper;
 #print Dumper $parser->entry($text);
 #$::RD_WARN=3;
 #$::RD_TRACE=1;
 
-#use Test::More "no_plan";
+use Test::More "no_plan";
 foreach my $k (keys %data) {
-	if (my $out = $parser->entry($k)) {
-		if (join("",@$out) eq $data{$k}) {
-			print "$k\n";
-			print "OK\n";
+	my $out = $parser->entry($k);
+	if (defined $data{$k}) {
+		if (defined $out) {
+			is(join("",@$out), $data{$k});
 		} else {
-			print Dumper $out;
+			is($out, $data{$k});
 		}
+	} else {
+		ok(not defined $out); # expecting undef
 	}
-	#print Dumper $parser->entry($k);
-	#print "$k\n";
-	#if ($parser->entry($k)) {
-	#	print "OK\n";
-	#} else {
-	#	print "FAILED\n";
-	#}
 }
 	
 
