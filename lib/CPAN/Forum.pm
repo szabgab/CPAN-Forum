@@ -522,6 +522,15 @@ sub cgiapp_init {
 	
 	my $log = $self->param("ROOT") . "/db/messages.log";
 	$STATUS_FILE = $self->param("ROOT") . "/db/status";
+	my $log_level = 'critical'; 
+	if (open my $fh, $self->param("ROOT") . "/db/log_level") {
+		chomp (my $str = <$fh>);
+		if (Log::Dispatch->level_is_valid($str)) {
+			$log_level = $str;
+		} else {
+			warn "Invalid log level '$str'\n";
+		}
+	}
 
 	$self->log_config(
 		LOG_DISPATCH_MODULES => [
@@ -529,7 +538,7 @@ sub cgiapp_init {
 			module            => 'Log::Dispatch::File',
 			name              => 'messages',
 			filename          => $log,
-			min_level         => 'debug',
+			min_level         => $log_level,
 			mode              => 'append',
 			close_after_write => 1,
 		},
@@ -951,7 +960,7 @@ sub register_process {
 	}
 	
 	# TODO arbitrary nickname constraint, allow other nicknames ?
-	if ($q->param('nickname') !~ /^[a-z0-9]{1,10}$/) {
+	if ($q->param('nickname') !~ /^[a-z0-9]{1,25}$/) {
 		return $self->register({"bad_nickname" => 1});
 	}
 
