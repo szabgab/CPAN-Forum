@@ -248,6 +248,8 @@ at both ends of the typed in word.
   Maybe it should fetch all the data to memory and work there.
 - make paging available responses 1..10, 11.20, etc, 
 
+- replace the e-mail address checking by  if ($q->param('email') !~ $Email::Address::addr_spec) {
+
 - Enable people to edit their posts 
    - Shall we track changes ? 
    - Shall we display the orinal date and the last update date ?
@@ -1096,7 +1098,7 @@ sub pwreminder {
 	);
 
 	$t->param($errs) if $errs;
-	$t->param($q->param('field') => 1);
+	$t->param($q->param('field') => 1) if $q->param('field') and $q->param('field') =~ /^username|email$/;
 	return $t->output;
 }
 
