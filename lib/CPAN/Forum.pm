@@ -593,6 +593,7 @@ my @restricted_modes = qw(
 			admin_process
 			admin_edit_user
 			admin_edit_user_process
+			add_new_group
 			response_form 
 			module_search
 			selfconfig change_password change_info update_subscription); 
@@ -887,8 +888,10 @@ sub login_process {
 					password => $q->param('password'),
 			});
 	if (not $user) {
+		$self->log->debug("No user found");
 		return $self->login({bad_login => 1});
 	}
+	$self->log->debug("Username: " . $user->username);
 
 	my $session = $self->session;
 	$session->param(admin     => 0); # make sure it is clean
@@ -1939,6 +1942,30 @@ sub search {
 		}
 		$t->param(no_results => not $any_result);
 	}
+	$t->output;
+}
+
+sub add_new_group {
+	my ($self) = @_;
+	if (not $self->session->param("admin")) {
+		return $self->internal_error("", "restricted_area");
+	}
+	my $q = $self->query;
+	my $group_name = $q->param("group");
+	$self->log->debug("Adding group with name: '$group_name'");
+	my $group = eval {
+			CPAN::Forum::Groups->create({
+				name  => $group_name,
+				gtype => 3,
+				});
+			};
+	if ($@) {
+		$self->log->debug("Failed to add group with name: '$group_name'");
+		return $self->internal_error("", "failed_to_add_group");
+	}
+
+	my $t = $self->load_tmpl("admin.tmpl");
+	$t->param(updated => 1);
 	$t->output;
 }
 

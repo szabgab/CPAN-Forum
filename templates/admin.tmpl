@@ -2,10 +2,28 @@
 <p id="pageTitle">Admin interface</p>
 
 <TMPL_INCLUDE NAME="navigation.tmpl">
+<TMPL_INCLUDE NAME="search_form.tmpl">
 
 <TMPL_IF updated>
-Data updated. <a href="/admin/">look it again</a>
+Data updated. <a href="/admin/">look at it again</a>
 <TMPL_ELSE>
+
+<hr />
+<form method="POST" action="/admin/">
+<p>
+<input type="hidden" name="rm" value="add_new_group" />
+</p>
+<table>
+<tr><td>Group name:</td><td><input name="group" value="" size="50"></td></tr>
+</table>
+<p>
+<input type="submit" value="Add new group" />
+</p>
+</form>
+
+
+<hr />
+
 
 <form method="POST" action="/admin/">
 <p>

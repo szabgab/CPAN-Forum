@@ -24,11 +24,19 @@ Restricted area. How did you get here ?
 No such user.
 </TMPL_IF>
 
+<TMPL_IF failed_to_add_group>
+<p>
+Failed to add group.
+</p>
+</TMPL_IF>
+
+
 <TMPL_IF generic>
 <p>
 Something went wrong here. The webmaster will be informed and will try to take action. 
 </p>
 </TMPL_IF>
+
 
 <TMPL_INCLUDE NAME="footer.tmpl">
 
