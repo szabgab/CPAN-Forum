@@ -234,33 +234,6 @@ at both ends of the typed in word.
 
 =head2 TODO
 
-- Enable people to subscribe to all messages or all thread starters or all followups
-  (probably group = 0 will do it)
-- Add announcement service (check for new versions of modules and send e-mail
-  to those whom are interested in announcements.
-- Put time ellapsed since post instead of date of post, (3 min. 6 hours 3 days ago)
-  make this configurabel: User can say after N days passed the date should show,
-  before that the ellapsed time
-- Admin: hide a posting
-- Admin: delete a user
-- Admin: add a new module manually
-- Script that populates databse should not lock the whole database for a long time
-  Maybe it should fetch all the data to memory and work there.
-- make paging available responses 1..10, 11.20, etc, 
-
-- replace the e-mail address checking by  if ($q->param('email') !~ $Email::Address::addr_spec) {
-
-- Enable people to edit their posts 
-   - Shall we track changes ? 
-   - Shall we display the orinal date and the last update date ?
-   - Shall we display the post on its new date (order the display result by date ?)
-
-- Somehow let a module author (or anyone ?) subscribe/unsubscribe to all of her modules.
-  Rephrasing: 
-    1) Enable listing modules based on module author
-	2) Enable subscribing to several modules at the same time
-
-
 - Decide on Basic Markup language and how to extend for shortcuts opening tag
 for code:  <code[^>]*>  but right now only <code> should be accepted closing
 tag for code:  </code>
@@ -272,8 +245,7 @@ clean up documentation
 
 add indexes to the tables ?
 
-show the release dates of the various versions of a module so
-it is easy to compare that to the post.
+show the release dates and version numbers of the modules
 
 Authentication and user management process:
 - new user comes to our site we give him a cookie, when he wants to login we offer him
@@ -328,25 +300,6 @@ The PREVIEW and the EDITOR should be filled by the same information, though
 within the editor we don't need the parent id and similar to be shown.
 
 
-- Enable some administrator to mark a message (or a whole thread) to be hidden 
-(database already has field)
-
-- Enable some administator to mark a group to be 
-- hidden (messages don't show up)
-- frozen (cannot add new message but still can see the earlier messages)
-Critical part: make place for this in database (status field)
-
-- Administrator (or even the author ?) should be able to move a message from
-one module to another module or group.
-
- 
-- Enable administrator to ban a user (mark in the users database to disable the user)
-Hmm, do I really need this ? maybe as I cannot just delete a user. (added a 
-status field that is not used currently)
-
-- Replace the /post/number link by /post/TITLE_OF_POST ???
-
-
 OK, so we have listing in places like
 
 	/
@@ -371,8 +324,6 @@ We'll also have some search facility that will be a post operation and
 
 From the forms we have post methods so no need for URL munging
 process_post  =>  (show previous post)? show editor + show preview
-
-- make the page size (for paging) user configurable
 
 =over 4
 
@@ -439,14 +390,6 @@ the user to do so)
 
 When replying to a post within a thread we might want to open the editor window
 in the middle of the thread, just below the post I am responding to.
-
-- Make the Session use the database instead of plain file
-
-- Make autoposter of new version announcements work
-
-A script that will send an announcement on the new version of every module to
-the list I think this is done as a script listening in the cpan-testers mailing
-list, though it might be one similar to bin/populate.pl
 
 - make sure links that are relevant for distros don't show up on pages which
 don't belong to distros. (e.g. a link to search.cpan.org/dist/CGI is ok but a

@@ -1,0 +1,96 @@
+
+
+- Record the date when a user joined
+- Record when a user last visited
+
+
+- Enable people to subscribe to all messages or all thread starters or all followups
+  (probably group = 0 will do it)
+  
+- Add announcement service (check for new versions of modules and send e-mail
+  to those whom are interested in announcements.
+  
+- Put time ellapsed since post instead of date of post, (3 min. 6 hours 3 days ago)
+  make this configurabel: User can say after N days passed the date should show,
+  before that the ellapsed time
+  
+- Admin: hide a posting
+
+- Admin: delete a user
+
+- Admin: add a new module manually
+
+- Script that populates databse should not lock the whole database for a long time
+  Maybe it should fetch all the data to memory and work there.
+
+- make paging available responses 1..10, 11.20, etc, 
+
+- replace the e-mail address checking by  if ($q->param('email') !~ $Email::Address::addr_spec) {
+
+- Enable people to edit their posts 
+   - Shall we track changes ? 
+   - Shall we display the orinal date and the last update date ?
+   - Shall we display the post on its new date (order the display result by date ?)
+
+- Somehow let a module author (or anyone ?) subscribe/unsubscribe to all of her modules.
+  Rephrasing: 
+    1) Enable listing modules based on module author
+	2) Enable subscribing to several modules at the same time
+
+
+
+- Improve the markup language
+
+- Enable module authors (or some other volunteer) to configure some aspects of the 
+  section of their own module
+
+- Posting a message under more than one distribution
+
+- Create larger discussion groups (e.g. Web development and All)
+
+- Get a nice logo and favicon.ico
+
+- xml version of the search results
+
+- Admin: disable posting to a distibution, 
+
+- Admin: hide a distribution and all its postings
+
+- Admin: disable user, change username ?
+
+- Statistics on posts, views etc.
+
+- Other (human) languages (?)
+
+- Enable sending direct mail to a poster (?) (without disclosing e-mail address)
+
+- Better integration with search.cpan.org, cpanratings.perl.org
+  Fetch data from  cpanratings and display
+  Provide statistics on number of comments per distro to be displayed on search.cpan
+
+- Admin: hide a message (or a whole thread) (database already has field)
+
+- Admin: freeze a distro: (cannot add new message but still can see the earlier messages)
+
+- Admin: (or even the author ?) should be able to move a message from one module to 
+          another module or group.
+ 
+- Replace the /post/number link by /post/TITLE_OF_POST ???
+
+- make the page size (for paging) user configurable
+
+
+- Allow users to subscribe for announcement service:
+  A script that will send an announcement on the new version of every module to
+  those who asked for this information.
+
+- JavaScript that lets users to set all the modules in /mypan to the same value
+  (either All message or thread starter or Followup or nothing)
+
+- Let people select a group of distros (e.g. all the distros by author SZABGAB)
+  and show them on the /mypan interface (or just subscribe to all of them)
+
+
+
+ 
+
