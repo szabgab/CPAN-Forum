@@ -33,7 +33,7 @@ my %data = (
 	'apple<code><</code>'      => q(<div class="text">apple</div><div class="code">&lt;</div>),
 	'<code> $x < $y </code>'   => q(<div class="code"> $x &lt; $y </div>),
 	'<code extra><STD></code>' => undef,
-	'<code><STD></code>'       => q(<div code extra>&lt;STD&gt;</code>), 
+	'<code><STD></code>'       => q(<div class="code">&lt;STD&gt;</div>), 
 );
 use Data::Dumper;
 #print Dumper $parser->entry($text);
