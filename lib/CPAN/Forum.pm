@@ -1863,7 +1863,7 @@ sub search {
 	if ($what and $name) {
 		if ($what eq "module") {
 			my @things;
-			my $it =  CPAN::Forum::Groups->search_like(name => $name . '%');
+			my $it =  CPAN::Forum::Groups->search_like(name => '%' . $name . '%');
 			while (my $group  = $it->next) {
 				push @things, {name => $group->name};
 			}
