@@ -185,6 +185,7 @@ v0.10_02
   <p>, <br> enabled
   Add link to Kobes Search
   Improve full text search for posts
+  Add capability to search for module names
 
 
 v0.10
@@ -690,7 +691,7 @@ rm=something
 
 sub autoload {
 	my $self = shift;
-	$self->internal_error;
+	$self->internal_error();
 }
 
 
@@ -812,9 +813,10 @@ Maybe this one should also receive the error message and print it to the log fil
 =cut
 
 sub internal_error {
-	my ($self, $msg) = @_;
+	my ($self, $msg, $tag) = @_;
 	cluck $msg if $msg;
 	my $t = $self->load_tmpl("internal_error.tmpl");
+	$t->param($tag => 1) if $tag;
 	$t->output;
 }
 
@@ -1178,20 +1180,23 @@ sub posts {
 				if ($gr) {
 					$new_group_id = $gr->id;
 				} else {
-					cluck "Group '$new_group' was not in database when accessed PATH_INFO: '$ENV{PATH_INFO}'";
-					return $self->internal_error;
+					return $self->internal_error(
+						"Group '$new_group' was not in database when accessed PATH_INFO: '$ENV{PATH_INFO}'",
+						);
 				}
 			} else {
-				cluck "Bad regex for '$new_group' ? Accessed PATH_INFO: '$ENV{PATH_INFO}'";
-				return $self->internal_error;
+				return $self->internal_error(
+					"Bad regex for '$new_group' ? Accessed PATH_INFO: '$ENV{PATH_INFO}'",
+					);
 			}
 		} elsif ($new_group_id) {
 			my ($gr) = CPAN::Forum::Groups->retrieve($new_group_id);
 			if ($gr) {
 				$new_group = $gr->name;
 			} else {
-				cluck "Group '$new_group_id' was not in database when accessed PATH_INFO: '$ENV{PATH_INFO}'";
-				return $self->internal_error;
+				return $self->internal_error(
+					"Group '$new_group_id' was not in database when accessed PATH_INFO: '$ENV{PATH_INFO}'",
+				);
 			}
 		} elsif ($q->param('q')) {
 			# process search later	
@@ -1202,9 +1207,11 @@ sub posts {
 	}
 	if ($rm eq "process_post") {
 		$new_group_id = $q->param("new_group");
-		return $self->internal_error(
-			"Missing new_group_id. Accessed PATH_INFO: '$ENV{PATH_INFO}'")
-			if not $new_group_id;
+		if (not $new_group_id) {
+			return $self->internal_error(
+				"Missing new_group_id. Accessed PATH_INFO: '$ENV{PATH_INFO}'",
+				);
+		}
 
 		if ($new_group_id =~ /^(\d+)$/) {
 			$new_group_id = $1;
@@ -1212,10 +1219,14 @@ sub posts {
 			if ($grp) {
 				$new_group = $grp->name;
 			} else {
-				return $self->internal_error("Bad value for new_group (id) '$new_group_id' ? Accessed PATH_INFO: '$ENV{PATH_INFO}'");
+				return $self->internal_error(
+					"Bad value for new_group (id) '$new_group_id' ? Accessed PATH_INFO: '$ENV{PATH_INFO}'",
+					);
 			} 
 		} else {
-			return $self->internal_error("Bad value for new_group (id) '$new_group_id' ? Accessed PATH_INFO: '$ENV{PATH_INFO}'");
+			return $self->internal_error(
+				"Bad value for new_group (id) '$new_group_id' ? Accessed PATH_INFO: '$ENV{PATH_INFO}'",
+				);
 		}
 	}
 	#warn $new_group;
@@ -1238,8 +1249,9 @@ sub posts {
 	if ($id) { # Show post
 		my $post = CPAN::Forum::Posts->retrieve($id);
 		if (not $post) {
-			cluck "PATH_INFO: $ENV{PATH_INFO}";
-			return $self->internal_error;
+			return $self->internal_error(
+				"PATH_INFO: $ENV{PATH_INFO}",
+				);
 		}
 		my $thread_count = CPAN::Forum::Posts->sql_count_thread($post->thread)->select_val;
 		if ($thread_count > 1) {
@@ -1347,8 +1359,9 @@ sub process_post {
 		return $self->posts(["preview"]);
 	}
 	if ($button ne "Submit") {
-		warn "Someone sent in a button called '$button'";
-		return $self->internal_error;
+		return $self->internal_error(
+			"Someone sent in a button called '$button'",
+			);
 	}
 
 	my $pid;
@@ -1371,9 +1384,9 @@ sub process_post {
 		#push @errors, "subject_too_long" if $@ =~ /subject_too_long/;
 		#warn $CPAN::Forum::Post::lasterror if $@ =~ /text_format/;
 		if (not @errors) {
-			warn "UNKNOWN_ERROR: $@";
-			cluck "PATH_INFO: $ENV{PATH_INFO}";
-			return $self->internal_error;
+			return $self->internal_error(
+				"PATH_INFO: '$ENV{PATH_INFO}'\nUNKNOWN_ERROR: $@",
+			);
 		}
 		return $self->posts(\@errors);
 	}
@@ -1450,8 +1463,9 @@ sub threads {
 
 	my @posts = CPAN::Forum::Posts->search(thread => $id);
 	if (not @posts) {
-		cluck "PATH_INFO: $ENV{PATH_INFO}";
-		return $self->internal_error;
+		return $self->internal_error(
+			"PATH_INFO: $ENV{PATH_INFO}",
+			);
 	}
 
 	my @posts_html;
@@ -1496,21 +1510,24 @@ sub dist {
 	if ($group =~ /^([\w-]+)$/) {
 		$group = $1;
 	} else {
-		warn "Probably bad regex when checking group name for $group called in $ENV{PATH_INFO}";
-		return $self->internal_error();
+		return $self->internal_error(
+			"Probably bad regex when checking group name for $group called in $ENV{PATH_INFO}",
+			);
 	}
 
 	my ($gr) = CPAN::Forum::Groups->search(name => $group);
 	if (not $gr) {
-		warn "Invalid group $group called in $ENV{PATH_INFO}";
-		return $self->internal_error();
+		return $self->internal_error(
+			"Invalid group $group called in $ENV{PATH_INFO}",
+			);
 	}
 	my $gid = $gr->id;
 	if ($gid =~ /^(\d+)$/) {
 		$gid = $1;
 	} else {
-		warn "Invalid gid received $gid called in $ENV{PATH_INFO}";
-		return $self->internal_error();
+		return $self->internal_error(
+			"Invalid gid received $gid called in $ENV{PATH_INFO}",
+			);
 	}
 
 
@@ -1538,8 +1555,9 @@ sub users {
 	$username = ${$self->param("path_parameters")}[0];
 
 	if (not $username) {
-		cluck "No username: PATH_INFO: $ENV{PATH_INFO}";
-		return $self->internal_error;
+		return $self->internal_error(
+			"No username: PATH_INFO: $ENV{PATH_INFO}",
+			);
 	}
 
 	my $t = $self->load_tmpl("users.tmpl",
@@ -1550,8 +1568,9 @@ sub users {
 	my ($user) = CPAN::Forum::Users->search(username => $username);
 
 	if (not $user) {
-		warn "Non existing user was accessed: $ENV{PATH_INFO}";
-		return $self->internal_error;
+		return $self->internal_error(
+			"Non existing user was accessed: $ENV{PATH_INFO}",
+			);
 	}
 
 
@@ -1611,8 +1630,9 @@ sub mypan {
 	my ($user) = CPAN::Forum::Users->search(username => $username);
 
 	if (not $user) {
-		warn "Trouble accessing personal information of: '$username' $ENV{PATH_INFO}";
-		return $self->internal_error;
+		return $self->internal_error(
+			"Trouble accessing personal information of: '$username' $ENV{PATH_INFO}",
+			);
 	}
 	my $fullname = "";
 	$fullname .= $user->fname if $user->fname;
@@ -1635,8 +1655,9 @@ sub mypan {
 		my $group = $params[1];
 		my ($grp) = CPAN::Forum::Groups->search(name => $group);
 		if (not $grp) {
-			warn "Accessing $ENV{PATH_INFO}\n";
-			return $self->internal_error;
+			return $self->internal_error(
+				"Accessing $ENV{PATH_INFO}\n",
+			);
 		}
 		$gids = $grp->id;
 		my ($s) = CPAN::Forum::Subscriptions->search(uid => $user->id, gid => $grp->id);
@@ -1687,7 +1708,7 @@ sub update_subscription {
 	#warn $q->param("gids");
 	my @gids = split /,/, $q->param("gids");
 	if (not @gids) {
-		return $self->internal_error;
+		return $self->internal_error();
 	}
 
 	my $username = $self->session->param("username");
