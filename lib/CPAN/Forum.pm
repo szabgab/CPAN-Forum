@@ -1432,7 +1432,8 @@ sub _post {
 		text        => _text_escape($post->text),
 	);
 
-	$post{$_} = $post->get($_) for qw(subject id);
+	$post{id}      = $post->id;
+	$post{subject} = _subject_escape($post->subject);
 
 	return \%post;
 }
