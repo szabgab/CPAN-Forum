@@ -78,12 +78,13 @@ table {
 }
 
 .odd {
-	background: #20B2AA;
+	/*background: #20B2AA;*/
+	background: #AAAAAA;
 	color: inherit; 
 }
 
 .odd TD, .even TD {
-	padding: 3ex 0ex 3ex 1ex;
+	padding: 0ex 0ex 0ex 1ex;
 	vertical-align: baseline;
 }
 
@@ -129,7 +130,15 @@ table {
 }
 
 .about_title {
-	font-size: 20pt;
+	margin-top: 0px; 
+	background: white; 
+	height: 18px; 
+	padding: 0px 0px 0px 20px; 
+	font-size: 12pt;
+	color: MidnightBlue;
+	margin-bottom: 20px;
+	border: MidnightBlue solid thin;
+}
 }
 
 
