@@ -1,12 +1,15 @@
 
 
-- Record the date when a user joined
-- Record when a user last visited
-
-
 - Enable people to subscribe to all messages or all thread starters or all followups
-  (probably group = 0 will do it)
+
+  A table called "subscription_all"
+
   
+  
+
+- Script that populates databse should not lock the whole database for a long time
+  Maybe it should fetch all the data to memory and work there.
+
 - Add announcement service (check for new versions of modules and send e-mail
   to those whom are interested in announcements.
   For example I just tried to install a module but it failed its test. Checking 
@@ -17,24 +20,20 @@
   it is hot. I can subscribe to the announcement service of this module and get
   the message.
 
+- Announcment service for new modules (modules that appear on CPAN for the first time)
+  For this I n
+
+- Include the information received from cpanratings in our database:
+  For each "group" add two fields:  "ratings" and "review_count"
+
+- Register the PAUSEID where the module was last seen:
+  Send out e-mail about PAUSEID changes
   
-- Put time ellapsed since post instead of date of post, (3 min. 6 hours 3 days ago)
-  make this configurabel: User can say after N days passed the date should show,
-  before that the ellapsed time
-  
-- Admin: hide a posting
 
-- Admin: delete a user
 
-- Script that populates databse should not lock the whole database for a long time
-  Maybe it should fetch all the data to memory and work there.
+  A table called "subscription_PAUSE"
 
-- replace the e-mail address checking by  if ($q->param('email') !~ $Email::Address::addr_spec) {
 
-- Enable people to edit their posts 
-   - Shall we track changes ? 
-   - Shall we display the orinal date and the last update date ?
-   - Shall we display the post on its new date (order the display result by date ?)
 
 - Somehow let a module author (or anyone ?) subscribe/unsubscribe to all of her 
   current and future(!) modules.
@@ -46,9 +45,37 @@
 	So especially the module authors would like to have a button that sais
 	subscribe too all the modules of XYZ
 
+- A way to monitor all current and future modules associated with a certain PAUSE ID.
+ (both RSS and e-mail)
+ 
 - Let people select a group of distros (e.g. all the distros by author SZABGAB)
   and show them on the /mypan interface (or just subscribe to all of them)
 
+
+
+
+
+- Create larger discussion groups (e.g. Web development and All)
+
+
+
+- Record the date when a user joined
+- Record when a user last visited
+ 
+- Put time ellapsed since post instead of date of post, (3 min. 6 hours 3 days ago)
+  make this configurable: User can say after N days passed the date should show,
+  before that the ellapsed time
+  
+- Admin: hide a posting
+
+- Admin: delete a user
+
+- replace the e-mail address checking by  if ($q->param('email') !~ $Email::Address::addr_spec) {
+
+- Enable people to edit their posts 
+   - Shall we track changes ? 
+   - Shall we display the orinal date and the last update date ?
+   - Shall we display the post on its new date (order the display result by date ?)
 - Improve the markup language
 
 - Enable module authors (or some other volunteer) to configure some aspects of the 
@@ -56,7 +83,6 @@
 
 - Posting a message under more than one distribution
 
-- Create larger discussion groups (e.g. Web development and All)
 
 - Get a nice logo and favicon.ico
 
@@ -75,7 +101,6 @@
 - Enable sending direct mail to a poster (?) (without disclosing e-mail address)
 
 - Better integration with search.cpan.org, cpanratings.perl.org
-  Fetch data from  cpanratings and display
   Provide statistics on number of comments per distro to be displayed on search.cpan
 
 - Admin: hide a message (or a whole thread) (database already has field)
@@ -117,9 +142,7 @@ PROBLEM:
   4) Add a field to the session table where I indicate the last access time
 
 
-- A way to monitor all current and future modules associated with a certain PAUSE ID.
- (both RSS and e-mail)
- 
+
 - check out the remote authentication module of  David Nicol: AIS::Client
   and its server.
 
