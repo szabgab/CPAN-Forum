@@ -48,6 +48,7 @@ my %cases = (
 	'a<i>c</i><code>x</code>d<code>y</code>' => $TEXT . 'a<i>c</i>' . $END . $CODE . 'x' . $END . $TEXT . 'd' . $END . $CODE . 'y' . $END,
 	'a<b>c</b>d<i>x</i>f'      => $TEXT . 'a<b>c</b>d<i>x</i>f' . $END,
 	'&lt;'                     => $TEXT . '&lt;' . $END,
+	'<p>text</p>'              => $TEXT . '<p>text</p>' . $END,
 
 
 );
@@ -70,6 +71,7 @@ my %fails = (
 	'a<b>c'                    => undef,
 	'a<i>c'                    => undef,
 	'apple<'                   => undef,
+	'<p>text'                  => undef,
 );
 
 
