@@ -626,8 +626,8 @@ sub build_listing {
 			thread       => ($thread_count > 1 ? 1 : 0),
 			thread_id    => $post->thread,
 			thread_count => $thread_count-1,
-			date         => strftime("%e/%b", localtime $post->date),
-			#date         => scalar localtime $post->date,
+			#date         => strftime("%e/%b", localtime $post->date),
+			date         => scalar localtime $post->date,
 			postername   => $post->uid,
 			};
 	}
