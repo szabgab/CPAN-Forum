@@ -11,7 +11,7 @@ body {
 }
 
 #pageHeader { 
-	background: MidnightBlue; 
+	background: #eeeeee; 
 	margin-top: 10px; 
 	margin-left: 25px; 
 	margin-bottom: 0px; 
@@ -20,7 +20,7 @@ body {
 	padding: 0px 10px 0px 10px; 
 	font-size: 30pt;
 	font-weight: bold;
-	color: white;
+	color: #555555;
 }
 
 #pageTitle { 
@@ -29,9 +29,10 @@ body {
 	height: 18px; 
 	padding: 0px 0px 0px 20px; 
 	font-size: 12pt;
-	color: MidnightBlue;
+	color: #333333;
 	margin-bottom: 20px;
-	border: MidnightBlue solid thin;
+	border: solid thin;
+	border-color: #333333;
 }
 
 .navigation  {
@@ -61,7 +62,8 @@ a:visited {
 
 #posts_table { 
 	margin: 10px 0px 10px 0px;
-	border: MidnightBlue solid thin;
+	border: solid thin;
+	border-color: #333333;
 }
 
 .posts_head {
@@ -91,14 +93,14 @@ table {
 .threads_odd TD {
 	background: #dddddd;
 	border-style: solid;
-	border-width: 1;
+	border-width: 2px;
 	border-color: yellow;
 }
 
 .threads_even TD {
 /*	background: #dddddd;*/
 	border-style: solid;
-	border-width: 1;
+	border-width: 2px;
 	border-color: yellow;
 }
 
@@ -146,10 +148,10 @@ table {
 	height: 18px; 
 	padding: 0px 0px 0px 20px; 
 	font-size: 12pt;
-	color: MidnightBlue;
+	color: #333333;
 	margin-bottom: 20px;
-	border: MidnightBlue solid thin;
-}
+	border: solid thin;
+	border-color: #333333;
 }
 
 
@@ -204,7 +206,6 @@ input {
 .text {
 	background: #eeeeee;
 	white-space: pre;
-	width: 80%;
 }
 .code {
 	background: #dddddd;
