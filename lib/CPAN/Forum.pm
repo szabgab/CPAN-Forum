@@ -556,7 +556,7 @@ sub cgiapp_init {
 				-expires => '+24h',
 				-path    => '/',
 		},
-		SEND_COOKIE         => 1,
+		SEND_COOKIE         => 0,
 	);
 	$self->log->debug("sid:  " . ($self->session->id() || ""));
 	
@@ -566,7 +566,7 @@ sub cgiapp_init {
 		# on the other hand it is needed in Opera to make sure it won't cache pages.
 		-charset => "utf-8",
 	);
-	$self->session_cookie();
+	#$self->session_cookie();
 }
 
 sub _set_log_level {
@@ -874,6 +874,7 @@ sub login {
 	my ($self, $errs) = @_;
 	my $q = $self->query;
 
+	$self->session_cookie();
 	my $t = $self->load_tmpl(
 			"login.tmpl",
 			associate => $q,
@@ -911,7 +912,6 @@ sub login_process {
 	}
 	$self->log->debug("Username: " . $user->username);
 
-	#$self->session_cookie();
 	my $session = $self->session;
 	$session->param(admin     => 0); # make sure it is clean
 
@@ -2281,9 +2281,10 @@ sub site_is_closed {
 sub teardown {
 	my ($self) = @_;
 	$self->log->debug("teardown called");
-	if (not  $self->session->param('loggedin') ) {
-		$self->log->debug("not logged in, but not deleting session");
-		#$self->session->delete();
+	my $rm = $self->get_current_runmode();
+	if (not  $self->session->param('loggedin')  and $rm ne "login") {
+		$self->log->debug("not logged in, deleting session");
+		$self->session->delete();
 		#$self->session->flush();
 	}
 }
