@@ -15,6 +15,11 @@
 
 <TMPL_INCLUDE NAME="listing.tmpl">
 
+<TMPL_IF no_results>
+<p class="error">
+No hits.
+</p>
+</TMPL_IF>
 
 <TMPL_INCLUDE NAME="footer.tmpl">
 

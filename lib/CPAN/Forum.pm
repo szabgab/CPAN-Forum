@@ -179,6 +179,12 @@ variable to the URL where you installed the forum.
 
 =head2 Changes
 
+v0.11_01
+  Put the page size and the rss size in the configuration table
+  Make CPAN::Forum::Configure an easy interface to the configuration table
+  Give "no result" on no result
+  Trim off leading and trailing spaces from the query. 
+
 v0.11
   Search for users
   Unite the serch methods
@@ -237,6 +243,15 @@ at both ends of the typed in word.
   Maybe it should fetch all the data to memory and work there.
 - make paging available responses 1..10, 11.20, etc, 
 
+- Enable people to edit their posts 
+   - Shall we track changes ? 
+   - Shall we display the orinal date and the last update date ?
+   - Shall we display the post on its new date (order the display result by date ?)
+
+- Somehow let a module author (or anyone ?) subscribe/unsubscribe to all of her modules.
+  Rephrasing: 
+    1) Enable listing modules based on module author
+	2) Enable subscribing to several modules at the same time
 
 
 - Decide on Basic Markup language and how to extend for shortcuts opening tag
@@ -741,6 +756,7 @@ sub home {
 	$t->output;
 }
 
+# currently returning the number of results but this might change
 sub _search_results {
 	my ($self, $t, $params) = @_;
 	
@@ -760,6 +776,7 @@ sub _search_results {
     $t->param(last_entry     => $pager->last);
     $t->param(first_page     => 1)                      if $pager->current_page != 1;
     $t->param(last_page      => $pager->last_page)      if $pager->current_page != $pager->last_page;
+	return $pager->total_entries;
 }
 
 sub all {
@@ -1764,6 +1781,7 @@ sub module_search {
 
 	my $q = $self->query;
 	my $txt = $q->param("q");
+	$txt =~ s/^\s+|\s+$//g;
 
 	# remove taint if there is
 	if ($txt =~ /^([\w:.%-]+)$/) {
@@ -1804,6 +1822,8 @@ sub search {
 	my $q      = $self->query;
 	my $name   = $q->param("name")    || '';
 	my $what   = $q->param("what")    || '';
+	$name      =~ s/^\s+|\s+$//g;
+	my $any_result = 0;
 
 	# kill the taint checking (why do I use taint checking if I kill it then ?)
 	if ($name =~ /(.*)/) { $name    = $1; }
@@ -1830,6 +1850,7 @@ sub search {
 			while (my $group  = $it->next) {
 				push @things, {name => $group->name};
 			}
+			$any_result = 1 if @things;
 			$t->param(groups => \@things);
 			$t->param($what => 1);
 		} elsif ($what eq "user") {
@@ -1838,6 +1859,7 @@ sub search {
 			while (my $user  = $it->next) {
 				push @things, {username => $user->username};
 			}
+			$any_result = 1 if @things;
 			$t->param(users => \@things);
 			$t->param($what => 1);
 		} else {
@@ -1850,11 +1872,11 @@ sub search {
 				$self->log->debug("Search 2: " . join "|", %where);
 
 				my $page = $q->param('page') || 1;
-				$self->_search_results($t, {where => \%where, page => $page});
-
+				$any_result = $self->_search_results($t, {where => \%where, page => $page});
 				$t->param($what => 1);
 			}
 		}
+		$t->param(no_results => not $any_result);
 	}
 	$t->output;
 }
