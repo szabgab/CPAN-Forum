@@ -1144,8 +1144,13 @@ sub process_post {
 			push @errors, "no_group";
 		}
 	}
-	push @errors, "no_subject" if not $q->param("new_subject");
-	push @errors, "no_text"    if not $q->param("new_text");
+	
+	my $new_subject = $q->param("new_subject");
+	my $new_text = $q->param("new_text"); 
+	
+	push @errors, "no_subject" if not $new_subject;
+	push @errors, "no_text"    if not $new_text;
+	push @errors, "subject_too_long" if $new_subject and length($new_subject) > 50;
 	return $self->posts(\@errors) if @errors;
 	
 
@@ -1153,7 +1158,6 @@ sub process_post {
 	# We will save the message only if the Submit button was pressed.
 	# When the editor first displayed and every time if an error was caught this button will be hidden.
 
-	my $new_text = $q->param("new_text"); 
 	eval {
 		_posting_process($new_text) ;
 	};
@@ -1189,7 +1193,7 @@ sub process_post {
 		#warn "PG:" . $post->gid;
 	};
 	if ($@) {
-		push @errors, "subject_too_long" if $@ =~ /subject_too_long/;
+		#push @errors, "subject_too_long" if $@ =~ /subject_too_long/;
 		#warn $CPAN::Forum::Post::lasterror if $@ =~ /text_format/;
 		if (not @errors) {
 			warn "UNKNOWN_ERROR: $@";
