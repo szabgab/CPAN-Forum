@@ -52,6 +52,7 @@ CREATE TABLE users (
 			email            VARCHAR(255) UNIQUE,
 			fname            VARCHAR(255),
 			lname            VARCHAR(255),
+			update_on_new_user VARCHAR(1),
 			status           INTEGER
 );
 

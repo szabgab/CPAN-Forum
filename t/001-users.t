@@ -1,30 +1,23 @@
 #!/usr/bin/perl -w
 
 use strict;
+use warnings;
 
-use Test::More tests => 4;
-use File::Copy qw(copy);
+use Test::More "no_plan";
 
-use lib ("blib", "t/lib");
+use lib qw(t/lib);
+use CPAN::Forum::Test;
 
-chdir "blib";
-copy "../t/CONFIG", ".";
-
-system "$^X bin/setup.pl";
-ok(-e "db/forum.db");
-system "$^X bin/populate.pl ../t/02packages.details.txt";
-
-ok(-e "db/modules.txt");
-chdir "..";
-use constant ROOT => "blib";  
+setup_database();
+ok(-e "blib/db/forum.db");
+ok(-e "blib/db/modules.txt");
 
 use CPAN::Forum::DBI;
-CPAN::Forum::DBI->myinit(ROOT . "/db/forum.db");
+CPAN::Forum::DBI->myinit("$ROOT/db/forum.db");
 
 use CGI::Application::Test;
 use CPAN::Forum;
-my $cat = CGI::Application::Test->new({root => ROOT, cookie => "cpanforum"});
-
+my $cat = CGI::Application::Test->new({root => $ROOT, cookie => "cpanforum"});
 
 
 {

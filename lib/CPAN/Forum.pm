@@ -2,7 +2,7 @@ package CPAN::Forum;
 use strict;
 use warnings;
 
-our $VERSION = "0.09_04_dev";
+our $VERSION = "0.09_05";
 
 use base "CGI::Application";
 use CGI::Application::Plugin::Session;
@@ -11,6 +11,7 @@ use Data::Dumper qw(Dumper);
 use Fcntl qw(:flock);
 use POSIX qw(strftime);
 use Carp qw(cluck carp);
+use Mail::Sendmail qw(sendmail);
 
 use CPAN::Forum::INC;
 
@@ -807,19 +808,19 @@ sub register {
 sub register_process {
 	my ($self) = @_;
 	my $q = $self->query;
+
 	if (not $q->param('nickname') or not $q->param('email')) {
 		return $self->register({"no_register_data" => 1});
 	}
 	
-	# TODO arbitrary nickname constraints
-	if ($q->param('nickname') =~ /\W/ or
-		length $q->param('nickname') > 10 or
-		length $q->param('nickname') < 4
-		) {  # TODO other nicknames ?
-		return $self->register({"no_register_data" => 1});
+	# TODO arbitrary nickname constraint, allow other nicknames ?
+	if ($q->param('nickname') !~ /^[a-z0-9]{4,10}$/) {
+		return $self->register({"bad_nickname" => 1});
 	}
-	if ($q->param('email') =~ /[^\w@.-]/) {  # TODO fix the e-mail checking and the error message
-		return $self->register({"no_register_data" => 1});
+
+	# TODO fix the e-mail checking and the error message
+	if ($q->param('email') !~ /^[a-z0-9_+@.-]+$/) {  
+		return $self->register({"bad_email" => 1});
 	}
 	
 	my $user = eval {
@@ -831,6 +832,14 @@ sub register_process {
 	if ($@) {
 		return $self->register({"nickname_exists" => 1});
 	}
+
+	$self->send_password($user);
+	$self->notify_admin($user);
+	return $self->register({"done" => 1});
+}
+
+sub send_password {
+	my ($self, $user) = @_;
 
 	# TODO: put this text in a template
 	my $password = $user->password;
@@ -849,26 +858,31 @@ MSG
 	my $FROM = $field->value;
 	$self->log->debug("FROM field set to be $FROM");
 
-	require Mail::Sendmail;
-	import Mail::Sendmail qw(sendmail);
 	my %mail = (
-		To       => $q->param('email'),
+		To       => $user->email,
 		From     => $FROM,
 		Subject  => $subject,
 		Message  => $message,
 	);
 	sendmail(%mail);
+}
 
+sub notify_admin {
+	my ($self, $user) = @_;
+
+	my ($field) = CPAN::Forum::Configure->search({field => "from"});
+	my $FROM = $field->value;
 
 	# TODO: the admin should be able to configure if she wants to get messages on
-	# every new user
+	# every new user (field update_on_new_user)
 	my $admin = CPAN::Forum::Users->retrieve(1);
-	$mail{To} = $admin->email;
-	$mail{Subject} = "New Forum user: " . $user->username;
-	$mail{Message} = "";
+	my %mail = (
+		To      => $admin->email,
+		From     => $FROM,
+		Subject => "New Forum user: " . $user->username,
+		Message => "\nUsername: " . $user->username . "\n",
+	);
 	sendmail(%mail);
-
-	return $self->register({"done" => 1});
 }
 
 sub pwreminder {
@@ -918,8 +932,6 @@ MSG
 	my $FROM = $field->value;
 	$self->log->debug("FROM field set to be $FROM");
 
-	require Mail::Sendmail;
-	import Mail::Sendmail qw(sendmail);
 	my %mail = (
 		To       => $user->email,
 		From     => $FROM,
@@ -1704,9 +1716,6 @@ sub notify {
 	my $self = shift;
 	my $post_id = shift;
 	
-	require Mail::Sendmail;
-	import Mail::Sendmail qw(sendmail);
-
 	my $post = CPAN::Forum::Posts->retrieve($post_id);
 
 	#	Subject  => '[CPAN Forum] ' . $post->subject,

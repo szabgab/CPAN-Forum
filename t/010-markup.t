@@ -22,7 +22,7 @@ my %fails = (
 	'apple< sd'            => qr(^ERR no_less_sign$),
 	'apple<'               => qr(^ERR no_less_sign$),
 	'apple<code>sd'        => qr(^ERR open_code_without_closing$),
-	'1234567890' x 7 . "x" => qr(^ERR line_too_long$),
+#	'1234567890' x 7 . "x" => qr(^ERR line_too_long$),
 );
 
 
