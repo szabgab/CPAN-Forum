@@ -37,6 +37,7 @@ my $builder = CPAN::Forum::Build->new(
 		'Parse::RecDescent'                     => 0,
 		'Class::DBI::Plugin::AbstractCount'     => 0,
 		'Class::DBI::Plugin::Pager'             => 0,
+		'Text::CSV_XS'                          => 0,
 	},
 	build_requires => {
 		'Test::WWW::Mechanize'       => 0.02,
