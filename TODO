@@ -9,6 +9,14 @@
   
 - Add announcement service (check for new versions of modules and send e-mail
   to those whom are interested in announcements.
+  For example I just tried to install a module but it failed its test. Checking 
+  search.cpan.org I noticed the module has been updated lately and looking at
+  the results of the CPAN Testers I can see I am not the only one with these problems.
+  So for now I skip the installation of this module but I'd like to get an e-mail
+  when a new version of this module is uploaded to CPAN so I can try it while
+  it is hot. I can subscribe to the announcement service of this module and get
+  the message.
+
   
 - Put time ellapsed since post instead of date of post, (3 min. 6 hours 3 days ago)
   make this configurabel: User can say after N days passed the date should show,
