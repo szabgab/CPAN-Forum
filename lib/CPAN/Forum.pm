@@ -790,10 +790,11 @@ sub about {
 	my $self = shift;
 	my $t = $self->load_tmpl("about.tmpl");
 	
-	$t->param(distro_cnt => CPAN::Forum::Groups->count_all());
-	$t->param(posts_cnt  => CPAN::Forum::Posts->count_all());
-	$t->param(users_cnt  => CPAN::Forum::Users->count_all());
-	$t->param(version    => $VERSION);
+	$t->param(distro_cnt        => CPAN::Forum::Groups->count_all());
+	$t->param(posts_cnt         => CPAN::Forum::Posts->count_all());
+	$t->param(users_cnt         => CPAN::Forum::Users->count_all());
+	$t->param(subscription_cnt  => CPAN::Forum::Subscriptions->count_all());
+	$t->param(version           => $VERSION);
 
 	$t->output;
 }
@@ -2007,7 +2008,8 @@ sub help {
 
 =head1 ACKNOWLEDGEMENTS
 
-Thanks to Offer Kaye for his initial help with HTML and CSS.  Thanks to all
+Thanks to Offer Kaye for his initial help with HTML and CSS.  Thanks
+to Shlomi Fish for some patches. Thanks to all
 the people who develop and maintain the underlying technologies.  See
 L<http://www.cpanforum.com/about/> for a list of tools we used.  In addition to
 Perl of course.
