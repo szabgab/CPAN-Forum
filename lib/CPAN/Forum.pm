@@ -39,7 +39,7 @@ CPAN::Forum - Web forum application to discuss CPAN modules
 This is a Web forum application specifically designed to be used for
 discussing CPAN modules. At one point it might be adapted to be a general
 forum software but for now it is released in the hope that people
-will help improving it and by that improving the L<http://www.cpanforum.org/> site.
+will help improving it and by that improving the L<http://www.cpanforum.com/> site.
 
 =head2 Features
 
@@ -173,6 +173,23 @@ Will come here after we start to accumulate them
 - Improve Legal statement, look at other sites.
 
 =head2 TODO other, TBD
+
+
+clean documentation
+check all submitted fields (restrict posting size to 10.000 Kbyte ?
+
+add indexes to the tables
+
+post link should give a search box that will let the user search
+within the names of the modules. The result should be a restricted
+list with only a few module names in a pull-down menu like we have now.
+The search can be regular SQL LIKE search and the user can add % signs
+to use as wide cards
+
+show the release dates of the various versions of a module so
+it is easy to compare that to the post.
+
+
 
 Authentication and user management process:
   - new user comes to our site we give him a cookie, when he wants to login we offer him

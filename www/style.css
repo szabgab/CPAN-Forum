@@ -90,7 +90,18 @@ table {
 
 .threads_odd TD {
 	background: #dddddd;
+	border-style: solid;
+	border-width: 1;
+	border-color: yellow;
 }
+
+.threads_even TD {
+/*	background: #dddddd;*/
+	border-style: solid;
+	border-width: 1;
+	border-color: yellow;
+}
+
 
 .col1 {
 	width: 25%;
