@@ -1798,6 +1798,11 @@ L<http://svn.pti.co.il/svn/cpan-forum/trunk/>
 There is a mailing list to see the commits to the repository:
 L<http://perl.org.il/mailman/listinfo/cpan-forum-commit>
 
+Discussion of this module will take place on
+L<http://www.cpanforum.com/dist/CPAN-Forum>
+If you need help or if you'd like to offer your help.
+That's the right place to do it.
+
 =head1 BUGS
 
 Please report them at L<http://rt.cpan.org/>
