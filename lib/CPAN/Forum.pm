@@ -734,16 +734,15 @@ sub home {
 		loop_context_vars => 1,
 	);
 	
-	#my $from = ${$self->param("path_parameters")}[1] || 0;
-	#my $cnt  = ${$self->param("path_parameters")}[2] || $limit;
-	#my @results = CPAN::Forum::Posts->retrieve_latest($from+$cnt);
-	#$t->param(messages => $self->build_listing(
-	#		\@results,
-	#		CPAN::Forum::Posts->count_all(),
-	#		));
-	#		
 	my $page = $q->param('page') || 1;
-	my $pager   = CPAN::Forum::Posts->mysearch({}, $page, $limit);
+	$self->_search_results($t, {}, $page, $limit);
+	$t->output;
+}
+
+sub _search_results {
+	my ($self, $t, $params, $page, $limit) = @_;
+	
+	my $pager   = CPAN::Forum::Posts->mysearch($params, $page, $limit);
 	my @results = $pager->search_where();
     my $total   = $pager->total_entries;
 	$self->log->debug("number of entries: total=$total");
@@ -759,8 +758,6 @@ sub home {
     $t->param(last_entry     => $pager->last);
     $t->param(first_page     => 1)                      if $pager->current_page != 1;
     $t->param(last_page      => $pager->last_page)      if $pager->current_page != $pager->last_page;
-
-	$t->output;
 }
 
 sub all {
