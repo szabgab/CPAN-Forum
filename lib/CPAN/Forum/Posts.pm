@@ -23,6 +23,18 @@ sub retrieve_latest {
 	return $class->sth_to_objects($class->sql_latest($count));
 }
 
+sub mysearch {
+	my ($self, $params, $page, $per_page) = @_;
+
+	my %where;
+
+	my $pager = __PACKAGE__->pager(
+		where         => \%where,
+		per_page      => $per_page || 10,
+		page          => $page || 1,
+#		order_by      => $order_by,
+	);
+}
 
 1;
  

@@ -4,6 +4,9 @@ use warnings;
 use base 'Class::DBI';
 use Carp qw(croak);
 
+use Class::DBI::Plugin::AbstractCount;      # pager needs this
+use Class::DBI::Plugin::Pager;
+
 use DBI;
 
 sub myinit {

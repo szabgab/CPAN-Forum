@@ -35,6 +35,8 @@ my $builder = CPAN::Forum::Build->new(
 		'Mail::Sendmail'                        => 0,  
 		'CGI::Session::SQLite'                  => 0,
 		'Parse::RecDescent'                     => 0,
+		'Class::DBI::Plugin::AbstractCount'     => 0,
+		'Class::DBI::Plugin::Pager'             => 0,
 	},
 	build_requires => {
 		'Test::WWW::Mechanize'       => 0.02,
