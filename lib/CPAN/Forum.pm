@@ -547,7 +547,7 @@ sub cgiapp_init {
 	$self->log->debug("--- START ---");
 	
 
-	$self->log->debug("Cookie received: "  . $self->query->cookie($cookiename) );
+	$self->log->debug("Cookie received: "  . ($self->query->cookie($cookiename) || "") );
 	CGI::Session->name($cookiename);
 	$self->session_config(
 		#CGI_SESSION_OPTIONS => [ "driver:File", $self->query, {Directory => "/tmp"}],
