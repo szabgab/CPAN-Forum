@@ -16,8 +16,6 @@ use CGI ();
 
 use CPAN::Forum::INC;
 
-my $limit;
-
 my $limit_rss   = 10;
 my $cookiename  = "cpanforum";
 my $SUBJECT = qr{[\w .:~!@#\$%^&*\()+?><,'";=-]+};
@@ -584,8 +582,6 @@ sub cgiapp_init {
 
 	$self->log->debug("--- START ---");
 	
-	my ($field) = CPAN::Forum::Configure->search({field => "per_page"});
-	$limit = $field->value if $field;
 
 	CGI::Session->name($cookiename);
 	$self->session_config(
@@ -604,6 +600,12 @@ sub cgiapp_init {
 		-charset => "utf-8",
 	);
 	$self->session_cookie();
+}
+
+sub config {
+	my ($self, $field) = @_;
+	
+	CPAN::Forum::Configure->param($field);
 }
 
 # modes that can be accessed without a valid session
@@ -737,19 +739,19 @@ sub home {
 	);
 	
 	my $page = $q->param('page') || 1;
-	$self->_search_results($t, {where => {}, page => $page, per_page => $limit});
+	$self->_search_results($t, {where => {}, page => $page});
 	$t->output;
 }
 
 sub _search_results {
 	my ($self, $t, $params) = @_;
 	
+	$params->{per_page} = $self->config("per_page");
+
 	my $pager   = CPAN::Forum::Posts->mysearch($params);
 	my @results = $pager->search_where();
     my $total   = $pager->total_entries;
 	$self->log->debug("number of entries: total=$total");
-    #$self->session->param('per_page'     => $per_page);
-    #$self->session->param('current_page' => $pager->current_page);
 	my $data = $self->build_listing(\@results);
 
     $t->param(messages       => $data);
@@ -1570,7 +1572,7 @@ sub dist {
 	}
 
 	my $page = $q->param('page') || 1;
-	$self->_search_results($t, {where => {gid => $gid}, page => $page, per_page => $limit});
+	$self->_search_results($t, {where => {gid => $gid}, page => $page});
 	$t->output;
 }
 
@@ -1619,7 +1621,7 @@ sub users {
 	$t->param(title => "Information about $username");
 
 	my $page = $q->param('page') || 1;
-	$self->_search_results($t, {where => {uid => $username}, page => $page, per_page => $limit});
+	$self->_search_results($t, {where => {uid => $username}, page => $page});
 	$t->output;
 }
 
@@ -1872,7 +1874,7 @@ sub search {
 				$self->log->debug("Search 2: " . join "|", %where);
 
 				my $page = $q->param('page') || 1;
-				$self->_search_results($t, {where => \%where, page => $page, per_page => $limit});
+				$self->_search_results($t, {where => \%where, page => $page});
 
 				$t->param($what => 1);
 			}

@@ -7,8 +7,13 @@ __PACKAGE__->table('configure');
 __PACKAGE__->columns(All => qw/field value/);
 
 
-1;
+sub param {
+	my ($self, $field, $value) = @_;
 
+	my ($handle) = CPAN::Forum::Configure->search({field => $field});
+	return $handle->value if $handle;
+	return;
+}
 
 
 1;
