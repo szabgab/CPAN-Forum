@@ -10,14 +10,14 @@ use CGI qw();
 use Parse::RecDescent;
 
 my $grammar = q {
-	entry: chunk(s) eodata  { $item[1] }
-	chunk: text | code
-	text: m{[\w ]+} { qq(<div class="text">$item[1]</div>); }
-	code: opencode codetext closecode {$item[2] }
-	opencode:  m{<code>}
-	codetext: m{[\t\n -~]+(?=</code>)} { qq(<div class="code">) . CGI::escapeHTML($item[1]) . qq(</div>); }
-	closecode: m{</code>}
-	eodata:   m{^\Z}
+	entry      : chunk(s) eodata                  { $item[1] }
+	chunk      : text | code                      { $item[1] }
+	text       : m{[\w ]+}                        { qq(<div class="text">$item[1]</div>); }
+	code       : code_open code_text code_close   {$item[2] }
+	code_open  : m{<code>}
+	code_text  : m{[\t\n -~]+(?=</code>)}         { qq(<div class="code">) . CGI::escapeHTML($item[1]) . qq(</div>); }
+	code_close : m{</code>}
+	eodata     : m{^\Z}
 };
 
 $Parse::RecDescent::skip = '';
@@ -40,13 +40,15 @@ $code = "<code>$code</code>";
 my %data = (
 	'Hello world'              => q(<div class="text">Hello world</div>),
 	' World'                   => q(<div class="text"> World</div>),
-	'<code>'                   => undef,
-	'Hello<code>'              => undef,
 	'<code>program</code>'     => q(<div class="code">program</div>),
 	'apple<code><</code>'      => q(<div class="text">apple</div><div class="code">&lt;</div>),
 	'<code> $x < $y </code>'   => q(<div class="code"> $x &lt; $y </div>),
-	'<code extra><STD></code>' => undef,
 	'<code><STD></code>'       => q(<div class="code">&lt;STD&gt;</div>), 
+#	'<b>bold</b> more text'    => q(<div class="text"><b>bold</b> more text</div>),
+
+	'<code>'                   => undef,
+	'Hello<code>'              => undef,
+	'<code extra><STD></code>' => undef,
 );
 use Data::Dumper;
 #print Dumper $parser->entry($text);
