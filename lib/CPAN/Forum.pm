@@ -886,8 +886,7 @@ Semi standard CGI::Application method to replace the way we load the templates.
 
 sub load_tmpl {
 	my $self = shift;
-
-	my $t = $self->SUPER::load_tmpl(@_, global_vars => 1
+	my $t = $self->SUPER::load_tmpl(@_
 #		      die_on_bad_params => -e ($self->param("ROOT") . "/die_on_bad_param") ? 1 : 0
 	);
 	$t->param("loggedin" => $self->session->param("loggedin") || "");
@@ -896,7 +895,6 @@ sub load_tmpl {
 	$t->param("admin" => $self->session->param('admin'));
 	return $t;
 }
-# config_fake_login  (not used currently)
 
 
 sub login {
@@ -944,8 +942,8 @@ sub login_process {
 	$session->param(loggedin  => 1);
 	$session->param(username  => $user->username);
 	$session->param(uid       => $user->id);
-	$session->param(fname     => $user->fname); # TODO
-	$session->param(lname     => $user->lname); # TODO
+	$session->param(fname     => $user->fname);
+	$session->param(lname     => $user->lname);
 	$session->param(email     => $user->email);
 	foreach my $g (CPAN::Forum::Usergroups->search_ugs($user->id)) {
 		$self->log->debug("UserGroups: " . $g->name);
@@ -1016,11 +1014,20 @@ sub register_process {
 	if ($q->param('email') !~ /^[a-z0-9_+@.-]+$/) {  
 		return $self->register({"bad_email" => 1});
 	}
+
+	if ($q->param('fname') !~ /^[a-zA-Z]*$/) {
+		return $self->register({"bad_fname" => 1});
+	}
+	if ($q->param('lname') !~ /^[a-zA-Z]*$/) {
+		return $self->register({"bad_lname" => 1});
+	}
 	
 	my $user = eval {
 		CPAN::Forum::Users->create({
 				username => $q->param('nickname'),
 				email    => $q->param('email'),
+				fname    => $q->param('fname'),
+				lname    => $q->param('lname'),
 			});
 	};
 	if ($@) {
@@ -1065,6 +1072,8 @@ sub notify_admin {
 
 	my $FROM = $self->config("from");
 
+	my $msg = "\nUsername: " . $user->username . "\nName: " . $user->fname . " " . $user->lname . "\n"; 
+
 	# TODO: the admin should be able to configure if she wants to get messages on
 	# every new user (field update_on_new_user)
 	my $admin = CPAN::Forum::Users->retrieve(1);
@@ -1072,7 +1081,7 @@ sub notify_admin {
 		To      => $admin->email,
 		From     => $FROM,
 		Subject => "New Forum user: " . $user->username,
-		Message => "\nUsername: " . $user->username . "\n",
+		Message => $msg,
 	);
 	sendmail(%mail);
 }
@@ -1546,6 +1555,7 @@ sub dist {
 
 	my $t = $self->load_tmpl("groups.tmpl",
 		loop_context_vars => 1,
+		global_vars => 1,
 	);
 	$t->param(hide_group => 1);
 				
@@ -1604,6 +1614,7 @@ sub users {
 
 	my $t = $self->load_tmpl("users.tmpl",
 		loop_context_vars => 1,
+		global_vars => 1,
 	);
 				
 	$t->param(hide_username => 1);
