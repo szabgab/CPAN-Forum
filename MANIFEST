@@ -25,11 +25,13 @@ t/CONFIG
 t/00.load.t
 t/001-users.t
 t/010-markup.t
+t/011-register.t
 t/100-auth.t
 t/pod-coverage.t
 t/pod.t
 t/02packages.details.txt
 t/lib/CGI/Application/Test.pm
+t/lib/CPAN/Forum/Test.pm
 
 templates/change_password.tmpl
 templates/help.tmpl
@@ -55,7 +57,7 @@ templates/search.tmpl
 templates/message.tmpl
 templates/notes.tmpl
 templates/module_search_form.tmpl
-
+templates/module_select_form.tmpl
 
 www/cgi/index.pl
 www/robots.txt
