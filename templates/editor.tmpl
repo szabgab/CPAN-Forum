@@ -8,20 +8,29 @@
 	<TMPL_IF bad_group>Bad distribution name<br /></TMPL_IF>
 	<TMPL_IF bad_data>Bad data<br /></TMPL_IF>
 	<TMPL_IF subject_too_long>Subject must be up to 50 characters.<br /></TMPL_IF>
-	<TMPL_IF text_format>Text format is not correct.<br /></TMPL_IF>
+	<TMPL_IF text_format>Text format is not correct. As we are still in development
+	this might be either a bug or on purpose. If after reading again the rules of posting
+	at the bottom of this page you still think your post should work, please send a copy of
+	it to <a href="mailto:gabor@perl.org.il">szabgab</a><br /></TMPL_IF>
 
 	<TMPL_IF bad_thing>Bad thing<br /></TMPL_IF>
 </div>
 
 <form method="post" action="/">
 <p>
+<input type="submit" name="button" value="Preview" />
+<TMPL_IF preview>
+	<input type="submit" name="button" value="Submit" />
+</TMPL_IF>
+<br />
 <input type="hidden" name="rm" value="process_post" />
 <input type="hidden" name="new_parent" value="<TMPL_VAR id>" />
 	
-<TMPL_VAR group_selector><br />
-Subject:<br /><input name="new_subject" size="60" value="<TMPL_VAR new_subject>" /><br />
-Text:<br /><textarea name="new_text" rows="15" cols="60"><TMPL_VAR new_text></textarea><br />
-	
+<input type="hidden" name="new_group_id" value="<TMPL_VAR new_group_id>">
+Distribution: <TMPL_VAR new_group><br />
+Subject:<br /><input name="new_subject" size="100" value="<TMPL_VAR new_subject>" /><br />
+Text:<br /><textarea name="new_text" rows="15" cols="100"><TMPL_VAR new_text></textarea><br />
+
 <input type="submit" name="button" value="Preview" />
 <TMPL_IF preview>
 	<input type="submit" name="button" value="Submit" />

@@ -190,7 +190,7 @@ v0.10_03
   Admin page
   Admin can change "From" e-address
   Enable <i>, <b> <br> and <a ..> with <p></p> pairs
-
+  Remove the selection box from the post interface as it was not used there.
   
   Admin can change e-mail address of any user
   Add paging
@@ -267,11 +267,6 @@ should use separate fields for usernames from various sources and when
 displayed we might prefix it auth:gabor, local:gabor etc.  Not nice, any better
 way ?
 
-- Add constraint checking to every field that the user can change by submitting
-information.  
-
-- Finalize markup
-
 Subject field:
 -  <= 50 chars
 -  Can contain any characters, we'll escape them when showing on the web site
@@ -315,9 +310,11 @@ one module to another module or group.
 Hmm, do I really need this ? maybe as I cannot just delete a user. (added a 
 status field that is not used currently)
 
-=head1 TODO Nice to have
+- Administrator can add a new module manually
+- Script that populates databse should not lock the whole database for a long time
+  Maybe it should fetch all the data to memory and work there.
 
-- Make sure adding a new module works fine
+- Replace the /post/number link by /post/TITLE_OF_POST ???
 
 - make paging available responses 1..10, 11.20, etc, 
 
@@ -1205,6 +1202,7 @@ sub posts {
 	if ($rm eq "new_post") {
 		$new_group = ${$self->param("path_parameters")}[0] || "";
 		$new_group_id = $q->param('new_group') if $q->param('new_group');
+		$self->log->debug("A: new_group: '$new_group' and id: '$new_group_id'");
 		
 		if ($new_group) {
 			if ($new_group =~ /^([\w-]+)$/) {
@@ -1237,9 +1235,10 @@ sub posts {
 			# TODO should be called whent the module_search is ready
 			return $self->module_serach_form();
 		}
+		$self->log->debug("B: new_group: '$new_group' and id: '$new_group_id'");
 	}
 	if ($rm eq "process_post") {
-		$new_group_id = $q->param("new_group");
+		$new_group_id = $q->param("new_group_id");
 		if (not $new_group_id) {
 			return $self->internal_error(
 				"Missing new_group_id. Accessed PATH_INFO: '$ENV{PATH_INFO}'",
@@ -1262,12 +1261,7 @@ sub posts {
 				);
 		}
 	}
-	#warn $new_group;
-	#warn $new_group_id;
-
-	#$new_group =~ s/-/::/g;
-	#(my $dashgroup = $new_group) =~ s/::/-/g;
-	#$t->param(dashgroup => $dashgroup);
+	$self->log->debug("C: new_group: '$new_group' and id: '$new_group_id'");
 
 	my $title = ""; # of the page
 	my $editor = 0;
@@ -1308,7 +1302,10 @@ sub posts {
 		$new_group        = $post->gid->name;
 		$new_group_id     = $post->gid->id;   	
 	}
-	$t->param("group_selector" => $self->_group_selector($new_group, $new_group_id));
+	$self->log->debug("D: new_group: '$new_group' and id: '$new_group_id'");
+	#$t->param("group_selector" => $self->_group_selector($new_group, $new_group_id));
+	$t->param(new_group    => $new_group);
+	$t->param(new_group_id => $new_group_id);
 	$t->param(new_text     => CGI::escapeHTML($q->param("new_text")));
 	
 	# for previewing purposes:
@@ -1354,8 +1351,8 @@ sub process_post {
 		($parent_post) = CPAN::Forum::Posts->search(id => $parent);
 		push @errors, "bad_thing"  if not $parent_post;
 	} else {       # assume new post
-		if ($q->param("new_group")) {
-			push @errors, "bad_group"  if not CPAN::Forum::Groups->search(id => $q->param("new_group"));
+		if ($q->param("new_group_id")) {
+			push @errors, "bad_group"  if not CPAN::Forum::Groups->search(id => $q->param("new_group_id"));
 		} else {
 			push @errors, "no_group";
 		}
@@ -1401,7 +1398,7 @@ sub process_post {
 	eval {
 		my $post = CPAN::Forum::Posts->create({
 			uid     => $self->session->param("username"),
-			gid     => $parent_post ? $parent_post->gid : $q->param("new_group"),
+			gid     => $parent_post ? $parent_post->gid : $q->param("new_group_id"),
 			subject => $q->param("new_subject"),
 			text    => $new_text,
 			date    => time,
@@ -1410,8 +1407,6 @@ sub process_post {
 		$post->parent($parent) if $parent_post;
 		$post->update;
 		$pid = $post->id;
-		#warn $parent_post ? $parent_post->gid : $q->param("new_group");
-		#warn "PG:" . $post->gid;
 	};
 	if ($@) {
 		#push @errors, "subject_too_long" if $@ =~ /subject_too_long/;
