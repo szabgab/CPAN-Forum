@@ -32,54 +32,66 @@ CPAN::Forum - Web forum application to discuss CPAN modules
 
 =head1 SYNOPSIS
 
- Visit L<http://www.cpanforum.com/>
+Visit L<http://www.cpanforum.com/>
 
 =head1 DESCRIPTION
 
 This is a Web forum application specifically designed to be used for
 discussing CPAN modules. At one point it might be adapted to be a general
 forum software but for now it is released in the hope that people
-will help improving it and by that improving the L<http://www.cpanforum.com/> site.
+will help improving it and by that improving the 
+L<http://www.cpanforum.com/> site.
 
 =head2 Features
 
-- Posting only by authenticated users
-- For registration valid e-mail required 
-- username and password should be in lowercase and unique
+=over 4 
 
-- Every poster will have to give
-	1) name of the group
-	2) Subject
-	3) Content
-	
-	4) We'll also add a unique id to the post and an id of the post this is responding to.
-	   This reference id will be NULL for new posts.
+=item * Posting only by authenticated users.
 
-	 At the beginning responses will have to maintain group but can change the subject and 
-	 will have to write new text.
-	 
-	- later we might enable changing the group to a related group 
-	  (e.g. a message about a module can get a response in a group to which this module belongs to)
-	- later we might enable total random change in the groups 
+=item * For registration a valid e-mail is required.
 
-- We make sure the links are Google friendly
-	/posts/ID  (link to a post)
-	/threads/ID  (link to a thread)
+=item * Username and password should be in lowercase and unique.
 
-- We provide RSS feed of the recent posts belonging to any of the groups.
+=item * Every poster will have to give
 
-- We'll provide search capability with restrictions to groups.
+=over 4
+
+=item 1. name of the group
+
+=item 2. Subject
+
+=item 3. Content
+
+=item 4. (Future) A unique id to the post and the post made in response to.
+	   
+This reference id will be NULL for new posts. At the beginning responses will 
+have to maintain group but can change the subject and will have to write new 
+text.
+
+=back 
+
+=item * Later we might enable changing the group to a related group.
+
+(e.g. a message about a module can get a response in a group to which this 
+module belongs to)
+
+=item * Later we might enable total random change in the groups.
+
+=item * We make sure the links are search-engine friendly
+
+- /posts/ID  (link to a post)
+- /threads/ID  (link to a thread)
+
+=item * We provide RSS feed of the recent posts belonging to any of the groups.
+
+=item * We'll provide search capability with restrictions to groups.
 
 =head1 Authentication
 
-	Shared authentication with auth.perl.org ?
-	Once I tried to do this but then for some reason I could not finish the process.
-	Maybe later we'll want to enable our users to use their auth.perl.org identity ?
-	
-	Maybe we can do it also with PerlMonks ?
-
-    Right now we have our own registration and login mechanism.
-
+Shared authentication with auth.perl.org? I once tried to do this but then for 
+some reason I could not finish the process. Maybe later we'll want to enable 
+our users to use their auth.perl.org identity. Maybe we can do it also with 
+PerlMonks. Right now we have our own registration and login mechanism.
 
 =head1 INSTALLATION
 
@@ -87,96 +99,96 @@ will help improving it and by that improving the L<http://www.cpanforum.com/> si
 
 This is the configuration of my Apache server on my notebook
 
- AddHandler cgi-script .pl
+    AddHandler cgi-script .pl
 
-<VirtualHost 127.0.0.1>
-    ServerName cpan.local
-    DocumentRoot                /home/gabor/work/gabor/public/dev/CPAN/www/
-    ScriptAliasMatch ^/(.*/.*)  /home/gabor/work/gabor/public/dev/CPAN/www/cgi/index.pl/$1
-    DirectoryIndex              cgi/index.pl
-</VirtualHost>
+    <VirtualHost 127.0.0.1>
+        ServerName cpan.local
+        DocumentRoot                /home/gabor/work/gabor/public/dev/CPAN/www/
+        ScriptAliasMatch ^/(.*/.*)  /home/gabor/work/gabor/public/dev/CPAN/www/cgi/index.pl/$1
+        DirectoryIndex              cgi/index.pl
+    </VirtualHost>
 
 
- <Directory "/home/gabor/work/dev/CPAN">
-    Options Indexes FollowSymLinks ExecCGI
-    AllowOverride None
-    Order allow,deny
-    Allow from 127.0.0.1
- </Directory>
+    <Directory "/home/gabor/work/dev/CPAN">
+        Options Indexes FollowSymLinks ExecCGI
+        AllowOverride None
+        Order allow,deny
+        Allow from 127.0.0.1
+    </Directory>
 
 =head2 hosts
 
-For local installations in /etc/hosts I added 
+For local installations in /etc/hosts I added:
 
-127.0.0.1         cpan.local
+    127.0.0.1         cpan.local
 
-so I have a totally separate virtual host just for this application.
+That way, I have a totally separate virtual host just for this application.
 
 In a real setting probably you'll have something like www.cpanforum.com 
 pointed to your server.
 
 =head2 Install the perl code
 
- perl Build.PL
- ./Build
- ./Build test
- ./Build install dir=/path/to/install
- cd /path/to/install
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install dir=/path/to/install
+    cd /path/to/install
 
- chmod a+x www/cgi/index.pl  (needed only if you work out of the repository)
- chmod a+x db/forum.db       (or whatever you need to make sure the database is writable by the web server.
+    chmod a+x www/cgi/index.pl  (needed only if you work out of the repository)
+    chmod a+x db/forum.db       (or whatever you need to make sure the database is writable by the web server.
 
- manually edit the www/cgi/index.pl file and set the sh-bang to the correct one
+Finally, manually edit the www/cgi/index.pl file and set the sha-bang to the 
+correct one
 
 
 =head2 Setup the database
 
-In the directory where you installed the modules create
-a file called CONFIG (see t/CONFIG for an example). 
-Having the following fileds:
+In the directory where you installed the modules create a file called CONFIG 
+(see t/CONFIG for an example). Having the following fields:
 
- username=        the user name of the administrator
- email=           of the administrator
- password=        the password of the administrator
- from=            email address to be used as the from address in the messages sent
-                  by the system
+    username=        The user name of the administrator.
+    email=           The E-mail of the administrator.
+    password=        The password of the administrator.
+    from=            The Email address to be used as the from address in the 
+                     messages sent by the system.
 
-You will be able to change all these values later from the web interface but we need
-to have the first values.
+You will be able to change all these values later from the web interface but 
+we need to have the first values.
 
- perl bin/setup.pl 
+Run:
+
+    perl bin/setup.pl 
 
 (you can now delete the CONFIG file)
 
- perl bin/populate.pl    (this will fetch a file from www.cpan.org and 
-                         might take a few minutes to run)
+Run:
 
-
+    perl bin/populate.pl
+    
+(this will fetch a file from www.cpan.org and might take a few minutes to run)
 
 =head2 CPAN_FORUM_URL
 
-For some of the tests you'll have to set the CPAN_FORUM_URL environment variable 
-to the URL where you installed the forum.
+For some of the tests you'll have to set the CPAN_FORUM_URL environment 
+variable to the URL where you installed the forum.
 
 =head2 Changes
 
 v0.09_04
 
-- Before writing a new post instead of showing a list of all the modules now the user 
-  first will search for a module name.
-  post link should give a search box that will let the user search
-  within the names of the modules. The result should be a restricted
-  list with only a few module names in a pull-down menu like we have now.
-  The search is a regular SQL LIKE search and we add % signs at both ends 
-  of the typed in word.
-
-
+- Before writing a new post instead of showing a list of all the modules now 
+the user first will search for a module name.  post link should give a search
+box that will let the user search within the names of the modules. The result
+should be a restricted list with only a few module names in a pull-down menu
+like we have now.  The search is a regular SQL LIKE search and we add % signs
+at both ends of the typed in word.
 
 =head2 TODO Critical for launching
 
-- Decide on Basic Markup language and how to extend for shortcuts
-  opening tag for code:  <code[^>]*>  but right now only <code> should be accepted
-  closing tag for code:  </code>
+- Decide on Basic Markup language and how to extend for shortcuts opening tag
+for code:  <code[^>]*>  but right now only <code> should be accepted closing
+tag for code:  </code>
 
 - check all submitted fields (restrict posting size to 10.000 Kbyte ?
 
@@ -187,7 +199,6 @@ v0.09_04
 
 =head2 TODO other, TBD
 
-
 clean up documentation
 
 add indexes to the tables ?
@@ -196,95 +207,102 @@ show the release dates of the various versions of a module so
 it is easy to compare that to the post.
 
 Authentication and user management process:
-  - new user comes to our site we give him a cookie, when he wants to login we offer him
-  --  login using the auth.perl.org credentials
-  --  login using XYZ credentials
-  --  create local credential
+- new user comes to our site we give him a cookie, when he wants to login we offer him
+--  login using the auth.perl.org credentials
+--  login using XYZ credentials
+--  create local credential
 
-  -- For auth.perl.org
-  --- redirect the user to auth.perl.org wait till he logs in there (maybe even creates the new account)
-  --- sets the preferences
-  --- comes back
-  --- we can fetch some of the information from that user
-  --- we need to keep the user_id received from auth.perl.org for later identification of the user
-  --- while we tell the user we would like to get the username/fullname/e-mail address from auth he might
-      not want to give, for this case we should have our way to update the locally updated username, 
-	  full name and validated e-mail address.
+-- For auth.perl.org
+--- redirect the user to auth.perl.org wait till he logs in there (maybe even creates the new account)
+--- sets the preferences
+--- comes back
+--- we can fetch some of the information from that user
+--- we need to keep the user_id received from auth.perl.org for later identification of the user
+--- while we tell the user we would like to get the username/fullname/e-mail
+address from auth he might not want to give, for this case we should have our
+way to update the locally updated username, full name and validated e-mail
+address.
   
-  -- For XYZ we have to see how they work
+--- For XYZ we have to see how they work
 
-  -- For local credentials we need the user to give us username/password/fullname and validated e-mail address
-  
+-- For local credentials we need the user to give us 
+username/password/fullname and validated e-mail address.
 
-We have to make sure that usernames which are displayed don't collide. Maybe we should use separate fields
-for usernames from various sources and when displayed we might prefix it auth:gabor, local:gabor etc.
-Not nice, any better way ?
+
+We have to make sure that usernames which are displayed don't collide. Maybe we
+should use separate fields for usernames from various sources and when
+displayed we might prefix it auth:gabor, local:gabor etc.  Not nice, any better
+way ?
 
 - Add constraint checking to every field that the user can change by submitting
-  information.  
+information.  
 
 - Finalize markup
 
-  Subject field:
-  -  <= 50 chars
-  -  Can contain any characters, we'll escape them when showing on the web site
+Subject field:
+-  <= 50 chars
+-  Can contain any characters, we'll escape them when showing on the web site
  
-  Text field:
-  - No restriction on line length, let the HTML handle that part
-  - The text is divided into areas of free text and marked sections
+Text field:
+- No restriction on line length, let the HTML handle that part
+- The text is divided into areas of free text and marked sections
 
-  In order to avoid accepting postings today that will break when we add more tags, 
-  we will reject any submission that is not correctly marked up.
+In order to avoid accepting postings today that will break when we add more 
+tags, we will reject any submission that is not correctly marked up.
 
 - Pages:
-  new mesage:      EDITOR;          PREVIEW + EDITOR
-  show:            POST
-  response:        POST + EDITOR;   POST + PREVIEW + EDITOR
+    new mesage:      EDITOR;          PREVIEW + EDITOR
+    show:            POST
+    response:        POST + EDITOR;   POST + PREVIEW + EDITOR
 
-  thread:          P1 + P2 + .. Pn
-  thread response: P1 + P2 + .. Pn + EDITOR;   P1 + P2 + .. Pn + PREVIEW + EDITOR;
+    thread:          P1 + P2 + .. Pn
+    thread response: P1 + P2 + .. Pn + EDITOR;   \
+    P1 + P2 + .. Pn + PREVIEW + EDITOR;
 
-  When the EDITOR comes up first the subject should be filled by the subject it is
-  answering to or empty for new message.
+When the EDITOR comes up first the subject should be filled by the subject it
+is answering to or empty for new message.
   
-  Yhe PREVIEW and the EDITOR should be filled by the same information, though within the
-  editor we don't need the parent id and similar to be shown.
+The PREVIEW and the EDITOR should be filled by the same information, though
+within the editor we don't need the parent id and similar to be shown.
 
 
 - Enable some administrator to mark a message (or a whole thread) to be hidden 
-	(database already has field)
+(database already has field)
 
 - Enable some administator to mark a group to be 
-	- hidden (messages don't show up)
-	- frozen (cannot add new message but still can see the earlier messages)
-  Critical part: make place for this in database (status field)
+- hidden (messages don't show up)
+- frozen (cannot add new message but still can see the earlier messages)
+Critical part: make place for this in database (status field)
 
-- Administrator (or even the author ?) should be able to move a message from one
-  module to another module or group.
+- Administrator (or even the author ?) should be able to move a message from
+one module to another module or group.
 
  
 - Enable administrator to ban a user (mark in the users database to disable the user)
-  hmm, do I really need this ? maybe as I cannot just delete a user. (added a status field
-  that is not used currently)
+Hmm, do I really need this ? maybe as I cannot just delete a user. (added a 
+status field that is not used currently)
 
 =head1 TODO Nice to have
 
 - Make sure adding a new module works fine
 
 - make paging available responses 1..10, 11.20, etc, 
-	OK, so we have listing in places like
+
+OK, so we have listing in places like
+
 	/
 	/dist/Distro-Name
 	/users/USERNAME
 	
-	/all  Can be a name for all the posts so we don't need to put any other information immediately after
-			the first slash  maybe it should be /home ?
+	/all  Can be a name for all the posts so we don't need to put any other 
+          information immediately after the first slash  maybe it should be 
+          /home ?
 
     /dist/Distro-Name/start/count
 	/all/start/count
 
 	
-	We'll also have some search facility that will be a post operation and
+We'll also have some search facility that will be a post operation and
 
 	/posts/id          show a post      (show post         )
 	/new_post/         start new post   (            editor with module list)
@@ -295,129 +313,139 @@ Not nice, any better way ?
 From the forms we have post methods so no need for URL munging
 process_post  =>  (show previous post)? show editor + show preview
 
-
-
 =head1 TODO Next release only
 
 - make the page size (for paging) user configurable
 
 - Notify user
-	A user can ask to be notified upon the following events per distribution.
-	subscriptions: uid, gid, (all), (starter), (participate)
-	1) All messages 
-	
-	All the messages execute 
-	QUERY: select uid FROM subscription WHERE gid == disto and all. 
-	
-	2) Thread starters
-	Thread starteres (where id=thread) execute 
-	QUERY: select uid FROM subscription WHERE gid == distro and starter
-	
-	3) Followup messages in a thread he participated already
-	Every message (well, except thread starters) execute:
-	QUERY: select uid FROM subscription
-	- there is a post with the same thread id as of this post which was posted by a user which
-	  has a subsciption (participate)
-	
-	
-	4) People whom are not subscribed to All messages (1) when seeing an interesting
-		posting they can say: send me all followups.
-		uid, threadid
 
-	She can set up such notification on a per module basis or for all the modules.
-	
-	After logging in the user can modify his "subscriptions" to such notifications.
-	The notification will be sent out from an e-mail address such as 
-	noreply@bla.com  which will discard any message sent to it. The message will contain
-	the text of the post, a link to the post_response page, a link to view the whole thread
-	and an e-mail address in case someone wants to complain/whatever.
+=over 4
 
+A user can ask to be notified upon the following events per distribution.
+subscriptions: uid, gid, (all), (starter), (participate)
+1) All messages 
+	
+All the messages execute 
+QUERY: select uid FROM subscription WHERE gid == disto and all. 
+	
+2) Thread starters
+Thread starteres (where id=thread) execute 
+QUERY: select uid FROM subscription WHERE gid == distro and starter
+	
+3) Followup messages in a thread he participated already
+Every message (well, except thread starters) execute:
+QUERY: select uid FROM subscription
+- there is a post with the same thread id as of this post which was posted by a user which
+has a subsciption (participate)
+	
+	
+4) People who are not subscribed to All messages (1) when seeing an
+interesting posting they can say: send me all followups.  uid, threadid
+
+She can set up such notification on a per module basis or for all the modules.
+	
+After logging in the user can modify his "subscriptions" to such notifications.
+The notification will be sent out from an e-mail address such as 
+noreply@bla.com  which will discard any message sent to it. The message will contain
+the text of the post, a link to the post_response page, a link to view the 
+whole thread
+and an e-mail address in case someone wants to complain/whatever.
+
+=back
 
 - Subscription (notify) management:
-   - /mypan will be the url to get and set all the configuration information.
-     It will list all your current subscriptions and you can enable/disable them.
-     Normally this will show only distributions you have some kind of a subscription.
 
-	 In addition from /mypan there will be a way to ask to add a new subscription by selecting
-	 the name of a module and the initial subscription parameters to it.
+- /mypan will be the url to get and set all the configuration information.
+It will list all your current subscriptions and you can enable/disable them.
+Normally this will show only distributions you have some kind of a subscription.
 
-	 In addition when displaying the list of all the messages to a specific module, logged in users
-	 will see their current subscription to this module (even if that is empty).
+In addition from /mypan there will be a way to ask to add a new subscription by selecting
+the name of a module and the initial subscription parameters to it.
+
+In addition when displaying the list of all the messages to a specific module, logged in users
+will see their current subscription to this module (even if that is empty).
 
 
 - Fix Installation
-	- when installing one might need to be root, in order to set the permissions correctly ?
-	- as user www fetch the module list file, unzip it in the db directory (as this is the only
-		directory we can write to) and run the populator
-	- on a new installation, change the ownership of directories (or at leas tell the user to do so)
+
+- when installing one might need to be root, in order to set the permissions 
+correctly ?
+
+- as user www fetch the module list file, unzip it in the db directory (as 
+this is the only directory we can write to) and run the populator
+
+- on a new installation, change the ownership of directories (or at leas tell
+the user to do so)
 
 
 - Write comprehensive test suit
 
 - Reply within a thread
-	When replying to a post within a thread we might want to open the editor window in the middle
-	of the thread, just below the post I am responding to.
+
+When replying to a post within a thread we might want to open the editor window
+in the middle of the thread, just below the post I am responding to.
 
 - Make the Session use the database instead of plain file
 
-
 - Make autoposter of new version announcements work
-	A script that will send an announcement on the new version of every module to the list
-	I think this is done as a script listening in the cpan-testers mailing list, though it
-	might be one similar to bin/populate.pl
 
-- make sure links that are relevant for distros don't show up on pages which don't belong
-	to distros. (e.g. a link to search.cpan.org/dist/CGI is ok but a link to 
-	search.cpan.org/dist/General is not)
+A script that will send an announcement on the new version of every module to
+the list I think this is done as a script listening in the cpan-testers mailing
+list, though it might be one similar to bin/populate.pl
 
-- Sometime we'll want to post a message in more than one group, e.g.
-	now I'd like to know how to use CGI::Session with DBD::SQLite. I might want to
-	post the message on more than one list at the same time as this is related to more
-	than one module.  Porbably if I need to chose one I'll select CGI::Session as I 
-	am trying to use that but it might be a nice feature.
-	Maybe I need to tell one module as the main group and then have a way to associate a 
-	few more modules with the posting.
+- make sure links that are relevant for distros don't show up on pages which
+don't belong to distros. (e.g. a link to search.cpan.org/dist/CGI is ok but a
+link to search.cpan.org/dist/General is not)
 
-	This can be done by de-coupleing the name of the distribution from the posts table for
-	all the distributions or we can add such an extra table for the additional distributions
-	so there will be a leading distro of the thread.
+- Sometime we'll want to post a message in more than one group, e.g.  now I'd
+like to know how to use CGI::Session with DBD::SQLite. I might want to post the
+message on more than one list at the same time as this is related to more than
+one module.  Porbably if I need to chose one I'll select CGI::Session as I am
+trying to use that but it might be a nice feature.  Maybe I need to tell one
+module as the main group and then have a way to associate a few more modules
+with the posting.
+
+This can be done by de-coupleing the name of the distribution from the posts table for all the distributions or we can add such an extra table for the additional distributions so there will be a leading distro of the thread.
 
 
 - Getting the listing of all ~7000 module names takes a long time.
-	I should profile it.
-	1) write a small script that will run the relevant code on the command line,
-	2) time this
-	3) look at the size of the output 386K -> it won't fly, you can't have such a page
-		on the web. Other solutions: 
-		- type in the name
-		- search for the name
-		- currently we'll keep a separate file called db/modules.txt with a listing of all
-			the distros. This make page generation in 1-2 sec instead of 7-8. Obviously
-			there is a problem we'll have to fix.
+I should profile it.
+1) write a small script that will run the relevant code on the command line,
+2) time this
+3) look at the size of the output 386K -> it won't fly, you can't have such a page
+on the web. Other solutions: 
+- type in the name
+- search for the name
+- currently we'll keep a separate file called db/modules.txt with a listing of all
+the distros. This make page generation in 1-2 sec instead of 7-8. Obviously
+there is a problem we'll have to fix.
 
 
 - Create a group for 
-	- each Distribution (DONE)
-	- Some bigger groups (eg. databases, testing, )
-		maybe put each distribution under one or more of the groups too
-	- General and other special purpose groups such as News (for the site)
-		where only "administrators" can post.
+- each Distribution (DONE)
+- Some bigger groups (eg. databases, testing, )
+maybe put each distribution under one or more of the groups too
+- General and other special purpose groups such as News (for the site)
+where only "administrators" can post.
 
-	I am not sure if I have to keep all these things in one table and if the
-	same form has to serve for creating messages in both distros and categories.
+I am not sure if I have to keep all these things in one table and if the
+same form has to serve for creating messages in both distros and categories.
 
 - Database or plain files ?
-	I think every information should be in the database but then we 
-	might want to generate static pages from the posts and discussions in 
-	order to reduce the need to fetch information from the database. Hmm, it sound faster
-	but we'll probabl want to build the pages on the fly anyway so maybe it does not improve
-	anything. We can start off by totally dynamic pages and then see if making them static will
-	reduce the load on the server. First we'll have to have load on the server. :-) 
 
-- Check if the technique we use to remember the last request before login cannot cause some security
-	problem such as remembering the last request of someone else who used the same machine recently ? 
+I think every information should be in the database but then we might want to
+generate static pages from the posts and discussions in order to reduce the
+need to fetch information from the database. Hmm, it sound faster but we'll
+probabl want to build the pages on the fly anyway so maybe it does not improve
+anything. We can start off by totally dynamic pages and then see if making them
+static will reduce the load on the server. First we'll have to have load on the
+server. :-) 
 
-- xml - provied
+- Check if the technique we use to remember the last request before login
+cannot cause some security problem such as remembering the last request of
+someone else who used the same machine recently ? 
+
+- xml - provided
 
 - favicon.ico and a banner image would be good
 
@@ -425,11 +453,12 @@ process_post  =>  (show previous post)? show editor + show preview
 
 =head2 cgiapp_init
 
-Standard CGI::Application method
+Standard CGI::Application method.
 
 Setup the Session object and the default HTTP headers
 
 =cut
+
 sub cgiapp_init {
 	my $self = shift;
 	my $dbh = CPAN::Forum::DBI::db_Main();
@@ -522,11 +551,11 @@ sub setup {
 
 Regular CGI::Application method
 
-We use it to change the run mode according to the requested URL
-(PATH_INFO).
+We use it to change the run mode according to the requested URL (PATH_INFO).
 Maybe we should move his code to the mode_param method ?
 
 =cut
+
 sub cgiapp_prerun {
 	my $self = shift;
 	my $rm = $self->get_current_runmode();
@@ -574,9 +603,11 @@ sub cgiapp_prerun {
 
 =head2 autoload
 
-Just to avoid real crashes when user types in bad URLs that happen to include rm=something
+Just to avoid real crashes when user types in bad URLs that happen to include 
+rm=something
 
 =cut
+
 sub autoload {
 	my $self = shift;
 	$self->internal_error;
@@ -585,7 +616,8 @@ sub autoload {
 
 =head2 home
 
-This the default run mode, it shows the home page that includes the list of most recent posts.
+This the default run mode, it shows the home page that includes the list of
+most recent posts.
 
 =cut
 sub home {
@@ -616,6 +648,7 @@ Builds an array of hashes from all the posts or those in the given range
 and returns the array reference.
 
 =cut
+
 sub build_listing {
 	my ($self, $it, $total) = @_;
 	$self->log->debug("build_listing: total=$total");
@@ -653,11 +686,13 @@ sub build_listing {
 	#@resp = reverse @resp if $to; # Otherwise we fetched in DESC order
 	return \@resp;
 }
+
 =head2 redirect_home
 
 Just to easily redirect to the home page
 
 =cut
+
 sub redirect_home {
 	my $self = shift;
 	$self->header_type("redirect");
@@ -669,6 +704,7 @@ sub redirect_home {
 About box with some statistics.
 
 =cut
+
 sub about {
 	my $self = shift;
 	my $t = $self->load_tmpl("about.tmpl");
@@ -689,11 +725,12 @@ sub faq {
 
 =head2 internal_error
 
-Gives a costume Internal error page.
+Gives a custom Internal error page.
 
 Maybe this one should also receive the error message and print it to the log file.
 
 =cut
+
 sub internal_error {
 	my ($self, $msg) = @_;
 	cluck $msg if $msg;
@@ -706,6 +743,7 @@ sub internal_error {
 Semi standard CGI::Application method to replace the way we load the templates.
 
 =cut
+
 sub load_tmpl {
 	my $self = shift;
 
@@ -742,6 +780,7 @@ sub login {
 - redirecting to the page where the user wanted to go before he was diverted to the login page
 
 =cut
+
 sub login_process {
 	my $self = shift;
 	my $q = $self->query;
@@ -779,6 +818,7 @@ sub login_process {
 Set the session to be logged out and remove personal information from the Session object.
 
 =cut
+
 sub logout {
 	my $self = shift;
 	
@@ -947,9 +987,11 @@ MSG
 =head2 _group_selector
 
 
-It is supposed to show the for to write a new message but will probably be a redirection.
+It is supposed to show the form to write a new message but will probably be a 
+redirection.
 
 =cut
+
 sub _group_selector {
 	my ($self, $group_name, $group_id) = @_;
 	my $q = $self->query;
@@ -1007,9 +1049,10 @@ sub new_post {
 
 =head2 response_form
 
-probably obsolate
+Probably obsolete.
 
 =cut
+
 sub response_form {
 	posts(@_);
 }
@@ -1024,9 +1067,10 @@ sub module_serach_form {
 
 =head2 posts
 
-Show a post, the editor and a preview - whichever needed
+Show a post, the editor and a preview - whichever is needed.
 
 =cut
+
 sub posts {
 	my ($self, $errors) = @_;
 	my $q = $self->query;
@@ -1167,11 +1211,12 @@ sub posts {
 
 =head2 process_post
 
-Process a posting, that is take the values from the CGI object, check if they are acceptable
-and try to add them to the database. If anything bad happens, give an error message preferably
-by filling out the form again.
+Process a posting, that is take the values from the CGI object, check if they
+are acceptable and try to add them to the database. If anything bad happens,
+give an error message preferably by filling out the form again.
 
 =cut
+
 sub process_post {
 	my $self = shift;
 	my $q = $self->query;
@@ -1304,6 +1349,7 @@ sub _text_escape {
 Show all the posts of a thread.
 
 =cut
+
 sub threads {
 	my $self = shift;
 
@@ -1338,10 +1384,11 @@ sub threads {
 
 =head2 dist
 
-List last few posts belonging to this group,
-provides a link to post a new message within this group
+List last few posts belonging to this group, provides a link to post a new 
+message within this group
 
 =cut
+
 sub dist {
 	my $self = shift;
 	
@@ -1395,6 +1442,7 @@ sub dist {
 List the posts of a particular user.
 
 =cut
+
 sub users {
 	my $self = shift;
 	
@@ -1463,9 +1511,10 @@ sub change_password {
 
 =head2 mypan
 
-Planned to be the manager for the notify subscription, currntly not in use.
+Planned to be the manager for the notify subscription, currently not in use.
 
 =cut
+
 sub mypan {
 	my $self = shift;
 
@@ -1635,9 +1684,10 @@ sub module_search {
 
 =head2 search
 
-Search form and processor
+Search form and processor.
 
 =cut
+
 sub search {
 	my $self = shift;
 
@@ -1669,8 +1719,8 @@ Provide RSS feed
 /rss  latest 20 entries
 /rss/dist/Distro-Name  latest 20 entries of that distro name
 
-
 =cut
+
 sub rss {
 	my $self = shift;
 	
@@ -1709,9 +1759,10 @@ sub rss {
 
 =head2 notify
 
-Send out e-mails upon receiving a submission
+Send out e-mails upon receiving a submission.
 
 =cut
+
 sub notify {
 	my $self = shift;
 	my $post_id = shift;
@@ -1793,14 +1844,13 @@ sub _sendmail {
 	}
 }
 
-
-
-
 =head2 _text2mail
 
-replace the markup used in the posting by things we can use in e-mail messages.
+replace the markup used in the posting by things we can use in 
+e-mail messages.
 
 =cut
+
 sub _text2mail {
 	return $_[0];
 }
@@ -1814,10 +1864,10 @@ sub help {
 
 =head1 ACKNOWLEDGEMENTS
 
-Thanks to Offer Kaye for his initial help with HTML and CSS.
-Thanks to all those people who develop and maintain the underlying technologies.
-See L<http://www.cpanforum.com/about/> for a list of tools we used.
-In addition to Perl of course.
+Thanks to Offer Kaye for his initial help with HTML and CSS.  Thanks to all
+the people who develop and maintain the underlying technologies.  See
+L<http://www.cpanforum.com/about/> for a list of tools we used.  In addition to
+Perl of course.
 
 =head1 DEVELOPMENT
 
