@@ -3,7 +3,11 @@ body {
 }
 
 #container { 
-	background: #dddddd; 
+	background: #dddddd;
+}
+.warning {
+	color: red;
+	font-size: 20pt;
 }
 
 #pageHeader h1 { 
