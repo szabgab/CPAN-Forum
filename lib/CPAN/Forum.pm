@@ -1052,6 +1052,7 @@ sub pwreminder {
 	);
 
 	$t->param($errs) if $errs;
+	$t->param($q->param('field') => 1);
 	return $t->output;
 }
 
@@ -1059,16 +1060,12 @@ sub pwreminder {
 sub pwreminder_process {
 	my ($self) = @_;
 	my $q = $self->query;
-	if (not $q->param('nickname') and not $q->param('email')) {
+	my $field = $q->param('field');
+	if (not $field or $field !~ /^username|email$/ or not $q->param('value')) {
 		return $self->pwreminder({"no_data" => 1});
 	}
 
-	my $user;
-	if ($q->param('nickname')) {
-		($user) = CPAN::Forum::Users->search({username => $q->param('nickname')});
-	} else {
-		($user) = CPAN::Forum::Users->search({email    => $q->param('email')});
-	};
+	my ($user) = CPAN::Forum::Users->search({$field => $q->param('value')});
 	return $self->pwreminder({"no_data" => 1}) if not $user;
 
 	# TODO: put this text in a template
@@ -1085,8 +1082,8 @@ http://$ENV{HTTP_HOST}/
 
 MSG
 
-	my ($field) = CPAN::Forum::Configure->search({field => "from"});
-	my $FROM = $field->value;
+	my ($from) = CPAN::Forum::Configure->search({field => "from"});
+	my $FROM = $from->value;
 	$self->log->debug("FROM field set to be $FROM");
 
 	my %mail = (

@@ -15,12 +15,13 @@
 <form method="post" action="/">
 <p>
 <input type="hidden" name="rm" value="pwreminder_process" />
+<select name="field">
+ <option value="username" <TMPL_IF username>SELECTED</TMPL_IF>>Nickname</option>
+ <option value="email"    <TMPL_IF email>SELECTED</TMPL_IF>>Email</option>
+</select>
+<input name="value" value="<TMPL_VAR value>" /> 
+<input type="submit" value="Remind me" />
 </p>
-	<table>
-	<tr><td>Nickname:</td><td><input name="nickname" value="<TMPL_VAR nickname>" /> or</td></tr>
-	<tr><td>Email:</td><td><input name="email" value="<TMPL_VAR email>" /></td></tr>
-	<tr><td></td><td><input type="submit" value="Remind me" /></td></tr>
-	</table>
 </form>
 </TMPL_IF>
 
