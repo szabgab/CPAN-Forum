@@ -33,6 +33,7 @@ my %cases = (
 	'a<b>c</b><code>x</code>d<code>y</code>' => q(<div class="text">a<b>c</b></div><div class="code">x</div><div class="text">d</div><div class="code">y</div>),
 	'a<i>c</i><code>x</code>d<code>y</code>' => q(<div class="text">a<i>c</i></div><div class="code">x</div><div class="text">d</div><div class="code">y</div>),
 	'a<b>c</b>d<i>x</i>f'      => q(<div class="text">a<b>c</b>d<i>x</i>f</div>),
+	'&lt;'                     => q(<div class="text">&lt;</div>),
 
 
 );
@@ -105,4 +106,10 @@ while (<qqrq>) {
 
 1;
 </code>
+
+CODE
+I am using Parse::RecDescent to validate the input on this forum. Right now it can give OK/NOT OK but I'd like to be a bit more specific. E.g.I'd like to give differen error messages 
+if there is a not approved HTML tag such as &lt;img&gt; in the text 
+or if there is an opening tag withou a closing tag
+or just a single &lt; mark somewhere
 

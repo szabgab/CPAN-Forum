@@ -1207,6 +1207,7 @@ sub posts {
 		$new_group_id     = $post->gid->id;   	
 	}
 	$t->param("group_selector" => $self->_group_selector($new_group, $new_group_id));
+	$t->param(new_text     => CGI::escapeHTML($q->param("new_text")));
 	
 	# for previewing purposes:
 	# This is funky, in order to use the same template for regular show of a message and for

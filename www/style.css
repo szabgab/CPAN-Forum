@@ -204,6 +204,7 @@ input {
 .text {
 	background: #eeeeee;
 	white-space: pre;
+	width: 80%;
 }
 .code {
 	background: #dddddd;
