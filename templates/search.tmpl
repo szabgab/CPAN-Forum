@@ -10,7 +10,7 @@
 </TMPL_LOOP>
 
 <TMPL_LOOP users>
-  <TMPL_VAR username><br />
+  <a href="/users/<TMPL_VAR username>"><TMPL_VAR username></a><br />
 </TMPL_LOOP>
 
 <TMPL_INCLUDE NAME="listing.tmpl">
