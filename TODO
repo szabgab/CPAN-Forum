@@ -32,12 +32,18 @@
    - Shall we display the orinal date and the last update date ?
    - Shall we display the post on its new date (order the display result by date ?)
 
-- Somehow let a module author (or anyone ?) subscribe/unsubscribe to all of her modules.
-  Rephrasing: 
+- Somehow let a module author (or anyone ?) subscribe/unsubscribe to all of her 
+  current and future(!) modules.
     1) Enable listing modules based on module author
 	2) Enable subscribing to several modules at the same time
+	this is not good as this does not cover the "future" thing and people will
+	forget to subscribe to the new module when they release one.
+	
+	So especially the module authors would like to have a button that sais
+	subscribe too all the modules of XYZ
 
-
+- Let people select a group of distros (e.g. all the distros by author SZABGAB)
+  and show them on the /mypan interface (or just subscribe to all of them)
 
 - Improve the markup language
 
@@ -87,10 +93,30 @@
 - JavaScript that lets users to set all the modules in /mypan to the same value
   (either All message or thread starter or Followup or nothing)
 
-- Let people select a group of distros (e.g. all the distros by author SZABGAB)
-  and show them on the /mypan interface (or just subscribe to all of them)
 
 
+PROBLEM:
+  Currently when a new browse visits the site we immediately give a cookie and
+  instert an entry in the sessions table.
+  After running for about 10 days we have about 32.000 entries in the sessions table.
+  It is not likely that so many people have visited the site.
+  I think the crawlers of Google and co. never return the cookie that I give them and
+  thus every hit they generate will create a new cookie and a new entry in the sessions
+  table. Besides, I never clean up the sessions table.
 
+  So let's see what can we do
+  1) Add an index to that table to speed up the access time (this I should do in any case)
+  2) If I recognize a crawler (e.g. googlebot) don't give a session ID to it.
+  3) Run cleanup routine that will delete old sessions:
+     As right now the session time is only kept within the a_session field this will be a slow
+	 process but should be done anyway
+  4) Add a field to the session table where I indicate the last access time
+
+
+- A way to monitor all current and future modules associated with a certain PAUSE ID.
+ (both RSS and e-mail)
  
+- check out the remote authentication module of  David Nicol: AIS::Client
+  and its server.
+
 
