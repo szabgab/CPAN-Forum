@@ -814,7 +814,10 @@ Maybe this one should also receive the error message and print it to the log fil
 
 sub internal_error {
 	my ($self, $msg, $tag) = @_;
-	cluck $msg if $msg;
+	if ($msg) {
+		warn $msg;
+		$self->log->debug($msg);
+	}
 	my $t = $self->load_tmpl("internal_error.tmpl");
 	$t->param($tag => 1) if $tag;
 	$t->output;
