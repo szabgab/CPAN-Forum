@@ -20,7 +20,7 @@ my $grammar = q {
 	text       : m{[\t\n -;=?-~]+}                {$item[1] }
 	code       : code_open code_text code_close   {$item[2] }
 	code_open  : m{<code>}
-	code_text  : m{[\t\n -~]+(?=</code>)}         { qq(<div class="code">) . CGI::escapeHTML($item[1]) . qq(</div>); }
+	code_text  : m{[\t\n -~]+?(?=</code>)}         { qq(<div class="code">) . CGI::escapeHTML($item[1]) . qq(</div>); }
 	code_close : m{</code>}
 	eodata     : m{^\Z}
 };
@@ -52,6 +52,8 @@ my %data = (
 	'<code><STD></code>'       => q(<div class="code">&lt;STD&gt;</div>), 
 	'some; strange $%^& text'  => q(<div class="text">some; strange $%^& text</div>),
 	'<b>bold</b> more text'    => q(<div class="text"><b>bold</b> more text</div>),
+	'a<b>c</b><code>x</code>d' => q(<div class="text">a<b>c</b></div><div class="code">x</div><div class="text">d</div>),
+	'a<b>c</b><code>x</code>d<code>y</code>' => q(<div class="text">a<b>c</b></div><div class="code">x</div><div class="text">d</div><div class="code">y</div>),
 
 	'<code>'                   => undef,
 	'Hello<code>'              => undef,
