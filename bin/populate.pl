@@ -11,7 +11,6 @@ use FindBin qw ($Bin);
 
 my $dir = "$Bin/../db";
 my $dbfile = "$dir/forum.db";
-my $modules_file = "$dir/modules.txt";
 CPAN::Forum::DBI->myinit($dbfile);
 
 use CPAN::Forum::Groups;
@@ -71,10 +70,6 @@ foreach my $d (@distributions) {
 			name => $name,
 			gtype => $CPAN::Forum::DBI::group_types{Distribution}, 
 		});
-
-		if (open my $fh, ">>", $modules_file) {
-			print $fh $dist->id, ":$name\n";
-		}
 	};
 }
 

@@ -31,9 +31,7 @@ END
 
 my $dir = "$Bin/../db";
 my $dbfile = "$dir/forum.db";
-my $modules = "$dir/modules.txt";
 unlink $dbfile if -e $dbfile;
-unlink $modules if -e $modules;
 mkdir $dir if not -e $dir;
 CPAN::Forum::DBI->myinit($dbfile);
 CPAN::Forum::DBI->init_db($dbfile);
