@@ -20,30 +20,34 @@ is(CPAN::Forum::Markup::split_rows("some text", 60), "some text");
 
 my $markup = CPAN::Forum::Markup->new();
 
-my %cases = (
-	'apple'                    => q(<div class="text">apple</div>),
-	'apple<code><</code>'      => q(<div class="text">apple</div><div class="code">&lt;</div>),
-	'apple<code><code></code>' => q(<div class="text">apple</div><div class="code">&lt;code&gt;</div>),
-	'1234567890' x 7           => q(<div class="text">) . '1234567890' x 7   . q(</div>),
-	'1234567890' x 100         => q(<div class="text">) . '1234567890' x 100 . q(</div>),
-	'Hello world'              => q(<div class="text">Hello world</div>),
-	'<code>program</code>'     => q(<div class="code">program</div>),
-	'<code><STD></code>'       => q(<div class="code">&lt;STD&gt;</div>),
+my $TEXT = '<div class="text">';
+my $END  = '</div>';
+my $CODE = '<div class="code">';
 
-	'Hello world'              => q(<div class="text">Hello world</div>),
-	' World'                   => q(<div class="text"> World</div>),
-	'apple<code>bob</code>'    => q(<div class="text">apple</div><div class="code">bob</div>),
-	'<code>program</code>'     => q(<div class="code">program</div>),
-	'apple<code><</code>'      => q(<div class="text">apple</div><div class="code">&lt;</div>),
-	'<code> $x < $y </code>'   => q(<div class="code"> $x &lt; $y </div>),
-	'<code><STD></code>'       => q(<div class="code">&lt;STD&gt;</div>), 
-	'some; strange $%^& text'  => q(<div class="text">some; strange $%^& text</div>),
-	'<b>bold</b> more text'    => q(<div class="text"><b>bold</b> more text</div>),
-	'a<b>c</b><code>x</code>d' => q(<div class="text">a<b>c</b></div><div class="code">x</div><div class="text">d</div>),
-	'a<b>c</b><code>x</code>d<code>y</code>' => q(<div class="text">a<b>c</b></div><div class="code">x</div><div class="text">d</div><div class="code">y</div>),
-	'a<i>c</i><code>x</code>d<code>y</code>' => q(<div class="text">a<i>c</i></div><div class="code">x</div><div class="text">d</div><div class="code">y</div>),
-	'a<b>c</b>d<i>x</i>f'      => q(<div class="text">a<b>c</b>d<i>x</i>f</div>),
-	'&lt;'                     => q(<div class="text">&lt;</div>),
+my %cases = (
+	'apple'                    => $TEXT . 'apple' . $END,
+	'apple<code><</code>'      => $TEXT . 'apple' . $END . $CODE . '&lt;' . $END,
+	'apple<code><code></code>' => $TEXT . 'apple' . $END . $CODE . '&lt;code&gt;' . $END,
+	'1234567890' x 7           => $TEXT . '1234567890' x 7   . $END,
+	'1234567890' x 100         => $TEXT . '1234567890' x 100 . $END,
+	'Hello world'              => $TEXT . 'Hello world' . $END,
+	'<code>program</code>'     => $CODE . 'program' . $END,
+	'<code><STD></code>'       => $CODE . '&lt;STD&gt;' . $END,
+
+	'Hello world'              => $TEXT . 'Hello world' . $END,
+	' World'                   => $TEXT . ' World' . $END,
+	'apple<code>bob</code>'    => $TEXT . 'apple' . $END . $CODE . 'bob' . $END,
+	'<code>program</code>'     => $CODE . 'program' . $END,
+	'apple<code><</code>'      => $TEXT . 'apple' . $END . $CODE . '&lt;' . $END,
+	'<code> $x < $y </code>'   => $CODE . ' $x &lt; $y ' . $END,
+	'<code><STD></code>'       => $CODE . '&lt;STD&gt;' . $END,
+	'some; strange $%^& text'  => $TEXT . 'some; strange $%^& text' . $END,
+	'<b>bold</b> more text'    => $TEXT . '<b>bold</b> more text' . $END,
+	'a<b>c</b><code>x</code>d' => $TEXT . 'a<b>c</b>' . $END . $CODE . 'x' . $END . $TEXT . 'd' . $END,
+	'a<b>c</b><code>x</code>d<code>y</code>' => $TEXT . 'a<b>c</b>' . $END . $CODE . 'x' . $END . $TEXT . 'd' . $END . $CODE . 'y' . $END,
+	'a<i>c</i><code>x</code>d<code>y</code>' => $TEXT . 'a<i>c</i>' . $END . $CODE . 'x' . $END . $TEXT . 'd' . $END . $CODE . 'y' . $END,
+	'a<b>c</b>d<i>x</i>f'      => $TEXT . 'a<b>c</b>d<i>x</i>f' . $END,
+	'&lt;'                     => $TEXT . '&lt;' . $END,
 
 
 );
