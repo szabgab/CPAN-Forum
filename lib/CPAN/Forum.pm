@@ -19,6 +19,7 @@ use CPAN::Forum::INC;
 my $limit       = 3;
 my $limit_rss   = 10;
 my $cookiename  = "cpanforum";
+my $SUBJECT = qr{[\w .:~!@#\$%^&*\()+?><,'";=-]+};
 
 my %errors = (
 	"ERR no_less_sign"              => "No < sign in text",
@@ -177,6 +178,11 @@ For some of the tests you'll have to set the CPAN_FORUM_URL environment
 variable to the URL where you installed the forum.
 
 =head2 Changes
+
+v0.09_05
+- POD cleanup (Shlomi Fish)
+
+- More tests
 
 v0.09_04
 
@@ -688,7 +694,7 @@ sub build_listing {
 		#(my $dashgroup = $post->gid) =~ s/::/-/g;
 		my $thread_count = CPAN::Forum::Posts->sql_count_thread($post->thread)->select_val;
 		push @resp, {
-			subject      => $post->subject, 
+			subject      => _subject_escape($post->subject), 
 			id           => $post->id, 
 			group        => $post->gid->name, 
 			#dashgroup    => $dashgroup,
@@ -1193,8 +1199,8 @@ sub posts {
 			$new_subject = "Re: $new_subject";
 		}
 		
-		$t->param(new_subject  => $new_subject);
-		$t->param(title        => $post->subject);
+		$t->param(new_subject  => _subject_escape($new_subject));
+		$t->param(title        => _subject_escape($post->subject));
 		$t->param(post         => 1);
 		
 		$new_group        = $post->gid->name;
@@ -1208,7 +1214,7 @@ sub posts {
 	# only one iteration in it) The following hash is in preparation of this internal loop.
 	if (not @$errors or $$errors[0] eq "preview") {
 		my %preview;
-		$preview{subject}    = $q->param("new_subject") || "";
+		$preview{subject}    = _subject_escape($q->param("new_subject")) || "";
 		$preview{text}       = _text_escape($q->param("new_text"))    || "";
 		$preview{parentid}   = $q->param("new_parent")  || "";
 #		$preview{thread_id}  = $q->param("new_text")    || "";
@@ -1219,7 +1225,7 @@ sub posts {
 		$t->param(preview_loop => [\%preview]);
 	}
 
-	$t->param(new_subject => $q->param("new_subject"));
+	$t->param(new_subject => _subject_escape($q->param("new_subject")));
 	$t->param(group       => $new_group) if $new_group;
 
 	return $t->output;
@@ -1256,7 +1262,6 @@ sub process_post {
 	my $new_text = $q->param("new_text"); 
 	
 	push @errors, "no_subject" if not $new_subject;
-	my $SUBJECT = qr{[\w .:~!@#\$%^&*\()+?><,'";=-]+};
 	push @errors, "invalid_subject" if $new_subject and $new_subject !~ m{^$SUBJECT$};
 	
 	push @errors, "no_text"    if not $new_text;
@@ -1341,6 +1346,11 @@ sub _post {
 	return \%post;
 }
 
+sub _subject_escape {
+	my ($subject) = @_;
+	return CGI::escapeHTML($subject);
+}
+
 # this is not correct, the Internal error should be raised all the way up, not as the
 # text field...
 sub _text_escape {
@@ -1394,7 +1404,7 @@ sub threads {
 #	(my $dashgroup = $posts[0]->gid) =~ s/::/-/g;
 	$t->param(group => $posts[0]->gid->name);
 #	$t->param(dashgroup => $dashgroup);
-	$t->param(title => $posts[0]->subject);
+	$t->param(title => _subject_escape($posts[0]->subject));
 
 	return $t->output;
 }
@@ -1762,7 +1772,7 @@ sub rss {
 
 	my $prefix = "";
 	while (my $post = $it->next() and $cnt--) {
-		$rss->item($url. "posts/" . $post->id(), $prefix . $post->subject);
+		$rss->item($url. "posts/" . $post->id(), $prefix . $post->subject); # TODO _subject_escape ?
 	}
 #	$rss->save("file.rss");
 
@@ -1802,7 +1812,7 @@ sub notify {
 	# disclaimer ?
 	# X-lits: field ?
 
-	my $subject = sprintf ("[%s] %s",  $post->gid->name, $post->subject);
+	my $subject = sprintf ("[%s] %s",  $post->gid->name, $post->subject); # TODO _subject_escape ?
 
 	my ($field) = CPAN::Forum::Configure->search({field => "from"});
 	my $FROM = $field->value;
