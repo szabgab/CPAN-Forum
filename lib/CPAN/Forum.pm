@@ -815,6 +815,7 @@ Maybe this one should also receive the error message and print it to the log fil
 sub internal_error {
 	my ($self, $msg, $tag) = @_;
 	if ($msg) {
+		$msg .= " REFERER: $ENV{HTTP_REFERER}" if $ENV{HTTP_REFERER};
 		warn $msg;
 		$self->log->debug($msg);
 	}
