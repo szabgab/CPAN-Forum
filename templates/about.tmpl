@@ -15,8 +15,8 @@
 	<a href="http://lists.cpan.org/">Lists CPAN</a>. For even more resources visit 
 	<a href="http://www.perl.org/">Perl.org</a>.
 </div>
-<div id="about_list1">
-	<h2>Tools used</h2>
+<div class="about_list">
+	<p class="about_title">Tools used</p>
 	<ul>
 		<li><a href="/dist/CGI">CGI</a></li>
 		<li><a href="/dist/Test-More">Test::More</a></li>
@@ -35,8 +35,8 @@
 		<li><a href="/dist/Mail-Sendmail">Mail::Sendmail</a></li>
 	</ul>
 </div>
-<div id="about_list2">
-	<h2>Statistics:</h2>
+<div class="about_list">
+	<p class="about_title">Statistics:</p>
 	<ul>
 		<li>Number of distributions: <TMPL_VAR distro_cnt></li>
 		<li>Number of posts: <TMPL_VAR posts_cnt></li>
@@ -48,14 +48,27 @@
 		Current site version: <TMPL_VAR version>
 	</p>
 </div>
-<div id="about_list3">
-	<h2>News</h2>
+<div class="about_list">
+	<p class="about_title">News</p>
 	<ul>
-		<li> 2004 June ?? - First public version.</li>
+		<li> 2005 January 15 - First public beta version</li>
+		<li> 2004 June - First version (and then a long silence fell on us)</li>
 	</ul>
 </div>
-<div id="about_list4">
-	<h2>TODO</h2>
+<div class="about_list">
+	<p class="about_title">Development</p>
+	<p>If you'd like to follow the development of this web site and the
+	   <a href="http://search.cpan.org/dist/CPAN-Forum/">CPAN::Forum</a> distribution
+	   on CPAN you should know the follwoing things:
+	</p>
+	<ul>
+	  <li><a href="http://svn.pti.co.il/svn/cpan-forum/trunk/">Subversion repository</a></li>
+      <li><a href="http://perl.org.il/mailman/listinfo/cpan-forum-commit">mailing list for repository commits</a></li>
+      <li><a href="http://www.cpanforum.com/dist/CPAN-Forum">Discussion</a></li>
+	</ul>
+</div>
+<div class="about_list">
+	<p class="about_title">TODO</p>
 	<ul>
 		<li> Finalize the markup language</li>
 		<li> -----</li>
@@ -76,3 +89,4 @@
 </div>
 
 <TMPL_INCLUDE NAME="footer.tmpl">
+

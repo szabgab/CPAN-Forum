@@ -124,21 +124,15 @@ table {
 	margin-bottom: 10px;
 }
 
-#about_list1 h2 {
+.about_list {
 	font-size: 14pt;
 }
 
-#about_list2 h2 {
-	font-size: 14pt;
+.about_title {
+	font-size: 20pt;
 }
 
-#about_list3 h2 {
-	font-size: 14pt;
-}
 
-#about_list4 h2 {
-	font-size: 14pt;
-}
 #posting_rules {
 	margin-top: 10px;
 }
