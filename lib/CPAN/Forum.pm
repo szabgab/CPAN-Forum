@@ -1021,8 +1021,7 @@ your password is: $password
 
 MSG
 
-	my ($field) = CPAN::Forum::Configure->search({field => "from"});
-	my $FROM = $field->value;
+	my $FROM = $self->config("from");
 	$self->log->debug("FROM field set to be $FROM");
 
 	my %mail = (
@@ -1037,8 +1036,7 @@ MSG
 sub notify_admin {
 	my ($self, $user) = @_;
 
-	my ($field) = CPAN::Forum::Configure->search({field => "from"});
-	my $FROM = $field->value;
+	my $FROM = $self->config("from");
 
 	# TODO: the admin should be able to configure if she wants to get messages on
 	# every new user (field update_on_new_user)
@@ -1092,8 +1090,7 @@ http://$ENV{HTTP_HOST}/
 
 MSG
 
-	my ($from) = CPAN::Forum::Configure->search({field => "from"});
-	my $FROM = $from->value;
+	my $FROM = $self->config("from");
 	$self->log->debug("FROM field set to be $FROM");
 
 	my %mail = (
@@ -2047,8 +2044,7 @@ sub notify {
 
 	my $subject = sprintf ("[%s] %s",  $post->gid->name, $post->subject); # TODO _subject_escape ?
 
-	my ($field) = CPAN::Forum::Configure->search({field => "from"});
-	my $FROM = $field->value;
+	my $FROM = $self->config("from");
 	$self->log->debug("FROM field set to be $FROM");
 	my $admin = CPAN::Forum::Users->retrieve(1);
 	# send all messages to Admin, this shuld be configurabele
