@@ -1394,6 +1394,27 @@ sub process_post {
 	
 	push @errors, "no_text"    if not $new_text;
 	push @errors, "subject_too_long" if $new_subject and length($new_subject) > 50;
+
+	$self->log->debug("username: " . 
+				$self->session->param("username") . 
+				" uid: " .  
+				$self->session->param("uid"));
+				
+	my $button = $q->param("button");
+	# BUG: we are putting in the usernames instead of the user ids in the uid field of the posts
+	# but for this reason we'll have to use the username in every other place
+	if (not @errors and $button eq "Submit") {
+		my ($last_post) = CPAN::Forum::Posts->search(uid => $self->session->param("username"), {order_by => 'id DESC', limit => 1});
+		if ($last_post) {
+			$self->log->debug("username: " . 
+				$self->session->param("username") . 
+				" last post: " . $last_post->date . " now: " . time());
+			if ($last_post->date > time() - $self->config("flood_control_time_limit")) {
+				push @errors, "flood_control";
+			}
+		}
+	}
+	
 	return $self->posts(\@errors) if @errors;
 	
 
@@ -1412,7 +1433,6 @@ sub process_post {
 	}
 
 
-	my $button = $q->param("button");
 	if ($button eq "Preview") {
 		return $self->posts(["preview"]);
 	}
