@@ -82,6 +82,23 @@ sub posting_process {
 }
 
 
+=head1 NAME
+
+CPAN::Forum::Markup - Markup definitions and processing for CPAN::Forum
+
+=head1 SYNOPSIS
+
+	my $markup = CPAN::Forum::Markup->new();
+	my $result = $markup->posting_process($new_text) ;
+
+=head1 DESCRIPTION
+
+Based on Parse::RecDescent, this module provide a method to check if a give
+piece of text is a valid post. It returns the text in the format it could be
+sent to the user or returns undef if the text is invalid.
+
+=cut
+
 
 1;
 
