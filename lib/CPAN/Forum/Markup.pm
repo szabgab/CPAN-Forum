@@ -2,61 +2,52 @@ package CPAN::Forum::Markup;
 use strict;
 use warnings;
 
-use CGI qw(escapeHTML);
+use CGI qw();
+use Parse::RecDescent;
 
 sub new {
 	my ($class) = @_;
-	bless {}, $class;
+	my $self = bless {}, $class;
+	
+	$self->{grammar} = q {
+	entry      : chunk(s) eodata                  { $item[1] }
+	chunk      : marked_html | marked_code        { $item[1] }
+
+	marked_html: html(s)                          { qq(<div class="text">) . join("", @{$item[1]}) . qq(</div>); }
+	html       : text                             { $item[1] } 
+	           | open_b text close_b              { join "", @item[1..$#item] }
+	           | open_i text close_i              { join "", @item[1..$#item] }
+	open_b     : m{<b>}
+	close_b    : m{</b>}
+	open_i     : m{<i>}
+	close_i    : m{</i>}
+	text       : m{[\t\n -;=?-~]+}                {$item[1] }
+
+	marked_code: open_code code close_code        { join("", @item[1..$#item]) }
+	open_code  : m{<code>}                        { qq(<div class="code">) }
+	close_code : m{</code>}                       { qq(</div>) }
+	code       : m{[\t\n -~]+?(?=</code>)}        { CGI::escapeHTML($item[1]) }
+
+	eodata     : m{^\Z}
+	};
+
+	$Parse::RecDescent::skip = '';
+
+	return $self;
 }
 
-
-# will someone simplify this code ??
 sub posting_process {
-	my ($self, $t) = @_;
-
-	my ($text, $rest) = split /<code>/, $t, 2;
-	my $ret = $self->text_proc($text);
-	if (not $rest) {
-		if ($t =~ /<code>/) {
-			die "ERR open_code_without_closing\n";
-		} else {
-			return $ret;
-		}
-	}
-
-	die "ERR open_code_without_closing\n" if $rest !~ m{</code>};
-	my ($code, $more) = split /<\/code>/, $rest, 2;
-	$ret .= $self->code_proc($code);
-	$ret .= $self->posting_process($more) if $more;
-	return $ret;
-}
-
-
-sub text_proc {
 	my ($self, $text) = @_;
-	die "ERR no_less_sign\n" if $text =~ /</;
-	$self->line_width($text);
-	$text = escapeHTML $text;
-	return qq(<div class="text">$text</div>\n);
-}
 
-sub code_proc {
-	my ($self, $code) = @_;
-	$self->line_width($code);
-	#$code =~ s/</&lt;/g;
-	$code = escapeHTML $code;
-	return qq(<div class="code">$code</div>\n);
+	my $parser = new Parse::RecDescent ($self->{grammar});
+	if (not $parser) {
+		warn "Bad Grammar\n";
+		return;
+	}
+	my $out = $parser->entry($text);
+	return if not defined $out;
+	return join("",@$out);
 }
-
-sub line_width {
-	my ($self, $str) = @_;
-	my @lines = split /\n/, $str;
-	#foreach my $line (@lines) {
-	#	die "ERR line_too_long\n" if length $line > 70;
-	#}
-	return 1;
-}
-
 
 
 

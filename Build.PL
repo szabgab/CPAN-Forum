@@ -34,6 +34,7 @@ my $builder = CPAN::Forum::Build->new(
 		'XML::RSS::SimpleGen'                   => 0,  # for, well RSS generation
 		'Mail::Sendmail'                        => 0,  
 		'CGI::Session::SQLite'                  => 0,
+		'Parse::RecDescent'                     => 0,
 	},
 	build_requires => {
 		'Test::WWW::Mechanize'       => 0.02,

@@ -1274,10 +1274,8 @@ sub process_post {
 	# When the editor first displayed and every time if an error was caught this button will be hidden.
 
 	my $markup = CPAN::Forum::Markup->new();
-	eval {
-		$markup->posting_process($new_text) ;
-	};
-	if ($@) {
+	my $result = $markup->posting_process($new_text) ;
+	if (not defined $result) {
 		push @errors, "text_format";
 		return $self->posts(\@errors);
 	}
@@ -1358,9 +1356,9 @@ sub _text_escape {
 
 	return "" if not $text;
 	my $markup = CPAN::Forum::Markup->new();
-	my $html = eval { $markup->posting_process($text) };
-	if ($@) {
-		warn "Error displaying already accepted text: '$text' $@";
+	my $html = $markup->posting_process($text);
+	if (not defined $html) {
+		warn "Error displaying already accepted text: '$text'";
 		return "Internal Error";
 	}
 	return $html;

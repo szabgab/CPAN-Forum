@@ -69,6 +69,7 @@ my %data = (
 	'a<b>c</i>'                => undef,
 	'a<b>c'                    => undef,
 	'a<i>c'                    => undef,
+	'apple<'                   => undef,
 );
 use Data::Dumper;
 
