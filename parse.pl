@@ -15,12 +15,15 @@ my $grammar = q {
 	marked_html: html(s)                          { '<div class="text">' . join("", @{$item[1]}) . '</div>'; }
 	html       : text                             { $item[1] } 
 	           | open_b text close_b              { join "", @item[1..$#item] }
+	           | open_i text close_i              { join "", @item[1..$#item] }
 	open_b     : m{<b>}
 	close_b    : m{</b>}
+	open_i     : m{<i>}
+	close_i    : m{</i>}
 	text       : m{[\t\n -;=?-~]+}                {$item[1] }
 	code       : code_open code_text code_close   {$item[2] }
 	code_open  : m{<code>}
-	code_text  : m{[\t\n -~]+?(?=</code>)}         { qq(<div class="code">) . CGI::escapeHTML($item[1]) . qq(</div>); }
+	code_text  : m{[\t\n -~]+?(?=</code>)}        { qq(<div class="code">) . CGI::escapeHTML($item[1]) . qq(</div>); }
 	code_close : m{</code>}
 	eodata     : m{^\Z}
 };
@@ -54,10 +57,13 @@ my %data = (
 	'<b>bold</b> more text'    => q(<div class="text"><b>bold</b> more text</div>),
 	'a<b>c</b><code>x</code>d' => q(<div class="text">a<b>c</b></div><div class="code">x</div><div class="text">d</div>),
 	'a<b>c</b><code>x</code>d<code>y</code>' => q(<div class="text">a<b>c</b></div><div class="code">x</div><div class="text">d</div><div class="code">y</div>),
+	'a<i>c</i><code>x</code>d<code>y</code>' => q(<div class="text">a<i>c</i></div><div class="code">x</div><div class="text">d</div><div class="code">y</div>),
+	'a<b>c</b>d<i>x</i>f'      => q(<div class="text">a<b>c</b>d<i>x</i>f</div>),
 
 	'<code>'                   => undef,
 	'Hello<code>'              => undef,
 	'<code extra><STD></code>' => undef,
+	'a<b>c</i>'                => undef,
 );
 use Data::Dumper;
 
