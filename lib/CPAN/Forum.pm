@@ -837,7 +837,7 @@ MSG
 
 	# TODO: the admin should be able to configure if she wants to get messages on
 	# every new user
-	my $admin = CPAN::Forum::Username->retrieve(1);
+	my $admin = CPAN::Forum::Users->retrieve(1);
 	$mail{To} = $admin->email;
 	$mail{Subject} = "New Forum user: " . $user->username;
 	$mail{Message} = "";
@@ -1655,7 +1655,7 @@ sub rss {
 	my $rss = XML::RSS::SimpleGen->new( $url, "CPAN Forum", "Discussing Perl CPAN modules");
 	$rss->language( 'en' );
 
-	my $admin = CPAN::Forum::Users->retreive(1);
+	my $admin = CPAN::Forum::Users->retrieve(1);
 	$rss->webmaster($admin->email);
 
 	my $prefix = "";

@@ -12,14 +12,15 @@ my %cases = (
 	'apple'                    => qr(\s*<div class="text">apple</div>\s*),
 	'apple<code><</code>'      => qr(\s*<div class="text">apple</div>\s*<div class="code">&lt;</div>\s*),
 	'apple<code><code></code>' => qr(\s*<div class="text">apple</div>\s*<div class="code">&lt;code&gt;</div>\s*),
+	'1234567890' x 7           => qr(),
 );
 
 my %fails = (
-	'apple<B>'             => "ERR no_less_sign",
-	'apple< sd'            => "ERR no_less_sign",
-	'apple<'               => "ERR no_less_sign",
-	'apple<code>sd'        => "ERR open_code_without_closing",
-	'1234567890' x 7 . "x" => "ERR line_too_long",
+	'apple<B>'             => qr(^ERR no_less_sign$),
+	'apple< sd'            => qr(^ERR no_less_sign$),
+	'apple<'               => qr(^ERR no_less_sign$),
+	'apple<code>sd'        => qr(^ERR open_code_without_closing$),
+	'1234567890' x 7 . "x" => qr(^ERR line_too_long$),
 );
 
 
@@ -29,7 +30,7 @@ foreach my $c (sort keys %cases) {
 }
 
 foreach my $c (sort keys %fails) {
-	throws_ok {f($c)} qr/^$fails{$c}$/, $fails{$c};
+	throws_ok {f($c)} $fails{$c}, "OK";
 }
 
 
