@@ -180,6 +180,12 @@ variable to the URL where you installed the forum.
 
 =head2 Changes
 
+Longer usernames
+Search box on more pages
+Search for module uses % at the beginning of the string as well
+Include stars of CPAN Ratings
+Admin can add new modules manually
+
 v0.11_01
   Put the page size and the rss size in the configuration table
   Make CPAN::Forum::Configure an easy interface to the configuration table

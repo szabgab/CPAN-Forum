@@ -26,8 +26,6 @@
 
 - Admin: delete a user
 
-- Admin: add a new module manually
-
 - Script that populates databse should not lock the whole database for a long time
   Maybe it should fetch all the data to memory and work there.
 

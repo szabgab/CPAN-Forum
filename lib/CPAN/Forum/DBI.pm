@@ -96,6 +96,21 @@ CREATE TABLE groups (
 			gtype            INTEGER NOT NULL
 );
 
+CREATE TABLE metagroups (
+			id               INTEGER PRIMARY KEY auto_increment,
+			name             VARCHAR(255) UNIQUE NOT NULL,
+			status           INTEGER,
+);
+
+CREATE TABLE group_in_meta (
+			meta             INTEGER NOT NULL,
+			group            INTEGER NOT NULL
+			,FOREIGN KEY (meta)  REFERENCES metagroups(id)
+			,FOREIGN KEY (group) REFERENCES groups(id)
+);
+
+	
+
 CREATE TABLE grouprelations (
 			parent            INTEGER NOT NULL,
 			child            INTEGER NOT NULL
