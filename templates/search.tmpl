@@ -5,6 +5,20 @@
 
 <form method="post" action="/search/">
 <p>
+<input type="hidden" name="rm" value="find_groups" />
+<input name="name" value="<TMPL_VAR name>" /><br />
+<input type="submit" value="Search Module names" />
+</p>
+</form>
+
+<TMPL_LOOP groups>
+   <a href="/dist/<TMPL_VAR name>"><TMPL_VAR name></a><br />
+</TMPL_LOOP>
+
+<hr />
+
+<form method="post" action="/search/">
+<p>
 <input type="hidden" name="rm" value="search" />
 </p>
 <table>
@@ -16,10 +30,7 @@
 </p>
 </form>
 
-<TMPL_IF q>
-Search results
-</TMPL_IF>
-
 <TMPL_INCLUDE NAME="listing.tmpl">
+
 <TMPL_INCLUDE NAME="footer.tmpl">
 

@@ -184,6 +184,8 @@ variable to the URL where you installed the forum.
 v0.10_02
   <p>, <br> enabled
   Add link to Kobes Search
+  Improve full text search for posts
+
 
 v0.10
 - markup improved, bugs fixed
@@ -212,10 +214,7 @@ for code:  <code[^>]*>  but right now only <code> should be accepted closing
 tag for code:  </code>
 
 - check all submitted fields (restrict posting size to 10.000 Kbyte ?
-- Make the site look nicer (HTML and css work)
 - Improve text and explanations.
-- Improve Legal statement, look at other sites.
-
 
 clean up documentation
 
@@ -595,6 +594,7 @@ my @free_modes = qw(home
 					posts threads dist users 
 					search all 
 					help
+					find_groups
 					rss ); 
 my @restricted_modes = qw(
 			new_post process_post
@@ -1774,29 +1774,32 @@ Search form and processor.
 
 =cut
 # not in use
-sub small_search {
-	my $self = shift;
-	my $q       = $self->query;
-	my $name    = $q->param("name")    || '';
+sub find_groups {
+	my $self  = shift;
+	my $q     = $self->query;
+	my $name  = $q->param("name")    || '';
 
-	if ($name    =~ /(.*)/) { $name    = $1; }
+	if ($name =~ /(.*)/) { $name    = $1; }
+	$name =~ s/::/-/g;
 	
 	my $t = $self->load_tmpl("search.tmpl",
 		associate => $q,
 		loop_context_vars => 1,
 	);
-
+	my $it;
+	my @groups;
 	if ($name) {
 		my $it =  CPAN::Forum::Groups->search_like(name => $name . '%');
-		my $cnt = CPAN::Forum::Groups->sql_count_like("name" =>  $name . '%')->select_val;
-		$t->param(messages => $self->build_listing($it,$cnt));
+		while (my $group  = $it->next) {
+			push @groups, {name => $group->name};
+		}
 	}
+	$t->param(groups => \@groups);
 
 	$t->output;
 }
 
 
-# not yet in use
 sub search {
 	my $self = shift;
 
