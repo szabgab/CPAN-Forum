@@ -51,9 +51,9 @@ sub code_proc {
 sub line_width {
 	my ($self, $str) = @_;
 	my @lines = split /\n/, $str;
-	foreach my $line (@lines) {
-		die "ERR line_too_long\n" if length $line > 70;
-	}
+	#foreach my $line (@lines) {
+	#	die "ERR line_too_long\n" if length $line > 70;
+	#}
 	return 1;
 }
 

@@ -159,13 +159,26 @@ to the URL where you installed the forum.
 
 =head2 Changes
 
-Will come here after we start to accumulate them
+v0.09_04
+
+- Before writing a new post instead of showing a list of all the modules now the user 
+  first will search for a module name.
+  post link should give a search box that will let the user search
+  within the names of the modules. The result should be a restricted
+  list with only a few module names in a pull-down menu like we have now.
+  The search is a regular SQL LIKE search and we add % signs at both ends 
+  of the typed in word.
+
+
 
 =head2 TODO Critical for launching
 
-- Basic Markup language:
-  <code>
-  </code>
+- Decide on Basic Markup language and how to extend for shortcuts
+  opening tag for code:  <code[^>]*>  but right now only <code> should be accepted
+  closing tag for code:  </code>
+
+- check all submitted fields (restrict posting size to 10.000 Kbyte ?
+
 
 - Make the site look nicer (HTML and css work)
 - Improve text and explanations.
@@ -174,21 +187,12 @@ Will come here after we start to accumulate them
 =head2 TODO other, TBD
 
 
-clean documentation
-check all submitted fields (restrict posting size to 10.000 Kbyte ?
+clean up documentation
 
-add indexes to the tables
-
-post link should give a search box that will let the user search
-within the names of the modules. The result should be a restricted
-list with only a few module names in a pull-down menu like we have now.
-The search can be regular SQL LIKE search and the user can add % signs
-to use as wide cards
+add indexes to the tables ?
 
 show the release dates of the various versions of a module so
 it is easy to compare that to the post.
-
-
 
 Authentication and user management process:
   - new user comes to our site we give him a cookie, when he wants to login we offer him
@@ -1178,7 +1182,7 @@ sub process_post {
 	my $new_text = $q->param("new_text"); 
 	
 	push @errors, "no_subject" if not $new_subject;
-	my $SUBJECT = qr{[\w .:~!@#\$%^&*\()+=-]+};
+	my $SUBJECT = qr{[\w .:~!@#\$%^&*\()+?><,'";=-]+};
 	push @errors, "invalid_subject" if $new_subject and $new_subject !~ m{^$SUBJECT$};
 	
 	push @errors, "no_text"    if not $new_text;
