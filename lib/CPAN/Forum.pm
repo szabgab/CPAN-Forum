@@ -728,18 +728,37 @@ most recent posts.
 =cut
 sub home {
 	my $self = shift;
+	my $q = $self->query;
 	
 	my $t = $self->load_tmpl("home.tmpl",
 		loop_context_vars => 1,
 	);
 	
-	my $from = ${$self->param("path_parameters")}[1] || 0;
-	my $cnt  = ${$self->param("path_parameters")}[2] || $limit;
-	$t->param(messages => $self->build_listing(
-			scalar CPAN::Forum::Posts->retrieve_latest($from+$cnt),
-			CPAN::Forum::Posts->count_all(),
-			));
-	#CPAN::Forum::Posts->mysearch({},1 $limit);
+	#my $from = ${$self->param("path_parameters")}[1] || 0;
+	#my $cnt  = ${$self->param("path_parameters")}[2] || $limit;
+	#my @results = CPAN::Forum::Posts->retrieve_latest($from+$cnt);
+	#$t->param(messages => $self->build_listing(
+	#		\@results,
+	#		CPAN::Forum::Posts->count_all(),
+	#		));
+	#		
+	my $page = $q->param('page') || 1;
+	my $pager   = CPAN::Forum::Posts->mysearch({}, $page, $limit);
+	my @results = $pager->search_where();
+    my $total   = $pager->total_entries;
+	$self->log->debug("number of entries: total=$total");
+    #$self->session->param('per_page'     => $per_page);
+    #$self->session->param('current_page' => $pager->current_page);
+	my $data = $self->new_build_listing(\@results);
+
+    $t->param(messages       => $data);
+    $t->param(total          => $total);
+    $t->param(previous_page  => $pager->previous_page);
+    $t->param(next_page      => $pager->next_page);
+    $t->param(first_entry    => $pager->first);
+    $t->param(last_entry     => $pager->last);
+    $t->param(first_page     => 1)                      if $pager->current_page != 1;
+    $t->param(last_page      => $pager->last_page)      if $pager->current_page != $pager->last_page;
 
 	$t->output;
 }
@@ -765,9 +784,9 @@ sub build_listing {
 	my $to   = $from+$cnt-1;
 	
 	my @resp;
-	if ($to) {
-		$it = $it->slice($from, $to);
-	}
+	#if ($to) {
+	#	$it = $it->slice($from, $to);
+	#}
 
 	#my $start = $from % $cnt;
 	
@@ -778,7 +797,7 @@ sub new_build_listing {
 	my ($self, $it) = @_;
 	
 	my @resp;
-	while (my $post = $it->next) {
+	foreach my $post (@$it) {
 		my $thread_count = CPAN::Forum::Posts->sql_count_thread($post->thread)->select_val;
 		push @resp, {
 			subject      => _subject_escape($post->subject), 
@@ -825,6 +844,12 @@ sub about {
 	$t->param(users_cnt         => CPAN::Forum::Users->count_all());
 	$t->param(subscription_cnt  => CPAN::Forum::Subscriptions->count_all());
 	$t->param(version           => $VERSION);
+	# number of posts per group name, can create some xml feed from it that can
+	# be used by search.cpan.org and Kobes to add a number of posts next to the link
+	#select count(*),groups.name from posts, groups where groups.id=gid group by gid;
+	#
+	#count posts for a specific group:
+	#select count(*) from posts, groups where groups.id=gid and groups.name="CPAN-Forum";
 
 	$t->output;
 }
@@ -2108,6 +2133,7 @@ sub _text2mail {
 sub help {
 	$_[0]->load_tmpl("help.tmpl")->output;
 }
+
 
 1;
 

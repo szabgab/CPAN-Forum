@@ -17,4 +17,10 @@
 	</tr>
 </TMPL_LOOP>
 </table>
+<TMPL_IF first_page>   <a href="?page=<TMPL_VAR first_page>">first page</a> | </TMPL_IF>
+<TMPL_IF previous_page><a href="?page=<TMPL_VAR previous_page>">previous page</a> | </TMPL_IF>
+<TMPL_VAR first_entry> - <TMPL_VAR last_entry> messages in a total of <TMPL_VAR total>
+<TMPL_IF next_page> | <a href="?page=<TMPL_VAR next_page>">next page</a></TMPL_IF>
+<TMPL_IF last_page> | <a href="?page=<TMPL_VAR last_page>">last page</a></TMPL_IF>
+
 </TMPL_IF>
