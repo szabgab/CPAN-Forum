@@ -2010,7 +2010,7 @@ sub admin_process {
 	my $q = $self->query;
 
 	# fields that can have only one value
-	foreach my $field (qw(rss_size per_page from)) {
+	foreach my $field (qw(rss_size per_page from flood_control_time_limit )) {
 		if (my ($conf) = CPAN::Forum::Configure->find_or_create({field => $field})) {
 			$conf->value($q->param($field));
 			$conf->update;
