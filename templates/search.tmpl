@@ -1,11 +1,15 @@
 <TMPL_INCLUDE NAME="head.tmpl">
 <h2>Search page</h2>
+</div>
+
 <TMPL_INCLUDE NAME="navigation.tmpl">
 
-<form method="POST" action="/search">
-<input type="hidden" name="rm" value="search">
-<input name="q" value="<TMPL_VAR q>">
-<input type="submit" value="Search">
+<form method="post" action="/search/">
+<p>
+<input type="hidden" name="rm" value="search" />
+<input name="q" value="<TMPL_VAR q>" />
+<input type="submit" value="Search" />
+</p>
 </form>
 
 <TMPL_IF q>

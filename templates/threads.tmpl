@@ -1,5 +1,7 @@
 <TMPL_INCLUDE NAME="head.tmpl">
 <h2>CPAN Forum - Thread</h2>
+</div>
+
 <TMPL_INCLUDE NAME="navigation.tmpl">
 <TMPL_INCLUDE NAME="links.tmpl">
 
@@ -24,7 +26,7 @@
 		<TMPL_LOOP responses>
 			<a href="#<TMPL_VAR id>"><TMPL_VAR id></a> &nbsp;   
 		</TMPL_LOOP>
-		<br>
+		<br />
 	</TMPL_IF>
 	<a href="/response_form/<TMPL_VAR id>">Write a response</a>.
 </td></tr>
