@@ -917,6 +917,7 @@ sub login_process {
 
 	my $request = $session->param("request") || "";
 	$session->param("request" => "");
+	$session->flush();
 	$self->header_type("redirect");
 	$request .= "/" if $request !~ m{/$};
 	$self->header_props(-url => "http://$ENV{HTTP_HOST}/$request");
@@ -933,6 +934,7 @@ sub logout {
 	my $self = shift;
 	
 	my $session = $self->session;
+	my $username = $session->param('username');
 	$session->param(loggedin => 0);
 	$session->param(username => '');
 	$session->param(uid       => '');
@@ -940,6 +942,8 @@ sub logout {
 	$session->param(lname     => '');
 	$session->param(email     => '');
 	$session->param(admin     => '');
+	$session->flush();
+	$self->log->debug("logged out '$username'");
 
 	$self->redirect_home;
 }
