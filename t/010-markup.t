@@ -5,8 +5,18 @@ use warnings;
 use Test::More "no_plan";
 use Test::Exception;
 
+
+
 use lib "blib/lib";
 use CPAN::Forum::Markup;
+
+my $long = "123456789 " x 10;
+my $long_new = "123456789 " x 6 . "\n" . "123456789 " x 4;
+my $long2 = "123456789 " x 10 . "abcde " x 20;
+my $long2_new = "123456789 " x 6 . "\n" . "123456789 " x 4 . "\n" . "abcde " x 13 . "\n" . "abcde " x 7;
+is(CPAN::Forum::Markup::limit_rows("some text"), "some text");
+is(CPAN::Forum::Markup::limit_rows($long), $long);
+is(CPAN::Forum::Markup::limit_rows($long2), $long2);
 
 my $markup = CPAN::Forum::Markup->new();
 
@@ -70,13 +80,12 @@ foreach my $c (sort keys %fails) {
 	#throws_ok {f($c)} $fails{$c}, "OK";
 }
 
-
 my $data = join "", <DATA>;
 foreach my $code (split /CODE/, $data) {
 	#print STDERR $code;
 	my $out = $markup->posting_process($code);
 	ok(defined($out), "BIG CODE");
-	ok(length($out) > length ($code));
+	ok(length($out) > length ($code)) or print STDERR $out;
 }
 
 

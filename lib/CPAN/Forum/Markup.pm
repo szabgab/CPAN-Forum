@@ -21,12 +21,12 @@ sub new {
 	close_b    : m{</b>}
 	open_i     : m{<i>}
 	close_i    : m{</i>}
-	text       : m{[\r\t\n -;=?-~]+}                {$item[1] }
+	text       : m{[\r\t\n -;=?-~]+}              {$item[1] }
 
 	marked_code: open_code code close_code        { join("", @item[1..$#item]) }
 	open_code  : m{<code>}                        { qq(<div class="code">) }
 	close_code : m{</code>}                       { qq(</div>) }
-	code       : m{[\r\t\n -~]+?(?=</code>)}        { CGI::escapeHTML($item[1]) }
+	code       : m{[\r\t\n -~]+?(?=</code>)}      { CGI::escapeHTML(CPAN::Forum::Markup::limit_rows($item[1])) }
 
 	eodata     : m{^\Z}
 	};
@@ -34,6 +34,20 @@ sub new {
 	$Parse::RecDescent::skip = '';
 
 	return $self;
+}
+
+# takes a string
+# makes sure every line is max N characters long
+sub limit_rows {
+	my ($text) = @_;
+	my $N = 70;
+	
+	my @text = split /\n/, $text;
+	my @new;
+	foreach my $row (@text) {
+		push @new, $row;
+	}
+	return join "\n", @new;
 }
 
 sub parser {

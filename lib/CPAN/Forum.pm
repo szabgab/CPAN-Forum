@@ -471,6 +471,54 @@ variables) and then to construct a /cpan-forum/login/ /cpan-forum/register/
 etc. path. (or use relative URLs).
 
 
+=head2 TEMPLATES
+
+
+root templates:
+
+about.tmpl
+change_password.tmpl
+faq.tmpl
+groups.tmpl
+help.tmpl
+home.tmpl
+internal_error.tmpl
+login.tmpl
+module_search_form.tmpl
+module_select_form.tmpl
+mypan.tmpl
+notes.tmpl
+posts.tmpl
+pwreminder.tmpl
+search.tmpl
+users.tmpl
+register.tmpl
+threads.tmpl
+
+
+every root template should INCLUDE      -> head.tmpl navigation.tmpl footer.tmpl
+
+groups.tmpl            -> links.tmpl listing.tmpl     (list of messages within one group)
+home.tmpl              -> listing.tmpl                (list of messages in all the site)
+posts.tmpl             -> links.tmpl message.tmpl message.tmpl editor.tmpl  
+                                                      (single message 
+													  with or without the editor
+													  with or without a preview pane)
+search.tmpl            -> listing.tmpl                (list of messages resulted from search)
+threads.tmpl           -> links.tmpl
+users.tmpl             -> listing.tmpl                (list of messages of one user)
+
+
+Non root templates:
+links.tmpl      - a bunch of links to search.cpan.org and similar places (specific to one distro)
+listing.tmpl    - can show the titles of many messages 
+message.tmpl    - can show one message (or a preview message)
+naviagtion.tmpl -
+head.tmpl       -
+footer.tmpl     -
+
+Use this for mapping:
+grep INCLUDE *| grep -v navigation.tmpl | grep -v footer.tmpl | grep -v head.tmpl
 
 =head1 METHODS
 
@@ -1671,7 +1719,6 @@ sub notes {
 }
 
 
-# partially written code to select a module name
 sub module_search {
 	my ($self) = @_;
 
