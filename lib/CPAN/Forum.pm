@@ -526,8 +526,8 @@ sub cgiapp_init {
 	my $self = shift;
 	my $dbh = CPAN::Forum::DBI::db_Main();
 	
-	my $log = $self->param("ROOT") . "/db/messages.log";
-	$STATUS_FILE = $self->param("ROOT") . "/db/status";
+	my $log       = $self->param("ROOT") . "/db/messages.log";
+	$STATUS_FILE  = $self->param("ROOT") . "/db/status";
 	my $log_level = $self->_set_log_level();
 
 	$self->log_config(
@@ -547,8 +547,10 @@ sub cgiapp_init {
 	$self->log->debug("--- START ---");
 	
 
+	$self->log->debug("Cookie received: "  . $self->query->cookie($cookiename) );
 	CGI::Session->name($cookiename);
 	$self->session_config(
+		#CGI_SESSION_OPTIONS => [ "driver:File", $self->query, {Directory => "/tmp"}],
 		CGI_SESSION_OPTIONS => [ "driver:SQLite", $self->query, {Handle => $dbh}],
 		COOKIE_PARAMS       => {
 				-expires => '+24h',
@@ -556,8 +558,9 @@ sub cgiapp_init {
 		},
 		SEND_COOKIE         => 1,
 	);
+	$self->log->debug("sid:  " . ($self->session->id() || ""));
 	
-	$self->header_props( 
+	$self->header_props(
 		-expires => '-1d',  
 		# I think this this -expires causes some strange behaviour in IE 
 		# on the other hand it is needed in Opera to make sure it won't cache pages.
@@ -686,6 +689,7 @@ sub cgiapp_prerun {
 
 	$self->log->debug("Current runmode:  $rm"); 
 	$self->log->debug("Current user:  " . ($self->session->param("username") || ""));
+	$self->log->debug("Current sid:  " . ($self->session->id() || ""));
 
 	return if grep {$rm eq $_} @free_modes;
 	#return if not grep {$rm eq $_} @restricted_modes;
@@ -907,6 +911,7 @@ sub login_process {
 	}
 	$self->log->debug("Username: " . $user->username);
 
+	#$self->session_cookie();
 	my $session = $self->session;
 	$session->param(admin     => 0); # make sure it is clean
 
@@ -926,6 +931,7 @@ sub login_process {
 	my $request = $session->param("request") || "";
 	$session->param("request" => "");
 	$session->flush();
+	$self->log->debug("Session flushed after login " . $session->param('loggedin'));
 	$self->header_type("redirect");
 	$request .= "/" if $request !~ m{/$};
 	$self->header_props(-url => "http://$ENV{HTTP_HOST}/$request");
@@ -1368,7 +1374,7 @@ sub process_post {
 	push @errors, "invalid_subject" if $new_subject and $new_subject !~ m{^$SUBJECT$};
 	
 	push @errors, "no_text"    if not $new_text;
-	push @errors, "subject_too_long" if $new_subject and length($new_subject) > 50;
+	push @errors, "subject_too_long" if $new_subject and length($new_subject) > 80;
 
 	$self->log->debug("username: " . 
 				$self->session->param("username") . 
@@ -2270,6 +2276,16 @@ sub help {
 
 sub site_is_closed {
 	$_[0]->load_tmpl("site_is_closed.tmpl")->output;
+}
+
+sub teardown {
+	my ($self) = @_;
+	$self->log->debug("teardown called");
+	if (not  $self->session->param('loggedin') ) {
+		$self->log->debug("not logged in, but not deleting session");
+		#$self->session->delete();
+		#$self->session->flush();
+	}
 }
 
 1;
