@@ -1632,7 +1632,7 @@ sub users {
 	$fullname .= $user->fname if $user->fname;
 	$fullname .= " " if $fullname;
 	$fullname .= $user->lname if $user->lname;
-	$fullname = $username if not $fullname;
+	#$fullname = $username if not $fullname;
 
 	$t->param(this_username => $username);
 	$t->param(this_fullname => $fullname);
@@ -1715,7 +1715,7 @@ sub mypan {
 	$fullname .= $user->fname if $user->fname;
 	$fullname .= " " if $fullname;
 	$fullname .= $user->lname if $user->lname;
-	$fullname = $username if not $fullname;
+	#$fullname = $username if not $fullname;
 
 
 	$t->param(fullname => $fullname);
