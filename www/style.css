@@ -28,6 +28,7 @@ BODY {
 	height: 18px; 
 	padding: 0px 0px 0px 20px; 
 	font-size: 12pt;
+	/*font-weight: bold;*/
 	color: #333333;
 	border: solid thin;
 	border-color: #333333;
@@ -221,6 +222,7 @@ INPUT {
 .links {
 /*	background: lightyellow; */
 	background: #eeeeee;
+	text-align: center; 
 
 }
 

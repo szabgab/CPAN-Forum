@@ -880,7 +880,7 @@ Semi standard CGI::Application method to replace the way we load the templates.
 sub load_tmpl {
 	my $self = shift;
 
-	my $t = $self->SUPER::load_tmpl(@_, 
+	my $t = $self->SUPER::load_tmpl(@_, global_vars => 1
 #		      die_on_bad_params => -e ($self->param("ROOT") . "/die_on_bad_param") ? 1 : 0
 	);
 	$t->param("loggedin" => $self->session->param("loggedin") || "");
@@ -1535,6 +1535,7 @@ sub dist {
 	my $t = $self->load_tmpl("groups.tmpl",
 		loop_context_vars => 1,
 	);
+	$t->param(hide_group => 1);
 				
 #	$t->param(dashgroup => $dashgroup);
 	$t->param(group => $group);
@@ -1593,6 +1594,7 @@ sub users {
 		loop_context_vars => 1,
 	);
 				
+	$t->param(hide_username => 1);
 
 	my ($user) = CPAN::Forum::Users->search(username => $username);
 
