@@ -2,7 +2,7 @@ package CPAN::Forum;
 use strict;
 use warnings;
 
-our $VERSION = "0.10_02";
+our $VERSION = "0.11";
 
 use base "CGI::Application";
 use CGI::Application::Plugin::Session;
@@ -16,7 +16,7 @@ use CGI ();
 
 use CPAN::Forum::INC;
 
-my $limit       = 3;
+my $limit       = 20;
 my $limit_rss   = 10;
 my $cookiename  = "cpanforum";
 my $SUBJECT = qr{[\w .:~!@#\$%^&*\()+?><,'";=-]+};
@@ -181,7 +181,7 @@ variable to the URL where you installed the forum.
 
 =head2 Changes
 
-v0.10_03
+v0.11
   Search for users
   Unite the serch methods
   Accept both upper-case and lower-case HTML tags and turn them all to lower 
@@ -193,8 +193,6 @@ v0.10_03
   Remove the selection box from the post interface as it was not used there.
   Put the search form on the home page as well.
   Admin can change e-mail address of any user
-
-
   Add paging
  
 
@@ -735,20 +733,20 @@ sub home {
 	);
 	
 	my $page = $q->param('page') || 1;
-	$self->_search_results($t, {}, $page, $limit);
+	$self->_search_results($t, {where => {}, page => $page, per_page => $limit});
 	$t->output;
 }
 
 sub _search_results {
-	my ($self, $t, $params, $page, $limit) = @_;
+	my ($self, $t, $params) = @_;
 	
-	my $pager   = CPAN::Forum::Posts->mysearch($params, $page, $limit);
+	my $pager   = CPAN::Forum::Posts->mysearch($params);
 	my @results = $pager->search_where();
     my $total   = $pager->total_entries;
 	$self->log->debug("number of entries: total=$total");
     #$self->session->param('per_page'     => $per_page);
     #$self->session->param('current_page' => $pager->current_page);
-	my $data = $self->new_build_listing(\@results);
+	my $data = $self->build_listing(\@results);
 
     $t->param(messages       => $data);
     $t->param(total          => $total);
@@ -764,33 +762,7 @@ sub all {
 	home(@_);
 }
 
-=head2 build_listing
-
-Receives a CPAN::Forum::Posts iterator and optionally two numbers
-Builds an array of hashes from all the posts or those in the given range
-and returns the array reference.
-
-=cut
-
 sub build_listing {
-	my ($self, $it, $total) = @_;
-	$self->log->debug("build_listing: total=$total");
-	
-	my $from = ${$self->param("path_parameters")}[1] || 0;
-	my $cnt  = ${$self->param("path_parameters")}[2] || $limit;
-	my $to   = $from+$cnt-1;
-	
-	my @resp;
-	#if ($to) {
-	#	$it = $it->slice($from, $to);
-	#}
-
-	#my $start = $from % $cnt;
-	
-	$self->new_build_listing($it);
-}
-
-sub new_build_listing {
 	my ($self, $it) = @_;
 	
 	my @resp;
@@ -1231,7 +1203,7 @@ sub posts {
 	$self->log->debug("posts rm=$rm");
 
 	my $new_group = "";
-	my $new_group_id;
+	my $new_group_id = "";
 	
 	if ($rm eq "new_post") {
 		$new_group = ${$self->param("path_parameters")}[0] || "";
@@ -1593,14 +1565,9 @@ sub dist {
 			);
 	}
 
-
-	$t->param(messages => $self->build_listing(
-			scalar CPAN::Forum::Posts->search(gid => $gid, {order_by => 'date DESC'}),
-			CPAN::Forum::Posts->sql_count_where("gid", $gid)->select_val,
-			));
-
+	my $page = $q->param('page') || 1;
+	$self->_search_results($t, {where => {gid => $gid}, page => $page, per_page => $limit});
 	$t->output;
-
 }
 
 =head2 users
@@ -1647,10 +1614,8 @@ sub users {
 	$t->param(this_fullname => $fullname);
 	$t->param(title => "Information about $username");
 
-	$t->param(messages => $self->build_listing(
-			scalar CPAN::Forum::Posts->search(uid => $username, {order_by => 'date DESC'}),
-			CPAN::Forum::Posts->sql_count_where("uid", $username)->select_val,
-			));
+	my $page = $q->param('page') || 1;
+	$self->_search_results($t, {where => {uid => $username}, page => $page, per_page => $limit});
 	$t->output;
 }
 
@@ -1856,7 +1821,7 @@ sub search {
 	my ($self) = @_;
 	my $q      = $self->query;
 	my $name   = $q->param("name")    || '';
-	my $what   = $q->param("what")    || 'module';
+	my $what   = $q->param("what")    || '';
 
 	# kill the taint checking (why do I use taint checking if I kill it then ?)
 	if ($name =~ /(.*)/) { $name    = $1; }
@@ -1867,7 +1832,16 @@ sub search {
 		loop_context_vars => 1,
 	);
 	my $it;
-	if ($name and $what) {
+
+	if (not $what and not $name) {
+		$what = $self->session->param('search_what');
+		$name = $self->session->param('search_name');
+	}
+
+	$self->session->param(search_what => $what);
+	$self->session->param(search_name => $name);
+
+	if ($what and $name) {
 		if ($what eq "module") {
 			my @things;
 			my $it =  CPAN::Forum::Groups->search_like(name => $name . '%');
@@ -1876,8 +1850,7 @@ sub search {
 			}
 			$t->param(groups => \@things);
 			$t->param($what => 1);
-		}
-		if ($what eq "user") {
+		} elsif ($what eq "user") {
 			my @things;
 			my $it =  CPAN::Forum::Users->search_like(username => '%' . lc($name) . '%');
 			while (my $user  = $it->next) {
@@ -1885,15 +1858,20 @@ sub search {
 			}
 			$t->param(users => \@things);
 			$t->param($what => 1);
-		}
-		my %search;
-		if ($what eq "subject") { %search = (subject => '%' . $name . '%'); }
-		if ($what eq "text")    { %search = (text    => '%' . $name . '%'); }
-		if (%search) {
-			my $it =  CPAN::Forum::Posts->search_like(%search);
-			my $cnt = CPAN::Forum::Posts->sql_count_like(%search)->select_val;
-			$t->param(messages => $self->build_listing($it,$cnt));
-			$t->param($what => 1);
+		} else {
+			my %where;
+			if ($what eq "subject") { %where = (subject => {'LIKE', '%' . $name . '%'}); }
+			if ($what eq "text")    { %where = (text    => {'LIKE', '%' . $name . '%'}); }
+			$self->log->debug("Search 1: " . join "|", %where);
+			if (%where) {
+
+				$self->log->debug("Search 2: " . join "|", %where);
+
+				my $page = $q->param('page') || 1;
+				$self->_search_results($t, {where => \%where, page => $page, per_page => $limit});
+
+				$t->param($what => 1);
+			}
 		}
 	}
 	$t->output;

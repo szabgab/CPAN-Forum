@@ -24,22 +24,16 @@ sub retrieve_latest {
 }
 
 sub mysearch {
-	my ($self, $params, $page, $per_page, $order_by) = @_;
+	my ($self, $params) = @_;
 
-	my %where;
-
-	if (not %where) {
-		$where{1} = 1;
-	}
-	$order_by ||= "id";
-
-	$order_by .= " desc";
+	my %where  = %{$params->{where}};
+	%where = (1 => 1) if not %where;
 
 	my $pager = __PACKAGE__->pager(
 		where         => \%where,
-		per_page      => $per_page || 10,
-		page          => $page || 1,
-		order_by      => $order_by,
+		per_page      => $params->{per_page} || 10,
+		page          => $params->{page}     || 1,
+		order_by      => $params->{order_by} || "id DESC",
 	);
 }
 
