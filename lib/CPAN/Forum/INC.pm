@@ -1,6 +1,7 @@
 package CPAN::Forum::INC;
 
 use CPAN::Forum;
+use CPAN::Forum::Markup;
 use CPAN::Forum::Configure;
 use CPAN::Forum::DBI;
 use CPAN::Forum::Users;

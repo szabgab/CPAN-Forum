@@ -8,6 +8,7 @@ bin/populate.pl
 bin/setup.pl
 
 lib/CPAN/Forum.pm
+lib/CPAN/Forum/Markup.pm
 lib/CPAN/Forum/Build.pm
 lib/CPAN/Forum/DBI.pm
 lib/CPAN/Forum/INC.pm

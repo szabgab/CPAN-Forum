@@ -11,7 +11,6 @@ use Data::Dumper qw(Dumper);
 use Fcntl qw(:flock);
 use POSIX qw(strftime);
 use Carp qw(cluck carp);
-use CGI qw(escapeHTML);
 
 use CPAN::Forum::INC;
 
@@ -1183,8 +1182,9 @@ sub process_post {
 	# We will save the message only if the Submit button was pressed.
 	# When the editor first displayed and every time if an error was caught this button will be hidden.
 
+	my $markup = CPAN::Forum::Markup->new();
 	eval {
-		_posting_process($new_text) ;
+		$markup->posting_process($new_text) ;
 	};
 	if ($@) {
 		push @errors, "text_format";
@@ -1261,7 +1261,8 @@ sub _text_escape {
 	my ($text) = @_;
 
 	return "" if not $text;
-	my $html = eval { _posting_process($text) };
+	my $markup = CPAN::Forum::Markup->new();
+	my $html = eval { $markup->posting_process($text) };
 	if ($@) {
 		warn "Error displaying already accepted text: '$text' $@";
 		return "Internal Error";
@@ -1616,53 +1617,6 @@ sub search {
 	}
 
 	$t->output;
-}
-
-sub _line_width {
-	my $str = shift;
-	my @lines = split /\n/, $str;
-	foreach my $line (@lines) {
-		die "ERR line_too_long\n" if length $line > 70;
-	}
-	return 1;
-}
-
-
-sub _text_proc {
-	my $text = shift;
-	die "ERR no_less_sign\n" if $text =~ /</;
-	_line_width($text);
-	$text = escapeHTML $text;
-	return qq(<div class="text">$text</div>\n);
-}
-
-sub _code_proc {
-	my $code = shift;
-	_line_width($code);
-	#$code =~ s/</&lt;/g;
-	$code = escapeHTML $code;
-	return qq(<div class="code">$code</div>\n);
-}
-
-# will someone simplify this code ??
-sub _posting_process {
-	my ($t) = @_;
-
-	my ($text, $rest) = split /<code>/, $t, 2;
-	my $ret = _text_proc($text);
-	if (not $rest) {
-		if ($t =~ /<code>/) {
-			die "ERR open_code_without_closing\n";
-		} else {
-			return $ret;
-		}
-	}
-
-	die "ERR open_code_without_closing\n" if $rest !~ m{</code>};
-	my ($code, $more) = split /<\/code>/, $rest, 2;
-	$ret .= _code_proc($code);
-	$ret .= _posting_process($more) if $more;
-	return $ret;
 }
 
 =head2 rss

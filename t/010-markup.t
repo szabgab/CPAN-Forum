@@ -6,7 +6,9 @@ use Test::More "no_plan";
 use Test::Exception;
 
 use lib "blib/lib";
-use CPAN::Forum;
+use CPAN::Forum::Markup;
+
+my $markup = CPAN::Forum::Markup->new();
 
 my %cases = (
 	'apple'                    => qr(\s*<div class="text">apple</div>\s*),
@@ -35,7 +37,7 @@ foreach my $c (sort keys %fails) {
 
 
 sub f {
-	CPAN::Forum::_posting_process(@_);
+	$markup->posting_process(@_);
 }
 
 
