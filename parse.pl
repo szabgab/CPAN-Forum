@@ -15,14 +15,27 @@ my $grammar = q {
 	text: m{[\w ]+} { qq(<div class="text">$item[1]</div>); }
 	code: opencode codetext closecode {$item[2] }
 	opencode:  m{<code>}
+	codetext: m{[\t\n -~]+(?=</code>)} { qq(<div class="code">) . CGI::escapeHTML($item[1]) . qq(</div>); }
 	closecode: m{</code>}
-	codetext: m{[\w <>\$]+(?=</code>)} { qq(<div class="code">) . CGI::escapeHTML($item[1]) . qq(</div>); }
 	eodata:   m{^\Z}
 };
-	#codetext: m{[ -.0-~\s]+} { qq(<div class="code">$item[1]</div>); }
 
 $Parse::RecDescent::skip = '';
 my $parser = new Parse::RecDescent ($grammar) or die "Bad Grammar\n";
+
+my $code = q(
+#!/usr/bin/perl
+
+open my $fh, ">>", "filename";
+while (<$fh>) {
+   print $x . 'sss';
+	xxl
+}
+
+);
+$code = "<code>$code</code>";
+
+
 
 my %data = (
 	'Hello world'              => q(<div class="text">Hello world</div>),
@@ -54,5 +67,9 @@ foreach my $k (keys %data) {
 	}
 }
 	
+my $out = $parser->entry($code);
+ok(defined $out);
+#ok(length(join "", @$out) > length ($code));
+
 
 
