@@ -528,15 +528,7 @@ sub cgiapp_init {
 	
 	my $log = $self->param("ROOT") . "/db/messages.log";
 	$STATUS_FILE = $self->param("ROOT") . "/db/status";
-	my $log_level = 'critical'; 
-	if (open my $fh, $self->param("ROOT") . "/db/log_level") {
-		chomp (my $str = <$fh>);
-		if (Log::Dispatch->level_is_valid($str)) {
-			$log_level = $str;
-		} else {
-			warn "Invalid log level '$str'\n";
-		}
-	}
+	my $log_level = $self->_set_log_level();
 
 	$self->log_config(
 		LOG_DISPATCH_MODULES => [
@@ -573,6 +565,22 @@ sub cgiapp_init {
 	);
 	$self->session_cookie();
 }
+
+sub _set_log_level {
+	my ($self) = @_;
+
+	if (open my $fh, $self->param("ROOT") . "/db/log_level") {
+		chomp (my $str = <$fh>);
+		$str =~ s/^\s*|\s*$//g;
+		if (Log::Dispatch->level_is_valid($str)) {
+			return $str;
+		} else {
+			warn "Invalid log level '$str'\n";
+		}
+	}
+	return 'critical'; 
+}
+
 
 sub config {
 	my ($self, $field) = @_;
