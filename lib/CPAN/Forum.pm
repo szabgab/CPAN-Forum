@@ -1017,7 +1017,8 @@ sub notify_admin {
 
 	my $FROM = $self->config("from");
 
-	my $msg = "\nUsername: " . $user->username . "\nName: " . $user->fname . " " . $user->lname . "\n"; 
+	#my $msg = "\nUsername: " . $user->username . "\nName: " . $user->fname . " " . $user->lname . "\n"; 
+	my $msg = "\nUsername: " . $user->username . "\n"; 
 
 	# TODO: the admin should be able to configure if she wants to get messages on
 	# every new user (field update_on_new_user)
