@@ -31,8 +31,6 @@
 - Script that populates databse should not lock the whole database for a long time
   Maybe it should fetch all the data to memory and work there.
 
-- make paging available responses 1..10, 11.20, etc, 
-
 - replace the e-mail address checking by  if ($q->param('email') !~ $Email::Address::addr_spec) {
 
 - Enable people to edit their posts 
