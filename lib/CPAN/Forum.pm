@@ -12,6 +12,7 @@ use Fcntl qw(:flock);
 use POSIX qw(strftime);
 use Carp qw(cluck carp);
 use Mail::Sendmail qw(sendmail);
+use CGI ();
 
 use CPAN::Forum::INC;
 
@@ -85,6 +86,8 @@ module belongs to)
 =item * We provide RSS feed of the recent posts belonging to any of the groups.
 
 =item * We'll provide search capability with restrictions to groups.
+
+=back
 
 =head1 Authentication
 
