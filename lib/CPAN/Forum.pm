@@ -1198,7 +1198,7 @@ sub response_form {
 }
 
 
-sub module_serach_form {
+sub module_search_form {
 	my ($self, $errors) = @_;
 	my $t = $self->load_tmpl("module_search_form.tmpl");
 	$t->param($_=>1) foreach @$errors;
@@ -1261,7 +1261,7 @@ sub posts {
 			# process search later	
 		} else {
 			# TODO should be called whent the module_search is ready
-			return $self->module_serach_form();
+			return $self->module_search_form();
 		}
 		$self->log->debug("B: new_group: '$new_group' and id: '$new_group_id'");
 	}
@@ -1843,7 +1843,7 @@ sub module_search {
 	}
 
 	if (not $txt) {
-		return $self->module_serach_form(['invalid_search_term']);
+		return $self->module_search_form(['invalid_search_term']);
 	}
 	$self->log->debug("group name search term: $txt");
 	$txt =~ s/::/-/g;
@@ -1858,7 +1858,7 @@ sub module_search {
 		push @group_ids, $group->id;
 	}
 	if (not @group_names) {
-		return $self->module_serach_form(['no_module_found']);
+		return $self->module_search_form(['no_module_found']);
 	}
 	
 	#$self->log->debug("GROUP NAMES: @group_names");
