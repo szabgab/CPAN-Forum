@@ -1,0 +1,5 @@
+User-agent: *
+Disallow: /mypan/
+Disallow: /new_post/
+Disallow: /admin/
+
