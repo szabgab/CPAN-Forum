@@ -191,7 +191,8 @@ v0.10_03
   Admin can change "From" e-address
   Enable <i>, <b> <br> and <a ..> with <p></p> pairs
   Remove the selection box from the post interface as it was not used there.
-  
+  Put the search form on the home page as well.
+ 
   Admin can change e-mail address of any user
   Add paging
  

@@ -54,6 +54,7 @@ templates/users.tmpl
 templates/faq.tmpl
 templates/mypan.tmpl
 templates/search.tmpl
+templates/search_form.tmpl
 templates/message.tmpl
 templates/notes.tmpl
 templates/module_search_form.tmpl

@@ -1,0 +1,15 @@
+<form method="post" action="/search/">
+<p>
+<input type="hidden" name="rm" value="search" />
+<select name="what">
+<option value="module"  <TMPL_IF module> SELECTED</TMPL_IF>>Module name</option>
+<option value="user"    <TMPL_IF user>   SELECTED</TMPL_IF>>User name</option>
+<option value="subject" <TMPL_IF subject>SELECTED</TMPL_IF>>Post by text in subject</option>
+<option value="text"    <TMPL_IF text>   SELECTED</TMPL_IF>>Post by text in body</option>
+</select>
+<input name="name" value="<TMPL_VAR name>" />
+<input type="submit" value="Search" />
+</p>
+</form>
+
+
