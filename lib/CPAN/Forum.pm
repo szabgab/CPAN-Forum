@@ -16,7 +16,7 @@ use CGI ();
 
 use CPAN::Forum::INC;
 
-my $limit       = 20;
+my $limit       = 50;
 my $limit_rss   = 10;
 my $cookiename  = "cpanforum";
 my $SUBJECT = qr{[\w .:~!@#\$%^&*\()+?><,'";=-]+};
@@ -941,7 +941,7 @@ sub register_process {
 	}
 	
 	# TODO arbitrary nickname constraint, allow other nicknames ?
-	if ($q->param('nickname') !~ /^[a-z0-9]{4,10}$/) {
+	if ($q->param('nickname') !~ /^[a-z0-9]{1,10}$/) {
 		return $self->register({"bad_nickname" => 1});
 	}
 
