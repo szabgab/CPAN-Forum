@@ -18,7 +18,6 @@ use CPAN::Forum::INC;
 my $limit       = 3;
 my $limit_rss   = 10;
 my $cookiename  = "cpanforum";
-my $FROM;
 
 my %errors = (
 	"ERR no_less_sign"              => "No < sign in text",
@@ -417,7 +416,7 @@ sub cgiapp_init {
 			module            => 'Log::Dispatch::File',
 			name              => 'messages',
 			filename          => '/tmp/messages.log',
-			min_level         => 'error',
+			min_level         => 'debug',
 			mode              => 'append',
 			close_after_write => 1,
 		},
@@ -545,8 +544,9 @@ sub cgiapp_prerun {
 	}
 
 
-	my ($field) = CPAN::Forum::Configure->search({field => "from"});
-	$FROM = $field->value;
+	#my ($field) = CPAN::Forum::Configure->search({field => "from"});
+	#$FROM = $field->value;
+	#$self->log->debug("FROM field set to be $FROM");
 }
 
 
@@ -824,6 +824,10 @@ your password is: $password
 
 MSG
 
+	my ($field) = CPAN::Forum::Configure->search({field => "from"});
+	my $FROM = $field->value;
+	$self->log->debug("FROM field set to be $FROM");
+
 	require Mail::Sendmail;
 	import Mail::Sendmail qw(sendmail);
 	my %mail = (
@@ -888,6 +892,10 @@ http://$ENV{HTTP_HOST}/
 
 
 MSG
+
+	my ($field) = CPAN::Forum::Configure->search({field => "from"});
+	my $FROM = $field->value;
+	$self->log->debug("FROM field set to be $FROM");
 
 	require Mail::Sendmail;
 	import Mail::Sendmail qw(sendmail);
@@ -1704,6 +1712,9 @@ sub notify {
 
 	my $subject = sprintf ("[%s] %s",  $post->gid->name, $post->subject);
 
+	my ($field) = CPAN::Forum::Configure->search({field => "from"});
+	my $FROM = $field->value;
+	$self->log->debug("FROM field set to be $FROM");
 	my $admin = CPAN::Forum::Users->retrieve(1);
 	# send all messages to Admin, this shuld be configurabele
 	my %mail = (

@@ -4,7 +4,7 @@
 
 <TMPL_IF done>
    Thank you for registering. You are going to get your password in your mailbox.<br />
-   <a href="/login">login</a>
+   <a href="/login/">login</a>
 <TMPL_ELSE>
 
 <div class="error">
@@ -12,7 +12,8 @@
 <TMPL_IF nickname_exists>Nickname or e-mail already in use<br /></TMPL_IF>
 </div>
 
-In order to post on this site first you'll have to register with a valid e-mail address.
+In order to post on this site first you'll have to register with a valid e-mail address.<br>
+Username currently should be between 4-10 characters.
 <form method="POST" action="/">
 	<input type="hidden" name="rm" value="register_process">
 	<table>
