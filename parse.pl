@@ -11,8 +11,9 @@ use Parse::RecDescent;
 
 my $grammar = q {
 	entry      : chunk(s) eodata                  { $item[1] }
-	chunk      : marked_html | code               { $item[1] }
-	marked_html: html(s)                          { '<div class="text">' . join("", @{$item[1]}) . '</div>'; }
+	chunk      : marked_html | marked_code        { $item[1] }
+
+	marked_html: html(s)                          { qq(<div class="text">) . join("", @{$item[1]}) . qq(</div>); }
 	html       : text                             { $item[1] } 
 	           | open_b text close_b              { join "", @item[1..$#item] }
 	           | open_i text close_i              { join "", @item[1..$#item] }
@@ -21,10 +22,12 @@ my $grammar = q {
 	open_i     : m{<i>}
 	close_i    : m{</i>}
 	text       : m{[\t\n -;=?-~]+}                {$item[1] }
-	code       : code_open code_text code_close   {$item[2] }
-	code_open  : m{<code>}
-	code_text  : m{[\t\n -~]+?(?=</code>)}        { qq(<div class="code">) . CGI::escapeHTML($item[1]) . qq(</div>); }
-	code_close : m{</code>}
+
+	marked_code: open_code code close_code        { join("", @item[1..$#item]) }
+	open_code  : m{<code>}                        { qq(<div class="code">) }
+	close_code : m{</code>}                       { qq(</div>) }
+	code       : m{[\t\n -~]+?(?=</code>)}        { CGI::escapeHTML($item[1]) }
+
 	eodata     : m{^\Z}
 };
 
@@ -64,6 +67,8 @@ my %data = (
 	'Hello<code>'              => undef,
 	'<code extra><STD></code>' => undef,
 	'a<b>c</i>'                => undef,
+	'a<b>c'                    => undef,
+	'a<i>c'                    => undef,
 );
 use Data::Dumper;
 
