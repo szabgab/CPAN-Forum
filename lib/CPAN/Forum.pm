@@ -614,6 +614,8 @@ my @restricted_modes = qw(
 			mypan 
 			admin
 			admin_process
+			admin_edit_user
+			admin_edit_user_process
 			response_form 
 			module_search
 			selfconfig change_password update_subscription); 
@@ -628,6 +630,7 @@ my @urls = qw(
 	response_form 
 	faq 
 	admin
+	admin_edit_user
 	mypan selfconfig 
 	search all rss); 
 
@@ -1866,12 +1869,41 @@ sub search {
 	$t->output;
 }
 
-sub admin_process {
+sub admin_edit_user_process {
 	my ($self) = @_;
-	my $q = $self->query;
 	if (not $self->session->param("admin")) {
 		return $self->internal_error("", "restricted_area");
 	}
+	my $q = $self->query;
+}
+
+sub admin_edit_user {
+	my ($self) = @_;
+	if (not $self->session->param("admin")) {
+		return $self->internal_error("", "restricted_area");
+	}
+	my $q = $self->query;
+	my $username = ${$self->param("path_parameters")}[0] || '';
+	$self->log->debug("admin_edit_user username: '$username'");
+
+	my ($person) = CPAN::Forum::Users->search(username => $username);
+	if (not $person) {
+		return $self->internal_error("", "no_such_user");
+	}
+
+	my $t = $self->load_tmpl("admin_edit_user.tmpl");
+	$t->param(this_username => $username);
+	$t->param(email => $person->email);
+	$t->output;
+
+}
+
+sub admin_process {
+	my ($self) = @_;
+	if (not $self->session->param("admin")) {
+		return $self->internal_error("", "restricted_area");
+	}
+	my $q = $self->query;
 
 	if (my ($conf) = CPAN::Forum::Configure->search(field => 'from')) {
 		$self->log->debug("Old FROM field was " . $conf->value);

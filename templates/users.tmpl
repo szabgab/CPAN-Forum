@@ -1,5 +1,10 @@
 <TMPL_INCLUDE NAME="head.tmpl">
 <p id="pageTitle">Recent postings by <TMPL_VAR this_fullname> (<TMPL_VAR this_username>)</p>
+<!--
+First name: <TMPL_VAR fname><br />
+Last name: <TMPL_VAR lname><br />
+-->
+<TMPL_IF admin><a href="/admin_edit_user/<TMPL_VAR this_username>">EDIT</TMPL_IF>
 
 <TMPL_INCLUDE NAME="navigation.tmpl">
 
