@@ -20,6 +20,8 @@ our @users = (
 sub setup_database {
 	chdir "blib";
 	copy "../t/CONFIG", ".";
+	mkdir "schema";
+	copy "../schema/schema.sql", "schema";
 
 	system "$^X bin/setup.pl";
 	system "$^X bin/populate.pl ../t/02packages.details.txt";
