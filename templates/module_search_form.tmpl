@@ -2,14 +2,17 @@
 <p id="pageTitle">Search for module name</p>
 
 <TMPL_INCLUDE NAME="navigation.tmpl">
+<p class="error">
+<TMPL_IF invalid_search_term>Invalid or missing search term</TMPL_IF><br />
+<TMPL_IF no_module_found>No module found</TMPL_IF><br />
+</p>
 <p>
-Please type in the name of a module.
-You can use '%' signs as wide cards.
+Please search for the name of a module.
 </p>
 
 <form method="post" action="/module_search/">
 <p>
-<input type="hidden" name="rm" value="search" />
+<input type="hidden" name="rm" value="module_search" />
 <input name="q" value="<TMPL_VAR q>" />
 <input type="submit" value="Search" />
 </p>

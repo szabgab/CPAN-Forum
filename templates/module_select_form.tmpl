@@ -1,0 +1,20 @@
+<TMPL_INCLUDE NAME="head.tmpl">
+<p id="pageTitle">Select the module name to write about</p>
+
+<TMPL_INCLUDE NAME="navigation.tmpl">
+<p class="error">
+<TMPL_IF invalid_search_term>Invalid or missing search term</TMPL_IF>
+</p>
+<p>
+</p>
+
+<form method="post" action="/new_post/">
+<p>
+<input type="hidden" name="rm" value="new_post" />
+<TMPL_VAR group_selector>
+<input type="submit" value="Select" />
+</p>
+</form>
+
+<TMPL_INCLUDE NAME="footer.tmpl">
+

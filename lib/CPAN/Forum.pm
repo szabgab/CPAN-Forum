@@ -486,6 +486,7 @@ my @restricted_modes = qw(
 			new_post process_post
 			mypan 
 			response_form 
+			module_search
 			selfconfig change_password update_subscription); 
 			
 my @urls = qw(
@@ -563,11 +564,6 @@ sub cgiapp_prerun {
 		$self->header_props(-url => "http://$ENV{HTTP_HOST}/login/");
 		return;
 	}
-
-
-	#my ($field) = CPAN::Forum::Configure->search({field => "from"});
-	#$FROM = $field->value;
-	#$self->log->debug("FROM field set to be $FROM");
 }
 
 
@@ -946,13 +942,15 @@ sub _group_selector {
 	my @group_ids;
 	
 	if ($group_id) {
-		@group_ids = ($group_id);
-		$group_labels{$group_id} = $group_name;
+		if (ref $group_id eq "ARRAY") {
+			@group_ids = @$group_id;
+			@group_labels{@$group_id} = @$group_name;
+		} else {
+			@group_ids = ($group_id);
+			$group_labels{$group_id} = $group_name;
+		}
 	}
 
-	if ($q->param('q')) {
-		# TODO
-	}
 
 	my $cache = $self->param("ROOT") . "/db/modules.txt";
 	if (not @group_ids and open my $fh, $cache) {
@@ -1001,9 +999,10 @@ sub response_form {
 }
 
 
-sub _module_serach_form {
-	my ($self) = @_;
+sub module_serach_form {
+	my ($self, $errors) = @_;
 	my $t = $self->load_tmpl("module_search_form.tmpl");
+	$t->param($_=>1) foreach @$errors;
 	$t->output;
 }
 
@@ -1030,6 +1029,7 @@ sub posts {
 	
 	if ($rm eq "new_post") {
 		$new_group = ${$self->param("path_parameters")}[0] || "";
+		$new_group_id = $q->param('new_group') if $q->param('new_group');
 		
 		if ($new_group) {
 			if ($new_group =~ /^([\w-]+)$/) {
@@ -1045,11 +1045,19 @@ sub posts {
 				cluck "Bad regex for '$new_group' ? Accessed PATH_INFO: '$ENV{PATH_INFO}'";
 				return $self->internal_error;
 			}
+		} elsif ($new_group_id) {
+			my ($gr) = CPAN::Forum::Groups->retrieve($new_group_id);
+			if ($gr) {
+				$new_group = $gr->name;
+			} else {
+				cluck "Group '$new_group_id' was not in database when accessed PATH_INFO: '$ENV{PATH_INFO}'";
+				return $self->internal_error;
+			}
 		} elsif ($q->param('q')) {
 			# process search later	
 		} else {
-			# TODO should be called whent the _module_search is ready
-			#return $self->_module_serach_form();
+			# TODO should be called whent the module_search is ready
+			return $self->module_serach_form();
 		}
 	}
 	if ($rm eq "process_post") {
@@ -1570,23 +1578,43 @@ sub notes {
 
 
 # partially written code to select a module name
-sub _module_search {
+sub module_search {
 	my ($self) = @_;
 
 	my $q = $self->query;
 	my $txt = $q->param("q");
 
-	# kill the taint checking (why do I use taint checking if I kill it then ?)
-	if ($txt =~ /(.*)/) {
+	# remove taint if there is
+	if ($txt =~ /^([\w:.%-]+)$/) {
 		$txt = $1;
+	} else {
+		$self->log->debug("Tained search: $txt");
 	}
 
-	if ($txt) {
-		if ($txt =~ /%/) {
-			my $it =  CPAN::Forum::Groups->search_like(name => $txt);
-			my $cnt = CPAN::Forum::Groups->sql_count_like("name", $txt)->select_val;
-		}
+	if (not $txt) {
+		return $self->module_serach_form(['invalid_search_term']);
 	}
+	$self->log->debug("group name search term: $txt");
+	$txt = '%' . $txt . '%';
+	
+	my $it =  CPAN::Forum::Groups->search_like(name => $txt);
+	my $cnt = CPAN::Forum::Groups->sql_count_like("name", $txt)->select_val;
+	my @group_names;
+	my @group_ids;
+	while (my $group  = $it->next) {
+		push @group_names, $group->name;
+		push @group_ids, $group->id;
+	}
+	if (not @group_names) {
+		return $self->module_serach_form(['no_module_found']);
+	}
+	
+	#$self->log->debug("GROUP NAMES: @group_names");
+
+	my $t = $self->load_tmpl("module_select_form.tmpl",
+	);
+	$t->param("group_selector" => $self->_group_selector(\@group_names, \@group_ids));
+	$t->output;
 }
 
 =head2 search
