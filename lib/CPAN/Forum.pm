@@ -1790,6 +1790,14 @@ Thanks to all those people who develop and maintain the underlying technologies.
 See L<http://www.cpanforum.com/about/> for a list of tools we used.
 In addition to Perl of course.
 
+=head1 DEVELOPMENT
+
+Subversion repository is at 
+L<http://svn.pti.co.il/svn/cpan-forum/trunk/>
+
+There is a mailing list to see the commits to the repository:
+L<http://perl.org.il/mailman/listinfo/cpan-forum-commit>
+
 =head1 BUGS
 
 Please report them at L<http://rt.cpan.org/>
