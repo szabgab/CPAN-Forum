@@ -16,7 +16,7 @@ use CGI ();
 
 use CPAN::Forum::INC;
 
-my $limit       = 50;
+my $limit       = 3;
 my $limit_rss   = 10;
 my $cookiename  = "cpanforum";
 my $SUBJECT = qr{[\w .:~!@#\$%^&*\()+?><,'";=-]+};
@@ -227,6 +227,22 @@ at both ends of the typed in word.
 
 =head2 TODO
 
+- Enable people to subscribe to all messages or all thread starters or all followups
+  (probably group = 0 will do it)
+- Add announcement service (check for new versions of modules and send e-mail
+  to those whom are interested in announcements.
+- Put time ellapsed since post instead of date of post, (3 min. 6 hours 3 days ago)
+  make this configurabel: User can say after N days passed the date should show,
+  before that the ellapsed time
+- Admin: hide a posting
+- Admin: delete a user
+- Admin: add a new module manually
+- Script that populates databse should not lock the whole database for a long time
+  Maybe it should fetch all the data to memory and work there.
+- make paging available responses 1..10, 11.20, etc, 
+
+
+
 - Decide on Basic Markup language and how to extend for shortcuts opening tag
 for code:  <code[^>]*>  but right now only <code> should be accepted closing
 tag for code:  </code>
@@ -258,8 +274,6 @@ address from auth he might not want to give, for this case we should have our
 way to update the locally updated username, full name and validated e-mail
 address.
   
---- For XYZ we have to see how they work
-
 -- For local credentials we need the user to give us 
 username/password/fullname and validated e-mail address.
 
@@ -312,13 +326,8 @@ one module to another module or group.
 Hmm, do I really need this ? maybe as I cannot just delete a user. (added a 
 status field that is not used currently)
 
-- Administrator can add a new module manually
-- Script that populates databse should not lock the whole database for a long time
-  Maybe it should fetch all the data to memory and work there.
-
 - Replace the /post/number link by /post/TITLE_OF_POST ???
 
-- make paging available responses 1..10, 11.20, etc, 
 
 OK, so we have listing in places like
 
@@ -345,11 +354,7 @@ We'll also have some search facility that will be a post operation and
 From the forms we have post methods so no need for URL munging
 process_post  =>  (show previous post)? show editor + show preview
 
-=head1 TODO Next release only
-
 - make the page size (for paging) user configurable
-
-- Notify user
 
 =over 4
 
@@ -734,6 +739,7 @@ sub home {
 			scalar CPAN::Forum::Posts->retrieve_latest($from+$cnt),
 			CPAN::Forum::Posts->count_all(),
 			));
+	#CPAN::Forum::Posts->mysearch({},1 $limit);
 
 	$t->output;
 }
@@ -765,11 +771,14 @@ sub build_listing {
 
 	#my $start = $from % $cnt;
 	
-	
-	
+	$self->new_build_listing($it);
+}
 
+sub new_build_listing {
+	my ($self, $it) = @_;
+	
+	my @resp;
 	while (my $post = $it->next) {
-		#(my $dashgroup = $post->gid) =~ s/::/-/g;
 		my $thread_count = CPAN::Forum::Posts->sql_count_thread($post->thread)->select_val;
 		push @resp, {
 			subject      => _subject_escape($post->subject), 
@@ -787,6 +796,7 @@ sub build_listing {
 	#@resp = reverse @resp if $to; # Otherwise we fetched in DESC order
 	return \@resp;
 }
+
 
 =head2 redirect_home
 
