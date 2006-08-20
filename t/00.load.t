@@ -1,8 +1,8 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
+use warnings;
 use strict;
 
 use Test::More tests => 1;
-use lib "blib";
 
 BEGIN {
 use_ok( 'CPAN::Forum' );

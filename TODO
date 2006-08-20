@@ -1,11 +1,29 @@
 
+- A way to monitor all current and future modules associated with a certain PAUSE ID.
+ (both RSS and e-mail)
 
-- Enable people to subscribe to all messages or all thread starters or all followups
 
-  A table called "subscription_all"
+BUG:
+When I try to reply and the original subject is already 50 chars long
+in offers a new subject with Re: prefix but then when I try to submit
+it won't let me.
 
+(So far is ok, though it should 70 or 100 long)
+
+But the main problem is that if I delete the last word from the
+subject and press preview again
+it returns the same error message as it put back the word where it was earlier.
+
+
+
+ 
+- Clean up the listing of the subscribers at the bottom of the pages:
+  Separate people who will receive all messages
+  Thread starters
+  And show names of people with "followup set" only within the threads they posted.
   
-  
+- Unite and clean up the code that fetches list of people who need to be notified
+
 
 - Script that populates databse should not lock the whole database for a long time
   Maybe it should fetch all the data to memory and work there.
@@ -30,7 +48,6 @@
   Send out e-mail about PAUSEID changes
   
 
-
   A table called "subscription_PAUSE"
 
 
@@ -44,14 +61,14 @@
 	
 	So especially the module authors would like to have a button that sais
 	subscribe too all the modules of XYZ
-
-- A way to monitor all current and future modules associated with a certain PAUSE ID.
- (both RSS and e-mail)
- 
 - Let people select a group of distros (e.g. all the distros by author SZABGAB)
   and show them on the /mypan interface (or just subscribe to all of them)
 
 
+
+
+In order to avoid accepting postings today that will break when we add more 
+tags, we will reject any submission that is not correctly marked up.
 
 
 
@@ -145,5 +162,117 @@ PROBLEM:
 
 - check out the remote authentication module of  David Nicol: AIS::Client
   and its server.
+
+
+- Decide on Basic Markup language and how to extend for shortcuts opening tag
+for code:  <code[^>]*>  but right now only <code> should be accepted closing
+tag for code:  </code>
+
+- check all submitted fields (restrict posting size to 10.000 Kbyte ?
+- Improve text and explanations.
+
+- clean up documentation
+
+- add indexes to the tables ?
+
+- show the release dates and version numbers of the modules
+
+Authentication and user management process:
+- new user comes to our site we give him a cookie, when he wants to login we offer him
+--  login using the auth.perl.org credentials
+--  login using XYZ credentials
+--  create local credential
+
+-- For auth.perl.org
+--- redirect the user to auth.perl.org wait till he logs in there (maybe even creates the new account)
+--- sets the preferences
+--- comes back
+--- we can fetch some of the information from that user
+--- we need to keep the user_id received from auth.perl.org for later identification of the user
+--- while we tell the user we would like to get the username/fullname/e-mail
+address from auth he might not want to give, for this case we should have our
+way to update the locally updated username, full name and validated e-mail
+address.
+  
+-- For local credentials we need the user to give us 
+username/password/fullname and validated e-mail address.
+
+
+We have to make sure that usernames which are displayed don't collide. Maybe we
+should use separate fields for usernames from various sources and when
+displayed we might prefix it auth:gabor, local:gabor etc.  Not nice, any better
+way ?
+
+- Fix Installation
+
+- when installing one might need to be root, in order to set the permissions 
+correctly ?
+
+- as user www fetch the module list file, unzip it in the db directory (as 
+this is the only directory we can write to) and run the populator
+
+- on a new installation, change the ownership of directories (or at least tell
+the user to do so)
+
+- Write comprehensive test suit
+
+- Reply within a thread
+
+When replying to a post within a thread we might want to open the editor window
+in the middle of the thread, just below the post I am responding to.
+
+- make sure links that are relevant for distros don't show up on pages which
+don't belong to distros. (e.g. a link to search.cpan.org/dist/CGI is ok but a
+link to search.cpan.org/dist/General is not)
+
+- Sometime we'll want to post a message in more than one group, e.g.  now I'd
+like to know how to use CGI::Session with DBD::SQLite. I might want to post the
+message on more than one list at the same time as this is related to more than
+one module.  Porbably if I need to chose one I'll select CGI::Session as I am
+trying to use that but it might be a nice feature.  Maybe I need to tell one
+module as the main group and then have a way to associate a few more modules
+with the posting.
+
+This can be done by de-coupleing the name of the distribution from the posts table for all the distributions or we can add such an extra table for the additional distributions so there will be a leading distro of the thread.
+
+
+- Create a group for 
+- each Distribution (DONE)
+- Some bigger groups (eg. databases, testing, )
+maybe put each distribution under one or more of the groups too
+- General and other special purpose groups such as News (for the site)
+where only "administrators" can post.
+
+I am not sure if I have to keep all these things in one table and if the
+same form has to serve for creating messages in both distros and categories.
+
+- Database or plain files ?
+
+I think every information should be in the database but then we might want to
+generate static pages from the posts and discussions in order to reduce the
+need to fetch information from the database. Hmm, it sound faster but we'll
+probabl want to build the pages on the fly anyway so maybe it does not improve
+anything. We can start off by totally dynamic pages and then see if making them
+static will reduce the load on the server. First we'll have to have load on the
+server. :-) 
+
+- Check if the technique we use to remember the last request before login
+cannot cause some security problem such as remembering the last request of
+someone else who used the same machine recently ? 
+
+- xml - provided
+
+
+
+Shlomi:
+The Forum uses cgiapp_prerun to set the mode according to the PATH_INFO instead of 
+using a mode_param code-reference. This causes a lot of warnings in the logs, 
+and doesn't really belong in cgiapp_prerun.
+
+It cannot be hosted on a URL except for its own virtual host, as it uses 
+absolute URLs. ("/login/", "/register/", etc.) A better idea would be to 
+track the path that the web-server gives (it's in one of the environment 
+variables) and then to construct a /cpan-forum/login/ /cpan-forum/register/ 
+etc. path. (or use relative URLs).
 
 

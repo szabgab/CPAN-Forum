@@ -180,6 +180,9 @@ variable to the URL where you installed the forum.
 
 =head2 Changes
 
+Enable people to subscribe to all messages or all thread starters or all followups
+Add a table called "subscription_all"
+ 
 Longer usernames
 Search box on more pages
 Search for module uses % at the beginning of the string as well
@@ -240,55 +243,16 @@ at both ends of the typed in word.
 
 =head2 TODO
 
-- Decide on Basic Markup language and how to extend for shortcuts opening tag
-for code:  <code[^>]*>  but right now only <code> should be accepted closing
-tag for code:  </code>
-
-- check all submitted fields (restrict posting size to 10.000 Kbyte ?
-- Improve text and explanations.
-
-clean up documentation
-
-add indexes to the tables ?
-
-show the release dates and version numbers of the modules
-
-Authentication and user management process:
-- new user comes to our site we give him a cookie, when he wants to login we offer him
---  login using the auth.perl.org credentials
---  login using XYZ credentials
---  create local credential
-
--- For auth.perl.org
---- redirect the user to auth.perl.org wait till he logs in there (maybe even creates the new account)
---- sets the preferences
---- comes back
---- we can fetch some of the information from that user
---- we need to keep the user_id received from auth.perl.org for later identification of the user
---- while we tell the user we would like to get the username/fullname/e-mail
-address from auth he might not want to give, for this case we should have our
-way to update the locally updated username, full name and validated e-mail
-address.
-  
--- For local credentials we need the user to give us 
-username/password/fullname and validated e-mail address.
-
-
-We have to make sure that usernames which are displayed don't collide. Maybe we
-should use separate fields for usernames from various sources and when
-displayed we might prefix it auth:gabor, local:gabor etc.  Not nice, any better
-way ?
+Removed the use of CPAN::Forum::Build - need to see what was it doing and
+replace its functionality with something better
 
 Subject field:
--  <= 50 chars
+-  <= 80 chars
 -  Can contain any characters, we'll escape them when showing on the web site
  
 Text field:
 - No restriction on line length, let the HTML handle that part
 - The text is divided into areas of free text and marked sections
-
-In order to avoid accepting postings today that will break when we add more 
-tags, we will reject any submission that is not correctly marked up.
 
 - Pages:
     new mesage:      EDITOR;          PREVIEW + EDITOR
@@ -377,92 +341,6 @@ the name of a module and the initial subscription parameters to it.
 In addition when displaying the list of all the messages to a specific module, logged in users
 will see their current subscription to this module (even if that is empty).
 
-
-- Fix Installation
-
-- when installing one might need to be root, in order to set the permissions 
-correctly ?
-
-- as user www fetch the module list file, unzip it in the db directory (as 
-this is the only directory we can write to) and run the populator
-
-- on a new installation, change the ownership of directories (or at leas tell
-the user to do so)
-
-
-- Write comprehensive test suit
-
-- Reply within a thread
-
-When replying to a post within a thread we might want to open the editor window
-in the middle of the thread, just below the post I am responding to.
-
-- make sure links that are relevant for distros don't show up on pages which
-don't belong to distros. (e.g. a link to search.cpan.org/dist/CGI is ok but a
-link to search.cpan.org/dist/General is not)
-
-- Sometime we'll want to post a message in more than one group, e.g.  now I'd
-like to know how to use CGI::Session with DBD::SQLite. I might want to post the
-message on more than one list at the same time as this is related to more than
-one module.  Porbably if I need to chose one I'll select CGI::Session as I am
-trying to use that but it might be a nice feature.  Maybe I need to tell one
-module as the main group and then have a way to associate a few more modules
-with the posting.
-
-This can be done by de-coupleing the name of the distribution from the posts table for all the distributions or we can add such an extra table for the additional distributions so there will be a leading distro of the thread.
-
-
-- Getting the listing of all ~8000 module names takes a long time.
-I should profile it.
-1) write a small script that will run the relevant code on the command line,
-2) time this
-3) look at the size of the output 386K -> it won't fly, you can't have such a page
-on the web. Other solutions: 
-- type in the name
-- search for the name
-
-
-- Create a group for 
-- each Distribution (DONE)
-- Some bigger groups (eg. databases, testing, )
-maybe put each distribution under one or more of the groups too
-- General and other special purpose groups such as News (for the site)
-where only "administrators" can post.
-
-I am not sure if I have to keep all these things in one table and if the
-same form has to serve for creating messages in both distros and categories.
-
-- Database or plain files ?
-
-I think every information should be in the database but then we might want to
-generate static pages from the posts and discussions in order to reduce the
-need to fetch information from the database. Hmm, it sound faster but we'll
-probabl want to build the pages on the fly anyway so maybe it does not improve
-anything. We can start off by totally dynamic pages and then see if making them
-static will reduce the load on the server. First we'll have to have load on the
-server. :-) 
-
-- Check if the technique we use to remember the last request before login
-cannot cause some security problem such as remembering the last request of
-someone else who used the same machine recently ? 
-
-- xml - provided
-
-- favicon.ico and a banner image would be good
-
-
-Shlomi:
-The Forum uses cgiapp_prerun to set the mode according to the PATH_INFO instead of 
-using a mode_param code-reference. This causes a lot of warnings in the logs, 
-and doesn't really belong in cgiapp_prerun.
-
-It cannot be hosted on a URL except for its own virtual host, as it uses 
-absolute URLs. ("/login/", "/register/", etc.) A better idea would be to 
-track the path that the web-server gives (it's in one of the environment 
-variables) and then to construct a /cpan-forum/login/ /cpan-forum/register/ 
-etc. path. (or use relative URLs).
-
-
 =head2 TEMPLATES
 
 
@@ -514,12 +392,6 @@ grep INCLUDE *| grep -v navigation.tmpl | grep -v footer.tmpl | grep -v head.tmp
 
 =head1 METHODS
 
-=head2 cgiapp_init
-
-Standard CGI::Application method.
-
-Setup the Session object and the default HTTP headers
-
 =cut
 
 sub cgiapp_init {
@@ -550,7 +422,6 @@ sub cgiapp_init {
 	$self->log->debug("Cookie received: "  . ($self->query->cookie($cookiename) || "") );
 	CGI::Session->name($cookiename);
 	$self->session_config(
-		#CGI_SESSION_OPTIONS => [ "driver:File", $self->query, {Directory => "/tmp"}],
 		CGI_SESSION_OPTIONS => [ "driver:SQLite", $self->query, {Handle => $dbh}],
 		COOKIE_PARAMS       => {
 				-expires => '+24h',
@@ -566,7 +437,6 @@ sub cgiapp_init {
 		# on the other hand it is needed in Opera to make sure it won't cache pages.
 		-charset => "utf-8",
 	);
-	#$self->session_cookie();
 }
 
 sub _set_log_level {
@@ -592,28 +462,29 @@ sub config {
 }
 
 # modes that can be accessed without a valid session
-my @free_modes = qw(home 
-					pwreminder pwreminder_process 
-					login login_process 
-					register register_process 
-					logout 
-					about faq
-					posts threads dist users 
-					search all 
-					site_is_closed
-					help
-					rss ); 
+my @free_modes = qw(
+	home 
+	pwreminder pwreminder_process 
+	login login_process 
+	register register_process 
+	logout 
+	about faq
+	posts threads dist users 
+	search all 
+	site_is_closed
+	help
+	rss ); 
 my @restricted_modes = qw(
-			new_post process_post
-			mypan 
-			admin
-			admin_process
-			admin_edit_user
-			admin_edit_user_process
-			add_new_group
-			response_form 
-			module_search
-			selfconfig change_password change_info update_subscription); 
+	new_post process_post
+	mypan 
+	admin
+	admin_process
+	admin_edit_user
+	admin_edit_user_process
+	add_new_group
+	response_form 
+	module_search
+	selfconfig change_password change_info update_subscription); 
 			
 my @urls = qw(
 	logout 
@@ -629,11 +500,6 @@ my @urls = qw(
 	mypan selfconfig 
 	search all rss); 
 
-=head2 setup
-
-Regular CGI::Appication method to setup the list of all run modes and the default run mode 
-
-=cut
 sub setup {
 	my $self = shift;
 	$self->start_mode("home");
@@ -642,8 +508,6 @@ sub setup {
 }
 
 =head2 cgiapp_prerun
-
-Regular CGI::Application method
 
 We use it to change the run mode according to the requested URL (PATH_INFO).
 Maybe we should move his code to the mode_param method ?
@@ -667,9 +531,9 @@ sub cgiapp_prerun {
 
 	if (not $rm or $rm eq "home") {
 		if ($ENV{PATH_INFO} =~ m{^/
-								([^/]+)        # first word till after the first /
-								(?:/(.*))?     # the rest, after the (optional) second /
-								}x) {
+						([^/]+)        # first word till after the first /
+						(?:/(.*))?     # the rest, after the (optional) second /
+						}x) {
 			my $newrm = $1;
 			my $params = $2 || "";
 			if (grep {$newrm eq $_} @urls) {
@@ -684,7 +548,6 @@ sub cgiapp_prerun {
 				# shall I make more noise ? 
 			}
 		}
-		
 	}
 
 	$self->log->debug("Current runmode:  $rm"); 
@@ -1096,11 +959,12 @@ sub pwreminder_process {
 
 	# TODO: put this text in a template
 	my $password = $user->password;
+	my $username = $user->username;
 	my $subject = "CPAN::Forum password reminder";
 	my $message = <<MSG;
 
-
-Your password on the CPAN::Forum is: $password
+Your nickname is $username
+Your secret key to CPAN::Forum is: $password
 Use it wisely.
 
 http://$ENV{HTTP_HOST}/
@@ -1635,16 +1499,17 @@ sub dist {
 sub _subscriptions {
 	my ($self, $t, $gid) = @_;
 
-
-	my @people;
-	my (@subs) = CPAN::Forum::Subscriptions->search(gid => $gid);
-	foreach my $s (@subs) {
-		push @people, {
+	my %people;
+	foreach my $s (
+			CPAN::Forum::Subscriptions->search(gid => $gid),
+			CPAN::Forum::Subscriptions_all->retrieve_all(),
+			) {
+		$people{$s->uid} =  {
 			username => $s->uid->username,
 		};
 	}
-	if (@people) {
-		$t->param(users => \@people);
+	if (%people) {
+		$t->param(users => [values %people]);
 	}
 }
 
@@ -1815,7 +1680,31 @@ sub mypan {
 			};
 		}
 	} else { # show all subscriptions
-		my $it = CPAN::Forum::Subscriptions->search(uid => $user->id);
+		my ($s) = CPAN::Forum::Subscriptions_all->search(uid => $user->id);
+		$self->log->debug("all subscriptions " . ($s ? "found" : "not found"));
+		push @subscriptions, {
+			gid       => "_all",
+			group     => "All",
+			allposts  => $s ? $s->allposts  : '',
+			starters  => $s ? $s->starters  : '',
+			followups => $s ? $s->followups : '',
+		};
+		$gids = "_all";
+
+		my $it = CPAN::Forum::Subscriptions_pauseid->search(uid => $user->id);
+		while (my $s = $it->next) {
+			#warn $s->allposts;
+			$gids .= ($gids ? ",_" : "_") . $s->pauseid->id; 
+			push @subscriptions, {
+				gid       => "_" . $s->pauseid->id,
+				group     => $s->pauseid->pauseid,
+				allposts  => $s->allposts,
+				starters  => $s->starters,
+				followups => $s->followups,
+			};
+		}
+
+		$it = CPAN::Forum::Subscriptions->search(uid => $user->id);
 		while (my $s = $it->next) {
 			#warn $s->allposts;
 			$gids .= ($gids ? "," : "") . $s->gid->id; 
@@ -1825,7 +1714,7 @@ sub mypan {
 				allposts  => $s->allposts,
 				starters  => $s->starters,
 				followups => $s->followups,
-			}
+			};
 		}
 	}
 	#warn Dumper \@subscriptions;
@@ -1852,29 +1741,88 @@ sub update_subscription {
 
 	#warn Dumper $q->Vars;
 	foreach my $gid (@gids) {
-		my ($s) = CPAN::Forum::Subscriptions->search(gid => $gid, uid => $user->id);
-		if (not $s) {
-			$s = CPAN::Forum::Subscriptions->create({
-				uid       => $user->id,
-				gid       => $gid,
-			});
+		if ($gid eq "_all") {
+			my ($s) = CPAN::Forum::Subscriptions_all->search(uid => $user->id);
+			if (not $s) {
+				$s = CPAN::Forum::Subscriptions_all->create({
+					uid       => $user->id,
+				});
+			}
+			$self->_update_subs($s, $gid);
+		} elsif ($gid =~ /^_(\d+)$/) {
+			my $pauseid = $1;
+			my ($s) = CPAN::Forum::Subscriptions_pauseid->search(pauseid => $pauseid, uid => $user->id);
+			if (not $s) {
+				$s = CPAN::Forum::Subscriptions->create({
+					uid       => $user->id,
+					pauseid   => $pauseid,
+				});
+			}
+			$self->_update_subs($s, $gid);
+		} else {
+			my ($s) = CPAN::Forum::Subscriptions->search(gid => $gid, uid => $user->id);
+			if (not $s) {
+				$s = CPAN::Forum::Subscriptions->create({
+					uid       => $user->id,
+					gid       => $gid,
+				});
+			}
+			$self->_update_subs($s, $gid);
 		}
-		my $on=0;
-		foreach my $type (qw(allposts starters followups)) {
-			if (defined $q->param($type ."_$gid") and $q->param($type . "_$gid") eq "on") {
-				$s->set($type, 1);
-				$on++;
+	}
+	
+	# TODO: error messages in case not all the values were filled in correctly
+	if ($q->param("name") and $q->param("type")) {
+		if ($q->param("type") eq "pauseid") {
+			my $pauseid = uc $q->param("name");
+			my ($pid) = CPAN::Forum::Authors->search(pauseid => $pauseid);
+			if ($pid) {
+				my $s = CPAN::Forum::Subscriptions_pauseid->find_or_create({
+					uid       => $user->id,
+					pauseid   => $pid->id,
+				});
+				$self->_update_subs($s, "_new");
 			} else {
-				$s->set($type, 0);
+				return $self->notes("no_such_pauseid");
 			}
 		}
-		$s->update;
-		$s->delete if not $on;  # remove the whole line if there are no subscriptions at all.
+		if ($q->param("type") eq "distro") {
+			my $name = $q->param("name");
+			$name =~ s/::/-/g;	
+			my ($grp) = CPAN::Forum::Groups->search(name => $name);
+			if ($grp) {
+				my $s = CPAN::Forum::Subscriptions->find_or_create({
+					uid       => $user->id,
+					gid       => $grp->id,
+				});
+				$self->_update_subs($s, "_new");
+			} else {
+				return $self->notes("no_such_group");
+			}
+		}
 	}
-
 
  	$self->notes("mypanok");
 }
+
+
+sub _update_subs {
+	my ($self, $s, $gid) = @_;
+	my $q = $self->query;
+
+	my $on=0;
+	foreach my $type (qw(allposts starters followups)) {
+		if (defined $q->param($type ."_$gid") and $q->param($type . "_$gid") eq "on") {
+			$s->set($type, 1);
+			$on++;
+		} else {
+			$s->set($type, 0);
+		}
+	}
+	$s->update;
+	$s->delete if not $on;  # remove the whole line if there are no subscriptions at all.
+}
+
 
 sub notes {
 	my ($self, $msg) = @_;
@@ -2184,32 +2132,42 @@ sub notify {
 		Subject  => $subject,
 		Message  => $message,
 	);
-	sendmail(%mail);
+	#sendmail(%mail);
 
 
 
 	my %to;
 	# subscriptions to "all" messages in the current group
-	#warn $post->gid;
-	#warn $post->uid->id;
+	$self->log->debug("Processing messages for allposts");
 	my $it = CPAN::Forum::Subscriptions->search(allposts => 1, gid => $post->gid);
-	#warn $it;
-	_sendmail($it, \%mail, \%to);
+	$self->_sendmail($it, \%mail, \%to);
+	$it = CPAN::Forum::Subscriptions_all->search(allposts => 1);
+	$self->_sendmail($it, \%mail, \%to);
+	#$self->log->debug("Post PAUSEID: " . $post->gid->pauseid);
+	#$it = CPAN::Forum::Subscriptions_pauseid->search(allposts => 1, pauseid => $post->gid->pauseid);
+	#$self->_sendmail($it, \%mail, \%to);
 
 	# subscription to thread "starters" in the current group
 	if ($post->thread == $post->id) { 
+		$self->log->debug("Processing messages for thread starter");
 		my $it = CPAN::Forum::Subscriptions->search(starters => 1, gid => $post->gid->id);
-		_sendmail($it, \%mail, \%to);
+		$self->_sendmail($it, \%mail, \%to);
+		$it = CPAN::Forum::Subscriptions_all->search(starters => 1);
+		$self->_sendmail($it, \%mail, \%to);
 	} else {
-		my %ids;
+		$self->log->debug("Processing messages for followups");
+		my %ids; # of users who posted in this thread
 		my $pit = CPAN::Forum::Posts->search(thread => $post->thread);
 		while (my $p = $pit->next) {
 			$ids{$p->uid}=1;
+			$self->log->debug("Ids: " . $p->uid);
 		}
 		
 		my $it = CPAN::Forum::Subscriptions->search(followups => 1, gid => $post->gid->id);
-		_sendmail($it, \%mail, \%to, \%ids);
+		$self->_sendmail($it, \%mail, \%to, \%ids);
 		# uid => is one of the uids in the current thread.
+		$it = CPAN::Forum::Subscriptions_all->search(followups => 1);
+		$self->_sendmail($it, \%mail, \%to, \%ids);
 		
 	}
 
@@ -2217,16 +2175,21 @@ sub notify {
 }
 
 sub _sendmail {
-	my ($it, $mail, $to, $ids) = @_;
+	my ($self, $it, $mail, $to, $ids) = @_;
 	
 	while (my $s = $it->next) {
 		my $email = $s->uid->email;
+		$self->log->debug("Sending to $email ?");
 		$mail->{To} = $email;
 		#warn "Sending ? to $email\n";
-		next if $ids and not $ids->{$s->uid};
+		$self->log->debug("Processing uid: " . $s->uid->username) if $ids;
+		next if $ids and not $ids->{$s->uid->username};
+		$self->log->debug("Sending to $email id was found");
 		next if $_[2]->{$email}++;
+		$self->log->debug("Sending to $email first time sending");
 		#warn "Yes, Sending to $email\n";
 		sendmail(%$mail);
+		$self->log->debug("Sent to $email");
 	}
 }
 

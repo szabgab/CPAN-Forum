@@ -1,19 +1,8 @@
-package CGI::Application::Test;
+package CPAN::Forum::TestApp;
 use strict;
 use warnings;
 
-use base 'Exporter';
-use Test::Builder;
-use Test::More;
-use CGI;
-
-our @EXPORT = qw(&cgiapp &extract_cookie);
-
-my $T = Test::Builder->new;
-$ENV{CGI_APP_RETURN_ONLY} = 1; # to eliminate screen output
-$ENV{HTTP_HOST} = "test-host";
-
-# CGI::Application::Test->new({root => ROOT, cookie => COOKIE_NAME});
+use base 'CGI::Application::Test';
 sub new {
 	my $class = shift;
 	my $self = shift;
@@ -37,7 +26,7 @@ sub cgiapp {
 	local $ENV{HTTP_COOKIE} = "$self->{cookie}=$cookie" if defined $cookie; 
 	
 	my $q = CGI->new($params);
-	my $webapp = CPAN::Forum->new(
+	my $webapp = $self->{class}->new(
 			TMPL_PATH => "$self->{root}/templates",
 		    QUERY => $q,
 			PARAMS => {

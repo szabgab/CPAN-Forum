@@ -16,52 +16,63 @@ CPAN::Forum::DBI->myinit("$ROOT/db/forum.db");
 
 use CGI::Application::Test;
 use CPAN::Forum;
-my $cat = CGI::Application::Test->new({root => $ROOT, cookie => "cpanforum"});
+my $cat = CGI::Application::Test->new({
+			class   => "CPAN::Forum", 
+			cookie  => "cpanforum", 
+			app     => {
+				TMPL_PATH => "$ROOT/templates",
+				PARAMS => {
+					ROOT => $ROOT,
+				},
+			}});
+
 
 {
-	my $r = $cat->cgiapp('/', '', {});
+	my $r = $cat->cgiapp(path_info => '/');
 	like($r, qr{CPAN Forum});
 }
 
 {
-	my $r = $cat->cgiapp('/register', '', {});
+	my $r = $cat->cgiapp(path_info => '/register');
 	like($r, qr{Registration Page});
 }
 
 {
-	my $r = $cat->cgiapp('/', '', {rm => 'register_process', nickname => '', email => ''});
+	my $r = $cat->cgiapp(path_info => '/', params => {rm => 'register_process', nickname => '', email => ''});
 	like($r, qr{Registration Page});
 	like($r, qr{Need both nickname and password});
 }
 
 {
-	my $r = $cat->cgiapp('/', '', {rm => 'register_process', nickname => '', email => 'some@email'});
+	my $r = $cat->cgiapp(path_info => '/',  params => {rm => 'register_process', nickname => '', email => 'some@email'});
 	like($r, qr{Registration Page});
 	like($r, qr{Need both nickname and password});
 }
 
 {
-	my $r = $cat->cgiapp('/', '', {rm => 'register_process', nickname => 'xyz', email => ''});
+	my $r = $cat->cgiapp(path_info => '/', params => {rm => 'register_process', nickname => 'xyz', email => ''});
 	like($r, qr{Registration Page});
 	like($r, qr{Need both nickname and password});
 }
 
 {
-	my $r = $cat->cgiapp('/', '', {rm => 'register_process', nickname => 'xyzqwertyui', email => 'a@com'});
+	my $r = $cat->cgiapp(path_info => '/', 
+			params => {rm => 'register_process', nickname => 'xyzqwertyuiqwertyuiopqwert', email => 'a@com'});
 	like($r, qr{Registration Page});
-	like($r, qr{Nickname must be lower case alphanumeric between 1-10 characters});
+	like($r, qr{Nickname must be lower case alphanumeric between 1-25 characters});
 }
 
 # reject bad usernames
 foreach my $username ("ab.c", "Abcde", "asd'er", "ab cd") {
-	my $r = $cat->cgiapp('/', '', {rm => 'register_process', nickname => $username, email => 'a@com'});
+	my $r = $cat->cgiapp(path_info => '/', 
+			params => {rm => 'register_process', nickname => $username, email => 'a@com'});
 	like($r, qr{Registration Page});
-	like($r, qr{Nickname must be lower case alphanumeric between 1-10 characters});
+	like($r, qr{Nickname must be lower case alphanumeric between 1-25 characters});
 }
 
 # reject bad usernames
 foreach my $email ("adb-?", "Abcde", "asd'er", "ab cd") {
-	my $r = $cat->cgiapp('/', '', {rm => 'register_process', nickname => "abcde", email => $email});
+	my $r = $cat->cgiapp(path_info => '/', params => {rm => 'register_process', nickname => "abcde", email => $email});
 	like($r, qr{Registration Page});
 	like($r, qr{Email must be a valid address writen in lower case letters});
 }
@@ -88,7 +99,8 @@ my $sendmail_count;
 {
 	$sendmail_count = 0;
 	$password = '';
-	my $r = $cat->cgiapp('/', '', {rm => 'register_process', nickname => $users[0]{username}, email => $users[0]{email}});
+	my $r = $cat->cgiapp(path_info => '/', 
+			params => {rm => 'register_process', nickname => $users[0]{username}, email => $users[0]{email}});
 	like($r, qr{Registration Page});
 	like($r, qr{Thank you for registering});
 	like($password, qr{\w{5}});
@@ -101,7 +113,8 @@ my $sendmail_count;
 {
 	$sendmail_count = 0;
 	$password = '';
-	my $r = $cat->cgiapp('/', '', {rm => 'register_process', nickname => $users[0]{username}, email => $users[0]{email}});
+	my $r = $cat->cgiapp(path_info => '/', 
+			params => {rm => 'register_process', nickname => $users[0]{username}, email => $users[0]{email}});
 	like($r, qr{Registration Page});
 	like($r, qr{Nickname or e-mail already in use});
 	is($sendmail_count, 0);

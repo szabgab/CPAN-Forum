@@ -43,7 +43,12 @@ CREATE TABLE groups (
 			id               INTEGER PRIMARY KEY auto_increment,
 			name             VARCHAR(255) UNIQUE NOT NULL,
 			status           INTEGER,
-			gtype            INTEGER NOT NULL
+			gtype            INTEGER NOT NULL,
+			version          VARCHAR(100),
+			pauseid          INTEGER,
+			rating           VARCHAR(10),	
+			review_count     INTEGER
+			,FOREIGN KEY (pauseid)  REFERENCES authors(id)
 );
 
 CREATE TABLE metagroups (
@@ -127,11 +132,9 @@ CREATE TABLE subscriptions_pauseid (
 			starters         BOOLEAN,
 			followups        BOOLEAN,
 			announcements    BOOLEAN
-			,FOREIGN KEY (gid) REFERENCES groups(id)
+			,FOREIGN KEY (pauseid) REFERENCES authors(id)
 			,FOREIGN KEY (uid) REFERENCES users(id)
 );
-
-
 
 CREATE TABLE sessions (
     id               CHAR(32) NOT NULL UNIQUE,

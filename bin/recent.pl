@@ -1,78 +1,64 @@
 #!/usr/bin/perl
-
 use strict;
 use warnings;
-use lib "lib";
-use Parse::CPAN::Packages;
-use LWP::Simple;
+
+
+# client for processing the most recent
+# PAUSE uploads ftp://www.cpan.org/modules/01modules.mtime.rss
+#
+
+
 use FindBin qw ($Bin);
-use Text::CSV_XS;
-use Mail::Sendmail qw(sendmail);
+use LWP::Simple qw(getstore);
+use XML::RSS;
+use CPAN::DistnameInfo;
 use Getopt::Long qw(GetOptions);
-
-use CPAN::Forum::DBI;
-use CPAN::Forum::Groups;
-
+use lib "lib";
+use CPAN::Forum::INC;
 
 my $dir          = "$Bin/../db";
 my $dbfile       = "$dir/forum.db";
 
-my $csv          = Text::CSV_XS->new();
 my %opts;
 
 CPAN::Forum::DBI->myinit($dbfile);
 
-GetOptions(\%opts, "sendmail");
+GetOptions(\%opts, "sendmail", "file=s");
 
 
-my $source = shift @ARGV;
-print "This operation can take a couple of minutes\n";
+my $remote_file = "http://www.cpan.org/modules/01modules.mtime.rss";
+my $local_file = $opts{file};
 
-
-
-if (not $source) {
-	my $file = "02packages.details.txt";
-	$source = "$dir/$file";
-
-	unlink $source if -e $source;
-	# must have downloaded and un-gzip-ed
-	# ~/mirror/cpan/modules/02packages.details.txt.gz 
-	print "Fecthing  $file from CPAN\n";
-	getstore("http://www.cpan.org/modules/02packages.details.txt.gz", "$source.gz");
-	print "Unzipping $file\n";
-	system("gunzip $source.gz");
+if (not $local_file or not -e $local_file) {
+	$local_file = "db/01modules.mtime.rss";
+	print "Fetching $remote_file\n";
+	getstore $remote_file, $local_file;
 }
 
-print "Processing $source file, adding distros to database, will take a few minutes\n";
-print "Go get a beer\n";
-my $p = Parse::CPAN::Packages->new($source);
-my @distributions = $p->distributions;
+
+my $rss = XML::RSS->new();
+$rss->parsefile($local_file);
 
 my %message = (
 	version => "",
 	pauseid => "",
-	new     => "",
+	news    => "",
 );
 
-foreach my $d (@distributions) {
-
-	# skip scripts
-	next if not $d->prefix or $d->prefix =~ m{^\w/\w\w/\w+/scripts/};	
-
-	my $name        = $d->dist;
-	if (not $name) {
-		#warn "No name: " . $d->prefix . "\n";
-		next;
-	}
+foreach my $item (reverse @{$rss->{items}}) {
+	my $link = $item->{link};
+	$link =~ s{^http://www.cpan.org/modules/by-authors/}{authors/};
+	my $d = CPAN::DistnameInfo->new($link);
+	#print $link, "\n";
+	#print $d->dist, "\n";
+	#print $d->version, "\n";
+	#print $d->cpanid(), "\n";
 	
-	# for now skip names that start with lower case
-	#next if $name =~ /^[a-z]/;
-
+	my $name = $d->dist();
 	my %new = (
 		version => ($d->version() || ""),
 		pauseid => ($d->cpanid()  || ""),
 	);
-
 
 	my ($g) = CPAN::Forum::Groups->search(name => $name);
 	if ($g) {
@@ -82,6 +68,7 @@ foreach my $d (@distributions) {
 			#print "NEW: $new{$field}\n";
 			#print "OLD: " . $g->$field, "\n";
 			#<STDIN>;
+			$new{version} =~ s/\.?0*$//; # so it won't try to update numbers with 00 or . endings.
 			if (not defined $g->$field or $g->$field ne $new{$field}) {
 				#print "change\n";
 				$message{$field} .= sprintf "The %s of %s has changed from %s to %s\n",
@@ -95,7 +82,7 @@ foreach my $d (@distributions) {
 		next;
 	}
 
-	$message{new} .= sprintf "%s   %s\n", $name, $new{version}, $new{pauseid};
+	$message{news} .= sprintf "%s   %s\n", $name, $new{version}, $new{pauseid};
 	eval {
 		my $g = CPAN::Forum::Groups->create({
 			name    => $name,
@@ -109,11 +96,6 @@ foreach my $d (@distributions) {
 		warn $@;
 	}
 }
-
-#open my $out, ">", $version_file or die "Could not open '$version_file' for writing $!\n";
-#foreach my $name (sort keys %version) {
-#	print $out qq("$name","$version{$name}"\n);
-#}
 
 my %mail = (
 	To       => 'gabor@pti.co.il',
@@ -132,13 +114,13 @@ if ($opts{sendmail}) {
 	To       => 'gabor@pti.co.il',
 	From     => 'cpanforum@cpanforum.com',
 	Subject  => 'New CPAN Distros',
-	Message  => $message{new},
+	Message  => $message{news},
 );
 if ($opts{sendmail}) {
 	sendmail(%mail);
 } else {
 	open my $fh, ">", "$Bin/../cpan_new_distros";
-	print $fh $message{new};
+	print $fh $message{news};
 }
 
 

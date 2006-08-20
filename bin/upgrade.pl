@@ -27,11 +27,11 @@ my $dbh = DBI->connect("dbi:SQLite:dbname=$live","","");
 
 ##########################################################################
 
-#$dbh->do("DROP TABLE person");
+$dbh->do("DROP TABLE groups");
 
-foreach my $table (qw(subscriptions_all)) {
+foreach my $table (qw(subscriptions_all groups authors subscriptions_pauseid)) {
 	my $sql = fetch_sql("CREATE", $table, $schema);
-	restore_and_exit("Could not fetch $table from schema") if not $sql;
+	restore_and_exit("Could not fetch table '$table' from schema") if not $sql;
 	eval {$dbh->do($sql);};
 	restore_and_exit() if $@;
 }
@@ -54,33 +54,39 @@ $dbh->disconnect;
 $dbh = DBI->connect("dbi:SQLite:dbname=$live","","");
 $dbh->do(qq(ATTACH DATABASE "$old" as old));
 
-=pod
-my $sth = $dbh->prepare("select * from old.person");
-$sth->execute;
-while (my $r = $sth->fetchrow_hashref('NAME_lc')) {
-	my (@fields, @values);
-	foreach my $f (keys %$r) {
-	 	push @fields, $f;
-		push @values, $r->{$f};
-	}
-	my $fields = join(",", @fields);
-	my $placeholders = ("?, " x (@fields-1)) . "?";
-
-	#$fields       .= ", announcement";
-	#$placeholders .= " ,?";
-	#push @values, 11;
-
-	my $sql = "INSERT INTO person ($fields) VALUES ($placeholders)";
-	#print $sql;
-	my $sth = $dbh->do($sql,  undef, @values);
-	#$dbh->do("INSERT INTO users (fname) SELECT fname FROM old.users");
-}
-=cut
+copy_table_data($dbh, "groups");
 
 unlink $old;
 exit;
 
 #############################################################################
+
+
+sub copy_table_data {
+	my ($dbh, $table) = @_;
+
+	my $sth = $dbh->prepare("select * from old.groups");
+	$sth->execute;
+	while (my $r = $sth->fetchrow_hashref('NAME_lc')) {
+		my (@fields, @values);
+		foreach my $f (keys %$r) {
+		 	push @fields, $f;
+			push @values, $r->{$f};
+		}
+		my $fields = join(",", @fields);
+		my $placeholders = ("?, " x (@fields-1)) . "?";
+
+		#$fields       .= ", announcement";
+		#$placeholders .= " ,?";
+		#push @values, 11;
+
+		my $sql = "INSERT INTO groups ($fields) VALUES ($placeholders)";
+		#print $sql;
+		my $sth = $dbh->do($sql,  undef, @values);
+		#$dbh->do("INSERT INTO users (fname) SELECT fname FROM old.users");
+	}
+}
+
 
 sub fetch_sql {
 	my ($type, $table, $schema) = @_;
@@ -88,7 +94,7 @@ sub fetch_sql {
 	my $sql;
 	for my $statement (split /;\s*/, $schema) {
 		if ($type eq "CREATE") {
-			if ($statement =~ /^CREATE\s+TABLE\s+$table/) {
+			if ($statement =~ /CREATE\s+TABLE\s+$table\s+/) {
 				$sql = $statement;
 				last;
 			}

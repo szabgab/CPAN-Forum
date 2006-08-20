@@ -14,7 +14,7 @@ Subscriptions
 <div class="subscription">
 <table>
 <tr>
-  <th>Distribution</th>
+  <th>Distribution or PAUSEID</th>
   <th>All messages</th>
   <th>Thread starters</th>
   <th>Followups</th>
@@ -35,7 +35,20 @@ Subscriptions
   <td><input type="checkbox" name="followups_<TMPL_VAR gid>" <TMPL_IF followups>CHECKED</TMPL_IF> /></td>
 </tr>
 </TMPL_LOOP>
+<tr>
+  <td><input name="name" size="20">
+      <select name="type">
+        <option value=""></option>
+        <option value="distro">Distribution</option>
+        <option value="pauseid">PAUSEID</option>
+      </select>
+     </td>
+  <td><input type="checkbox" name="allposts__new"  <TMPL_IF allposts>CHECKED</TMPL_IF> /></td>
+  <td><input type="checkbox" name="starters__new"  <TMPL_IF starters>CHECKED</TMPL_IF> /></td>
+  <td><input type="checkbox" name="followups__new" <TMPL_IF followups>CHECKED</TMPL_IF> /></td>
+</tr>
 </table>
+
 </div>
 
 <p>

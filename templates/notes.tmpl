@@ -4,9 +4,26 @@
 <TMPL_INCLUDE NAME="navigation.tmpl">
 
 <TMPL_IF mypanok>
+<p>
 Your subscriptions were successfully updated.
 You can look at them here: <a href="/mypan/">subscription information</a>
+</p>
 </TMPL_IF>
+
+<TMPL_IF no_such_pauseid>
+<p class="error">No such PAUSEID.</p>
+<p>
+Look at the <a href="/mypan/">subscription information</a> again.
+</p>
+</TMPL_IF>
+
+<TMPL_IF no_such_group>
+<p class="error">No such Distribution in our database.</p>
+<p>
+Look at the <a href="/mypan/">subscription information</a> again.
+</p>
+</TMPL_IF>
+
 
 <TMPL_INCLUDE NAME="footer.tmpl">
 
