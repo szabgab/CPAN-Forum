@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 use strict;
 use warnings;
@@ -17,32 +17,32 @@ CPAN::Forum::DBI->myinit("$ROOT/db/forum.db");
 use CGI::Application::Test;
 use CPAN::Forum;
 my $cat = CGI::Application::Test->new({
-			class   => "CPAN::Forum", 
-			cookie  => "cpanforum", 
-			app     => {
-				TMPL_PATH => "$ROOT/templates",
-				PARAMS => {
-					ROOT => $ROOT,
-				},
-			}});
+            class   => "CPAN::Forum", 
+            cookie  => "cpanforum", 
+            app     => {
+                TMPL_PATH => "$ROOT/templates",
+                PARAMS => {
+                    ROOT => $ROOT,
+                },
+            }});
 
 {
-	my $r = $cat->cgiapp(path_info => '/');
-	like($r, qr{CPAN Forum});
+    my $r = $cat->cgiapp(path_info => '/');
+    like($r, qr{CPAN Forum});
 }
 
 {
-	my $r = $cat->cgiapp(path_info => '/new_post');
-	like($r, qr{Location: http://test-host/login});
+    my $r = $cat->cgiapp(path_info => '/new_post');
+    like($r, qr{Location: http://test-host/login});
 
 #TODO: {
-#	local $TODO = "do real redirection here";
-#	unlike($r, qr{<HTML>}i);
-#	}	
+#   local $TODO = "do real redirection here";
+#   unlike($r, qr{<HTML>}i);
+#   }   
 }
 
 #{
-#	my $r = $cat->cgiapp(path_info => '/login');
-#	like($r, qr{Login});
+#   my $r = $cat->cgiapp(path_info => '/login');
+#   like($r, qr{Login});
 #}
 
