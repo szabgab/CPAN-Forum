@@ -3,37 +3,35 @@
 use strict;
 use warnings;
 
-use Test::More "no_plan";
+use Test::More;
+my $tests;
+plan tests => $tests;
 
 use lib qw(t/lib);
 use CPAN::Forum::Test;
 
-setup_database();
-ok(-e "blib/db/forum.db");
-
-use CPAN::Forum::DBI;
-CPAN::Forum::DBI->myinit("$ROOT/db/forum.db");
-
-use CGI::Application::Test;
+{
+    CPAN::Forum::Test::setup_database();
+    ok(-e "blib/db/forum.db");
+    BEGIN { $tests += 1; }
+}
 use CPAN::Forum;
-my $cat = CGI::Application::Test->new({
-            class   => "CPAN::Forum", 
-            cookie  => "cpanforum", 
-            app     => {
-                TMPL_PATH => "$ROOT/templates",
-                PARAMS => {
-                    ROOT => $ROOT,
-                },
-            }});
+
+my $w   = CPAN::Forum::Test::get_mech();
+my $url = CPAN::Forum::Test::get_url();
 
 {
-    my $r = $cat->cgiapp(path_info => '/');
-    like($r, qr{CPAN Forum});
+    $w->get_ok($url);
+    $w->content_like(qr{CPAN Forum});
+    BEGIN { $tests += 2; }
 }
 
+
 {
-    my $r = $cat->cgiapp(path_info => '/new_post');
-    like($r, qr{Location: http://test-host/login});
+    #$w->follow_link_ok({ text => 'new post' });
+    #like($r, qr{Location: http://test-host/login});
+
+    BEGIN { $tests += 0; }
 
 #TODO: {
 #   local $TODO = "do real redirection here";

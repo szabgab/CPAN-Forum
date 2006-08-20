@@ -4,11 +4,13 @@ use strict;
 use warnings;
 use lib "lib";
 use CPAN::Forum::INC;
-use FindBin qw($Bin);
 use Cwd qw(cwd);
 
+my $config_file = shift;
+my $dir      = shift or die "$0 CONFIG DB_DIR\n";
+
 my %opt;
-open my $opt, "$Bin/../CONFIG" or die "You need to create a CONFIG file. See README.\n";
+open my $opt, $config_file or die "You need to create a CONFIG file. See README.\n";
 while (<$opt>) {
 	chomp ;
 	my ($k, $v) = split /=/;
@@ -29,7 +31,6 @@ END
 
 }
 
-my $dir = "$Bin/../db";
 my $dbfile = "$dir/forum.db";
 unlink $dbfile if -e $dbfile;
 mkdir $dir if not -e $dir;

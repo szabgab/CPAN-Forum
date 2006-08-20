@@ -559,11 +559,13 @@ sub cgiapp_prerun {
 
 	# Redirect to login, if necessary
 	if (not  $self->session->param('loggedin') ) {
+	    $self->log->debug("Redirecting to login");
 		$self->session->param(request => $ENV{PATH_INFO});
 		$self->header_type("redirect");
 		$self->header_props(-url => "http://$ENV{HTTP_HOST}/login/");
 		return;
 	}
+	$self->log->debug("cgiapp_prerun ends");
 }
 
 
@@ -576,6 +578,7 @@ rm=something
 
 sub autoload {
 	my $self = shift;
+	$self->log->debug("autoload called: @ARGV");
 	$self->internal_error();
 }
 
@@ -590,12 +593,14 @@ sub home {
 	my $self = shift;
 	my $q = $self->query;
 	
+	$self->log->debug("home");
 	my $t = $self->load_tmpl("home.tmpl",
 		loop_context_vars => 1,
 	);
 	
 	my $page = $q->param('page') || 1;
 	$self->_search_results($t, {where => {}, page => $page});
+	$self->log->debug("home to output");
 	$t->output;
 }
 
@@ -722,9 +727,11 @@ Semi standard CGI::Application method to replace the way we load the templates.
 
 sub load_tmpl {
 	my $self = shift;
+	$self->log->debug("load_tmpl: @_");
 	my $t = $self->SUPER::load_tmpl(@_
 #		      die_on_bad_params => -e ($self->param("ROOT") . "/die_on_bad_param") ? 1 : 0
 	);
+	$self->log->debug("template loaded");
 	$t->param("loggedin" => $self->session->param("loggedin") || "");
 	$t->param("username" => $self->session->param("username") || "anonymous");
 	$t->param("test_site_warning" => -e $self->param("ROOT") . "/config_test_site");

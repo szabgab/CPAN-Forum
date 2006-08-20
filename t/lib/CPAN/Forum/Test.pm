@@ -6,9 +6,9 @@ require Exporter;
 use vars qw(@ISA @EXPORT);
 @ISA    = qw(Exporter);
 
-@EXPORT = qw(@users $ROOT setup_database);
+@EXPORT = qw(@users);
 
-our $ROOT = "blib";  
+my $ROOT = "blib";  
 
 our @users = (
 	{
@@ -23,12 +23,33 @@ sub setup_database {
 	mkdir "schema";
 	copy "../schema/schema.sql", "schema";
 
-	system "$^X bin/setup.pl";
-	system "$^X bin/populate.pl ../t/02packages.details.txt";
+	system "$^X ../bin/setup.pl CONFIG db";
+	system "$^X ../bin/populate.pl ../t/02packages.details.txt";
 
 	chdir "..";
 }
 
+sub get_mech {
+    use Test::WWW::Mechanize::CGI;
+    my $w = Test::WWW::Mechanize::CGI->new;
+    $w->cgi(sub {
+        require CPAN::Forum;
+        require CPAN::Forum::DBI;
+        CPAN::Forum::DBI->myinit("$ROOT/db/forum.db");
+        my $webapp = CPAN::Forum->new(
+                TMPL_PATH => "templates",
+                PARAMS => {
+                    ROOT => $ROOT,
+                },
+            );
+        $webapp->run();
+        }); 
+    return $w;
+};
+
+sub get_url {
+    return "http://cpanforum.local";
+}
 
 
 1;
