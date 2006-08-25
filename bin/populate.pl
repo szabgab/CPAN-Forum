@@ -24,7 +24,7 @@ GetOptions(\%opts, "sendmail", "source=s", "dir=s") or die;
 
 
 my $dbfile       = "$opts{dir}/forum.db";
-CPAN::Forum::DBI->myinit($dbfile);
+CPAN::Forum::DBI->myinit("dbi:SQLite:$dbfile");
 
 
 my $csv          = Text::CSV_XS->new();

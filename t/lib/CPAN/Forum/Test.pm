@@ -2,11 +2,11 @@ package CPAN::Forum::Test;
 
 use File::Copy qw(copy);
 
-require Exporter;
-use vars qw(@ISA @EXPORT);
-@ISA    = qw(Exporter);
+#require Exporter;
+#use vars qw(@ISA @EXPORT);
+#@ISA    = qw(Exporter);
 
-@EXPORT = qw(@users);
+#@EXPORT = qw(@users);
 
 my $ROOT = "blib";  
 
@@ -18,7 +18,7 @@ our @users = (
 );
 
 sub setup_database {
-    chdir "blib";
+    chdir $ROOT;
     copy "../t/CONFIG", ".";
     mkdir "schema";
     copy "../schema/schema.sql", "schema";
