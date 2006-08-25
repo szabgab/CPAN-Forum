@@ -37,7 +37,7 @@ END
 my $dbfile = "$opts{dir}/forum.db";
 unlink $dbfile if -e $dbfile;
 mkdir $opts{dir} if not -e $opts{dir};
-CPAN::Forum::DBI->myinit($dbfile);
+CPAN::Forum::DBI->myinit("dbi:SQLite:$dbfile");
 CPAN::Forum::DBI->init_db("schema/schema.sql", $dbfile);
 chmod 0755, $dbfile;
 

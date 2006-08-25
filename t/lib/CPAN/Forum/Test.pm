@@ -32,14 +32,14 @@ sub setup_database {
 sub get_mech {
     use Test::WWW::Mechanize::CGI;
     my $w = Test::WWW::Mechanize::CGI->new;
+    mkdir "$ROOT/db";
     $w->cgi(sub {
         require CPAN::Forum;
-        require CPAN::Forum::DBI;
-        CPAN::Forum::DBI->myinit("$ROOT/db/forum.db");
         my $webapp = CPAN::Forum->new(
                 TMPL_PATH => "templates",
                 PARAMS => {
-                    ROOT => $ROOT,
+                    ROOT       => $ROOT,
+                    DB_CONNECT => "dbi:SQLite:$ROOT/db/forum.db"
                 },
             );
         $webapp->run();

@@ -8,13 +8,17 @@ use Class::DBI::Plugin::AbstractCount;      # pager needs this
 use Class::DBI::Plugin::Pager;
 
 use DBI;
+my $dbh;
 
 sub myinit {
 	my $class = shift;
-	my $dbfile = shift;
-	__PACKAGE__->connection("dbi:SQLite:$dbfile", '', '', 
+	my $db_connect = shift;
+    if (not $dbh) {
+	    $dbh = __PACKAGE__->connection($db_connect, '', '', 
 					{
 					});
+    }
+    return $dbh;
 }
 
 our @group_types = ("None", "Global", "Field", "Distribution", "Module");

@@ -251,6 +251,9 @@ at both ends of the typed in word.
 Removed the use of CPAN::Forum::Build - need to see what was it doing and
 replace its functionality with something better
 
+Create links http://www.cpanforum.com/rss/author/PAUSEID
+These links don't seem to contain any data http://www.cpanforum.com/rss/dist/OpenOffice-OODoc
+
 Subject field:
 -  <= 80 chars
 -  Can contain any characters, we'll escape them when showing on the web site
@@ -401,8 +404,12 @@ grep INCLUDE *| grep -v navigation.tmpl | grep -v footer.tmpl | grep -v head.tmp
 
 sub cgiapp_init {
 	my $self = shift;
-	my $dbh = CPAN::Forum::DBI::db_Main();
 	
+    my $db_connect = $self->param("DB_CONNECT");
+    use CPAN::Forum::DBI;
+    CPAN::Forum::DBI->myinit($db_connect);
+	my $dbh = CPAN::Forum::DBI::db_Main();
+    
 	my $log       = $self->param("ROOT") . "/db/messages.log";
 	$STATUS_FILE  = $self->param("ROOT") . "/db/status";
 	my $log_level = $self->_set_log_level();
