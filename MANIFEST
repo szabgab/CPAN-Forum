@@ -22,13 +22,13 @@ lib/CPAN/Forum/Usergroups.pm
 lib/CPAN/Forum/UserInGroup.pm
 
 t/CONFIG
-t/000-load.t
-t/001-users.t
-t/011-register.t
-t/100-auth.t
 t/02packages.details.txt
 t/lib/CPAN/Forum/Test.pm
 
+t/mech/000-load.t
+t/mech/001-users.t
+t/mech/011-register.t
+t/mech/100-auth.t
 t/markup/010-markup.t
 t/other/pod-coverage.t
 t/other/pod.t
