@@ -25,6 +25,7 @@ t/CONFIG
 t/02packages.details.txt
 t/lib/CPAN/Forum/Test.pm
 
+t/db/users.t
 t/mech/000-load.t
 t/mech/001-users.t
 t/mech/011-register.t
@@ -62,9 +63,9 @@ templates/module_select_form.tmpl
 templates/message_in_thread.tmpl
 templates/admin.tmpl
 templates/admin_edit_user.tmpl
+templates/site_is_closed.tmpl
 
 www/cgi/index.pl
 www/robots.txt
 www/style.css
 
-templates/site_is_closed.tmpl

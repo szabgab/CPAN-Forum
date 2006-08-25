@@ -23,6 +23,15 @@ sub setup_database {
     chdir "..";
 }
 
+sub init_db {
+    require CPAN::Forum::DBI;
+    CPAN::Forum::DBI->myinit(db_connect());
+}
+
+sub db_connect {
+    return "dbi:SQLite:$ROOT/db/forum.db";
+}
+
 sub get_mech {
     use Test::WWW::Mechanize::CGI;
     my $w = Test::WWW::Mechanize::CGI->new;
@@ -33,7 +42,7 @@ sub get_mech {
                 TMPL_PATH => "templates",
                 PARAMS => {
                     ROOT       => $ROOT,
-                    DB_CONNECT => "dbi:SQLite:$ROOT/db/forum.db"
+                    DB_CONNECT => db_connect(),
                 },
             );
         $webapp->run();
@@ -43,6 +52,11 @@ sub get_mech {
 
 sub get_url {
     return "http://cpanforum.local";
+}
+
+sub register_user {
+    my ($id) = @_;
+   
 }
 
 
