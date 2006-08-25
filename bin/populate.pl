@@ -20,7 +20,21 @@ my %opts = (
     dir      => "$Bin/../db",
 );
 
-GetOptions(\%opts, "sendmail", "source=s", "dir=s") or die;
+GetOptions(\%opts, "sendmail", "source=s", "dir=s", "fetch", "help") 
+    or usage();
+usage() if $opts{help};
+
+sub usage {
+    print <<"END_USAGE";
+$0
+    --sendmail      to send report to Gabor
+    --source FILE   path to the 02packages.details.txt
+    --dir DIR       directory of the database
+    --fetch
+    --help          this help
+END_USAGE
+    exit;
+}
 
 
 my $dbfile       = "$opts{dir}/forum.db";
@@ -36,13 +50,15 @@ print "This operation can take a couple of minutes\n";
 if (not $opts{source}) {
     my $file = "02packages.details.txt";
     $opts{source} = "$opts{dir}/$file";
+}
 
+if ($opts{fetch}) {
     unlink $opts{source} if -e $opts{source};
     # must have downloaded and un-gzip-ed
     # ~/mirror/cpan/modules/02packages.details.txt.gz 
-    print "Fecthing  $file from CPAN\n";
+    print "Fecthing  $opts{source} from CPAN\n";
     getstore("http://www.cpan.org/modules/02packages.details.txt.gz", "$opts{source}.gz");
-    print "Unzipping $file\n";
+    print "Unzipping $opts{source}\n";
     system("gunzip $opts{source}.gz");
 }
 
@@ -57,19 +73,20 @@ my %message = (
     new     => "",
 );
 
+LINE:
 foreach my $d (@distributions) {
 
     # skip scripts
-    next if not $d->prefix or $d->prefix =~ m{^\w/\w\w/\w+/scripts/};   
+    next LINE if not $d->prefix or $d->prefix =~ m{^\w/\w\w/\w+/scripts/};   
 
     my $name        = $d->dist;
     if (not $name) {
         #warn "No name: " . $d->prefix . "\n";
-        next;
+        next LINE;
     }
     
     # for now skip names that start with lower case
-    #next if $name =~ /^[a-z]/;
+    #next LINE if $name =~ /^[a-z]/;
 
     my %new = (
         version => ($d->version() || ""),
@@ -95,16 +112,26 @@ foreach my $d (@distributions) {
         }
 
         $g->update if $changed;
-        next;
+        next LINE;
     }
 
     $message{new} .= sprintf "%s   %s\n", $name, $new{version}, $new{pauseid};
+    my $pause;
+    eval {
+        $pause = CPAN::Forum::Authors->find_or_create({ pauseid => $new{pauseid} });
+    };
+    if ($@) {
+        warn "$name\n";
+        warn $@;
+        next LINE;
+    }
+
     eval {
         my $g = CPAN::Forum::Groups->create({
             name    => $name,
             gtype   => $CPAN::Forum::DBI::group_types{Distribution}, 
             version => $new{version},
-            pauseid => $new{pauseid},
+            pauseid => $pause->id,
         });
     };
     if ($@) {
@@ -112,6 +139,7 @@ foreach my $d (@distributions) {
         warn $@;
     }
 }
+
 
 #open my $out, ">", $version_file or die "Could not open '$version_file' for writing $!\n";
 #foreach my $name (sort keys %version) {

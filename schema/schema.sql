@@ -98,7 +98,7 @@ CREATE TABLE posts (
 
 CREATE TABLE authors (
 			id               INTEGER PRIMARY KEY auto_increment,
-			pauseid          VARCHAR(100)
+			pauseid          VARCHAR(100) UNIQUE NOT NULL
 );
 
 

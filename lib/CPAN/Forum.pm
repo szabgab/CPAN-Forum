@@ -248,6 +248,21 @@ at both ends of the typed in word.
 
 =head2 TODO
 
+In order to prepare a downloadable version of the database we need to hide the
+personal infromation:
+    update users set email = 'test_' || id || '@cpanforum.com' where id in(select id from users);
+    update users set password = 'testpw';
+
+    -- maybe even change the usernames? but I think the ids are already public
+    -- so it won't bring any additional privacy or security
+
+    delete from sessions;
+
+    delete from configure;  -- ???
+    delete user_in_group;   -- ???
+
+
+
 Removed the use of CPAN::Forum::Build - need to see what was it doing and
 replace its functionality with something better
 
@@ -2163,8 +2178,9 @@ sub admin {
 =head2 rss
 
 Provide RSS feed
-/rss  latest 20 entries
-/rss/dist/Distro-Name  latest 20 entries of that distro name
+/rss/all  latest N entries
+/rss/dist/Distro-Name  latest N entries of that distro name
+/rss/author/PAUSEID
 
 =cut
 
@@ -2176,7 +2192,9 @@ sub rss {
     my $it;
     if (@params > 1 and $params[0] eq "dist") {
         my $dist = $params[1];
-        $it = CPAN::Forum::Posts->search(gid => $dist, {order_by => 'date DESC'}),
+        $self->log->debug("rss of dist: '$dist'");
+        my ($group) = CPAN::Forum::Groups->search({ name => $dist });
+        $it = CPAN::Forum::Posts->search(gid => $group->id, {order_by => 'date DESC'}),
     } else {
         $it = CPAN::Forum::Posts->retrieve_latest($cnt);
     }
