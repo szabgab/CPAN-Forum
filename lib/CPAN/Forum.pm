@@ -2,7 +2,7 @@ package CPAN::Forum;
 use strict;
 use warnings;
 
-our $VERSION = "0.11_01";
+our $VERSION = "0.11_02";
 
 use base "CGI::Application";
 use CGI::Application::Plugin::Session;
@@ -254,6 +254,13 @@ replace its functionality with something better
 Create links http://www.cpanforum.com/rss/author/PAUSEID
 These links don't seem to contain any data http://www.cpanforum.com/rss/dist/OpenOffice-OODoc
 
+Check if the database is writable by the process and give appropriate error
+message if not.
+If the directory of the database is not writable and logging was setup the
+application fails.
+
+
+
 Subject field:
 -  <= 80 chars
 -  Can contain any characters, we'll escape them when showing on the web site
@@ -398,6 +405,76 @@ footer.tmpl     -
 Use this for mapping:
 grep INCLUDE *| grep -v navigation.tmpl | grep -v footer.tmpl | grep -v head.tmpl
 
+=head1 Schema
+
+=over 4
+
+=item configure
+
+=item grouprelations
+
+NOT USED
+
+=item groups
+
+ name   - name of the module (using - separator)
+ gtype  - is
+ status - NOT USED
+
+Every CPAN module has an antry in this table.
+
+=item posts
+
+ gid
+ uid
+ parent
+ thread
+ hidden
+ subject
+ text
+ date
+
+=item sessions
+
+Used for session management
+
+=item subscriptions
+
+ uid
+ gid
+ allposts
+ starters
+ followups
+ announcements
+
+=item usergroups
+
+ name - name of the group
+
+Currently we only have the 'admin' group
+
+=item user_in_group
+
+ uid - user id
+ gid - group id
+
+ Members of the usergroup.
+
+=item users
+
+ username - should be lower case, 
+ password -
+ email - should be kept in lower case 
+ fname
+ lname
+ update_on_new_user - 
+      TRUE/FALSE, should be only relevant for users in the 'admin' group
+ status - NOT USED
+
+Registered users
+
+=back
+
 =head1 METHODS
 
 =cut
@@ -541,6 +618,27 @@ sub cgiapp_prerun {
 
 	$self->param(path_parameters => []);
 
+    $rm = $self->_get_run_mode($rm);
+
+	$self->log->debug("Current runmode:  $rm"); 
+	$self->log->debug("Current user:  " . ($self->session->param("username") || ""));
+	$self->log->debug("Current sid:  " . ($self->session->id() || ""));
+
+	return if grep {$rm eq $_} @free_modes;
+	#return if not grep {$rm eq $_} @restricted_modes;
+
+	# Redirect to login, if necessary
+	if (not  $self->session->param('loggedin') ) {
+	    $self->log->debug("Showing login");
+		$self->session->param(request => $rm);
+		$self->prerun_mode('login');
+		return;
+	}
+	$self->log->debug("cgiapp_prerun ends");
+}
+
+sub _get_run_mode {
+    my ($self, $rm) = @_;
 	if (not $rm or $rm eq "home") {
 		if ($ENV{PATH_INFO} =~ m{^/
 						([^/]+)        # first word till after the first /
@@ -561,25 +659,8 @@ sub cgiapp_prerun {
 			}
 		}
 	}
-
-	$self->log->debug("Current runmode:  $rm"); 
-	$self->log->debug("Current user:  " . ($self->session->param("username") || ""));
-	$self->log->debug("Current sid:  " . ($self->session->id() || ""));
-
-	return if grep {$rm eq $_} @free_modes;
-	#return if not grep {$rm eq $_} @restricted_modes;
-
-	# Redirect to login, if necessary
-	if (not  $self->session->param('loggedin') ) {
-	    $self->log->debug("Redirecting to login");
-		$self->session->param(request => $ENV{PATH_INFO});
-		$self->header_type("redirect");
-		$self->header_props(-url => "http://$ENV{HTTP_HOST}/login/");
-		return;
-	}
-	$self->log->debug("cgiapp_prerun ends");
+    return $rm;
 }
-
 
 =head2 autoload
 
@@ -666,18 +747,6 @@ sub build_listing {
 	return \@resp;
 }
 
-
-=head2 redirect_home
-
-Just to easily redirect to the home page
-
-=cut
-
-sub redirect_home {
-	my $self = shift;
-	$self->header_type("redirect");
-	$self->header_props(-url => "http://$ENV{HTTP_HOST}/");
-}
 
 =head2 about
 
@@ -810,13 +879,21 @@ sub login_process {
 		}
 	}
 
-	my $request = $session->param("request") || "";
+	my $request = $session->param("request") || "home";
 	$session->param("request" => "");
 	$session->flush();
 	$self->log->debug("Session flushed after login " . $session->param('loggedin'));
-	$self->header_type("redirect");
-	$request .= "/" if $request !~ m{/$};
-	$self->header_props(-url => "http://$ENV{HTTP_HOST}/$request");
+	$self->log->debug("Request redirection: '$request'");
+    no strict 'refs';
+    my $response;
+    eval {
+        $response = &$request($self);
+    };
+    if ($@) {
+	    $self->log->error($@);
+        die $@; # TODO: send error page?
+    }
+    return $response;
 }
 
 
@@ -841,7 +918,7 @@ sub logout {
 	$session->flush();
 	$self->log->debug("logged out '$username'");
 
-	$self->redirect_home;
+	$self->home;
 }
 
 
@@ -1333,7 +1410,7 @@ sub process_post {
 	
 	$self->notify($pid);
 
-	$self->redirect_home;
+	$self->home;
 }
 
 

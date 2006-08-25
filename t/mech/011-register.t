@@ -21,12 +21,6 @@ my @users = @CPAN::Forum::Test::users;
 my $w   = CPAN::Forum::Test::get_mech();
 my $url = CPAN::Forum::Test::get_url();
 
-#use CPAN::Forum::DBI;
-#CPAN::Forum::DBI->myinit("$ROOT/db/forum.db");
-
-#use CGI::Application::Test;
-#use CPAN::Forum;
-#my $cat = CGI::Application::Test->new({
 {
     $w->get_ok($url);
     $w->content_like(qr{CPAN Forum});
