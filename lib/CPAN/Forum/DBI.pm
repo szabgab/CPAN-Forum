@@ -11,12 +11,12 @@ use DBI;
 my $dbh;
 
 sub myinit {
-	my $class = shift;
-	my $db_connect = shift;
+    my $class = shift;
+    my $db_connect = shift;
     if (not $dbh) {
-	    $dbh = __PACKAGE__->connection($db_connect, '', '', 
-					{
-					});
+        $dbh = __PACKAGE__->connection($db_connect, '', '', 
+                    {
+                    });
     }
     return $dbh;
 }
@@ -27,28 +27,28 @@ $group_types{$group_types[$_]} = $_ for (0..$#group_types);
 
 # Initialize the database
 sub init_db {
-	my ($class, $schema_file, $dbfile) = @_;
+    my ($class, $schema_file, $dbfile) = @_;
 
-	die "No database file supplied" if not $dbfile;
+    die "No database file supplied" if not $dbfile;
 
-	my $sql;
-	my $dbh = $class->db_Main;
-	open my $data, "<", $schema_file or die "Coult no open '$schema_file'  $!\n";
-	$sql = join('', <$data>);
+    my $sql;
+    my $dbh = $class->db_Main;
+    open my $data, "<", $schema_file or die "Coult no open '$schema_file'  $!\n";
+    $sql = join('', <$data>);
 
-	for my $statement (split /;/, $sql) {
-		if ($dbh->{Driver}{Name} =~ /SQLite/) {
-			$statement =~ s/auto_increment//g;
-			$statement =~ s/,?FOREIGN .*$//mg;
-			$statement =~ s/TYPE=INNODB//g;
-		}
-		$statement =~ s/\#.*$//mg;    # strip # comments
-		$statement =~ s/--.*$//mg;    # strip -- comments
-		next unless $statement =~ /\S/;
-		eval {$dbh->do($statement)};
-		die "$@: $statement" if $@;
-	}
-	return 1;
+    for my $statement (split /;/, $sql) {
+        if ($dbh->{Driver}{Name} =~ /SQLite/) {
+            $statement =~ s/auto_increment//g;
+            $statement =~ s/,?FOREIGN .*$//mg;
+            $statement =~ s/TYPE=INNODB//g;
+        }
+        $statement =~ s/\#.*$//mg;    # strip # comments
+        $statement =~ s/--.*$//mg;    # strip -- comments
+        next unless $statement =~ /\S/;
+        eval {$dbh->do($statement)};
+        die "$@: $statement" if $@;
+    }
+    return 1;
 }
 
 1;

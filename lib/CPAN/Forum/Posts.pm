@@ -17,24 +17,24 @@ __PACKAGE__->set_sql(count_like   => "SELECT count(*) FROM __TABLE__ WHERE %s LI
 #__PACKAGE__->add_constraint('text_format', text => \&check_text_format);
 
 sub retrieve_latest { 
-	my ($class, $count) = @_;
-	
-#	$where = $where ? "WHERE $where" : "";
-	return $class->sth_to_objects($class->sql_latest($count));
+    my ($class, $count) = @_;
+    
+#   $where = $where ? "WHERE $where" : "";
+    return $class->sth_to_objects($class->sql_latest($count));
 }
 
 sub mysearch {
-	my ($self, $params) = @_;
+    my ($self, $params) = @_;
 
-	my %where  = %{$params->{where}};
-	%where = (1 => 1) if not %where;
+    my %where  = %{$params->{where}};
+    %where = (1 => 1) if not %where;
 
-	my $pager = __PACKAGE__->pager(
-		where         => \%where,
-		per_page      => $params->{per_page} || 10,
-		page          => $params->{page}     || 1,
-		order_by      => $params->{order_by} || "id DESC",
-	);
+    my $pager = __PACKAGE__->pager(
+        where         => \%where,
+        per_page      => $params->{per_page} || 10,
+        page          => $params->{page}     || 1,
+        order_by      => $params->{order_by} || "id DESC",
+    );
 }
 
 1;
