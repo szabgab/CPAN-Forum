@@ -2,12 +2,6 @@ package CPAN::Forum::Test;
 
 use File::Copy qw(copy);
 
-#require Exporter;
-#use vars qw(@ISA @EXPORT);
-#@ISA    = qw(Exporter);
-
-#@EXPORT = qw(@users);
-
 my $ROOT = "blib";  
 
 our @users = (

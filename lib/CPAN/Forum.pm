@@ -927,7 +927,7 @@ MSG
 		Subject  => $subject,
 		Message  => $message,
 	);
-	sendmail(%mail);
+	$self->_my_sendmail(%mail);
 }
 
 sub notify_admin {
@@ -947,7 +947,7 @@ sub notify_admin {
 		Subject => "New Forum user: " . $user->username,
 		Message => $msg,
 	);
-	sendmail(%mail);
+	$self->_my_sendmail(%mail);
 }
 
 sub pwreminder {
@@ -1000,7 +1000,7 @@ MSG
 		Subject  => $subject,
 		Message  => $message,
 	);
-	sendmail(%mail);
+	$self->_my_sendmail(%mail);
 
 	return $self->pwreminder({"done" => 1});
 }
@@ -2151,7 +2151,7 @@ sub notify {
 		Subject  => $subject,
 		Message  => $message,
 	);
-	#sendmail(%mail);
+	#$self->_my_sendmail(%mail);
 
 
 
@@ -2195,7 +2195,7 @@ sub notify {
 
 sub _sendmail {
 	my ($self, $it, $mail, $to, $ids) = @_;
-	
+
 	while (my $s = $it->next) {
 		my $email = $s->uid->email;
 		$self->log->debug("Sending to $email ?");
@@ -2207,7 +2207,7 @@ sub _sendmail {
 		next if $_[2]->{$email}++;
 		$self->log->debug("Sending to $email first time sending");
 		#warn "Yes, Sending to $email\n";
-		sendmail(%$mail);
+		$self->_my_sendmail(%$mail);
 		$self->log->debug("Sent to $email");
 	}
 }
@@ -2269,6 +2269,19 @@ sub teardown {
 		$self->session->delete();
 		#$self->session->flush();
 	}
+}
+
+sub _my_sendmail {
+    my ($self, @args) = @_;
+
+    # for testing
+    if (defined &_test_my_sendmail) {
+        $self->_test_my_sendmail(@_);
+        return;
+    }
+    else {
+        return sendmail(@args);
+    }
 }
 
 1;

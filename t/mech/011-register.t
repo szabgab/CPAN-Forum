@@ -9,6 +9,7 @@ plan tests => $tests;
 
 use lib qw(t/lib);
 use CPAN::Forum::Test;
+my @users = @CPAN::Forum::Test::users;
 
 {
     CPAN::Forum::Test::setup_database();
@@ -88,55 +89,73 @@ foreach my $username ("ab.c", "Abcde", "asd'er", "ab cd") {
     BEGIN { $tests += 2*4; }
 }
 
-__END__
-# reject bad usernames
+# reject bad email address 
 foreach my $email ("adb-?", "Abcde", "asd'er", "ab cd") {
-    my $r = $cat->cgiapp(path_info => '/', params => {rm => 'register_process', nickname => "abcde", email => $email});
-    like($r, qr{Registration Page});
-    like($r, qr{Email must be a valid address writen in lower case letters});
+    $w->submit_form(
+        fields => {
+            nickname => "abcde", 
+            email    => $email,
+        },
+    );
+    $w->content_like(qr{Registration Page});
+    $w->content_like(qr{Email must be a valid address writen in lower case letters});
+    BEGIN { $tests += 2*4; }
 }
+
+
+
 
 my $pw;
 my $password;
 my $sendmail_count;
 # register user
-{
-    no warnings;
-    sub CPAN::Forum::sendmail {
-        my %mail = @_;
-        #use Data::Dumper;
-        #print STDERR Dumper \%mail;
-        #print STDERR 
-        if ($mail{Message} =~ /your password is: (\w+)/) {
-            $password = $1;
-        }
-        $sendmail_count++;
+sub CPAN::Forum::_test_my_sendmail {
+    my %mail = @_;
+    #use Data::Dumper;
+    #print STDERR Dumper \%mail;
+    #print STDERR 
+    if ($mail{Message} =~ /your password is: (\w+)/) {
+        $password = $1;
     }
-    use warnings;
+    $sendmail_count++;
 }
+
 # TODO: check if the call to submail contains the correct values
 {
     $sendmail_count = 0;
     $password = '';
-    my $r = $cat->cgiapp(path_info => '/', 
-            params => {rm => 'register_process', nickname => $users[0]{username}, email => $users[0]{email}});
-    like($r, qr{Registration Page});
-    like($r, qr{Thank you for registering});
+    $w->submit_form(
+        fields => {
+            nickname => $users[0]{username}, 
+            email    => $users[0]{email},
+        },
+    );
+    $w->content_like(qr{Registration Page});
+    $w->content_like(qr{Thank you for registering});
     like($password, qr{\w{5}});
 
     is($sendmail_count, 2);
     $pw = $password;
+
+    BEGIN { $tests += 4; }
 }
 
 # try to register the same user again and see it fails
 {
     $sendmail_count = 0;
     $password = '';
-    my $r = $cat->cgiapp(path_info => '/', 
-            params => {rm => 'register_process', nickname => $users[0]{username}, email => $users[0]{email}});
-    like($r, qr{Registration Page});
-    like($r, qr{Nickname or e-mail already in use});
+    $w->back;
+    $w->submit_form(
+        fields => {
+            nickname => $users[0]{username}, 
+            email    => $users[0]{email},
+        },
+    );
+    $w->content_like(qr{Registration Page});
+    $w->content_like(qr{Nickname or e-mail already in use});
     is($sendmail_count, 0);
     is($password, "");
+
+    BEGIN { $tests += 4; }
 }
 
