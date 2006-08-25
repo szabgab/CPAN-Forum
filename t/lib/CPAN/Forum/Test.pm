@@ -56,7 +56,11 @@ sub get_url {
 
 sub register_user {
     my ($id) = @_;
-   
+
+    init_db();
+    require CPAN::Forum::Users;
+  	my $user = CPAN::Forum::Users->create($users[0]);
+    return $user;
 }
 
 

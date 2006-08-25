@@ -46,4 +46,13 @@ ALTER TABLE groups ADD pauseid INTEGER;
 ALTER TABLE groups ADD rating VARCHAR(10);
 ALTER TABLE groups ADD review_count INTEGER;
 
+CREATE TABLE subscriptions_all (
+			id               INTEGER PRIMARY KEY,
+			uid              INTEGER NOT NULL,
+			allposts         BOOLEAN,
+			starters         BOOLEAN,
+			followups        BOOLEAN,
+			announcements    BOOLEAN
+);
+
 

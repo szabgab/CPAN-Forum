@@ -34,10 +34,14 @@ CPAN::Forum::Test::init_db();
 		email    => $users[0]{email},
     });
     isa_ok($user, 'CPAN::Forum::Users');
+    is($user->username, $users[0]{username});
+    is($user->email, $users[0]{email});
+    is(length($user->password), 7);
 
     my @db_users = CPAN::Forum::Users->retrieve_all;
     is(@db_users, 2);
 	is(CPAN::Forum::Users->count_all(), 2);
-    BEGIN { $tests += 3; }
+    BEGIN { $tests += 6; }
 }
+
 

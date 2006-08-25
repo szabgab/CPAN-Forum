@@ -631,6 +631,10 @@ sub cgiapp_prerun {
     if (not  $self->session->param('loggedin') ) {
         $self->log->debug("Showing login");
         $self->session->param(request => $rm);
+        if ($rm eq 'new_post') {
+            my $group = ${$self->param("path_parameters")}[0];
+            $self->session->param(request_group => $group);
+        }
         $self->prerun_mode('login');
         return;
     }
@@ -880,19 +884,24 @@ sub login_process {
     }
 
     my $request = $session->param("request") || "home";
-    $session->param("request" => "");
-    $session->flush();
-    $self->log->debug("Session flushed after login " . $session->param('loggedin'));
     $self->log->debug("Request redirection: '$request'");
     no strict 'refs';
     my $response;
     eval {
+        if ($request eq 'new_post') {
+            my $request_group = $session->param("request_group") || '';
+            $self->param("path_parameters" => [$request_group]);
+        }
         $response = &$request($self);
     };
     if ($@) {
         $self->log->error($@);
         die $@; # TODO: send error page?
     }
+    $session->param("request" => "");
+    $session->param("request_group" => "");
+    $session->flush();
+    $self->log->debug("Session flushed after login " . $session->param('loggedin'));
     return $response;
 }
 
@@ -1163,6 +1172,11 @@ sub posts {
 
     my $rm = $self->get_current_runmode();
     $self->log->debug("posts rm=$rm");
+    my $request = $self->session->param('request');
+    if ($request) {
+        $rm = $request;
+        $self->log->debug("posts request reset rm=$rm");
+    }
 
     my $new_group = "";
     my $new_group_id = "";
@@ -1546,6 +1560,7 @@ sub dist {
     my $q = $self->query;
 
     my $group = ${$self->param("path_parameters")}[0];
+    $self->log->debug("show dist: '$group'");
 #   $group =~ s/-/::/g;
 #   (my $dashgroup = $group) =~ s/::/-/g;
 
