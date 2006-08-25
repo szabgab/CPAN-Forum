@@ -180,6 +180,11 @@ variable to the URL where you installed the forum.
 
 =head2 Changes
 
+  bin/populate.pl now gets all its arguments using --options
+  bin/setup.pl now uses --options
+
+
+
 Enable people to subscribe to all messages or all thread starters or all followups
 Add a table called "subscription_all"
  

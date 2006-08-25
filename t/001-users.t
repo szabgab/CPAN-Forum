@@ -15,7 +15,6 @@ use CPAN::Forum::Test;
     ok(-e "blib/db/forum.db");
     BEGIN { $tests += 1; }
 }
-use CPAN::Forum;
 
 my $w   = CPAN::Forum::Test::get_mech();
 my $url = CPAN::Forum::Test::get_url();

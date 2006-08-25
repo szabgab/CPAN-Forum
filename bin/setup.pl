@@ -5,12 +5,15 @@ use warnings;
 use lib "lib";
 use CPAN::Forum::INC;
 use Cwd qw(cwd);
+use Getopt::Long qw(GetOptions);
 
-my $config_file = shift;
-my $dir      = shift or die "$0 CONFIG DB_DIR\n";
+my %opts;
+GetOptions(\%opts, "config=s", "dir=s") or die;
+die "$0 --config CONFIG --dir DB_DIR\n" 
+    if not $opts{config} or not $opts{dir};
 
 my %opt;
-open my $opt, $config_file or die "You need to create a CONFIG file. See README.\n";
+open my $opt, $opts{config} or die "You need to create a CONFIG file. See README.\n";
 while (<$opt>) {
 	chomp ;
 	my ($k, $v) = split /=/;
@@ -31,9 +34,9 @@ END
 
 }
 
-my $dbfile = "$dir/forum.db";
+my $dbfile = "$opts{dir}/forum.db";
 unlink $dbfile if -e $dbfile;
-mkdir $dir if not -e $dir;
+mkdir $opts{dir} if not -e $opts{dir};
 CPAN::Forum::DBI->myinit($dbfile);
 CPAN::Forum::DBI->init_db("schema/schema.sql", $dbfile);
 chmod 0755, $dbfile;

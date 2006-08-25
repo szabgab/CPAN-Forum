@@ -11,22 +11,22 @@ use vars qw(@ISA @EXPORT);
 my $ROOT = "blib";  
 
 our @users = (
-	{
-		username => 'abcder',
-		email    => 'qqrq@banana.com',
-	},
+    {
+        username => 'abcder',
+        email    => 'qqrq@banana.com',
+    },
 );
 
 sub setup_database {
-	chdir "blib";
-	copy "../t/CONFIG", ".";
-	mkdir "schema";
-	copy "../schema/schema.sql", "schema";
+    chdir "blib";
+    copy "../t/CONFIG", ".";
+    mkdir "schema";
+    copy "../schema/schema.sql", "schema";
 
-	system "$^X ../bin/setup.pl CONFIG db";
-	system "$^X ../bin/populate.pl ../t/02packages.details.txt";
+    system "$^X ../bin/setup.pl --config CONFIG --dir db";
+    system "$^X ../bin/populate.pl --source ../t/02packages.details.txt --dir db";
 
-	chdir "..";
+    chdir "..";
 }
 
 sub get_mech {
