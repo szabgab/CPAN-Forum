@@ -16,13 +16,12 @@ use CPAN::Forum::Groups;
 
 
 
-my %opts = (
-    dir      => "$Bin/../db",
-);
+my %opts;
 
 GetOptions(\%opts, "sendmail", "source=s", "dir=s", "fetch", "help") 
     or usage();
 usage() if $opts{help};
+usage() if not $opts{dir};
 
 sub usage {
     print <<"END_USAGE";
@@ -77,11 +76,14 @@ LINE:
 foreach my $d (@distributions) {
 
     # skip scripts
-    next LINE if not $d->prefix or $d->prefix =~ m{^\w/\w\w/\w+/scripts/};   
+    if (not $d->prefix or $d->prefix =~ m{^\w/\w\w/\w+/scripts/}) {
+        warn "no prefix line $.\n";
+        next LINE;
+    }
 
     my $name        = $d->dist;
     if (not $name) {
-        #warn "No name: " . $d->prefix . "\n";
+        warn "No name: line: $. prefix:" . $d->prefix . "\n";
         next LINE;
     }
     
@@ -90,8 +92,26 @@ foreach my $d (@distributions) {
 
     my %new = (
         version => ($d->version() || ""),
-        pauseid => ($d->cpanid()  || ""),
     );
+
+
+    my $pauseid = ($d->cpanid()  || "");
+    my $p;
+    if ($pauseid) {
+        eval {
+            $p = CPAN::Forum::Authors->find_or_create({ pauseid => $pauseid });
+        };
+        if ($@) {
+            warn "$name\n";
+            warn $@;
+            next LINE;
+        }
+    }
+    if (not $p) {
+        warn "No PAUSEID?" . $d->prefix . "\n";
+        next LINE;
+    }
+    $new{pauseid} = $p->id;
 
 
     my ($g) = CPAN::Forum::Groups->search(name => $name);
@@ -111,27 +131,20 @@ foreach my $d (@distributions) {
             }
         }
 
-        $g->update if $changed;
+        if ($changed) {
+            $g->update;
+        }
         next LINE;
     }
 
-    $message{new} .= sprintf "%s   %s\n", $name, $new{version}, $new{pauseid};
-    my $pause;
-    eval {
-        $pause = CPAN::Forum::Authors->find_or_create({ pauseid => $new{pauseid} });
-    };
-    if ($@) {
-        warn "$name\n";
-        warn $@;
-        next LINE;
-    }
+    $message{new} .= sprintf "Creating %s   %s\n", $name, $new{version}, $pauseid;
 
     eval {
         my $g = CPAN::Forum::Groups->create({
             name    => $name,
             gtype   => $CPAN::Forum::DBI::group_types{Distribution}, 
             version => $new{version},
-            pauseid => $pause->id,
+            pauseid => $new{pauseid},
         });
     };
     if ($@) {

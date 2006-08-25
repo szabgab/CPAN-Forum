@@ -2187,16 +2187,27 @@ Provide RSS feed
 sub rss {
     my $self = shift;
     
-    my $cnt = $self->config("rss_size") || 10;
+    my $limit  = $self->config("rss_size") || 10;
     my @params = @{$self->param("path_parameters")};
     my $it;
-    if (@params > 1 and $params[0] eq "dist") {
-        my $dist = $params[1];
-        $self->log->debug("rss of dist: '$dist'");
-        my ($group) = CPAN::Forum::Groups->search({ name => $dist });
-        $it = CPAN::Forum::Posts->search(gid => $group->id, {order_by => 'date DESC'}),
-    } else {
-        $it = CPAN::Forum::Posts->retrieve_latest($cnt);
+    if (@params > 1) {
+        if ($params[0] eq 'dist') {
+            my $dist = $params[1];
+            $self->log->debug("rss of dist: '$dist'");
+            my ($group) = CPAN::Forum::Groups->search({ name => $dist });
+            $it = CPAN::Forum::Posts->search(gid => $group->id, {order_by => 'date DESC'});
+        }
+        elsif ($params[0] eq 'author') {
+            my $pauseid = uc $params[1];
+            $self->log->debug("rss of author: '$pauseid'");
+            $it = CPAN::Forum::Posts->search_post_by_pauseid($pauseid);
+        }
+        else {
+            $self->log->warnings("rss requested for $params[0]");
+        }
+    }
+    else {
+        $it = CPAN::Forum::Posts->retrieve_latest($limit);
     }
 
     require XML::RSS::SimpleGen;
@@ -2209,7 +2220,7 @@ sub rss {
     $rss->webmaster($admin->email);
 
     my $prefix = "";
-    while (my $post = $it->next() and $cnt--) {
+    while (my $post = $it->next() and $limit--) {
         $rss->item($url. "posts/" . $post->id(), $prefix . $post->subject); # TODO _subject_escape ?
     }
 #   $rss->save("file.rss");

@@ -15,6 +15,14 @@ __PACKAGE__->set_sql(count_where  => "SELECT count(*) FROM __TABLE__ WHERE %s='%
 __PACKAGE__->set_sql(count_like   => "SELECT count(*) FROM __TABLE__ WHERE %s LIKE '%s'");
 #__PACKAGE__->add_constraint('subject_too_long', subject => sub { length $_[0] <= 70 and $_[0] !~ /</});
 #__PACKAGE__->add_constraint('text_format', text => \&check_text_format);
+__PACKAGE__->set_sql(post_by_pauseid => qq{
+                        SELECT posts.id id
+                        FROM posts
+                        WHERE gid IN (
+                            SELECT DISTINCT groups.id 
+                            FROM groups, authors
+                            WHERE groups.pauseid=authors.id and authors.pauseid=?)
+                        ORDER BY date DESC});
 
 sub retrieve_latest { 
     my ($class, $count) = @_;

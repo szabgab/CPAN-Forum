@@ -55,4 +55,9 @@ CREATE TABLE subscriptions_all (
 			announcements    BOOLEAN
 );
 
+CREATE TABLE authors (
+			id               INTEGER PRIMARY KEY,
+			pauseid          VARCHAR(100) UNIQUE NOT NULL
+);
+
 
