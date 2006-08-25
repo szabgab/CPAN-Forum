@@ -3,73 +3,92 @@
 use strict;
 use warnings;
 
-use Test::More "no_plan";
-
+use Test::More;
+my $tests;
+plan tests => $tests;
 
 use lib qw(t/lib);
 use CPAN::Forum::Test;
 
-setup_database();
-
-use CPAN::Forum::DBI;
-CPAN::Forum::DBI->myinit("$ROOT/db/forum.db");
-
-use CGI::Application::Test;
-use CPAN::Forum;
-my $cat = CGI::Application::Test->new({
-            class   => "CPAN::Forum", 
-            cookie  => "cpanforum", 
-            app     => {
-                TMPL_PATH => "$ROOT/templates",
-                PARAMS => {
-                    ROOT => $ROOT,
-                },
-            }});
-
-
 {
-    my $r = $cat->cgiapp(path_info => '/');
-    like($r, qr{CPAN Forum});
+    CPAN::Forum::Test::setup_database();
+    ok(-e "blib/db/forum.db");
+    BEGIN { $tests += 1; }
+}
+
+
+my $w   = CPAN::Forum::Test::get_mech();
+my $url = CPAN::Forum::Test::get_url();
+
+#use CPAN::Forum::DBI;
+#CPAN::Forum::DBI->myinit("$ROOT/db/forum.db");
+
+#use CGI::Application::Test;
+#use CPAN::Forum;
+#my $cat = CGI::Application::Test->new({
+{
+    $w->get_ok($url);
+    $w->content_like(qr{CPAN Forum});
+
+    $w->follow_link_ok({ text => 'register' });
+    $w->content_like(qr{Registration Page});
+
+    BEGIN { $tests += 4; }
 }
 
 {
-    my $r = $cat->cgiapp(path_info => '/register');
-    like($r, qr{Registration Page});
-}
+    $w->submit_form(
+        fields => {
+            nickname => '', 
+            email    => 'some@email',
+        },
+    );
+    $w->content_like(qr{Registration Page});
+    $w->content_like(qr{Need both nickname and password});
 
-{
-    my $r = $cat->cgiapp(path_info => '/', params => {rm => 'register_process', nickname => '', email => ''});
-    like($r, qr{Registration Page});
-    like($r, qr{Need both nickname and password});
-}
+    $w->submit_form(
+        fields => {
+            nickname => '', 
+            email    => '',
+        },
+    );
+    $w->content_like(qr{Registration Page});
+    $w->content_like(qr{Need both nickname and password});
 
-{
-    my $r = $cat->cgiapp(path_info => '/',  params => {rm => 'register_process', nickname => '', email => 'some@email'});
-    like($r, qr{Registration Page});
-    like($r, qr{Need both nickname and password});
-}
+    $w->submit_form(
+        fields => {
+            nickname => 'xyz', 
+            email    => '',
+        },
+    );
+    $w->content_like(qr{Registration Page});
+    $w->content_like(qr{Need both nickname and password});
 
-{
-    my $r = $cat->cgiapp(path_info => '/', params => {rm => 'register_process', nickname => 'xyz', email => ''});
-    like($r, qr{Registration Page});
-    like($r, qr{Need both nickname and password});
-}
-
-{
-    my $r = $cat->cgiapp(path_info => '/', 
-            params => {rm => 'register_process', nickname => 'xyzqwertyuiqwertyuiopqwert', email => 'a@com'});
-    like($r, qr{Registration Page});
-    like($r, qr{Nickname must be lower case alphanumeric between 1-25 characters});
+    $w->submit_form(
+        fields => {
+            nickname => 'xyzqwertyuiqwertyuiopqwert', 
+            email => 'a@com',
+        },
+    );
+    $w->content_like(qr{Registration Page});
+    $w->content_like(qr{Nickname must be lower case alphanumeric between 1-25 characters});
+    BEGIN { $tests += 8; }
 }
 
 # reject bad usernames
 foreach my $username ("ab.c", "Abcde", "asd'er", "ab cd") {
-    my $r = $cat->cgiapp(path_info => '/', 
-            params => {rm => 'register_process', nickname => $username, email => 'a@com'});
-    like($r, qr{Registration Page});
-    like($r, qr{Nickname must be lower case alphanumeric between 1-25 characters});
+    $w->submit_form(
+        fields => {
+            nickname => $username, 
+            email => 'a@com',
+        },
+    );
+    $w->content_like(qr{Registration Page});
+    $w->content_like(qr{Nickname must be lower case alphanumeric between 1-25 characters});
+    BEGIN { $tests += 2*4; }
 }
 
+__END__
 # reject bad usernames
 foreach my $email ("adb-?", "Abcde", "asd'er", "ab cd") {
     my $r = $cat->cgiapp(path_info => '/', params => {rm => 'register_process', nickname => "abcde", email => $email});
@@ -120,12 +139,4 @@ my $sendmail_count;
     is($sendmail_count, 0);
     is($password, "");
 }
-
-
-    
-
-
-
-
-
 
