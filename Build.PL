@@ -9,12 +9,13 @@ use Module::Build;
 
 #my $builder = CPAN::Forum::Build->new(
 my $builder = Module::Build->new(
-    module_name         => 'CPAN::Forum',
-    license             => 'perl',
-    dist_version_from   => 'lib/CPAN/Forum.pm',
-    create_readme       => 1,
-    create_makefile_pl => 'traditional',
-    requires            => {
+    module_name          => 'CPAN::Forum',
+    license              => 'perl',
+    dist_version_from    => 'lib/CPAN/Forum.pm',
+    create_readme        => 1,
+    create_makefile_pl   => 'traditional',
+    recursive_test_files => 1,
+    requires             => {
         'HTML::Template'                        => 2.6,
         'CGI'                                   => 0,
         'CGI::Application'                      => 3.31,
