@@ -60,4 +60,5 @@ CREATE TABLE authors (
 			pauseid          VARCHAR(100) UNIQUE NOT NULL
 );
 
+DROP TABLE sessions;
 

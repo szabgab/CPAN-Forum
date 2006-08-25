@@ -526,7 +526,7 @@ sub cgiapp_init {
     $self->log->debug("Cookie received: "  . ($self->query->cookie($cookiename) || "") );
     CGI::Session->name($cookiename);
     $self->session_config(
-        CGI_SESSION_OPTIONS => [ "driver:SQLite", $self->query, {Handle => $dbh}],
+        #CGI_SESSION_OPTIONS => [ "driver:SQLite", $self->query, {Handle => $dbh}],
         COOKIE_PARAMS       => {
                 -expires => '+24h',
                 -path    => '/',
