@@ -31,7 +31,7 @@ my $builder = Module::Build->new(
         'DBD::SQLite'                           => 0.31,
         'Class::DBI'                            => 0,  # It was complaining: ERROR: Version v3.0.14 of Class::DBI is installed, but we need version >= 0.96
 #       'Crypt::SSLeay'                         => 0,  # needed for http access to PAUSE
-        'Parse::CPAN::Packages'                 => 0,  # for populating and maybe also later ?
+        'Parse::CPAN::Packages'                 => '2.26',  # for populating and maybe also later ?
         'LWP::Simple'                           => 0,  # for populate
         'XML::RSS::SimpleGen'                   => 0,  # for, well RSS generation
         'Mail::Sendmail'                        => 0,  

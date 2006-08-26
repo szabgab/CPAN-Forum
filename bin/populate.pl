@@ -64,7 +64,7 @@ if ($opts{fetch}) {
 print "Processing $opts{source} file, adding distros to database, will take a few minutes\n";
 print "Go get a beer\n";
 my $p = Parse::CPAN::Packages->new($opts{source});
-my @distributions = $p->distributions;
+;
 
 my %message = (
     version => "",
@@ -73,17 +73,19 @@ my %message = (
 );
 
 LINE:
-foreach my $d (@distributions) {
+my $cnt;
+foreach my $d ($p->latest_distributions) {
+    $cnt++;
 
     # skip scripts
     if (not $d->prefix or $d->prefix =~ m{^\w/\w\w/\w+/scripts/}) {
-        warn "no prefix line $.\n";
+        warn "no prefix line $cnt\n";
         next LINE;
     }
 
     my $name        = $d->dist;
     if (not $name) {
-        warn "No name: line: $. prefix:" . $d->prefix . "\n";
+        warn "No name: line: $cnt prefix:" . $d->prefix . "\n";
         next LINE;
     }
     

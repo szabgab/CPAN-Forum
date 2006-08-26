@@ -136,4 +136,7 @@ CREATE TABLE subscriptions_pauseid (
 			,FOREIGN KEY (uid) REFERENCES users(id)
 );
 
+CREATE UNIQUE INDEX groups_name ON groups (name);
+CREATE INDEX posts_thread ON posts (thread);
+CREATE INDEX posts_gid ON posts (gid);
 

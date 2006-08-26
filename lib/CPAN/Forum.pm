@@ -252,15 +252,16 @@ In order to prepare a downloadable version of the database we need to hide the
 personal infromation:
     update users set email = 'test_' || id || '@cpanforum.com' where id in(select id from users);
     update users set password = 'testpw';
-
-    -- maybe even change the usernames? but I think the ids are already public
-    -- so it won't bring any additional privacy or security
+    update users set username = 'test_' || id where id in(select id from users);
+    update users set fname='', lname='';
 
     delete from sessions;
 
     delete from configure;  -- ???
     delete user_in_group;   -- ???
 
+    update posts set uid=myuid where (select users.uid myuid from users where posts.uid=users.username;
+    select posts.id pid, users.id uid, users.username from posts, users where posts.uid=users.username;
 
 
 Removed the use of CPAN::Forum::Build - need to see what was it doing and
@@ -526,6 +527,7 @@ sub cgiapp_init {
     $self->log->debug("Cookie received: "  . ($self->query->cookie($cookiename) || "") );
     CGI::Session->name($cookiename);
     $self->session_config(
+        #CGI_SESSION_OPTIONS => [ "driver:File", $self->query, {Directory => "/tmp"}],
         #CGI_SESSION_OPTIONS => [ "driver:SQLite", $self->query, {Handle => $dbh}],
         COOKIE_PARAMS       => {
                 -expires => '+24h',
@@ -759,7 +761,7 @@ sub build_listing {
             thread_count => $thread_count-1,
             #date         => strftime("%e/%b", localtime $post->date),
             date         => scalar localtime $post->date,
-            postername   => $post->uid,
+            postername   => $post->uid->username,
             };
     }
     #@resp = reverse @resp if $to; # Otherwise we fetched in DESC order
@@ -1413,9 +1415,14 @@ sub process_post {
     }
 
     my $pid;
+    my $username = $self->session->param("username");
+    my ($user) = CPAN::Forum::Users->search({ username => $username });
+    if (not $user) {
+        return $self->internal_error("Unknonw username: $username");
+    }
     eval {
         my $post = CPAN::Forum::Posts->create({
-            uid     => $self->session->param("username"),
+            uid     => $user->id,
             gid     => $parent_post ? $parent_post->gid : $q->param("new_group_id"),
             subject => $q->param("new_subject"),
             text    => $new_text,
@@ -1452,7 +1459,7 @@ sub _post {
     my @responses = map {{id => $_->id}} CPAN::Forum::Posts->search(parent => $post->id);
 
     my %post = (
-        postername  => $post->uid,
+        postername  => $post->uid->username,
         date        => _post_date($post->date),
         parentid    => $post->parent,
         responses   => \@responses,
@@ -2219,9 +2226,9 @@ sub rss {
     # and this reveals the e-mail of the administrator. not a good idea I guess.
     $rss->webmaster($admin->email);
 
-    my $prefix = "";
     while (my $post = $it->next() and $limit--) {
-        $rss->item($url. "posts/" . $post->id(), $prefix . $post->subject); # TODO _subject_escape ?
+        my $title = sprintf "[%s] %s", $post->gid->name, $post->subject;
+        $rss->item($url. "posts/" . $post->id(), $title); # TODO _subject_escape ?
     }
 #   $rss->save("file.rss");
 
@@ -2395,6 +2402,7 @@ sub teardown {
 sub _my_sendmail {
     my ($self, @args) = @_;
 
+    return if $ENV{NO_CPAN_FORUM_MAIL};
     # for testing
     if (defined &_test_my_sendmail) {
         $self->_test_my_sendmail(@_);
