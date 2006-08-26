@@ -38,6 +38,8 @@
 		<ul>
 			<li> http://www.cpanforum.com/rss/all 10 latest posts</li>
 			<li> http://www.cpanforum.com/rss/dist/Distro-Name 10 latest posts in distro</li>
+			<li> http://www.cpanforum.com/rss/author/PAUSEID 10 latest posts
+                 in any of the distros of the given CPAN author</li>
 		</ul>
 	</dd>
 	<dt><a name="why">Why do I need this? We already have our mailing list!</a></dt>
@@ -89,13 +91,19 @@
 		CPAN::Forum provide module categorizations.<br />
 		You can find me on PerlMonks as <a href="http://www.perlmonks.org/?node_id=415035">SZABGAB</a>.<br/>
 		There was a thread on Perl Monks with a 
-		<a href="http://www.perlmonks.org/index.pl?node_id=196112">
-		similar idea</a> but appearently without implementation.<br />
+		<a href="http://www.perlmonks.org/index.pl?node_id=196112">similar idea</a> 
+        but appearently without implementation.<br />
 		It is a nice discussion though.
 	</dd>
 	<dt><a name="notify">Can I get notified when a new post arrives?</a></dt>
 	<dd>
-		Yes, you can subscribe to e-mail alerts for each distribution. You have 3 options:
+		Yes, you can subscribe to e-mail alerts for 
+        <ol> 
+            <li> all the distributions</li>
+            <li> all the distributions of a given CPAN author</li>
+            <li> a single distribution</li>
+        </ol>
+        In each case you have 3 options:
 		<ol>
 			<li> All messages - you get notification about every message sent to this group </li>
 			<li> Thread starters - Whenever someone starts a new thread you get a notification.

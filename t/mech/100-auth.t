@@ -103,3 +103,9 @@ sub read_config {
     BEGIN { $tests += 6; }
 }
 
+{
+    $w_user->follow_link_ok({ text => 'home' });
+    $w_user->follow_link_ok({ text => 'mypan' });
+
+    BEGIN { $tests += 2; }
+}
