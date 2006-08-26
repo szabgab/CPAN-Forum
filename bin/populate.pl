@@ -72,8 +72,8 @@ my %message = (
     new     => "",
 );
 
-LINE:
 my $cnt;
+LINE:
 foreach my $d ($p->latest_distributions) {
     $cnt++;
 
