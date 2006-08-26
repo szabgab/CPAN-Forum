@@ -3,6 +3,7 @@ Makefile.PL
 MANIFEST
 META.yml
 README
+Changes
 
 bin/populate.pl
 bin/setup.pl

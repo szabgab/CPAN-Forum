@@ -1,6 +1,39 @@
 
-- A way to monitor all current and future modules associated with a certain PAUSE ID.
- (both RSS and e-mail)
+  Tests  *  Tests   *   Tests
+
+
+
+
+  Cleanup the schema. Currently the schema/schema.sql is not the same as the
+  schema used in the live application.
+
+  Describe the schema (in Forum.pm) which fields are in use and which are not.
+
+  Make the data restrictions stricter in the schema (UNIQUE, NOT NULL)
+
+  Enable listing modules based on module author
+
+  Provide the alerts in rss feed as well, not only in e-mail.
+  Let people subscribe to alerts but ask to have the RSS feed only, no e-mails.
+  /rss/user/username
+
+
+  Check if the database (and its parent directory) is writable by the process 
+  and give appropriate error message if not.
+  BUG: If the directory of the database is not writable and logging was setup the
+   application fails.
+
+
+  Loggin: add client IP to logger and/or enable logging based on a single
+          client IP address
+  
+  Clean up STDERR, move voluntary warnings to logger
+
+  Include number of AnnoCPAN posts
+  
+  Provide a csv file with the number of posts for each distribution so 
+  other sites can include it.
+
 
 
 BUG:
@@ -14,8 +47,6 @@ But the main problem is that if I delete the last word from the
 subject and press preview again
 it returns the same error message as it put back the word where it was earlier.
 
-
-
  
 - Clean up the listing of the subscribers at the bottom of the pages:
   Separate people who will receive all messages
@@ -25,7 +56,7 @@ it returns the same error message as it put back the word where it was earlier.
 - Unite and clean up the code that fetches list of people who need to be notified
 
 
-- Script that populates databse should not lock the whole database for a long time
+- Script that populates database should not lock the whole database for a long time
   Maybe it should fetch all the data to memory and work there.
 
 - Add announcement service (check for new versions of modules and send e-mail
@@ -47,23 +78,6 @@ it returns the same error message as it put back the word where it was earlier.
 - Register the PAUSEID where the module was last seen:
   Send out e-mail about PAUSEID changes
   
-
-  A table called "subscription_PAUSE"
-
-
-
-- Somehow let a module author (or anyone ?) subscribe/unsubscribe to all of her 
-  current and future(!) modules.
-    1) Enable listing modules based on module author
-	2) Enable subscribing to several modules at the same time
-	this is not good as this does not cover the "future" thing and people will
-	forget to subscribe to the new module when they release one.
-	
-	So especially the module authors would like to have a button that sais
-	subscribe too all the modules of XYZ
-- Let people select a group of distros (e.g. all the distros by author SZABGAB)
-  and show them on the /mypan interface (or just subscribe to all of them)
-
 
 
 
@@ -261,6 +275,25 @@ cannot cause some security problem such as remembering the last request of
 someone else who used the same machine recently ? 
 
 - xml - provided
+
+In order to prepare a downloadable version of the database we need to hide the
+personal infromation:
+    update users set email = 'test_' || id || '@cpanforum.com' where id in(select id from users);
+    update users set password = 'testpw';
+    update users set username = 'test_' || id where id in(select id from users);
+    update users set fname='', lname='';
+
+    delete from sessions;
+
+    delete from configure;  -- ???
+    delete user_in_group;   -- ???
+
+    update posts set uid=myuid where (select users.uid myuid from users where posts.uid=users.username;
+    select posts.id pid, users.id uid, users.username from posts, users where posts.uid=users.username;
+
+
+Removed the use of CPAN::Forum::Build - need to see what was it doing and
+replace its functionality with something better
 
 
 

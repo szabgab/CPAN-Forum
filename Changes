@@ -1,0 +1,80 @@
+
+v0.12 
+
+  Include link to AnnoCPAN, rearrange links
+
+  Used on http://www.cpanforum.com/ but not released as a distribution
+
+  Create links http://www.cpanforum.com/rss/author/PAUSEID
+  Fix the dist based feeds: http://www.cpanforum.com/rss/dist/OpenOffice-OODoc
+
+
+  bin/populate.pl now gets all its arguments using --options
+  bin/setup.pl now uses --options
+
+  Let people monitor all current and future modules associated with a certain PAUSE ID.
+  (both RSS and e-mail)
+  A table called "subscription_PAUSE"
+	
+
+  Let people subscribe to all messages or all thread starters or all followups.
+  Add a table called "subscription_all"
+ 
+  Longer usernames
+  Search box on more pages
+  Search for module uses % at the beginning of the string as well
+  Include stars of CPAN Ratings
+  Admin can add new modules manually
+
+v0.11_01
+  Put the page size and the rss size in the configuration table
+  Make CPAN::Forum::Configure an easy interface to the configuration table
+  Give "no result" on no result
+  Trim off leading and trailing spaces from the query. 
+  Hide distname from the listing when resticted to one distribution (the same with users)
+  Setup a "status" variable for the site that allows the administrator to lock the whole site.
+     Currently it does not let the admin outlock, s/he has to remove the db/status file for this.
+
+
+v0.11
+  Search for users
+  Unite the serch methods
+  Accept both upper-case and lower-case HTML tags and turn them all to lower 
+    case tags when displaying
+  Accept <a href=> tags for http and mailto
+  Admin page
+  Admin can change "From" e-address
+  Enable <i>, <b> <br> and <a ..> with <p></p> pairs
+  Remove the selection box from the post interface as it was not used there.
+  Put the search form on the home page as well.
+  Admin can change e-mail address of any user
+  Add paging
+ 
+
+v0.10_02
+  <p>, <br> enabled
+  Add link to Kobes Search
+  Improve full text search for posts
+  Add capability to search for module names
+
+
+v0.10
+- markup improved, bugs fixed
+
+v0.09_05
+- POD cleanup (Shlomi Fish)
+
+- More tests
+
+- Start using Parse::RecDescent
+
+v0.09_04
+
+- Before writing a new post instead of showing a list of all the modules now 
+the user first will search for a module name.  post link should give a search
+box that will let the user search within the names of the modules. The result
+should be a restricted list with only a few module names in a pull-down menu
+like we have now.  The search is a regular SQL LIKE search and we add % signs
+at both ends of the typed in word.
+
+
