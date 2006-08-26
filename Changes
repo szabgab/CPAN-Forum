@@ -1,6 +1,9 @@
 
 v0.12 
 
+  Provide a csv file with the number of posts for each distribution so 
+  other sites can include it.
+
   Logging: add client IP to logger to enable filtering log messages based on that 
 
   Clean up STDERR, move (some) voluntary warnings to logger

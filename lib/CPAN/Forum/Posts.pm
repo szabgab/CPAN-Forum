@@ -23,6 +23,13 @@ __PACKAGE__->set_sql(post_by_pauseid => qq{
                             FROM groups, authors
                             WHERE groups.pauseid=authors.id and authors.pauseid=?)
                         ORDER BY date DESC});
+__PACKAGE__->set_sql(stat_posts => qq{
+            SELECT COUNT(*) cnt, groups.name gname
+            FROM posts,groups 
+            WHERE posts.gid=groups.id 
+            GROUP BY gname
+            ORDER BY cnt DESC
+            });
 
 sub retrieve_latest { 
     my ($class, $count) = @_;

@@ -23,18 +23,6 @@ GetOptions(\%opts, "sendmail", "source=s", "dir=s", "fetch", "help")
 usage() if $opts{help};
 usage() if not $opts{dir};
 
-sub usage {
-    print <<"END_USAGE";
-$0
-    --sendmail      to send report to Gabor
-    --source FILE   path to the 02packages.details.txt
-    --dir DIR       directory of the database
-    --fetch
-    --help          this help
-END_USAGE
-    exit;
-}
-
 
 my $dbfile       = "$opts{dir}/forum.db";
 CPAN::Forum::DBI->myinit("dbi:SQLite:$dbfile");
@@ -187,5 +175,17 @@ if ($opts{sendmail}) {
     print $fh $message{new};
 }
 
+
+sub usage {
+    print <<"END_USAGE";
+$0
+    --sendmail      to send report to Gabor
+    --source FILE   path to the 02packages.details.txt
+    --dir DIR       directory of the database
+    --fetch
+    --help          this help
+END_USAGE
+    exit;
+}
 
 

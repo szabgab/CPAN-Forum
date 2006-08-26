@@ -1,6 +1,13 @@
 
   Tests  *  Tests   *   Tests
 
+  Missing entries: 
+    ApacheDBI
+    Net-SMS-TWSMS   missing from 02... and from CPANTS
+  they are both on search.cpan.org
+
+  Improve the populate.pl, look at CPANTS for ideas:
+  http://search.cpan.org/src/DOMM/Module-CPANTS-ProcessCPAN-0.62/bin/update_authors.pl
 
 
   Cleanup the schema. Currently the schema/schema.sql is not the same as the
@@ -29,9 +36,6 @@
 
   Include number of AnnoCPAN posts
   
-  Provide a csv file with the number of posts for each distribution so 
-  other sites can include it.
-
 
 
 BUG:
