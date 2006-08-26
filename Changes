@@ -1,6 +1,10 @@
 
 v0.12 
 
+  Logging: add client IP to logger to enable filtering log messages based on that 
+
+  Clean up STDERR, move (some) voluntary warnings to logger
+
   Include link to AnnoCPAN, rearrange links
 
   Used on http://www.cpanforum.com/ but not released as a distribution
@@ -15,7 +19,7 @@ v0.12
   Let people monitor all current and future modules associated with a certain PAUSE ID.
   (both RSS and e-mail)
   A table called "subscription_PAUSE"
-	
+
 
   Let people subscribe to all messages or all thread starters or all followups.
   Add a table called "subscription_all"

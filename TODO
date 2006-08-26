@@ -3,7 +3,6 @@
 
 
 
-
   Cleanup the schema. Currently the schema/schema.sql is not the same as the
   schema used in the live application.
 
@@ -24,8 +23,7 @@
    application fails.
 
 
-  Loggin: add client IP to logger and/or enable logging based on a single
-          client IP address
+  Logging: enable logging based on a single client IP address
   
   Clean up STDERR, move voluntary warnings to logger
 

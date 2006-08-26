@@ -420,6 +420,7 @@ sub cgiapp_init {
             filename          => $log,
             min_level         => $log_level,
             mode              => 'append',
+            callbacks         => sub { $self->_logger(@_)},
             close_after_write => 1,
         },
         ],
@@ -450,6 +451,17 @@ sub cgiapp_init {
     );
 }
 
+sub _logger {
+    my ($self, %h) = @_;
+    return sprintf "[%s] - %s - [%s] [%s] %s\n",
+            scalar(localtime), 
+            $h{level}, 
+            ($ENV{REMOTE_ADDR} || ''),
+            ($ENV{HTTP_REFERER} || ''),
+            $h{message};
+            # keys of the hash: level, message, name
+}
+
 sub _set_log_level {
     my ($self) = @_;
 
@@ -462,7 +474,7 @@ sub _set_log_level {
             warn "Invalid log level '$str'\n";
         }
     }
-    return 'critical'; 
+    return 'warning'; 
 }
 
 
@@ -716,9 +728,7 @@ Maybe this one should also receive the error message and print it to the log fil
 sub internal_error {
     my ($self, $msg, $tag) = @_;
     if ($msg) {
-        $msg .= " REFERER: $ENV{HTTP_REFERER}" if $ENV{HTTP_REFERER};
-        warn $msg;
-        $self->log->debug($msg);
+        $self->log->warning($msg);
     }
     my $t = $self->load_tmpl("internal_error.tmpl");
     $t->param($tag => 1) if $tag;
