@@ -1,22 +1,25 @@
 <div class="navigation">
-		[
-		<a href="/">home</a> |
-		<a href="/faq/">FAQ</a> |
-		<a href="/about/">about</a> |
-		<a href="/stats/">stats</a> |
-		<a href="/new_post/<TMPL_VAR group>">new post</a> |
-		<TMPL_IF loggedin>
-		  You are logged in as <a href="/users/<TMPL_VAR username>"><TMPL_VAR username></a> |
-		  <a href="/mypan/">mypan</a> | 
-		  <a href="/selfconfig/">selfconfig</a> | 
-		  <a href="/logout/">logout</a> | 
-		  <TMPL_IF admin>
-		  <a href="/admin/">admin</a> | 
-		  </TMPL_IF>
-		<TMPL_ELSE>
-		  <a href="/login/">login</a> |
-		  <a href="/register/">register</a>
-		</TMPL_IF>
-		]
-	</div>
+[
+    <a href="/">home</a>
+    | <a href="/faq/">FAQ</a>
+    | <a href="/about/">about</a>
+    | <a href="/stats/">stats</a>
+    | <a href="/new_post/<TMPL_VAR group>">new post</a>
+    <TMPL_IF loggedin>
+        | You are logged in as <a href="/users/<TMPL_VAR username>"><TMPL_VAR username></a>
+        | <a href="/mypan/">mypan</a>
+        | <a href="/selfconfig/">selfconfig</a>
+        | <a href="/logout/">logout</a>
+        <TMPL_IF admin>
+            | <a href="/admin/">admin</a>
+        </TMPL_IF>
+    <TMPL_ELSE>
+        | <a href="/login/">login</a>
+        | <a href="/register/">register</a>
+    </TMPL_IF>
+]
+</div>
+<div class="navigation">
+<a href="http://www.perltraining.org/">Perl Training</a>
+</div>
 
