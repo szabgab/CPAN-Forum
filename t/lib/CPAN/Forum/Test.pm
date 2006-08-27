@@ -7,7 +7,7 @@ my $ROOT = "blib";
 our @users = (
     {
         username => 'abcder',
-        email    => 'qqrq@banana.com',
+        email    => 't@cpanforum.com',
     },
 );
 
@@ -59,9 +59,24 @@ sub register_user {
 
     init_db();
     require CPAN::Forum::Users;
-  	my $user = CPAN::Forum::Users->create($users[0]);
+    my $user = CPAN::Forum::Users->create($users[$id]);
     return $user;
 }
+
+sub register_users {
+    my ($id, $n) = @_;
+
+    init_db();
+    require CPAN::Forum::Users;
+    my @users;
+    foreach my $i (1..$n) {
+        my %user;
+        $user{$_} = $i . $users[$id]{$_} foreach qw(username email);
+        push @users, CPAN::Forum::Users->create(\%user);
+    }
+    return @users;
+}
+
 
 
 1;

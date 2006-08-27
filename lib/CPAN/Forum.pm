@@ -13,6 +13,7 @@ use POSIX qw(strftime);
 use Carp qw(cluck carp);
 use Mail::Sendmail qw(sendmail);
 use CGI ();
+use List::MoreUtils qw(any);
 
 use CPAN::Forum::INC;
 
@@ -441,11 +442,12 @@ sub cgiapp_init {
                 -path    => '/',
         },
         SEND_COOKIE         => 0,
+
     );
     $self->log->debug("sid:  " . ($self->session->id() || ""));
     
     $self->header_props(
-        -expires => '-1d',  
+        #-expires => '-1d',  
         # I think this this -expires causes some strange behaviour in IE 
         # on the other hand it is needed in Opera to make sure it won't cache pages.
         -charset => "utf-8",
@@ -540,27 +542,27 @@ Maybe we should move his code to the mode_param method ?
 
 sub cgiapp_prerun {
     my $self = shift;
-    my $rm = $self->get_current_runmode();
 
-    $self->log->debug("Current runmode:  $rm");
+    $self->error_mode('error');
 
     my $status = $self->status();
+    $self->log->debug("Status:  $status"); 
     if ($status ne "open" and not $self->session->param("admin")) {
+        $self->log->debug('site_is_closed');
         $self->prerun_mode('site_is_closed');
         return; 
     }
-    $self->log->debug("Status:  $status"); 
 
-    $self->param(path_parameters => []);
+    my $rm = $self->_set_run_mode();
+    $self->log->debug("Current runmode:  $rm");
 
-    $rm = $self->_get_run_mode($rm);
-
-    $self->log->debug("Current runmode:  $rm"); 
     $self->log->debug("Current user:  " . ($self->session->param("username") || ""));
     $self->log->debug("Current sid:  " . ($self->session->id() || ""));
 
-    return if grep {$rm eq $_} @free_modes;
-    #return if not grep {$rm eq $_} @restricted_modes;
+    if (any {$rm eq $_} @free_modes) {
+        $self->log->debug('Free mode');
+        return;
+    }
 
     # Redirect to login, if necessary
     if (not  $self->session->param('loggedin') ) {
@@ -576,8 +578,12 @@ sub cgiapp_prerun {
     $self->log->debug("cgiapp_prerun ends");
 }
 
-sub _get_run_mode {
-    my ($self, $rm) = @_;
+sub _set_run_mode {
+    my ($self) = @_;
+
+    $self->param(path_parameters => []);
+
+    my $rm = $self->get_current_runmode();
     if (not $rm or $rm eq "home") {
         if ($ENV{PATH_INFO} =~ m{^/
                         ([^/]+)        # first word till after the first /
@@ -585,16 +591,15 @@ sub _get_run_mode {
                         }x) {
             my $newrm = $1;
             my $params = $2 || "";
-            if (grep {$newrm eq $_} @urls) {
+            if (any {$newrm eq $_} @urls) {
                 my @params = split /\//, $params;
                 $self->param(path_parameters => @params ? \@params : []);
                 $rm = $newrm;
                 $self->prerun_mode($rm);
             } elsif ($ENV{PATH_INFO} eq "/cgi/index.pl") {
-                # TODO this is temporary to avoid unnecessary warnings
+                $self->log->error("Invalid PATH_INFO: $ENV{PATH_INFO}");
             } else {
-                warn "Invalid PATH_INFO: $ENV{PATH_INFO}";
-                # shall I make more noise ? 
+                $self->log->error("Invalid PATH_INFO: $ENV{PATH_INFO}");
             }
         }
     }
@@ -727,6 +732,12 @@ sub faq {
     $t->output;
 }
 
+sub error {
+    my ($self) = @_;
+    $self->log->fatal($@) if $@;
+    $self->internal_error();
+}
+
 =head2 internal_error
 
 Gives a custom Internal error page.
@@ -771,6 +782,7 @@ sub login {
     my ($self, $errs) = @_;
     my $q = $self->query;
 
+    $self->log->debug("Sending cookie using sid:  " . ($self->session->id() || ""));
     $self->session_cookie();
     my $t = $self->load_tmpl(
             "login.tmpl",
@@ -1506,11 +1518,17 @@ sub dist {
     
     my $q = $self->query;
 
-    my $group = ${$self->param("path_parameters")}[0];
+    my $group = ${$self->param("path_parameters")}[0] || '';
+    if ($group =~ /^([\w-]+)$/) {
+        $group = $1;
+    } else {
+        return $self->internal_error(
+            "Probably bad regex when checking group name for $group called in $ENV{PATH_INFO}",
+            );
+    }
     $self->log->debug("show dist: '$group'");
 #   $group =~ s/-/::/g;
 #   (my $dashgroup = $group) =~ s/::/-/g;
-
 
     my $t = $self->load_tmpl("groups.tmpl",
         loop_context_vars => 1,
@@ -1521,14 +1539,6 @@ sub dist {
 #   $t->param(dashgroup => $dashgroup);
     $t->param(group => $group);
     $t->param(title => "CPAN Forum - $group");
-
-    if ($group =~ /^([\w-]+)$/) {
-        $group = $1;
-    } else {
-        return $self->internal_error(
-            "Probably bad regex when checking group name for $group called in $ENV{PATH_INFO}",
-            );
-    }
 
     my ($gr) = CPAN::Forum::Groups->search(name => $group);
     if (not $gr) {
@@ -2320,8 +2330,10 @@ sub teardown {
     if (not  $self->session->param('loggedin')  and $rm ne "login") {
         $self->log->debug("not logged in, deleting session");
         $self->session->delete();
-        #$self->session->flush();
     }
+    # flush added as the Test::WWW::Mechanize::CGI did not work well without
+    # it after we started to use file based session objects
+    $self->session->flush();
 }
 
 sub _my_sendmail {

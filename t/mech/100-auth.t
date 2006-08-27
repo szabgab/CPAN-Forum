@@ -36,12 +36,30 @@ sub read_config {
 }
 
 {
+    unlink glob "/tmp/cgisess_*";
+    my @session_files = glob "/tmp/cgisess_*";
+    is (@session_files, 0);
+    BEGIN { $tests += 1; }
+}
+
+{
     $w_admin->get_ok($url);
     $w_admin->content_like(qr{CPAN Forum});
+    is($w_admin->cookie_jar->as_string, '');
+
 
     $w_admin->follow_link_ok({ text => 'login' });
     $w_admin->content_like(qr{Login});
     $w_admin->content_like(qr{Nickname});
+    my @session_files = glob "/tmp/cgisess_*";
+    is(@session_files, 1);
+    my $cookie = '';
+    my $cookie_jar = $w_admin->cookie_jar->as_string;
+    if ($cookie_jar =~ /cpanforum=(\w+)/) {
+        $cookie = $1;
+    }
+    is($session_files[0], "/tmp/cgisess_$cookie");
+
     $w_admin->submit_form(
         fields => {
             nickname => $config{username},
@@ -49,7 +67,14 @@ sub read_config {
         },
     );
     $w_admin->content_like(qr{You are logged in as.*$config{username}});
-    BEGIN { $tests += 6; }
+    is($w_admin->cookie_jar->as_string, $cookie_jar);
+    #diag $w_admin->cookie_jar->as_string;
+    BEGIN { $tests += 10; }
+}
+{
+    my @session_files = glob "/tmp/cgisess_*";
+    is (@session_files, 1);
+    BEGIN { $tests += 1; }
 }
 
 {
@@ -79,6 +104,8 @@ sub read_config {
     $w_guest->get_ok("$url/dist/Acme-Bleach");
     $w_guest->follow_link_ok({ text => 'new post' });
     # check if this is the login form
+
+    # next call causes the warning when running with -w
     $w_guest->submit_form(
         fields => {
             nickname => $user->username,
@@ -86,12 +113,13 @@ sub read_config {
         },
     );
     
+    # this seem to be ok when done with real browser
+    #diag $w_guest->content;
     $w_guest->content_like(qr{Distribution: Acme-Bleach});
     $w_guest->follow_link_ok({ text => 'logout' });
 
     BEGIN { $tests += 6; }
 }
-
 {
     $w_user->get_ok($url);
     $w_user->content_like(qr{CPAN Forum});
@@ -109,3 +137,4 @@ sub read_config {
 
     BEGIN { $tests += 2; }
 }
+
