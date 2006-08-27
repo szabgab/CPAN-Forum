@@ -1,0 +1,16 @@
+<TMPL_INCLUDE NAME="head.tmpl">
+<p id="pageTitle">Statistics of CPAN::Forum</p>
+
+<TMPL_INCLUDE NAME="navigation.tmpl">
+
+<a name="statistics"></a>
+<div class="about_list">
+<p class="about_title">Top 50 modules (number of posts)</p>
+<table>
+<TMPL_LOOP entries>
+  <tr><td><a href="/dist/<TMPL_VAR gname>"><TMPL_VAR gname></a></td><td><TMPL_VAR cnt></td></tr>
+</TMPL_LOOP>
+</table>
+</div>
+<TMPL_INCLUDE NAME="footer.tmpl">
+

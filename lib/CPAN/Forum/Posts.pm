@@ -26,9 +26,10 @@ __PACKAGE__->set_sql(post_by_pauseid => qq{
 __PACKAGE__->set_sql(stat_posts => qq{
             SELECT COUNT(*) cnt, groups.name gname
             FROM posts,groups 
-            WHERE posts.gid=groups.id 
+            WHERE posts.gid=groups.id
             GROUP BY gname
             ORDER BY cnt DESC
+            LIMIT ? 
             });
 
 sub retrieve_latest { 

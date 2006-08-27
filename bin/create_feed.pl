@@ -23,7 +23,7 @@ my $csv          = Text::CSV_XS->new();
 
 ;
 open my $out, '>', $opts{csv} or die $!;
-foreach my $entry (CPAN::Forum::Posts->search_stat_posts) {
+foreach my $entry (CPAN::Forum::Posts->search_stat_posts(5000)) {
     if ($csv->combine($entry->{gname}, $entry->{cnt})) {
         print {$out} $csv->string(), "\n";
     } else {

@@ -282,6 +282,7 @@ will see their current subscription to this module (even if that is empty).
 
 root templates:
 
+stats.tmpl
 about.tmpl
 change_password.tmpl
 faq.tmpl
@@ -491,7 +492,7 @@ my @free_modes = qw(
     login login_process 
     register register_process 
     logout 
-    about faq
+    about faq stats
     posts threads dist users 
     search all 
     site_is_closed
@@ -514,7 +515,7 @@ my @urls = qw(
     help
     new_post pwreminder 
     login register 
-    posts about 
+    posts about stats
     threads dist users 
     response_form 
     faq 
@@ -708,6 +709,15 @@ sub about {
     #count posts for a specific group:
     #select count(*) from posts, groups where groups.id=gid and groups.name="CPAN-Forum";
 
+    $t->output;
+}
+
+sub stats {
+    my $self = shift;
+    my $t = $self->load_tmpl("stats.tmpl");
+    my @entries = CPAN::Forum::Posts->search_stat_posts(50);
+    
+    $t->param(entries => \@entries);
     $t->output;
 }
 

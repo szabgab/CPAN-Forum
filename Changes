@@ -3,6 +3,7 @@ v0.12
 
   Provide a csv file with the number of posts for each distribution so 
   other sites can include it.
+  Create stats page with top 50 modules
 
   Logging: add client IP to logger to enable filtering log messages based on that 
 
