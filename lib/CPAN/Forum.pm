@@ -2294,11 +2294,8 @@ sub rss {
         my $title = sprintf "[%s] %s", $post->gid->name, $post->subject;
         $rss->item($url. "posts/" . $post->id(), $title); # TODO _subject_escape ?
     }
-#   $rss->save("file.rss");
 
-    
-    #print "Content-type: application/xml\n\n", rss_as_string();
-    #$self->header_props(-type => 'application/xml');
+    $self->header_props(-type => 'application/rss+xml');
     
     return $rss->as_string();
 }
