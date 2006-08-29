@@ -538,6 +538,7 @@ my @urls = qw(
 
 my %RM_MAP = (
     author => 'CPAN::Forum::RM::Author',
+    dist   => 'CPAN::Forum::RM::Dist',
 );
 
 =head2 setup
@@ -1600,64 +1601,6 @@ sub set_ratings {
         $t->param(roundrating  => $roundrating);
         $t->param(review_count => $review_count);
     }
-}
-
-
-=head2 dist
-
-List last few posts belonging to this group, provides a link to post a new 
-message within this group
-
-=cut
-
-sub dist {
-    my ($self) = @_;
-    my $q = $self->query;
-
-    my $group_name = ${$self->param("path_parameters")}[0] || '';
-    if ($group_name =~ /^([\w-]+)$/) {
-        $group_name = $1;
-    } else {
-        return $self->internal_error(
-            "Probably bad regex when checking group name for $group_name called in $ENV{PATH_INFO}",
-            );
-    }
-    $self->log->debug("show dist: '$group_name'");
-
-    my $t = $self->load_tmpl("groups.tmpl",
-        loop_context_vars => 1,
-        global_vars => 1,
-    );
-    $t->param(hide_group => 1);
-                
-    $t->param(group => $group_name);
-    $t->param(title => "CPAN Forum - $group_name");
-
-    my ($gr) = CPAN::Forum::Groups->search(name => $group_name);
-    if (not $gr) {
-        $self->log->warning("Invalid group $group_name called in $ENV{PATH_INFO}");
-        $gr = $self->process_missing_dist($group_name);
-        if (not $gr) {
-            return $self->internal_error(
-                "",
-                "no_such_group",
-            );
-        }
-    }
-    my $gid = $gr->id;
-    if ($gid =~ /^(\d+)$/) {
-        $gid = $1;
-    } else {
-        return $self->internal_error(
-            "Invalid gid received $gid called in $ENV{PATH_INFO}",
-            );
-    }
-
-    $self->set_ratings($t, $group_name);
-    my $page = $q->param('page') || 1;
-    $self->_search_results($t, {where => {gid => $gid}, page => $page});
-    $self->_subscriptions($t, $gr);
-    $t->output;
 }
 
 sub _subscriptions {
