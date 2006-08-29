@@ -505,7 +505,7 @@ my @free_modes = qw(
     register register_process 
     logout 
     about faq stats
-    posts threads dist users 
+    posts threads dist users author
     search all 
     site_is_closed
     help
@@ -528,7 +528,7 @@ my @urls = qw(
     new_post pwreminder 
     login register 
     posts about stats
-    threads dist users 
+    threads dist users author
     response_form 
     faq 
     admin
@@ -1595,6 +1595,47 @@ sub set_ratings {
     }
 }
 
+=head2 author
+
+List posts by module author (PAUSEID)
+
+=cut
+
+sub author {
+    my ($self) = @_;
+    my $q = $self->query;
+
+    my $pauseid = ${$self->param("path_parameters")}[0] || '';
+    $self->log->debug("show posts to modules of PAUSEID: '$pauseid'");
+
+    my $t = $self->load_tmpl("authors.tmpl",
+        loop_context_vars => 1,
+        global_vars => 1,
+    );
+   
+    $t->param(pauseid => $pauseid);
+    $t->param(title => "CPAN Forum - $pauseid");
+
+    my ($author) = CPAN::Forum::Authors->search(pauseid => $pauseid);
+    if (not $author) {
+        $self->log->warning("Invalid pauseid $pauseid called in $ENV{PATH_INFO}");
+        return $self->internal_error(
+                "",
+                "no_such_pauseid",
+        );
+    }
+    # TODO: simplify query!
+    my @group_ids = map {$_->id}
+                    CPAN::Forum::Groups->search( pauseid => $author->id );
+    $self->log->warning("Group IDs: @group_ids");
+    my $page = $q->param('page') || 1;
+    $self->_search_results($t, {where => {gid => \@group_ids}, page => $page});
+    #$self->_subscriptions($t, $gr);
+    $t->output;
+}
+
+
+
 =head2 dist
 
 List last few posts belonging to this group, provides a link to post a new 
@@ -1603,8 +1644,7 @@ message within this group
 =cut
 
 sub dist {
-    my $self = shift;
-    
+    my ($self) = @_;
     my $q = $self->query;
 
     my $group_name = ${$self->param("path_parameters")}[0] || '';
@@ -1616,8 +1656,6 @@ sub dist {
             );
     }
     $self->log->debug("show dist: '$group_name'");
-#   $group_name =~ s/-/::/g;
-#   (my $dashgroup = $group_name) =~ s/::/-/g;
 
     my $t = $self->load_tmpl("groups.tmpl",
         loop_context_vars => 1,
@@ -1625,7 +1663,6 @@ sub dist {
     );
     $t->param(hide_group => 1);
                 
-#   $t->param(dashgroup => $dashgroup);
     $t->param(group => $group_name);
     $t->param(title => "CPAN Forum - $group_name");
 
@@ -1655,7 +1692,6 @@ sub dist {
     $self->_subscriptions($t, $gr);
     $t->output;
 }
-
 
 sub _subscriptions {
     my ($self, $t, $group) = @_;
@@ -2274,7 +2310,7 @@ sub rss {
             $it = CPAN::Forum::Posts->search_post_by_pauseid($pauseid);
         }
         else {
-            $self->log->warnings("rss requested for $params[0]");
+            $self->log->warning("rss requested for $params[0]");
         }
     }
     else {
