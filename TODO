@@ -5,6 +5,9 @@
   notified. Test both the interface to manage this and the the actually
   retreival of addresses to be notified.
 
+  We might want to add another way of subscripton: to subscribe to a specific
+  thread even if the user has not posted.
+
   One-time notification of module author when the first post arrives to one of
   her modules.
 

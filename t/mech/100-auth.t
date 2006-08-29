@@ -3,6 +3,8 @@
 use strict;
 use warnings;
 
+use Storable qw(dclone);
+
 use Test::More;
 my $tests;
 plan tests => $tests;
@@ -172,6 +174,7 @@ BEGIN { @input_fields = (
     BEGIN { $tests += 4 + @input_fields*2 }
 }
 
+# set the flags of all modules
 foreach my $i (0..2) {
     my $input = $w_user->current_form->find_input( $input_fields[$i][0] );
     $input->check;
@@ -187,10 +190,87 @@ foreach my $i (0..2) {
     BEGIN { $tests += 3*(4 + @input_fields*2) }
 }
 
+# reset the flags of all modules
+foreach my $i (0..2) {
+    my $input = $w_user->current_form->find_input( $input_fields[$i][0] );
+    $input->value(undef);
+    $w_user->submit_form();
+    $w_user->content_like(qr{Your subscriptions were successfully updated.});
+    $w_user->content_like(qr{You can look at them here:});
+    $w_user->follow_link_ok({ text => 'subscription information' });
+    my ($form) = $w_user->forms;
+    $input_fields[$i][3] = undef;
+    check_form($form, \@input_fields);
+    # TODO: check it in the database as well....    
+
+    BEGIN { $tests += 3*(4 + @input_fields*2) }
+}
+
+my $input_ref;
+{
+    $w_user->current_form->find_input('name')->value( 'Acme-Bleach' );
+    $w_user->current_form->find_input('type')->value( 'Distribution' );
+    $w_user->current_form->find_input('allposts__new')->check;
+    $w_user->submit_form();
+    $w_user->content_like(qr{Your subscriptions were successfully updated.});
+    $w_user->content_like(qr{You can look at them here:});
+    $w_user->follow_link_ok({ text => 'subscription information' });
+    my ($form) = $w_user->forms;
+    $input_ref = dclone(\@input_fields);
+    # 3 is the id number of Acme-Bleach
+    push @$input_ref,
+        ['allposts_3',    'checkbox',  'HTML::Form::ListInput',   'on'],
+        ['starters_3',    'checkbox',  'HTML::Form::ListInput',   undef],
+        ['followups_3',   'checkbox',  'HTML::Form::ListInput',   undef];
+    $input_ref->[8][3] = '_all,3';
+    check_form($form, $input_ref);
+    # TODO: check it in the database as well....    
+
+    BEGIN { $tests += (4 + (@input_fields+3)*2) }
+}
+
+my $input_ref2;
+{
+    $w_user->current_form->find_input('name')->value( 'MARKSTOS' );
+    $w_user->current_form->find_input('type')->value( 'PAUSEID' );
+    $w_user->current_form->find_input('starters__new')->check;
+    $w_user->submit_form();
+    $w_user->content_like(qr{Your subscriptions were successfully updated.});
+    $w_user->content_like(qr{You can look at them here:});
+    $w_user->follow_link_ok({ text => 'subscription information' });
+    my ($form) = $w_user->forms;
+    my $input_ref2 = dclone($input_ref);
+    # 2 is the id number of MARKSTOS
+    push @$input_ref2,
+        ['allposts__2',    'checkbox',  'HTML::Form::ListInput',   undef],
+        ['starters__2',    'checkbox',  'HTML::Form::ListInput',   'on'],
+        ['followups__2',   'checkbox',  'HTML::Form::ListInput',   undef];
+    $input_ref2->[8][3] = '_all,_2,3';
+    check_form($form, $input_ref2);
+    # TODO: check it in the database as well....    
+
+    BEGIN { $tests += (4 + (@input_fields+3)*2) }
+}
+
+
+=pod
+sqlite> select * from groups;
+1|ABI||3|0.01|1||
+2|CGI-Application-ValidateRM||3|1.12|2||
+3|Acme-Bleach||3|1.12|3||
+4|CGI-Application||3|3.22|2||
+5|CGI-Application-Session||3|0.03|4||
+sqlite> select * from authors;
+1|MALAY
+2|MARKSTOS
+3|DCONWAY
+4|CEESHEK
+=cut
+
 
 
 sub check_form {
-    my ($form, $input_fields_ref) = @_;
+    my ($form, $input_fields_ref, $diag) = @_;
     foreach my $i (@$input_fields_ref) {
         my ($name, $type, $obj, $value) = @$i;
         my $input = $form->find_input( $name, $type);
@@ -204,7 +284,9 @@ sub check_form {
     }
     my @inputs = $form->inputs;
     is(@inputs, scalar @$input_fields_ref);
-    #foreach my $i (@inputs) {    diag $i->name; }
+    if ($diag) {
+        foreach my $i (@inputs) {    diag $i->name; }
+    }
 }
 
 

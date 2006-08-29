@@ -26,7 +26,6 @@ my $builder = Module::Build->new(
 #       'HTML::Lint'                            => 1.26,
 #       'Test::HTML::Lint'                      => 1.26,
         'WWW::Mechanize'                        => 0,
-#       'Storable'                              => 0,
         'DBI'                                   => 0,
         'DBD::SQLite'                           => 0.31,
         'Class::DBI'                            => 0,  # It was complaining: ERROR: Version v3.0.14 of Class::DBI is installed, but we need version >= 0.96
@@ -45,6 +44,7 @@ my $builder = Module::Build->new(
         'CPAN::DistnameInfo'                    => 0,
     },
     build_requires => {
+        'Storable'                              => 0,
         'Test::More'                            => 0.47,
         'Test::WWW::Mechanize::CGI'             => 0,
     },

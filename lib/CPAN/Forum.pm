@@ -8,9 +8,9 @@ use base 'CGI::Application';
 use CGI::Application::Plugin::Session;
 use CGI::Application::Plugin::LogDispatch;
 use Data::Dumper qw(Dumper);
-use Fcntl qw(:flock);
+#use Fcntl qw(:flock);
 use POSIX qw(strftime);
-use Carp qw(cluck carp);
+#use Carp qw(cluck carp);
 use Mail::Sendmail qw(sendmail);
 use CGI ();
 use List::MoreUtils qw(any);
@@ -744,6 +744,8 @@ Gives a custom Internal error page.
 
 Maybe this one should also receive the error message and print it to the log file.
 
+See C<notes()> for simple notes.
+
 =cut
 
 sub internal_error {
@@ -756,6 +758,19 @@ sub internal_error {
     $t->param(generic => 1) if not $tag;
     $t->output;
 }
+
+=head2 notes
+
+Print short notification messages to the user.
+
+=cut
+sub notes {
+    my ($self, $msg) = @_;
+    my $t = $self->load_tmpl("notes.tmpl");
+    $t->param($msg => 1);
+    $t->output;
+}
+
 
 =head2 load_tmpl
 
@@ -1251,7 +1266,7 @@ sub posts {
     if (not @$errors or $$errors[0] eq "preview") {
         my %preview;
         $preview{subject}    = _subject_escape($q->param("new_subject")) || "";
-        $preview{text}       = _text_escape($q->param("new_text"))    || "";
+        $preview{text}       = $self->_text_escape($q->param("new_text"))    || "";
         $preview{parentid}   = $q->param("new_parent")  || "";
 #       $preview{thread_id}  = $q->param("new_text")    || "";
         $preview{postername} = $self->session->param("username");
@@ -1372,7 +1387,6 @@ sub process_post {
     };
     if ($@) {
         #push @errors, "subject_too_long" if $@ =~ /subject_too_long/;
-        #warn $CPAN::Forum::Post::lasterror if $@ =~ /text_format/;
         if (not @errors) {
             return $self->internal_error(
                 "PATH_INFO: '$ENV{PATH_INFO}'\nUNKNOWN_ERROR: $@",
@@ -1400,7 +1414,7 @@ sub _post {
         date        => _post_date($post->date),
         parentid    => $post->parent,
         responses   => \@responses,
-        text        => _text_escape($post->text),
+        text        => $self->_text_escape($post->text),
     );
 
     $post{id}      = $post->id;
@@ -1414,16 +1428,16 @@ sub _subject_escape {
     return CGI::escapeHTML($subject);
 }
 
-# this is not correct, the Internal error should be raised all the way up, not as the
+# TODO: this is not correct, the Internal error should be raised all the way up, not as the
 # text field...
 sub _text_escape {
-    my ($text) = @_;
+    my ($self, $text) = @_;
 
     return "" if not $text;
     my $markup = CPAN::Forum::Markup->new();
     my $html = $markup->posting_process($text);
     if (not defined $html) {
-        warn "Error displaying already accepted text: '$text'";
+        $self->log->warning("Error displaying already accepted text: '$text'");
         return "Internal Error";
     }
     return $html;
@@ -1502,7 +1516,6 @@ sub set_ratings {
         $t->param(rating       => $rating);
         $t->param(roundrating  => $roundrating);
         $t->param(review_count => $review_count);
-        #warn "$rating $roundrating $review_count\n";
     }
 }
 
@@ -1688,7 +1701,26 @@ sub change_password {
 
 =head2 mypan
 
-Planned to be the manager for the notify subscription, currently not in use.
+Manage the notify subscription.
+
+Creates checkboxes, the names of the checkboxes start with
+the subscription mode:
+
+  allposts_   - every post
+  starters_   - every time a new thread is started
+  followups_  - every time there is a post where the user has already posted
+
+The names are the followed wit one of the following:
+
+  _all      - all the modules
+  _NNN      - Where NNN is the id number of an author
+  NNN       - where NNN is the id number of a group (distribution) 
+
+The gids field contains the comma separated list of all the postfixes.
+
+(Yes the difference between the two types of id is the extra _ only.)
+
+C<update_subscription> will process the submitted form.
 
 =cut
 
@@ -1710,13 +1742,9 @@ sub mypan {
     $fullname .= $user->fname if $user->fname;
     $fullname .= " " if $fullname;
     $fullname .= $user->lname if $user->lname;
-    #$fullname = $username if not $fullname;
-
 
     $t->param(fullname => $fullname);
-#   $t->param(all_post => $user->all_post);
-#   $t->param(all_start => $user->all_start);
-    $t->param(title => "Information about $username");
+    $t->param(title    => "Information about $username");
 
     my @params = @{$self->param("path_parameters")};
     my @subscriptions;
@@ -1765,7 +1793,6 @@ sub mypan {
 
         my $it = CPAN::Forum::Subscriptions_pauseid->search(uid => $user->id);
         while (my $s = $it->next) {
-            #warn $s->allposts;
             $gids .= ($gids ? ",_" : "_") . $s->pauseid->id; 
             push @subscriptions, {
                 gid       => "_" . $s->pauseid->id,
@@ -1778,7 +1805,6 @@ sub mypan {
 
         $it = CPAN::Forum::Subscriptions->search(uid => $user->id);
         while (my $s = $it->next) {
-            #warn $s->allposts;
             $gids .= ($gids ? "," : "") . $s->gid->id; 
             push @subscriptions, {
                 gid       => $s->gid,
@@ -1789,7 +1815,6 @@ sub mypan {
             };
         }
     }
-    #warn Dumper \@subscriptions;
 
     $t->param(subscriptions => \@subscriptions);
     $t->param(gids => $gids);
@@ -1797,11 +1822,15 @@ sub mypan {
     $t->output;
 }
 
+=head2 update_subscription
+
+Process the submitted form created by C<mypan()>
+
+=cut
 sub update_subscription {
     my $self = shift;
     my $q = $self->query;
     
-    #warn $q->param("gids");
     my @gids = split /,/, $q->param("gids");
     if (not @gids) {
         return $self->internal_error();
@@ -1810,8 +1839,6 @@ sub update_subscription {
     my $username = $self->session->param("username");
     my ($user) = CPAN::Forum::Users->search(username => $username);
 
-
-    #warn Dumper $q->Vars;
     foreach my $gid (@gids) {
         if ($gid eq "_all") {
             my ($s) = CPAN::Forum::Subscriptions_all->search(uid => $user->id);
@@ -1831,7 +1858,7 @@ sub update_subscription {
                 });
             }
             $self->_update_subs($s, $gid);
-        } else {
+        } elsif ($gid =~ /^(\d+)$/) {
             my ($s) = CPAN::Forum::Subscriptions->search(gid => $gid, uid => $user->id);
             if (not $s) {
                 $s = CPAN::Forum::Subscriptions->create({
@@ -1840,49 +1867,71 @@ sub update_subscription {
                 });
             }
             $self->_update_subs($s, $gid);
+        } else {
+            $self->log->error("Invalid gid: '$gid' provided in the gids entry of mypan");
+            # shall we show an error page here?
         }
     }
     
-    # TODO: error messages in case not all the values were filled in correctly
-    if ($q->param("name") and $q->param("type")) {
-        if ($q->param("type") eq "pauseid") {
-            my $pauseid = uc $q->param("name");
-            my ($pid) = CPAN::Forum::Authors->search(pauseid => $pauseid);
-            if ($pid) {
-                my $s = CPAN::Forum::Subscriptions_pauseid->find_or_create({
-                    uid       => $user->id,
-                    pauseid   => $pid->id,
-                });
-                $self->_update_subs($s, "_new");
-            } else {
-                return $self->notes("no_such_pauseid");
-            }
-        }
-        if ($q->param("type") eq "distro") {
-            my $name = $q->param("name");
-            $name =~ s/::/-/g;  
-            my ($grp) = CPAN::Forum::Groups->search(name => $name);
-            if ($grp) {
-                my $s = CPAN::Forum::Subscriptions->find_or_create({
-                    uid       => $user->id,
-                    gid       => $grp->id,
-                });
-                $self->_update_subs($s, "_new");
-            } else {
-                return $self->notes("no_such_group");
-            }
-        }
+    # if there is not name, no need for further processing
+    if (not $q->param("name")) {
+        return $self->notes("mypanok");
     }
 
-    $self->notes("mypanok");
+    # TODO: error messages in case not all the values were filled in correctly
+    # process new entry
+    if (not $q->param("type")) {
+        return $self->note("no_subs_type");
+    }
+
+    # TODO: if there is a subscription to the given distro or PAUSEID
+    # we should not let the user overwrite it using the new entry box
+    if ($q->param("type") eq "pauseid") {
+        my $pauseid = uc $q->param("name");
+        my ($author) = CPAN::Forum::Authors->search(pauseid => $pauseid);
+        if ($author) {
+            my $s = CPAN::Forum::Subscriptions_pauseid->find_or_create({
+                uid       => $user->id,
+                pauseid   => $author->id,
+            });
+            $self->_update_subs($s, "_new");
+        } else {
+            return $self->notes("no_such_pauseid");
+        }
+    }
+    elsif ($q->param("type") eq "distro") {
+        my $name = $q->param("name");
+        $name =~ s/::/-/g;  
+        my ($grp) = CPAN::Forum::Groups->search(name => $name);
+        if ($grp) {
+            my $s = CPAN::Forum::Subscriptions->find_or_create({
+                uid       => $user->id,
+                gid       => $grp->id,
+            });
+            $self->_update_subs($s, "_new");
+        } else {
+            return $self->notes("no_such_group");
+        }
+    }
+    else {
+        return $self->internal_error("", "invalid_subs_type");
+    }
+
+    return $self->notes("mypanok");
 }
 
+=head2 _update_subs
 
+Given a subscription obkect (1 out of 3 possible classes)
+and a gid (_all, _NNN or NNN) fetches the relevan checkboxes 
+(See C<mypan()> for details) and update the subscription object.
+
+=cut
 sub _update_subs {
     my ($self, $s, $gid) = @_;
     my $q = $self->query;
 
-    my $on=0;
+    my $on = 0;
     foreach my $type (qw(allposts starters followups)) {
         if (defined $q->param($type ."_$gid") and $q->param($type . "_$gid") eq "on") {
             $s->set($type, 1);
@@ -1891,17 +1940,14 @@ sub _update_subs {
             $s->set($type, 0);
         }
     }
-    $s->update;
-    $s->delete if not $on;  # remove the whole line if there are no subscriptions at all.
+    if ($on) {
+        return $s->update;
+    }
+    else {
+        return $s->delete;   # remove the whole line if there are no subscriptions at all.
+    }
 }
 
-
-sub notes {
-    my ($self, $msg) = @_;
-    my $t = $self->load_tmpl("notes.tmpl");
-    $t->param($msg => 1);
-    $t->output;
-}
 
 
 sub module_search {
@@ -2267,13 +2313,11 @@ sub _sendmail {
         my $email = $s->uid->email;
         $self->log->debug("Sending to $email ?");
         $mail->{To} = $email;
-        #warn "Sending ? to $email\n";
         $self->log->debug("Processing uid: " . $s->uid->username) if $ids;
         next if $ids and not $ids->{$s->uid->username};
         $self->log->debug("Sending to $email id was found");
         next if $_[2]->{$email}++;
         $self->log->debug("Sending to $email first time sending");
-        #warn "Yes, Sending to $email\n";
         $self->_my_sendmail(%$mail);
         $self->log->debug("Sent to $email");
     }
@@ -2292,7 +2336,7 @@ sub status {
 
         open my $fh, ">", $STATUS_FILE;
         if (not $fh) {
-            warn "Could not open status file '$STATUS_FILE' $!\n";
+            $self->log->warning("Could not open status file '$STATUS_FILE' $!");
             return;
         }
         print $fh $value;
