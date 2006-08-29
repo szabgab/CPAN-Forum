@@ -1,6 +1,22 @@
 
 v0.12 
 
+  Add large button on dist page to start a new post.
+
+  Added process_missing_dist that will automatically add distributions
+  if they are accessed by one of the search engines and exist on
+  search.cpan.org
+  When a request arrives to /dist/XYZ and XYZ is not in our database
+  we can fetch http://search.cpan.org/dist/XYZ and add the entry to our 
+  database. In order not to let some random person bombard our server and that
+  in turn that we don't bombard search.cpan.org (though our server will 
+  crash much sooner than search.cpan.org) we can add a list of trusted client
+  ip addresses from the list in the log file. After all very soon most of the
+  correct entries will be added to the database. A trusted ip would be
+  GoogleBot 66.249.66.3, msnbot 65.55.213.74, inktomisearch and similar
+ 
+  Cleaned up STDERR, moved voluntary warnings to logger
+
   Cookie exparation was increased from 1 day to 14 days
 
   Provide a csv file with the number of posts for each distribution so 
@@ -12,8 +28,6 @@ v0.12
   Clean up STDERR, move (some) voluntary warnings to logger
 
   Include link to AnnoCPAN, rearrange links
-
-  Used on http://www.cpanforum.com/ but not released as a distribution
 
   Create links http://www.cpanforum.com/rss/author/PAUSEID
   Fix the dist based feeds: http://www.cpanforum.com/rss/dist/OpenOffice-OODoc

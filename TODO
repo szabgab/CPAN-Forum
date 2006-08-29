@@ -1,25 +1,24 @@
 
   Tests  *  Tests   *   Tests
 
+  Unite and clean up the code that fetches list of people who need to be
+  notified. Test both the interface to manage this and the the actually
+  retreival of addresses to be notified.
+
+  One-time notification of module author when the first post arrives to one of
+  her modules.
+
   Missing entries: 
     ApacheDBI
     Net-SMS-TWSMS   missing from 02... and from CPANTS
-  they are both on search.cpan.org
+  they are both on search.cpan.org, now they are going to be auto-added but
+  we should still understand this issue so we can keep the version numbers
+  and the author changes up-to-date.
 
   Improve the populate.pl, look at CPANTS for ideas:
   http://search.cpan.org/src/DOMM/Module-CPANTS-ProcessCPAN-0.62/bin/update_authors.pl
   Finish the recent.pl file and maybe replace the populate.pl by using recent.pl
 
-  When a request arrives to /dist/XYZ and XYZ is not in our database
-  we can fetch http://search.cpan.org/dist/XYZ and add the entry to our 
-  database. In order not to let some random person bombard our server and that
-  in turn that we don't bombard search.cpan.org (though our server will 
-  crash much sooner than search.cpan.org) we can add a list of trusted client
-  ip addresses from the list in the log file. After all very soon most of the
-  correct entries will be added to the database. A trusted ip would be
-  GoogleBot 66.249.66.3, msnbot 65.55.213.74, inktomisearch and similar
-  
-  
 
   Cleanup the schema. Currently the schema/schema.sql is not the same as the
   schema used in the live application.
@@ -43,36 +42,28 @@
 
   Logging: enable logging based on a single client IP address
   
-  Clean up STDERR, move voluntary warnings to logger
-
   Include number of AnnoCPAN posts
   
 
-
-BUG:
-When I try to reply and the original subject is already 50 chars long
-in offers a new subject with Re: prefix but then when I try to submit
-it won't let me.
-
-(So far is ok, though it should 70 or 100 long)
-
-But the main problem is that if I delete the last word from the
-subject and press preview again
-it returns the same error message as it put back the word where it was earlier.
+  BUG:
+  When I try to reply and the original subject is already 50 chars long
+  in offers a new subject with Re: prefix but then when I try to submit
+  it won't let me.
+  (So far is ok, though it should 70 or 100 long)
+  But the main problem is that if I delete the last word from the
+  subject and press preview again
+  it returns the same error message as it put back the word where it was earlier.
 
  
-- Clean up the listing of the subscribers at the bottom of the pages:
+  Clean up the listing of the subscribers at the bottom of the pages:
   Separate people who will receive all messages
   Thread starters
   And show names of people with "followup set" only within the threads they posted.
   
-- Unite and clean up the code that fetches list of people who need to be notified
-
-
-- Script that populates database should not lock the whole database for a long time
+  Script that populates database should not lock the whole database for a long time
   Maybe it should fetch all the data to memory and work there.
 
-- Add announcement service (check for new versions of modules and send e-mail
+  Add announcement service (check for new versions of modules and send e-mail
   to those whom are interested in announcements.
   For example I just tried to install a module but it failed its test. Checking 
   search.cpan.org I noticed the module has been updated lately and looking at
@@ -82,38 +73,25 @@ it returns the same error message as it put back the word where it was earlier.
   it is hot. I can subscribe to the announcement service of this module and get
   the message.
 
-- Announcment service for new modules (modules that appear on CPAN for the first time)
+  Announcment service for new modules (modules that appear on CPAN for the first time)
   For this I n
 
-- Include the information received from cpanratings in our database:
-  For each "group" add two fields:  "ratings" and "review_count"
-
-- Register the PAUSEID where the module was last seen:
+  Register the PAUSEID where the module was last seen:
   Send out e-mail about PAUSEID changes
   
 
+  In order to avoid accepting postings today that will break when we add more 
+  tags, we will reject any submission that is not correctly marked up.
 
+  Create larger discussion groups (e.g. Web development and All)
 
-In order to avoid accepting postings today that will break when we add more 
-tags, we will reject any submission that is not correctly marked up.
-
-
-
-- Create larger discussion groups (e.g. Web development and All)
-
-
-
-- Record the date when a user joined
-- Record when a user last visited
+  Record the date when a user joined
+  Record when a user last visited
  
-- Put time ellapsed since post instead of date of post, (3 min. 6 hours 3 days ago)
+  Put time ellapsed since post instead of date of post, (3 min. 6 hours 3 days ago)
   make this configurable: User can say after N days passed the date should show,
   before that the ellapsed time
   
-- Admin: hide a posting
-
-- Admin: delete a user
-
 - replace the e-mail address checking by  if ($q->param('email') !~ $Email::Address::addr_spec) {
 
 - Enable people to edit their posts 
@@ -132,11 +110,22 @@ tags, we will reject any submission that is not correctly marked up.
 
 - xml version of the search results
 
-- Admin: disable posting to a distibution, 
+  Admin: hide a posting
 
-- Admin: hide a distribution and all its postings
+  Admin: delete or disable a user
 
-- Admin: disable user, change username ?
+  Admin: disable posting to a distibution, 
+
+  Admin: hide a distribution and all its postings
+
+  Admin: change username ?
+
+  Admin: hide a message (or a whole thread) (database already has field)
+
+  Admin: freeze a distro: (cannot add new message but still can see the earlier messages)
+
+  Admin: (or even the author ?) should be able to move a message from one module to 
+          another module or group.
 
 - Statistics on posts, views etc.
 
@@ -144,20 +133,15 @@ tags, we will reject any submission that is not correctly marked up.
 
 - Enable sending direct mail to a poster (?) (without disclosing e-mail address)
 
-- Better integration with search.cpan.org, cpanratings.perl.org
+  Include the information received from cpanratings in our database:
+  For each "group" add two fields:  "ratings" and "review_count"
+
+  Better integration with search.cpan.org, cpanratings.perl.org
   Provide statistics on number of comments per distro to be displayed on search.cpan
 
-- Admin: hide a message (or a whole thread) (database already has field)
-
-- Admin: freeze a distro: (cannot add new message but still can see the earlier messages)
-
-- Admin: (or even the author ?) should be able to move a message from one module to 
-          another module or group.
- 
 - Replace the /post/number link by /post/TITLE_OF_POST ???
 
 - make the page size (for paging) user configurable
-
 
 - Allow users to subscribe for announcement service:
   A script that will send an announcement on the new version of every module to
@@ -240,8 +224,6 @@ this is the only directory we can write to) and run the populator
 
 - on a new installation, change the ownership of directories (or at least tell
 the user to do so)
-
-- Write comprehensive test suit
 
 - Reply within a thread
 
