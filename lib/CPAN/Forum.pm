@@ -16,6 +16,7 @@ use CGI ();
 use List::MoreUtils qw(any);
 
 use CPAN::Forum::INC;
+use CPAN::Forum::DBI;
 
 my $cookiename  = "cpanforum";
 my $SUBJECT = qr{[\w .:~!@#\$%^&*\()+?><,'";=-]+};
@@ -406,7 +407,6 @@ sub cgiapp_init {
     my $self = shift;
     
     my $db_connect = $self->param("DB_CONNECT");
-    use CPAN::Forum::DBI;
     CPAN::Forum::DBI->myinit($db_connect);
     my $dbh = CPAN::Forum::DBI::db_Main();
     
@@ -438,7 +438,7 @@ sub cgiapp_init {
         #CGI_SESSION_OPTIONS => [ "driver:File", $self->query, {Directory => "/tmp"}],
         #CGI_SESSION_OPTIONS => [ "driver:SQLite", $self->query, {Handle => $dbh}],
         COOKIE_PARAMS       => {
-                -expires => '+24h',
+                -expires => '+14d',
                 -path    => '/',
         },
         SEND_COOKIE         => 0,
@@ -447,9 +447,6 @@ sub cgiapp_init {
     $self->log->debug("sid:  " . ($self->session->id() || ""));
     
     $self->header_props(
-        #-expires => '-1d',  
-        # I think this this -expires causes some strange behaviour in IE 
-        # on the other hand it is needed in Opera to make sure it won't cache pages.
         -charset => "utf-8",
     );
 }
