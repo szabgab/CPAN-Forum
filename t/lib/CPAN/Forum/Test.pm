@@ -1,4 +1,6 @@
 package CPAN::Forum::Test;
+use strict;
+use warnings;
 
 use File::Copy qw(copy);
 
