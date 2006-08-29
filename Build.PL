@@ -41,10 +41,11 @@ my $builder = Module::Build->new(
         'Class::DBI::Plugin::Pager'             => 0,
         'Text::CSV_XS'                          => 0,
         'List::MoreUtils'                       => 0,
+        'Test::WWW::Mechanize'                  => 0.02,
+        'CPAN::DistnameInfo'                    => 0,
     },
     build_requires => {
         'Test::More'                            => 0.47,
-        'Test::WWW::Mechanize'                  => 0.02,
         'Test::WWW::Mechanize::CGI'             => 0,
     },
     dist_author => 'Gabor Szabo <gabor@pti.co.il>',

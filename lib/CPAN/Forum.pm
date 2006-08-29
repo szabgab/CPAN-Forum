@@ -474,7 +474,7 @@ sub _set_log_level {
             warn "Invalid log level '$str'\n";
         }
     }
-    return 'warning'; 
+    return 'notice'; 
 }
 
 
@@ -581,25 +581,28 @@ sub _set_run_mode {
     $self->param(path_parameters => []);
 
     my $rm = $self->get_current_runmode();
-    if (not $rm or $rm eq "home") {
-        if ($ENV{PATH_INFO} =~ m{^/
-                        ([^/]+)        # first word till after the first /
-                        (?:/(.*))?     # the rest, after the (optional) second /
-                        }x) {
-            my $newrm = $1;
-            my $params = $2 || "";
-            if (any {$newrm eq $_} @urls) {
-                my @params = split /\//, $params;
-                $self->param(path_parameters => @params ? \@params : []);
-                $rm = $newrm;
-                $self->prerun_mode($rm);
-            } elsif ($ENV{PATH_INFO} eq "/cgi/index.pl") {
-                $self->log->error("Invalid PATH_INFO: $ENV{PATH_INFO}");
-            } else {
-                $self->log->error("Invalid PATH_INFO: $ENV{PATH_INFO}");
-            }
+    return $rm if $rm and $rm ne 'home'; # alredy has run-mode
+    $rm = 'home'; # set to default ???
+
+    # override rm based on PATH_INFO
+    if ($ENV{PATH_INFO} =~ m{^/
+                    ([^/]+)        # first word till after the first /
+                    (?:/(.*))?     # the rest, after the (optional) second /
+                    }x) {
+        my $newrm = $1;
+        my $params = $2 || "";
+        if (any {$newrm eq $_} @urls) {
+            my @params = split /\//, $params;
+            $self->param(path_parameters => @params ? \@params : []);
+            $rm = $newrm;
+        } elsif ($ENV{PATH_INFO} eq "/cgi/index.pl") {
+            # this should be ok here
+            #$self->log->error("Invalid PATH_INFO: $ENV{PATH_INFO}");
+        } else {
+            $self->log->error("Invalid PATH_INFO: $ENV{PATH_INFO}");
         }
     }
+    $self->prerun_mode($rm);
     return $rm;
 }
 
@@ -731,7 +734,7 @@ sub faq {
 
 sub error {
     my ($self) = @_;
-    $self->log->fatal($@) if $@;
+    $self->log->critical($@) if $@;
     $self->internal_error();
 }
 
@@ -1515,17 +1518,17 @@ sub dist {
     
     my $q = $self->query;
 
-    my $group = ${$self->param("path_parameters")}[0] || '';
-    if ($group =~ /^([\w-]+)$/) {
-        $group = $1;
+    my $group_name = ${$self->param("path_parameters")}[0] || '';
+    if ($group_name =~ /^([\w-]+)$/) {
+        $group_name = $1;
     } else {
         return $self->internal_error(
-            "Probably bad regex when checking group name for $group called in $ENV{PATH_INFO}",
+            "Probably bad regex when checking group name for $group_name called in $ENV{PATH_INFO}",
             );
     }
-    $self->log->debug("show dist: '$group'");
-#   $group =~ s/-/::/g;
-#   (my $dashgroup = $group) =~ s/::/-/g;
+    $self->log->debug("show dist: '$group_name'");
+#   $group_name =~ s/-/::/g;
+#   (my $dashgroup = $group_name) =~ s/::/-/g;
 
     my $t = $self->load_tmpl("groups.tmpl",
         loop_context_vars => 1,
@@ -1534,15 +1537,19 @@ sub dist {
     $t->param(hide_group => 1);
                 
 #   $t->param(dashgroup => $dashgroup);
-    $t->param(group => $group);
-    $t->param(title => "CPAN Forum - $group");
+    $t->param(group => $group_name);
+    $t->param(title => "CPAN Forum - $group_name");
 
-    my ($gr) = CPAN::Forum::Groups->search(name => $group);
+    my ($gr) = CPAN::Forum::Groups->search(name => $group_name);
     if (not $gr) {
-        return $self->internal_error(
-            "Invalid group $group called in $ENV{PATH_INFO}",
-            "no_such_group",
+        $self->log->warning("Invalid group $group_name called in $ENV{PATH_INFO}");
+        $gr = $self->process_missing_dist($group_name);
+        if (not $gr) {
+            return $self->internal_error(
+                "",
+                "no_such_group",
             );
+        }
     }
     my $gid = $gr->id;
     if ($gid =~ /^(\d+)$/) {
@@ -1553,7 +1560,7 @@ sub dist {
             );
     }
 
-    $self->set_ratings($t, $group);
+    $self->set_ratings($t, $group_name);
     my $page = $q->param('page') || 1;
     $self->_search_results($t, {where => {gid => $gid}, page => $page});
     $self->_subscriptions($t, $gid);
@@ -2347,9 +2354,93 @@ sub _my_sendmail {
     }
 }
 
+=head2 process_missing_dist
+
+A very CPAN related piece of code.
+Given a name of a distribution (with dashes), 
+check if the given distribution is on search.cpan.org 
+and try to add it to our database.
+
+Return true on success.
+
+=cut
 sub process_missing_dist {
-    my ($self) = @_;
-    #http://search.cpan.org/dist/Net-Libnet/ 
+    my ($self, $dist_name) = @_;
+    $self->log->debug("Fetch info regarding $dist_name from search.cpan.org");
+
+    # Cehck if client is approved
+    my %IPS = (
+        '66.249.66.3'  => 1,   # GoogleBot
+        '65.55.213.74' => 1,   # msnbot
+#        '127.0.0.1'    => 1,   # localhost for testing
+    );
+    if (not $ENV{REMOTE_ADDR} or not $IPS{ $ENV{REMOTE_ADDR} }) {
+        $self->log->debug("Client $ENV{REMOTE_ADDR} is not in the approved list");
+        return;
+    }
+
+    # Fetch page from search.cpan.org and do a sanity check
+    require WWW::Mechanize;
+    my $w = WWW::Mechanize->new;
+    my $url = "http://search.cpan.org/dist/$dist_name/";
+    $self->log->debug("URL: '$url'");
+    $w->get($url);
+    #$self->log->debug($w->content);
+    if (not $w->success) {
+        $self->log->debug("Could not fetch $url");
+        return;
+    }
+    my $discuss_link = $w->find_link( text_regex => qr{Discussion.*Forum} );
+    if (not $discuss_link) {
+        $self->log->debug("Could not find link to Discussion Forum");
+        return;
+    }
+    $self->log->debug("Url to discussion list: " . $discuss_link->url);
+
+    my $download_link = $w->find_link( text_regex => qr{Download} );
+    if (not $download_link) {
+        $self->log->debug("Could not find link to Download");
+        return;
+    }
+    my $download_url = $download_link->url;
+    $self->log->debug("Download url: $download_url");
+    require CPAN::DistnameInfo;
+    my $d = CPAN::DistnameInfo->new($download_url);
+    if (not $d) {
+        $self->log->debug("Could not parse download URL");
+        return;
+    }
+    if ($dist_name ne $d->dist) {
+         $self->log->debug("Distname $dist_name is different from " . $d->dist);
+    }
+
+    my $pauseid = $d->cpanid;
+    if (not $pauseid) {
+         $self->log->debug("Could not get PAUSEID from download_url");
+         return;
+    }
+    my $author = eval { CPAN::Forum::Authors->find_or_create({
+                    pauseid => $pauseid,
+                 }); };
+    if (not $author) {
+        $self->log->debug("Could not find_or_create author: '$pauseid'");
+        return;
+    }
+
+    my $group = eval { CPAN::Forum::Groups->create({
+        name    => $dist_name,
+        gtype   => $CPAN::Forum::DBI::group_types{Distribution}, 
+        version => $d->version,
+        pauseid => $author->id,
+    }); };
+    if ($group) {
+        $self->log->notice("Distribution $dist_name added");
+        return $group;
+    }
+    else {
+        $self->log->debug("Could not add distribution $dist_name: $@");
+        return;
+    }
 }
 
 
@@ -2384,7 +2475,7 @@ Please report them at L<http://rt.cpan.org/>
 
 =head1 LICENSE
 
-Copyright 2004-2005, Gabor Szabo (gabor@pti.co.il)
+Copyright 2004-2006, Gabor Szabo (gabor@pti.co.il)
  
 This software is free. It is licensed under the same terms as Perl itself.
 
