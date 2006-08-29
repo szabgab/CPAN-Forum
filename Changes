@@ -1,6 +1,8 @@
 
 v0.12 
 
+  Cookie exparation was increased from 1 day to 14 days
+
   Provide a csv file with the number of posts for each distribution so 
   other sites can include it.
   Create stats page with top 50 modules

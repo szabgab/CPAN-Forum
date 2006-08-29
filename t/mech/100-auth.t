@@ -131,10 +131,80 @@ sub read_config {
     BEGIN { $tests += 6; }
 }
 
+my @input_fields;
+BEGIN { @input_fields = (
+        ['allposts__all',    'checkbox',  'HTML::Form::ListInput',   undef],
+        ['starters__all',    'checkbox',  'HTML::Form::ListInput',   undef],
+        ['followups__all',   'checkbox',  'HTML::Form::ListInput',   undef],
+        ['allposts__new',    'checkbox',  'HTML::Form::ListInput',   undef],
+        ['starters__new',    'checkbox',  'HTML::Form::ListInput',   undef],
+        ['followups__new',   'checkbox',  'HTML::Form::ListInput',   undef],
+        ['type',             'option',    'HTML::Form::ListInput',   ''],
+        ['rm',               'hidden',    'HTML::Form::TextInput',   'update_subscription'],
+        ['gids',             'hidden',    'HTML::Form::TextInput',   '_all'],
+        ['submit',           'submit',    'HTML::Form::SubmitInput', 'Update'],
+        ['name',             'text',      'HTML::Form::TextInput',   ''],
+    );
+}
+
 {
     $w_user->follow_link_ok({ text => 'home' });
     $w_user->follow_link_ok({ text => 'mypan' });
+    $w_user->content_like(qr{Personal configuration of}); # fname lname (username)
+    my ($form) = $w_user->forms;
+    isa_ok($form, 'HTML::Form');
+    is($form->method, 'POST');
+    is($form->action, "$url/");
+    check_form($form, \@input_fields);
 
-    BEGIN { $tests += 2; }
+    BEGIN { $tests += 7 + @input_fields*2; }
 }
+
+{
+    # submit without any changes
+    $w_user->submit_form();
+    $w_user->content_like(qr{Your subscriptions were successfully updated.});
+    $w_user->content_like(qr{You can look at them here:});
+    $w_user->follow_link_ok({ text => 'subscription information' });
+    my ($form) = $w_user->forms;
+    check_form($form, \@input_fields);
+    
+    BEGIN { $tests += 4 + @input_fields*2 }
+}
+
+foreach my $i (0..2) {
+    my $input = $w_user->current_form->find_input( $input_fields[$i][0] );
+    $input->check;
+    $w_user->submit_form();
+    $w_user->content_like(qr{Your subscriptions were successfully updated.});
+    $w_user->content_like(qr{You can look at them here:});
+    $w_user->follow_link_ok({ text => 'subscription information' });
+    my ($form) = $w_user->forms;
+    $input_fields[$i][3] = 'on';
+    check_form($form, \@input_fields);
+    # TODO: check it in the database as well....    
+
+    BEGIN { $tests += 3*(4 + @input_fields*2) }
+}
+
+
+
+sub check_form {
+    my ($form, $input_fields_ref) = @_;
+    foreach my $i (@$input_fields_ref) {
+        my ($name, $type, $obj, $value) = @$i;
+        my $input = $form->find_input( $name, $type);
+        isa_ok($input, $obj, "$name is $obj") or next;
+        if (defined $value) {
+            is($input->value, $value, "$name is $value");
+        } else {
+            ok(!(defined $input->value), "$name is undef") 
+                or diag "$name is '" . $input->value . "'";
+        }
+    }
+    my @inputs = $form->inputs;
+    is(@inputs, scalar @$input_fields_ref);
+    #foreach my $i (@inputs) {    diag $i->name; }
+}
+
 

@@ -40,6 +40,7 @@ my $builder = Module::Build->new(
         'Class::DBI::Plugin::AbstractCount'     => 0,
         'Class::DBI::Plugin::Pager'             => 0,
         'Text::CSV_XS'                          => 0,
+        'List::MoreUtils'                       => 0,
     },
     build_requires => {
         'Test::More'                            => 0.47,

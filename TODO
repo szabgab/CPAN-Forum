@@ -8,7 +8,18 @@
 
   Improve the populate.pl, look at CPANTS for ideas:
   http://search.cpan.org/src/DOMM/Module-CPANTS-ProcessCPAN-0.62/bin/update_authors.pl
+  Finish the recent.pl file and maybe replace the populate.pl by using recent.pl
 
+  When a request arrives to /dist/XYZ and XYZ is not in our database
+  we can fetch http://search.cpan.org/dist/XYZ and add the entry to our 
+  database. In order not to let some random person bombard our server and that
+  in turn that we don't bombard search.cpan.org (though our server will 
+  crash much sooner than search.cpan.org) we can add a list of trusted client
+  ip addresses from the list in the log file. After all very soon most of the
+  correct entries will be added to the database. A trusted ip would be
+  GoogleBot 66.249.66.3, msnbot 65.55.213.74, inktomisearch and similar
+  
+  
 
   Cleanup the schema. Currently the schema/schema.sql is not the same as the
   schema used in the live application.

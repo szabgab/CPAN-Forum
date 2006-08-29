@@ -2,4 +2,7 @@ User-agent: *
 Disallow: /mypan/
 Disallow: /new_post/
 Disallow: /admin/
+Disallow: /rss/dist/
+Disallow: /rss/author/
+Disallow: /rss/user/
 
