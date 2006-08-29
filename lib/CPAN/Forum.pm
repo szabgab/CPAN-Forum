@@ -833,12 +833,16 @@ sub load_tmpl {
     return $t;
 }
 
+=head2 login
 
+Show the login form and possibly some error messages.
+
+=cut
 sub login {
     my ($self, $errs) = @_;
     my $q = $self->query;
 
-    $self->log->debug("Sending cookie using sid:  " . ($self->session->id() || ""));
+    $self->log->debug("Sending cookie using sid:  " . $self->session->id());
     $self->session_cookie();
     my $t = $self->load_tmpl(
             "login.tmpl",
@@ -942,9 +946,14 @@ sub logout {
 }
 
 
+=head2 register
+
+Show the registration page and possibly some error messages.
+
+=cut
+
 sub register {
-    my $self = shift;
-    my $errs = shift;
+    my ($self, $errs) = @_;
     my $q = $self->query;
 
     my $t = $self->load_tmpl(
@@ -956,6 +965,12 @@ sub register {
     return $t->output;
 }
 
+
+=head2 register_process
+
+Process the registration form.
+
+=cut
 
 sub register_process {
     my ($self) = @_;
@@ -974,20 +989,11 @@ sub register_process {
     if ($q->param('email') !~ /^[a-z0-9_+@.-]+$/) {  
         return $self->register({"bad_email" => 1});
     }
-
-    #if ($q->param('fname') !~ /^[a-zA-Z]*$/) {
-    #   return $self->register({"bad_fname" => 1});
-    #}
-    #if ($q->param('lname') !~ /^[a-zA-Z]*$/) {
-    #   return $self->register({"bad_lname" => 1});
-    #}
-    
+   
     my $user = eval {
         CPAN::Forum::Users->create({
                 username => $q->param('nickname'),
                 email    => $q->param('email'),
-    #           fname    => $q->param('fname'),
-    #           lname    => $q->param('lname'),
             });
     };
     if ($@) {
@@ -1027,6 +1033,12 @@ MSG
     $self->_my_sendmail(%mail);
 }
 
+=head2 notify_admin
+
+Notify the administrator about a new registration
+
+=cut
+
 sub notify_admin {
     my ($self, $user) = @_;
 
@@ -1046,6 +1058,11 @@ sub notify_admin {
     $self->_my_sendmail(%mail);
 }
 
+=head2 pwreminder
+
+Show form to ask for password reminder e-mail
+
+=cut
 sub pwreminder {
     my ($self, $errs) = @_;
     my $q = $self->query;
@@ -1060,6 +1077,12 @@ sub pwreminder {
     return $t->output;
 }
 
+
+=head2 pwreminder_process
+
+Process the request to get a reminder about the password.
+
+=cut
 
 sub pwreminder_process {
     my ($self) = @_;
@@ -1148,9 +1171,21 @@ sub _group_selector {
 }
 
 
+=head2 new_post
+
+Showing the new post page. (Alias of C<posts()>)
+
+=cut
+
 sub new_post {
     posts(@_);
 }
+
+=head2 response_form
+
+Showing the response form. (Alias of C<posts()>)
+
+=cut
 
 sub response_form {
     posts(@_);
@@ -2324,8 +2359,8 @@ sub fetch_subscriptions {
     $self->_sendmail($it, $mail, \%to);
 
     # People who asked for all the posts in this PAUSEID
-    #$it = CPAN::Forum::Subscriptions_pauseid->search(allposts => 1, pauseid => $post->gid->pauseid);
-    #$self->_sendmail($it, $mail, \%to);
+    $it = CPAN::Forum::Subscriptions_pauseid->search(allposts => 1, pauseid => $post->gid->pauseid);
+    $self->_sendmail($it, $mail, \%to);
 
     if ($post->thread == $post->id) { 
         $self->log->debug("Processing messages for thread starter");
@@ -2339,8 +2374,8 @@ sub fetch_subscriptions {
         $self->_sendmail($it, $mail, \%to);
 
         # People who are subscribed to the thread startes of this PAUSEID
-        #$it = CPAN::Forum::Subscriptions_pauseid->search(starters => 1, pauseid => $post->gid->pauseid);
-        #$self->_sendmail($it, $mail, \%to);
+        $it = CPAN::Forum::Subscriptions_pauseid->search(starters => 1, pauseid => $post->gid->pauseid);
+        $self->_sendmail($it, $mail, \%to);
     }
     else {
         $self->log->debug("Processing messages for followups");
@@ -2359,8 +2394,8 @@ sub fetch_subscriptions {
         $it = CPAN::Forum::Subscriptions->search(followups => 1, gid => $post->gid->id);
         $self->_sendmail($it, $mail, \%to, \%uids);
         
-        #$it = CPAN::Forum::Subscriptions_pauseid->search(followups => 1, pauseid => $post->gid->pauseid);
-        #$self->_sendmail($it, $mail, \%to);
+        $it = CPAN::Forum::Subscriptions_pauseid->search(followups => 1, pauseid => $post->gid->pauseid);
+        $self->_sendmail($it, $mail, \%to);
     }
 }
 

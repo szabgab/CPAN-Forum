@@ -62,6 +62,34 @@ sub read_config {
     }
     is($session_files[0], "/tmp/cgisess_$cookie");
 
+    # submit form without values
+    $w_admin->submit_form();
+    $w_admin->content_like(qr{Need both nickname and password.});
+
+    is($w_admin->cookie_jar->as_string, $cookie_jar);
+    #diag $w_admin->cookie_jar->as_string;
+
+    # submit form without password
+    $w_admin->submit_form(
+        fields => {
+            nickname => $config{username},
+        },
+    );
+    $w_admin->content_like(qr{Need both nickname and password.});
+    $w_admin->content_like(qr{$config{username}});
+
+    # submit form with bad password
+    $w_admin->submit_form(
+        fields => {
+            nickname => $config{username},
+            password => 'bad_assword',
+        },
+    );
+    $w_admin->content_like(qr{Login failed.});
+    $w_admin->content_like(qr{$config{username}});
+    $w_admin->content_unlike(qr{bad_password});
+
+
     $w_admin->submit_form(
         fields => {
             nickname => $config{username},
@@ -69,15 +97,16 @@ sub read_config {
         },
     );
     $w_admin->content_like(qr{You are logged in as.*$config{username}});
-    is($w_admin->cookie_jar->as_string, $cookie_jar);
-    #diag $w_admin->cookie_jar->as_string;
-    BEGIN { $tests += 10; }
+    BEGIN { $tests += 16; }
 }
+
+
 {
     my @session_files = glob "/tmp/cgisess_*";
     is (@session_files, 1);
     BEGIN { $tests += 1; }
 }
+
 
 {
     my $user = CPAN::Forum::Test::register_user(0);
@@ -249,7 +278,7 @@ my $input_ref2;
     check_form($form, $input_ref2);
     # TODO: check it in the database as well....    
 
-    BEGIN { $tests += (4 + (@input_fields+3)*2) }
+    BEGIN { $tests += (4 + (@input_fields+6)*2) }
 }
 
 
