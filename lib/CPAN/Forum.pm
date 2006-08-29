@@ -1723,7 +1723,7 @@ sub users {
     $t->param(title => "Information about $username");
 
     my $page = $q->param('page') || 1;
-    $self->_search_results($t, {where => {uid => $username}, page => $page});
+    $self->_search_results($t, {where => {uid => $user->id}, page => $page});
     $t->output;
 }
 
