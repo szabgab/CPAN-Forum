@@ -34,7 +34,7 @@ sub author {
     # TODO: simplify query!
     my @group_ids = map {$_->id}
                     CPAN::Forum::Groups->search( pauseid => $author->id );
-    $self->log->warning("Group IDs: @group_ids");
+    $self->log->debug("Group IDs: @group_ids");
     my $page = $q->param('page') || 1;
     $self->_search_results($t, {where => {gid => \@group_ids}, page => $page});
     #$self->_subscriptions($t, $gr);

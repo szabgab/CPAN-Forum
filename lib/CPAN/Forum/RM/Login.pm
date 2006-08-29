@@ -113,5 +113,72 @@ sub logout {
     $self->home;
 }
 
+=head2 pwreminder
+
+Show form to ask for password reminder e-mail
+
+=cut
+sub pwreminder {
+    my ($self, $errs) = @_;
+    my $q = $self->query;
+
+    my $t = $self->load_tmpl(
+            "pwreminder.tmpl",
+            associate => $q,
+    );
+
+    $t->param($errs) if $errs;
+    $t->param($q->param('field') => 1) if $q->param('field') and $q->param('field') =~ /^username|email$/;
+    return $t->output;
+}
+
+
+=head2 pwreminder_process
+
+Process the request to get a reminder about the password.
+
+=cut
+
+sub pwreminder_process {
+    my ($self) = @_;
+    my $q = $self->query;
+    my $field = $q->param('field');
+    if (not $field or $field !~ /^username|email$/ or not $q->param('value')) {
+        return $self->pwreminder({"no_data" => 1});
+    }
+
+    my ($user) = CPAN::Forum::Users->search({$field => $q->param('value')});
+    return $self->pwreminder({"no_data" => 1}) if not $user;
+
+    # TODO: put this text in a template
+    my $password = $user->password;
+    my $username = $user->username;
+    my $subject = "CPAN::Forum password reminder";
+    my $message = <<MSG;
+
+Your nickname is $username
+Your secret key to CPAN::Forum is: $password
+Use it wisely.
+
+http://$ENV{HTTP_HOST}/
+
+
+MSG
+
+    my $FROM = $self->config("from");
+    $self->log->debug("FROM field set to be $FROM");
+
+    my %mail = (
+        To       => $user->email,
+        From     => $FROM,
+        Subject  => $subject,
+        Message  => $message,
+    );
+    $self->_my_sendmail(%mail);
+
+    return $self->pwreminder({"done" => 1});
+}
+
+
 1;
 

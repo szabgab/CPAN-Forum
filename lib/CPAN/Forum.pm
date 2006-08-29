@@ -536,12 +536,37 @@ my @urls = qw(
     mypan selfconfig 
     search all rss); 
 
+use base 'CPAN::Forum::RM::Author';
+use base 'CPAN::Forum::RM::Dist';
+use base 'CPAN::Forum::RM::Login';
+use base 'CPAN::Forum::RM::Users';
+use base 'CPAN::Forum::RM::Admin';
+use base 'CPAN::Forum::RM::Other';
+use base 'CPAN::Forum::RM::Subscriptions';
 my %RM_MAP = (
-    author        => 'CPAN::Forum::RM::Author',
-    dist          => 'CPAN::Forum::RM::Dist',
-    login         => 'CPAN::Forum::RM::Login',
-    login_process => 'CPAN::Forum::RM::Login',
-    logout        => 'CPAN::Forum::RM::Login',
+    author                  => 'CPAN::Forum::RM::Author',
+
+    dist                    => 'CPAN::Forum::RM::Dist',
+
+    login                   => 'CPAN::Forum::RM::Login',
+    login_process           => 'CPAN::Forum::RM::Login',
+    logout                  => 'CPAN::Forum::RM::Login',
+    pwreminder              => 'CPAN::Forum::RM::Login',
+    pwreminder_process      => 'CPAN::Forum::RM::Login',
+
+    users                   => 'CPAN::Forum::RM::Users',
+
+    admin                   => 'CPAN::Forum::RM::Admin',
+    admin_process           => 'CPAN::Forum::RM::Admin',
+    admin_edit_user         => 'CPAN::Forum::RM::Admin',
+    admin_edit_user_process => 'CPAN::Forum::RM::Admin',
+
+    faq                     => 'CPAN::Forum::RM::Other',
+    about                   => 'CPAN::Forum::RM::Other',
+    stats                   => 'CPAN::Forum::RM::Other',
+
+    mypan                   => 'CPAN::Forum::RM::Subscriptions',
+    update_subscription     => 'CPAN::Forum::RM::Subscriptions',
 );
 
 =head2 setup
@@ -580,7 +605,11 @@ sub cgiapp_prerun {
     my $rm = $self->_set_run_mode();
     if ($RM_MAP{$rm}) {
         ## no critic (ProhibitStringyEval)
-        eval "use base $RM_MAP{$rm}";
+        $self->log->debug("Loading $RM_MAP{$rm}");
+        #eval "use base $RM_MAP{$rm}";
+        #if ($@) {
+        #    $self->log->critical("Could not load $RM_MAP{$rm}: $@");
+        #}
     }
 
     $self->log->debug("Current runmode:  $rm");
@@ -724,7 +753,6 @@ sub build_listing {
             subject      => _subject_escape($post->subject), 
             id           => $post->id, 
             group        => $post->gid->name, 
-            #dashgroup    => $dashgroup,
             thread       => ($thread_count > 1 ? 1 : 0),
             thread_id    => $post->thread,
             thread_count => $thread_count-1,
@@ -733,56 +761,7 @@ sub build_listing {
             postername   => $post->uid->username,
             };
     }
-    #@resp = reverse @resp if $to; # Otherwise we fetched in DESC order
     return \@resp;
-}
-
-
-=head2 about
-
-About box with some statistics.
-
-=cut
-
-sub about {
-    my $self = shift;
-    my $t = $self->load_tmpl("about.tmpl");
-    
-    $t->param(distro_cnt        => CPAN::Forum::Groups->count_all());
-    $t->param(posts_cnt         => CPAN::Forum::Posts->count_all());
-    $t->param(users_cnt         => CPAN::Forum::Users->count_all());
-    $t->param(subscription_cnt  => CPAN::Forum::Subscriptions->count_all());
-    $t->param(version           => $VERSION);
-    # number of posts per group name, can create some xml feed from it that can
-    # be used by search.cpan.org and Kobes to add a number of posts next to the link
-    #select count(*),groups.name from posts, groups where groups.id=gid group by gid;
-    #
-    #count posts for a specific group:
-    #select count(*) from posts, groups where groups.id=gid and groups.name="CPAN-Forum";
-
-    $t->output;
-}
-
-=head2 stats
-
-The stats run-mode showing some statistics
-(actually the 50 busiest groups)
-
-=cut
-
-sub stats {
-    my $self = shift;
-    my $t = $self->load_tmpl("stats.tmpl");
-    my @entries = CPAN::Forum::Posts->search_stat_posts(50);
-    
-    $t->param(entries => \@entries);
-    $t->output;
-}
-
-sub faq {
-    my $self = shift;
-    my $t = $self->load_tmpl("faq.tmpl");
-    $t->output;
 }
 
 sub error {
@@ -956,72 +935,6 @@ sub notify_admin {
         Message => $msg,
     );
     $self->_my_sendmail(%mail);
-}
-
-=head2 pwreminder
-
-Show form to ask for password reminder e-mail
-
-=cut
-sub pwreminder {
-    my ($self, $errs) = @_;
-    my $q = $self->query;
-
-    my $t = $self->load_tmpl(
-            "pwreminder.tmpl",
-            associate => $q,
-    );
-
-    $t->param($errs) if $errs;
-    $t->param($q->param('field') => 1) if $q->param('field') and $q->param('field') =~ /^username|email$/;
-    return $t->output;
-}
-
-
-=head2 pwreminder_process
-
-Process the request to get a reminder about the password.
-
-=cut
-
-sub pwreminder_process {
-    my ($self) = @_;
-    my $q = $self->query;
-    my $field = $q->param('field');
-    if (not $field or $field !~ /^username|email$/ or not $q->param('value')) {
-        return $self->pwreminder({"no_data" => 1});
-    }
-
-    my ($user) = CPAN::Forum::Users->search({$field => $q->param('value')});
-    return $self->pwreminder({"no_data" => 1}) if not $user;
-
-    # TODO: put this text in a template
-    my $password = $user->password;
-    my $username = $user->username;
-    my $subject = "CPAN::Forum password reminder";
-    my $message = <<MSG;
-
-Your nickname is $username
-Your secret key to CPAN::Forum is: $password
-Use it wisely.
-
-http://$ENV{HTTP_HOST}/
-
-
-MSG
-
-    my $FROM = $self->config("from");
-    $self->log->debug("FROM field set to be $FROM");
-
-    my %mail = (
-        To       => $user->email,
-        From     => $FROM,
-        Subject  => $subject,
-        Message  => $message,
-    );
-    $self->_my_sendmail(%mail);
-
-    return $self->pwreminder({"done" => 1});
 }
 
 
@@ -1515,59 +1428,6 @@ sub _subscriptions {
     }
 }
 
-
-
-=head2 users
-
-List the posts of a particular user.
-
-=cut
-
-sub users {
-    my $self = shift;
-    
-    my $q = $self->query;
-
-    my $username="";
-    $username = ${$self->param("path_parameters")}[0];
-
-    if (not $username) {
-        return $self->internal_error(
-            "No username: PATH_INFO: $ENV{PATH_INFO}",
-            );
-    }
-
-    my $t = $self->load_tmpl("users.tmpl",
-        loop_context_vars => 1,
-        global_vars => 1,
-    );
-                
-    $t->param(hide_username => 1);
-
-    my ($user) = CPAN::Forum::Users->search(username => $username);
-
-    if (not $user) {
-        return $self->internal_error(
-            "Non existing user was accessed: $ENV{PATH_INFO}",
-            );
-    }
-
-
-    my $fullname = "";
-    $fullname .= $user->fname if $user->fname;
-    $fullname .= " " if $fullname;
-    $fullname .= $user->lname if $user->lname;
-    #$fullname = $username if not $fullname;
-
-    $t->param(this_username => $username);
-    $t->param(this_fullname => $fullname);
-    $t->param(title => "Information about $username");
-
-    my $page = $q->param('page') || 1;
-    $self->_search_results($t, {where => {uid => $user->id}, page => $page});
-    $t->output;
-}
-
 sub selfconfig {
     my ($self, $errs) = @_;
     my $t = $self->load_tmpl("change_password.tmpl");
@@ -1615,256 +1475,6 @@ sub change_password {
     return $self->selfconfig({done => 1});
 
 }
-
-=head2 mypan
-
-Manage the notify subscription.
-
-Creates checkboxes, the names of the checkboxes start with
-the subscription mode:
-
-  allposts_   - every post
-  starters_   - every time a new thread is started
-  followups_  - every time there is a post where the user has already posted
-
-The names are the followed wit one of the following:
-
-  _all      - all the modules
-  _NNN      - Where NNN is the id number of an author
-  NNN       - where NNN is the id number of a group (distribution) 
-
-The gids field contains the comma separated list of all the postfixes.
-
-(Yes the difference between the two types of id is the extra _ only.)
-
-C<update_subscription> will process the submitted form.
-
-=cut
-
-sub mypan {
-    my $self = shift;
-
-    my $t = $self->load_tmpl("mypan.tmpl",
-        loop_context_vars => 1,
-    );
-    my $username = $self->session->param("username");
-    my ($user) = CPAN::Forum::Users->search(username => $username);
-
-    if (not $user) {
-        return $self->internal_error(
-            "Trouble accessing personal information of: '$username' $ENV{PATH_INFO}",
-            );
-    }
-    my $fullname = "";
-    $fullname .= $user->fname if $user->fname;
-    $fullname .= " " if $fullname;
-    $fullname .= $user->lname if $user->lname;
-
-    $t->param(fullname => $fullname);
-    $t->param(title    => "Information about $username");
-
-    my @params = @{$self->param("path_parameters")};
-    my @subscriptions;
-    my $gids;
-
-
-    if (@params == 2 and $params[0] eq "dist") { # specific distribution
-        my $group = $params[1];
-        my ($grp) = CPAN::Forum::Groups->search(name => $group);
-        if (not $grp) {
-            return $self->internal_error(
-                "Accessing $ENV{PATH_INFO}\n",
-            );
-        }
-        $gids = $grp->id;
-        my ($s) = CPAN::Forum::Subscriptions->search(uid => $user->id, gid => $grp->id);
-        if ($s) {
-            push @subscriptions, {
-                gid       => $grp->id,
-                group     => $group,
-                allposts  => $s->allposts,
-                starters  => $s->starters,
-                followups => $s->followups,
-            };
-                
-        } else {
-            push @subscriptions, {
-                gid       => $grp->id,
-                group     => $group,
-                allposts  => 0,
-                starters  => 0,
-                followups => 0,
-            };
-        }
-    } else { # show all subscriptions
-        my ($s) = CPAN::Forum::Subscriptions_all->search(uid => $user->id);
-        $self->log->debug("all subscriptions " . ($s ? "found" : "not found"));
-        push @subscriptions, {
-            gid       => "_all",
-            group     => "All",
-            allposts  => $s ? $s->allposts  : '',
-            starters  => $s ? $s->starters  : '',
-            followups => $s ? $s->followups : '',
-        };
-        $gids = "_all";
-
-        my $it = CPAN::Forum::Subscriptions_pauseid->search(uid => $user->id);
-        while (my $s = $it->next) {
-            $gids .= ($gids ? ",_" : "_") . $s->pauseid->id; 
-            push @subscriptions, {
-                gid       => "_" . $s->pauseid->id,
-                group     => $s->pauseid->pauseid,
-                allposts  => $s->allposts,
-                starters  => $s->starters,
-                followups => $s->followups,
-            };
-        }
-
-        $it = CPAN::Forum::Subscriptions->search(uid => $user->id);
-        while (my $s = $it->next) {
-            $gids .= ($gids ? "," : "") . $s->gid->id; 
-            push @subscriptions, {
-                gid       => $s->gid,
-                group     => $s->gid->name,
-                allposts  => $s->allposts,
-                starters  => $s->starters,
-                followups => $s->followups,
-            };
-        }
-    }
-
-    $t->param(subscriptions => \@subscriptions);
-    $t->param(gids => $gids);
-
-    $t->output;
-}
-
-=head2 update_subscription
-
-Process the submitted form created by C<mypan()>
-
-=cut
-sub update_subscription {
-    my $self = shift;
-    my $q = $self->query;
-    
-    my @gids = split /,/, $q->param("gids");
-    if (not @gids) {
-        return $self->internal_error();
-    }
-
-    my $username = $self->session->param("username");
-    my ($user) = CPAN::Forum::Users->search(username => $username);
-
-    foreach my $gid (@gids) {
-        if ($gid eq "_all") {
-            my ($s) = CPAN::Forum::Subscriptions_all->search(uid => $user->id);
-            if (not $s) {
-                $s = CPAN::Forum::Subscriptions_all->create({
-                    uid       => $user->id,
-                });
-            }
-            $self->_update_subs($s, $gid);
-        } elsif ($gid =~ /^_(\d+)$/) {
-            my $pauseid = $1;
-            my ($s) = CPAN::Forum::Subscriptions_pauseid->search(pauseid => $pauseid, uid => $user->id);
-            if (not $s) {
-                $s = CPAN::Forum::Subscriptions->create({
-                    uid       => $user->id,
-                    pauseid   => $pauseid,
-                });
-            }
-            $self->_update_subs($s, $gid);
-        } elsif ($gid =~ /^(\d+)$/) {
-            my ($s) = CPAN::Forum::Subscriptions->search(gid => $gid, uid => $user->id);
-            if (not $s) {
-                $s = CPAN::Forum::Subscriptions->create({
-                    uid       => $user->id,
-                    gid       => $gid,
-                });
-            }
-            $self->_update_subs($s, $gid);
-        } else {
-            $self->log->error("Invalid gid: '$gid' provided in the gids entry of mypan");
-            # shall we show an error page here?
-        }
-    }
-    
-    # if there is not name, no need for further processing
-    if (not $q->param("name")) {
-        return $self->notes("mypanok");
-    }
-
-    # TODO: error messages in case not all the values were filled in correctly
-    # process new entry
-    if (not $q->param("type")) {
-        return $self->note("no_subs_type");
-    }
-
-    # TODO: if there is a subscription to the given distro or PAUSEID
-    # we should not let the user overwrite it using the new entry box
-    if ($q->param("type") eq "pauseid") {
-        my $pauseid = uc $q->param("name");
-        my ($author) = CPAN::Forum::Authors->search(pauseid => $pauseid);
-        if ($author) {
-            my $s = CPAN::Forum::Subscriptions_pauseid->find_or_create({
-                uid       => $user->id,
-                pauseid   => $author->id,
-            });
-            $self->_update_subs($s, "_new");
-        } else {
-            return $self->notes("no_such_pauseid");
-        }
-    }
-    elsif ($q->param("type") eq "distro") {
-        my $name = $q->param("name");
-        $name =~ s/::/-/g;  
-        my ($grp) = CPAN::Forum::Groups->search(name => $name);
-        if ($grp) {
-            my $s = CPAN::Forum::Subscriptions->find_or_create({
-                uid       => $user->id,
-                gid       => $grp->id,
-            });
-            $self->_update_subs($s, "_new");
-        } else {
-            return $self->notes("no_such_group");
-        }
-    }
-    else {
-        return $self->internal_error("", "invalid_subs_type");
-    }
-
-    return $self->notes("mypanok");
-}
-
-=head2 _update_subs
-
-Given a subscription obkect (1 out of 3 possible classes)
-and a gid (_all, _NNN or NNN) fetches the relevan checkboxes 
-(See C<mypan()> for details) and update the subscription object.
-
-=cut
-sub _update_subs {
-    my ($self, $s, $gid) = @_;
-    my $q = $self->query;
-
-    my $on = 0;
-    foreach my $type (qw(allposts starters followups)) {
-        if (defined $q->param($type ."_$gid") and $q->param($type . "_$gid") eq "on") {
-            $s->set($type, 1);
-            $on++;
-        } else {
-            $s->set($type, 0);
-        }
-    }
-    if ($on) {
-        return $s->update;
-    }
-    else {
-        return $s->delete;   # remove the whole line if there are no subscriptions at all.
-    }
-}
-
 
 
 sub module_search {
@@ -1995,95 +1605,6 @@ sub add_new_group {
     $t->param(updated => 1);
     $t->output;
 }
-
-sub admin_edit_user_process {
-    my ($self) = @_;
-    if (not $self->session->param("admin")) {
-        return $self->internal_error("", "restricted_area");
-    }
-    my $q = $self->query;
-    my $email = $q->param('email');
-    my $uid   = $q->param('uid'); # TODO error checking here !
-
-    $self->log->debug("admin_edit_user_process uid: '$uid'");
-    my ($person) = CPAN::Forum::Users->retrieve($uid);
-    if (not $person) {
-        return $self->internal_error("", "no_such_user");
-    }
-    $person->email($email);
-    $person->update;
-
-    $self->admin_edit_user($person->username, ['done']);
-}
-
-sub admin_edit_user {
-    my ($self, $username, $errors) = @_;
-    if (not $self->session->param("admin")) {
-        return $self->internal_error("", "restricted_area");
-    }
-    my $q = $self->query;
-    if (not $username) {
-        $username = ${$self->param("path_parameters")}[0] || '';
-    }
-    $self->log->debug("admin_edit_user username: '$username'");
-
-    my ($person) = CPAN::Forum::Users->search(username => $username);
-    if (not $person) {
-        return $self->internal_error("", "no_such_user");
-    }
-
-    my $t = $self->load_tmpl("admin_edit_user.tmpl");
-    $t->param(this_username => $username);
-    $t->param(email => $person->email);
-    $t->param(uid   => $person->id);
-
-    if ($errors and ref($errors) eq "ARRAY") {
-        $t->param($_ => 1) foreach @$errors;
-    }
-
-    $t->output;
-
-}
-
-sub admin_process {
-    my ($self) = @_;
-    if (not $self->session->param("admin")) {
-        return $self->internal_error("", "restricted_area");
-    }
-    my $q = $self->query;
-
-    # fields that can have only one value
-    foreach my $field (qw(rss_size per_page from flood_control_time_limit )) {
-        if (my ($conf) = CPAN::Forum::Configure->find_or_create({field => $field})) {
-            $conf->value($q->param($field));
-            $conf->update;
-        }
-    }
-
-    $self->status($q->param('status'));
-    
-
-    my $t = $self->load_tmpl("admin.tmpl");
-    $t->param(updated => 1);
-    $t->output;
-}
-
-
-sub admin {
-    my ($self) = @_;
-    if (not $self->session->param("admin")) {
-        return $self->internal_error("", "restricted_area");
-    }
-    my %data;
-    foreach my $c (CPAN::Forum::Configure->retrieve_all()) {
-        $data{$c->field} = $c->value;
-    }
-    my $t = $self->load_tmpl("admin.tmpl");
-    $t->param("status_" . $self->status() => 1);
-    $t->param(%data);
-    $t->output;
-}
-
 =head2 rss
 
 Provide RSS feed
@@ -2419,6 +1940,9 @@ sub process_missing_dist {
 }
 
 
+sub version {
+    return $VERSION;
+}
 
 
 1;
