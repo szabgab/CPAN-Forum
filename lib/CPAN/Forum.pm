@@ -990,7 +990,6 @@ sub notify_admin {
 
     my $FROM = $self->config("from");
 
-    #my $msg = "\nUsername: " . $user->username . "\nName: " . $user->fname . " " . $user->lname . "\n"; 
     my $msg = "\nUsername: " . $user->username . "\n"; 
 
     # TODO: the admin should be able to configure if she wants to get messages on
@@ -1366,7 +1365,7 @@ sub process_post {
             );
     }
 
-    my $pid;
+    my $post_id;
     my $username = $self->session->param("username");
     my ($user) = CPAN::Forum::Users->search({ username => $username });
     if (not $user) {
@@ -1383,7 +1382,7 @@ sub process_post {
         $post->thread($parent_post ? $parent_post->thread : $post->id);
         $post->parent($parent) if $parent_post;
         $post->update;
-        $pid = $post->id;
+        $post_id = $post->id;
     };
     if ($@) {
         #push @errors, "subject_too_long" if $@ =~ /subject_too_long/;
@@ -1395,7 +1394,7 @@ sub process_post {
         return $self->posts(\@errors);
     }
     
-    $self->notify($pid);
+    $self->notify($post_id);
 
     $self->home;
 }
@@ -2231,12 +2230,10 @@ Send out e-mails upon receiving a submission.
 =cut
 
 sub notify {
-    my $self = shift;
-    my $post_id = shift;
+    my ($self, $post_id) = @_;
     
     my $post = CPAN::Forum::Posts->retrieve($post_id);
 
-    #   Subject  => '[CPAN Forum] ' . $post->subject,
     my $message = 
         _text2mail ($post->text) .
         "\n\n" .
@@ -2256,65 +2253,84 @@ sub notify {
 
     my $FROM = $self->config("from");
     $self->log->debug("FROM field set to be $FROM");
-    my $admin = CPAN::Forum::Users->retrieve(1);
-    # send all messages to Admin, this shuld be configurabele
     my %mail = (
-        To       => $admin->email,
         From     => $FROM,
         Subject  => $subject,
         Message  => $message,
     );
-    #$self->_my_sendmail(%mail);
 
 
+    $self->fetch_subscriptions(\%mail, $post);
+}
 
-    my %to;
+sub fetch_subscriptions {
+    my ($self, $mail, $post) = @_;
+
+    my %to; # keys are e-mail addresses that have already received an e-mail
+
     # subscriptions to "all" messages in the current group
     $self->log->debug("Processing messages for allposts");
-    my $it = CPAN::Forum::Subscriptions->search(allposts => 1, gid => $post->gid);
-    $self->_sendmail($it, \%mail, \%to);
-    $it = CPAN::Forum::Subscriptions_all->search(allposts => 1);
-    $self->_sendmail($it, \%mail, \%to);
-    #$self->log->debug("Post PAUSEID: " . $post->gid->pauseid);
-    #$it = CPAN::Forum::Subscriptions_pauseid->search(allposts => 1, pauseid => $post->gid->pauseid);
-    #$self->_sendmail($it, \%mail, \%to);
 
-    # subscription to thread "starters" in the current group
+    my $it;
+
+    # People who asked for all the posts
+    $it = CPAN::Forum::Subscriptions_all->search(allposts => 1);
+    $self->_sendmail($it, $mail, \%to);
+
+    # People who asked for all the posts in this group
+    $it = CPAN::Forum::Subscriptions->search(allposts => 1, gid => $post->gid);
+    $self->_sendmail($it, $mail, \%to);
+
+    # People who asked for all the posts in this PAUSEID
+    #$it = CPAN::Forum::Subscriptions_pauseid->search(allposts => 1, pauseid => $post->gid->pauseid);
+    #$self->_sendmail($it, $mail, \%to);
+
     if ($post->thread == $post->id) { 
         $self->log->debug("Processing messages for thread starter");
-        my $it = CPAN::Forum::Subscriptions->search(starters => 1, gid => $post->gid->id);
-        $self->_sendmail($it, \%mail, \%to);
+
+        # People who are subscribed to all thread starters
         $it = CPAN::Forum::Subscriptions_all->search(starters => 1);
-        $self->_sendmail($it, \%mail, \%to);
-    } else {
+        $self->_sendmail($it, $mail, \%to);
+
+        # People who are subscribed to the thread startes in this group
+        $it = CPAN::Forum::Subscriptions->search(starters => 1, gid => $post->gid->id);
+        $self->_sendmail($it, $mail, \%to);
+
+        # People who are subscribed to the thread startes of this PAUSEID
+        #$it = CPAN::Forum::Subscriptions_pauseid->search(starters => 1, pauseid => $post->gid->pauseid);
+        #$self->_sendmail($it, $mail, \%to);
+    }
+    else {
         $self->log->debug("Processing messages for followups");
-        my %ids; # of users who posted in this thread
+
+        # Collect the users who posted in this thread
+        my %uids;
         my $pit = CPAN::Forum::Posts->search(thread => $post->thread);
         while (my $p = $pit->next) {
-            $ids{$p->uid}=1;
+            $uids{$p->uid}=1;
             $self->log->debug("Ids: " . $p->uid);
         }
         
-        my $it = CPAN::Forum::Subscriptions->search(followups => 1, gid => $post->gid->id);
-        $self->_sendmail($it, \%mail, \%to, \%ids);
-        # uid => is one of the uids in the current thread.
         $it = CPAN::Forum::Subscriptions_all->search(followups => 1);
-        $self->_sendmail($it, \%mail, \%to, \%ids);
-        
-    }
+        $self->_sendmail($it, $mail, \%to, \%uids);
 
-    # subscriptions 
+        $it = CPAN::Forum::Subscriptions->search(followups => 1, gid => $post->gid->id);
+        $self->_sendmail($it, $mail, \%to, \%uids);
+        
+        #$it = CPAN::Forum::Subscriptions_pauseid->search(followups => 1, pauseid => $post->gid->pauseid);
+        #$self->_sendmail($it, $mail, \%to);
+    }
 }
 
 sub _sendmail {
-    my ($self, $it, $mail, $to, $ids) = @_;
+    my ($self, $it, $mail, $to, $uids) = @_;
 
     while (my $s = $it->next) {
         my $email = $s->uid->email;
         $self->log->debug("Sending to $email ?");
         $mail->{To} = $email;
-        $self->log->debug("Processing uid: " . $s->uid->username) if $ids;
-        next if $ids and not $ids->{$s->uid->username};
+        $self->log->debug("Processing uid: " . $s->uid->username) if $uids;
+        next if $uids and not $uids->{$s->uid->username};
         $self->log->debug("Sending to $email id was found");
         next if $_[2]->{$email}++;
         $self->log->debug("Sending to $email first time sending");
