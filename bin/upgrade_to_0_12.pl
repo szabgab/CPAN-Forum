@@ -102,4 +102,14 @@ CREATE TABLE posts (
 			date             TIMESTAMP
 );
 
+CREATE TABLE subscriptions_pauseid (
+			id               INTEGER PRIMARY KEY,
+			uid              INTEGER NOT NULL,
+			pauseid          INTEGER NOT NULL,
+			allposts         BOOLEAN,
+			starters         BOOLEAN,
+			followups        BOOLEAN,
+			announcements    BOOLEAN
+);
+
 

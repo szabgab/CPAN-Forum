@@ -151,6 +151,7 @@ sub read_config {
 
     BEGIN { $tests += 6; }
 }
+
 {
     $w_user->get_ok($url);
     $w_user->content_like(qr{CPAN Forum});

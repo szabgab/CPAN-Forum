@@ -1,6 +1,11 @@
 
 v0.12 
 
+  Add /author/PAUSEID to show all posts related to modules maintained by
+  PAUSEID
+
+  Move some of the run modues to be in the CPAN::Forum::RM namespace.
+
   Add large button on dist page to start a new post.
 
   Added process_missing_dist that will automatically add distributions
