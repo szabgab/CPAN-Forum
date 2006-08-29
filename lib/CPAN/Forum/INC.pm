@@ -1,4 +1,6 @@
 package CPAN::Forum::INC;
+use strict;
+use warnings;
 
 use CPAN::Forum;
 use CPAN::Forum::Markup;

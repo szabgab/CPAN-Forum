@@ -5,6 +5,12 @@ use warnings;
 use CGI qw();
 use Parse::RecDescent;
 
+=head2 new
+
+Create the markup grammar
+
+=cut
+
 sub new {
     my ($class) = @_;
     my $self = bless {}, $class;
@@ -65,8 +71,14 @@ sub new {
 
 
 
-# takes a string
-# makes sure every line is max N characters long
+=head2 split_rows
+
+Takes a string and a number N.
+
+Makes sure every line is max N characters long in it
+
+=cut
+
 sub split_rows {
     my ($text, $N) = @_;
     $N ||= 100;
@@ -90,10 +102,23 @@ sub split_rows {
     return join "\n", @new;
 }
 
+=head2 parser
+
+Run the Parse::RecDescent parser
+
+=cut
+
 sub parser {
     my ($self) = @_;
     return Parse::RecDescent->new($self->{grammar});
 }
+
+=head2 posting_process
+
+The external interface, received a TEXT 
+and returns the parsed text
+
+=cut
 
 sub posting_process {
     my ($self, $text) = @_;

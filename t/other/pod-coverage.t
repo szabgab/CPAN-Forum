@@ -1,5 +1,20 @@
-use Test::More tests => 1;
-#eval "use Test::Pod::Coverage 0.08";
-#plan skip_all => "Test::Pod::Coverage 0.08 required for testing POD coverage" if $@;
-#all_pod_coverage_ok();
-ok(1);
+use strict;
+use warnings;
+
+use Test::More;
+eval {
+    require Test::Pod::Coverage;
+    import Test::Pod::Coverage;
+};
+plan skip_all => "Test::Pod::Coverage 1.00 required for testing POD coverage" if $@;
+plan tests => 6;
+pod_coverage_ok('CPAN::Forum::Markup');
+TODO: {
+    local $TODO = "Write more documentation";
+    pod_coverage_ok('CPAN::Forum');
+    pod_coverage_ok('CPAN::Forum::Posts');
+    pod_coverage_ok('CPAN::Forum::Groups');
+    pod_coverage_ok('CPAN::Forum::Users');
+    pod_coverage_ok('CPAN::Forum::Configure');
+}
+

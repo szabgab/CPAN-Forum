@@ -403,6 +403,14 @@ Registered users
 
 =cut
 
+=head2 cgiapp_init
+
+ Connect to database
+ Setup logging
+ Setup session
+
+=cut
+
 sub cgiapp_init {
     my $self = shift;
     
@@ -465,7 +473,7 @@ sub _logger {
 sub _set_log_level {
     my ($self) = @_;
 
-    if (open my $fh, $self->param("ROOT") . "/db/log_level") {
+    if (open my $fh, '<', $self->param("ROOT") . "/db/log_level") {
         chomp (my $str = <$fh>);
         $str =~ s/^\s*|\s*$//g;
         if (Log::Dispatch->level_is_valid($str)) {
@@ -477,6 +485,11 @@ sub _set_log_level {
     return 'notice'; 
 }
 
+=head2 config
+
+Given a filed name returns the configuration value from the database
+
+=cut
 
 sub config {
     my ($self, $field) = @_;
@@ -522,6 +535,12 @@ my @urls = qw(
     admin_edit_user
     mypan selfconfig 
     search all rss); 
+
+=head2 setup
+
+Standard CGI::Application method
+
+=cut
 
 sub setup {
     my $self = shift;
@@ -664,9 +683,24 @@ sub _search_results {
     return $pager->total_entries;
 }
 
+
+=head2 all
+
+An alias of the C<home()> run-mode.
+=cut
+
 sub all {
     home(@_);
 }
+
+
+=head2 build_listing
+
+Given a reference to an array of Post objects creates and returns
+a reference to an array that can be used with HTML::Template to
+display the given posts.
+
+=cut
 
 sub build_listing {
     my ($self, $it) = @_;
@@ -716,6 +750,13 @@ sub about {
 
     $t->output;
 }
+
+=head2 stats
+
+The stats run-mode showing some statistics
+(actually the 50 busiest groups)
+
+=cut
 
 sub stats {
     my $self = shift;
@@ -854,13 +895,14 @@ sub login_process {
 
     my $request = $session->param("request") || "home";
     $self->log->debug("Request redirection: '$request'");
-    no strict 'refs';
     my $response;
     eval {
         if ($request eq 'new_post') {
             my $request_group = $session->param("request_group") || '';
             $self->param("path_parameters" => [$request_group]);
         }
+        ## no critic (ProhibitNoStrict)
+        no strict 'refs';
         $response = &$request($self);
     };
     if ($@) {
@@ -1492,7 +1534,7 @@ sub get_rating {
     my ($self, $dist) = @_;
     require Text::CSV_XS;
     my $csv    = Text::CSV_XS->new();
-    open my $fh, "../../db/cpan_ratings.csv" or return;
+    open my $fh, '<', '../../db/cpan_ratings.csv' or return;
     while (my $line = <$fh>) {
         next if $line !~ /^"$dist"/;
         last if not $csv->parse($line);

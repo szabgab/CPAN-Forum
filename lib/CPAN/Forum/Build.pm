@@ -76,7 +76,7 @@ sub copy_tree {
             mkpath $dir or die "Cannot create directory '$dir' $!\n";
     }
 
-    open my $m, "MANIFEST" or die "Could not find the MANIFEST file $!\n";
+    open my $m, '<', 'MANIFEST' or die "Could not find the MANIFEST file $!\n";
     while (my $line = <$m>) {
         next if $line !~ /\S/;
 
@@ -101,13 +101,13 @@ sub copy_tree {
         print "Copying '$file' to '$dir/$file'\n" if $args{verbose};
         copy("$from/$file", "$dir/$file") or die "Could not copy '$from/$file' $!\n";
         #if ($file =~ /pl$/) {
-            chmod 0755, "$dir/$file" or warn "Cannot chmod '$dir/$file' $!\n";
+            chmod oct(755), "$dir/$file" or warn "Cannot chmod '$dir/$file' $!\n";
         #}
     }
 
     if (not -e "$dir/db") {
         mkpath "$dir/db";
-        chmod 0777, "$dir/db";
+        chmod oct(777), "$dir/db";
     }
 }
 
