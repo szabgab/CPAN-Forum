@@ -1652,25 +1652,28 @@ sub dist {
     $self->set_ratings($t, $group_name);
     my $page = $q->param('page') || 1;
     $self->_search_results($t, {where => {gid => $gid}, page => $page});
-    $self->_subscriptions($t, $gid);
+    $self->_subscriptions($t, $gr);
     $t->output;
 }
 
 
 sub _subscriptions {
-    my ($self, $t, $gid) = @_;
+    my ($self, $t, $group) = @_;
+
 
     my %people;
     foreach my $s (
-            CPAN::Forum::Subscriptions->search(gid => $gid),
-            CPAN::Forum::Subscriptions_all->retrieve_all(),
+            CPAN::Forum::Subscriptions_all->search(allposts => 1),
+            CPAN::Forum::Subscriptions_pauseid->search(allposts => 1, pauseid => $group->pauseid),
+            CPAN::Forum::Subscriptions->search(allposts => 1, gid => $group->id),
             ) {
         $people{$s->uid} =  {
             username => $s->uid->username,
         };
     }
     if (%people) {
-        $t->param(users => [values %people]);
+        my @usernames = values %people;
+        $t->param(users => [sort {$a->{username} cmp $b->{username}} @usernames])
     }
 }
 
