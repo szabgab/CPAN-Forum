@@ -21,6 +21,7 @@ my $builder = Module::Build->new(
         'CGI::Application'                      => 3.31,
         'CGI::Application::Plugin::Session'     => 0,
         'CGI::Application::Plugin::LogDispatch' => 0,
+        'CGI::Session'                          => 4.13, # 3. 95 generates some warnings on ->flush
         
 #       'Test::Warn'                            => 0,
 #       'HTML::Lint'                            => 1.26,
