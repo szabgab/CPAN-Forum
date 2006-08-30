@@ -10,10 +10,11 @@ __PACKAGE__->has_a(parent => "CPAN::Forum::DB::Posts");
 __PACKAGE__->has_a(uid    => "CPAN::Forum::DB::Users");
 __PACKAGE__->has_a(gid    => "CPAN::Forum::DB::Groups");
 
-__PACKAGE__->set_sql(latest => "SELECT __ESSENTIAL__ FROM __TABLE__ ORDER BY DATE DESC LIMIT %s");
-__PACKAGE__->set_sql(count_thread => "SELECT count(*) FROM __TABLE__ WHERE thread=%s");
-__PACKAGE__->set_sql(count_where  => "SELECT count(*) FROM __TABLE__ WHERE %s='%s'");
-__PACKAGE__->set_sql(count_like   => "SELECT count(*) FROM __TABLE__ WHERE %s LIKE '%s'");
+__PACKAGE__->set_sql(latest         => "SELECT __ESSENTIAL__ FROM __TABLE__ ORDER BY DATE DESC LIMIT %s");
+__PACKAGE__->set_sql(latest_threads => "SELECT __ESSENTIAL__ FROM __TABLE__ WHERE parent is NULL ORDER BY DATE DESC LIMIT ?");
+__PACKAGE__->set_sql(count_thread   => "SELECT count(*) FROM __TABLE__ WHERE thread=%s");
+__PACKAGE__->set_sql(count_where    => "SELECT count(*) FROM __TABLE__ WHERE %s='%s'");
+__PACKAGE__->set_sql(count_like     => "SELECT count(*) FROM __TABLE__ WHERE %s LIKE '%s'");
 #__PACKAGE__->add_constraint('subject_too_long', subject => sub { length $_[0] <= 70 and $_[0] !~ /</});
 #__PACKAGE__->add_constraint('text_format', text => \&check_text_format);
 __PACKAGE__->set_sql(post_by_pauseid => qq{

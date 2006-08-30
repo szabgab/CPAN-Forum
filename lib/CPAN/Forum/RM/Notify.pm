@@ -77,40 +77,49 @@ Provide RSS feed
 =cut
 
 sub rss {
-    my $self = shift;
-    
-    my $limit  = $self->config("rss_size") || 10;
-    my @params = @{$self->param("path_parameters")};
-    my $it;
-    if (@params > 1) {
-        if ($params[0] eq 'dist') {
-            my $dist = $params[1];
-            $self->log->debug("rss of dist: '$dist'");
-            my ($group) = CPAN::Forum::DB::Groups->search({ name => $dist });
-            $it = CPAN::Forum::DB::Posts->search(gid => $group->id, {order_by => 'date DESC'});
-        }
-        elsif ($params[0] eq 'author') {
-            my $pauseid = uc $params[1];
-            $self->log->debug("rss of author: '$pauseid'");
-            $it = CPAN::Forum::DB::Posts->search_post_by_pauseid($pauseid);
-        }
-        else {
-            $self->log->warning("Invalid rss feed requested for $params[0]");
-            return $self->notes('no_such_rss_feed');
-        }
+    my ($self) = @_;
+    $self->_feed('rss');
+}
+
+sub atom {
+    my ($self) = @_;
+    $self->_feed('atom');
+}
+
+sub _feed {
+    my ($self, $type) = @_;
+
+    die "invalid _feed call '$type'" 
+        if not defined $type or $type ne 'rss' or $type ne 'atom';
+
+    my $limit  = $self->config("${type}_size") || 10;
+    my $it = $self->get_feed($limit);
+    if ($it) {
+        my $call = "generate_$type";
+        return $self->$call($it, $limit);
     }
     else {
-        $it = CPAN::Forum::DB::Posts->retrieve_latest($limit);
+        $self->log->warning("Invalid $type feed requested for $params[0] $ENV{PATH_INFO}");
+        return $self->notes('no_such_${type}_feed');
     }
+}
+
+sub generate_atom {
+    # TODO
+    die "TODO";
+}
+
+
+sub generate_rss {
+    my ($self, $it, $limit) = @_;
 
     require XML::RSS::SimpleGen;
     my $url = "http://$ENV{HTTP_HOST}/";
     my $rss = XML::RSS::SimpleGen->new( $url, "CPAN Forum", "Discussing Perl CPAN modules");
     $rss->language( 'en' );
 
-    my $admin = CPAN::Forum::DB::Users->retrieve(1); # TODO this is a hard coded user id of the administrator !
-    # and this reveals the e-mail of the administrator. not a good idea I guess.
-    $rss->webmaster($admin->email);
+    # TODO: replace this e-mail address with a configurable value
+    $rss->webmaster('admin@cpanforum.com');
 
     while (my $post = $it->next() and $limit--) {
         my $title = sprintf "[%s] %s", $post->gid->name, $post->subject;
@@ -122,7 +131,35 @@ sub rss {
     return $rss->as_string();
 }
 
+sub get_feed {
+    my ($self, $limit) = @_;
 
+    my @params = @{$self->param("path_parameters")};
+    my $it;
+    if (@params > 1) {
+    if ($params[0] eq 'dist') {
+        my $dist = $params[1] || '';
+        $self->log->debug("rss of dist: '$dist'");
+        my ($group) = CPAN::Forum::DB::Groups->search({ name => $dist });
+        if ($group) {
+            $it = CPAN::Forum::DB::Posts->search(gid => $group->id, {order_by => 'date DESC'});
+        }
+    }
+    elsif ($params[0] eq 'author') {
+        my $pauseid = uc($params[1]) || '';
+        $self->log->debug("rss of author: '$pauseid'");
+        if ($pauseid) {
+            $it = CPAN::Forum::DB::Posts->search_post_by_pauseid($pauseid);
+        }
+    }
+    elsif ($params[0] eq 'all') {
+        $it = CPAN::Forum::DB::Posts->retrieve_latest($limit);
+    }
+    elsif ($params[0] eq 'threads') {
+        $it = CPAN::Forum::DB::Posts->search_latest_threads($limit);
+    }
+    return $it;
+}
 
 1;
 
