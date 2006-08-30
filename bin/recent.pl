@@ -60,7 +60,7 @@ foreach my $item (reverse @{$rss->{items}}) {
 		pauseid => ($d->cpanid()  || ""),
 	);
 
-	my ($g) = CPAN::Forum::Groups->search(name => $name);
+	my ($g) = CPAN::Forum::DB::Groups->search(name => $name);
 	if ($g) {
 		my $changed;
 		foreach my $field (qw(version pauseid)) {
@@ -84,7 +84,7 @@ foreach my $item (reverse @{$rss->{items}}) {
 
 	$message{news} .= sprintf "%s   %s\n", $name, $new{version}, $new{pauseid};
 	eval {
-		my $g = CPAN::Forum::Groups->create({
+		my $g = CPAN::Forum::DB::Groups->create({
 			name    => $name,
 			gtype   => $CPAN::Forum::DBI::group_types{Distribution}, 
 			version => $new{version},

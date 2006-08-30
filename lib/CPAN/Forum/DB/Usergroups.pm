@@ -1,4 +1,4 @@
-package CPAN::Forum::Usergroups;
+package CPAN::Forum::DB::Usergroups;
 use strict;
 use warnings;
 use Carp;

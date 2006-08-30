@@ -13,10 +13,10 @@ sub about {
     my $self = shift;
     my $t = $self->load_tmpl("about.tmpl");
     
-    $t->param(distro_cnt        => CPAN::Forum::Groups->count_all());
-    $t->param(posts_cnt         => CPAN::Forum::Posts->count_all());
-    $t->param(users_cnt         => CPAN::Forum::Users->count_all());
-    $t->param(subscription_cnt  => CPAN::Forum::Subscriptions->count_all());
+    $t->param(distro_cnt        => CPAN::Forum::DB::Groups->count_all());
+    $t->param(posts_cnt         => CPAN::Forum::DB::Posts->count_all());
+    $t->param(users_cnt         => CPAN::Forum::DB::Users->count_all());
+    $t->param(subscription_cnt  => CPAN::Forum::DB::Subscriptions->count_all());
     $t->param(version           => $self->version);
     # number of posts per group name, can create some xml feed from it that can
     # be used by search.cpan.org and Kobes to add a number of posts next to the link
@@ -38,7 +38,7 @@ The stats run-mode showing some statistics
 sub stats {
     my $self = shift;
     my $t = $self->load_tmpl("stats.tmpl");
-    my @entries = CPAN::Forum::Posts->search_stat_posts(50);
+    my @entries = CPAN::Forum::DB::Posts->search_stat_posts(50);
     
     $t->param(entries => \@entries);
     $t->output;

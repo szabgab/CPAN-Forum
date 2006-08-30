@@ -13,14 +13,15 @@ lib/CPAN/Forum/Markup.pm
 lib/CPAN/Forum/Build.pm
 lib/CPAN/Forum/DBI.pm
 lib/CPAN/Forum/INC.pm
-lib/CPAN/Forum/Configure.pm
-lib/CPAN/Forum/Groups.pm
-lib/CPAN/Forum/GroupsRelations.pm
-lib/CPAN/Forum/Posts.pm
-lib/CPAN/Forum/Subscriptions.pm
-lib/CPAN/Forum/Users.pm
-lib/CPAN/Forum/Usergroups.pm
-lib/CPAN/Forum/UserInGroup.pm
+
+lib/CPAN/Forum/DB/Configure.pm
+lib/CPAN/Forum/DB/Groups.pm
+lib/CPAN/Forum/DB/GroupsRelations.pm
+lib/CPAN/Forum/DB/Posts.pm
+lib/CPAN/Forum/DB/Subscriptions.pm
+lib/CPAN/Forum/DB/Users.pm
+lib/CPAN/Forum/DB/Usergroups.pm
+lib/CPAN/Forum/DB/UserInGroup.pm
 
 t/CONFIG
 t/02packages.details.txt

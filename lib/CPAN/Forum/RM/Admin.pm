@@ -12,7 +12,7 @@ sub admin_edit_user_process {
     my $uid   = $q->param('uid'); # TODO error checking here !
 
     $self->log->debug("admin_edit_user_process uid: '$uid'");
-    my ($person) = CPAN::Forum::Users->retrieve($uid);
+    my ($person) = CPAN::Forum::DB::Users->retrieve($uid);
     if (not $person) {
         return $self->internal_error("", "no_such_user");
     }
@@ -33,7 +33,7 @@ sub admin_edit_user {
     }
     $self->log->debug("admin_edit_user username: '$username'");
 
-    my ($person) = CPAN::Forum::Users->search(username => $username);
+    my ($person) = CPAN::Forum::DB::Users->search(username => $username);
     if (not $person) {
         return $self->internal_error("", "no_such_user");
     }
@@ -60,7 +60,7 @@ sub admin_process {
 
     # fields that can have only one value
     foreach my $field (qw(rss_size per_page from flood_control_time_limit )) {
-        if (my ($conf) = CPAN::Forum::Configure->find_or_create({field => $field})) {
+        if (my ($conf) = CPAN::Forum::DB::Configure->find_or_create({field => $field})) {
             $conf->value($q->param($field));
             $conf->update;
         }
@@ -81,7 +81,7 @@ sub admin {
         return $self->internal_error("", "restricted_area");
     }
     my %data;
-    foreach my $c (CPAN::Forum::Configure->retrieve_all()) {
+    foreach my $c (CPAN::Forum::DB::Configure->retrieve_all()) {
         $data{$c->field} = $c->value;
     }
     my $t = $self->load_tmpl("admin.tmpl");

@@ -494,7 +494,7 @@ Given a filed name returns the configuration value from the database
 sub config {
     my ($self, $field) = @_;
     
-    CPAN::Forum::Configure->param($field);
+    CPAN::Forum::DB::Configure->param($field);
 }
 
 # modes that can be accessed without a valid session
@@ -740,7 +740,7 @@ sub build_listing {
     
     my @resp;
     foreach my $post (@$it) {
-        my $thread_count = CPAN::Forum::Posts->sql_count_thread($post->thread)->select_val;
+        my $thread_count = CPAN::Forum::DB::Posts->sql_count_thread($post->thread)->select_val;
         push @resp, {
             subject      => _subject_escape($post->subject), 
             id           => $post->id, 
@@ -862,7 +862,7 @@ sub register_process {
     }
    
     my $user = eval {
-        CPAN::Forum::Users->create({
+        CPAN::Forum::DB::Users->create({
                 username => $q->param('nickname'),
                 email    => $q->param('email'),
             });
@@ -930,7 +930,7 @@ sub _group_selector {
     }
 
     if (not @group_ids) {
-        my @groups = CPAN::Forum::Groups->search(gtype => $CPAN::Forum::DBI::group_types{Distribution});
+        my @groups = CPAN::Forum::DB::Groups->search(gtype => $CPAN::Forum::DBI::group_types{Distribution});
         foreach my $g (@groups) {
             push @group_ids, $g->id;
             $group_labels{$g->id} = $g->name;
@@ -939,9 +939,9 @@ sub _group_selector {
 #       @groups = (
 #       "Global", 
 #       "----",
-#       (sort map {$_->name} CPAN::Forum::Groups->search(gtype => $CPAN::Forum::DBI::group_types{Fields})),
+#       (sort map {$_->name} CPAN::Forum::DB::Groups->search(gtype => $CPAN::Forum::DBI::group_types{Fields})),
 #       "----",
-#           (sort map {$_->name} CPAN::Forum::Groups->search(gtype => $CPAN::Forum::DBI::group_types{Distribution})),
+#           (sort map {$_->name} CPAN::Forum::DB::Groups->search(gtype => $CPAN::Forum::DBI::group_types{Distribution})),
 #       );
     }
     @group_ids = sort {$group_labels{$a} cmp $group_labels{$b}}  @group_ids;
@@ -1006,7 +1006,7 @@ sub posts {
         if ($new_group) {
             if ($new_group =~ /^([\w-]+)$/) {
                 $new_group = $1;
-                my ($gr) = CPAN::Forum::Groups->search(name => $new_group);
+                my ($gr) = CPAN::Forum::DB::Groups->search(name => $new_group);
                 if ($gr) {
                     $new_group_id = $gr->id;
                 } else {
@@ -1020,7 +1020,7 @@ sub posts {
                     );
             }
         } elsif ($new_group_id) {
-            my ($gr) = CPAN::Forum::Groups->retrieve($new_group_id);
+            my ($gr) = CPAN::Forum::DB::Groups->retrieve($new_group_id);
             if ($gr) {
                 $new_group = $gr->name;
             } else {
@@ -1046,7 +1046,7 @@ sub posts {
 
         if ($new_group_id =~ /^(\d+)$/) {
             $new_group_id = $1;
-            my ($grp) = CPAN::Forum::Groups->retrieve($new_group_id);
+            my ($grp) = CPAN::Forum::DB::Groups->retrieve($new_group_id);
             if ($grp) {
                 $new_group = $grp->name;
             } else {
@@ -1073,13 +1073,13 @@ sub posts {
     }
     $id ||= $q->param("new_parent");
     if ($id) { # Show post
-        my $post = CPAN::Forum::Posts->retrieve($id);
+        my $post = CPAN::Forum::DB::Posts->retrieve($id);
         if (not $post) {
             return $self->internal_error(
                 "PATH_INFO: $ENV{PATH_INFO}",
                 );
         }
-        my $thread_count = CPAN::Forum::Posts->sql_count_thread($post->thread)->select_val;
+        my $thread_count = CPAN::Forum::DB::Posts->sql_count_thread($post->thread)->select_val;
         if ($thread_count > 1) {
             $t->param(thread_id    => $post->thread);
             $t->param(thread_count => $thread_count);
@@ -1148,11 +1148,11 @@ sub process_post {
     
     my $parent_post;
     if ($parent) { # assume response
-        ($parent_post) = CPAN::Forum::Posts->search(id => $parent);
+        ($parent_post) = CPAN::Forum::DB::Posts->search(id => $parent);
         push @errors, "bad_thing"  if not $parent_post;
     } else {       # assume new post
         if ($q->param("new_group_id")) {
-            push @errors, "bad_group"  if not CPAN::Forum::Groups->search(id => $q->param("new_group_id"));
+            push @errors, "bad_group"  if not CPAN::Forum::DB::Groups->search(id => $q->param("new_group_id"));
         } else {
             push @errors, "no_group";
         }
@@ -1176,7 +1176,7 @@ sub process_post {
     # BUG: we are putting in the usernames instead of the user ids in the uid field of the posts
     # but for this reason we'll have to use the username in every other place
     if (not @errors and $button eq "Submit") {
-        my ($last_post) = CPAN::Forum::Posts->search(uid => $self->session->param("username"), {order_by => 'id DESC', limit => 1});
+        my ($last_post) = CPAN::Forum::DB::Posts->search(uid => $self->session->param("username"), {order_by => 'id DESC', limit => 1});
         if ($last_post) {
             $self->log->debug("username: " . 
                 $self->session->param("username") . 
@@ -1216,12 +1216,12 @@ sub process_post {
 
     my $post_id;
     my $username = $self->session->param("username");
-    my ($user) = CPAN::Forum::Users->search({ username => $username });
+    my ($user) = CPAN::Forum::DB::Users->search({ username => $username });
     if (not $user) {
         return $self->internal_error("Unknonw username: $username");
     }
     eval {
-        my $post = CPAN::Forum::Posts->create({
+        my $post = CPAN::Forum::DB::Posts->create({
             uid     => $user->id,
             gid     => $parent_post ? $parent_post->gid : $q->param("new_group_id"),
             subject => $q->param("new_subject"),
@@ -1255,7 +1255,7 @@ sub _post_date {
 
 sub _post {
     my ($self, $post) = @_;
-    my @responses = map {{id => $_->id}} CPAN::Forum::Posts->search(parent => $post->id);
+    my @responses = map {{id => $_->id}} CPAN::Forum::DB::Posts->search(parent => $post->id);
 
     my %post = (
         postername  => $post->uid->username,
@@ -1314,7 +1314,7 @@ sub threads {
     my $id = $q->param("id");
     $id = ${$self->param("path_parameters")}[0] if ${$self->param("path_parameters")}[0];
 
-    my @posts = CPAN::Forum::Posts->search(thread => $id);
+    my @posts = CPAN::Forum::DB::Posts->search(thread => $id);
     if (not @posts) {
         return $self->internal_error(
             "PATH_INFO: $ENV{PATH_INFO}",
@@ -1373,9 +1373,9 @@ sub _subscriptions {
 
     my %people;
     foreach my $s (
-            CPAN::Forum::Subscriptions_all->search(allposts => 1),
-            CPAN::Forum::Subscriptions_pauseid->search(allposts => 1, pauseid => $group->pauseid),
-            CPAN::Forum::Subscriptions->search(allposts => 1, gid => $group->id),
+            CPAN::Forum::DB::Subscriptions_all->search(allposts => 1),
+            CPAN::Forum::DB::Subscriptions_pauseid->search(allposts => 1, pauseid => $group->pauseid),
+            CPAN::Forum::DB::Subscriptions->search(allposts => 1, gid => $group->id),
             ) {
         $people{$s->uid} =  {
             username => $s->uid->username,
@@ -1396,7 +1396,7 @@ sub add_new_group {
     my $group_name = $q->param("group");
     $self->log->debug("Adding group with name: '$group_name'");
     my $group = eval {
-            CPAN::Forum::Groups->create({
+            CPAN::Forum::DB::Groups->create({
                 name  => $group_name,
                 gtype => 3,
                 });
@@ -1422,30 +1422,30 @@ sub fetch_subscriptions {
     my $it;
 
     # People who asked for all the posts
-    $it = CPAN::Forum::Subscriptions_all->search(allposts => 1);
+    $it = CPAN::Forum::DB::Subscriptions_all->search(allposts => 1);
     $self->_sendmail($it, $mail, \%to);
 
     # People who asked for all the posts in this group
-    $it = CPAN::Forum::Subscriptions->search(allposts => 1, gid => $post->gid);
+    $it = CPAN::Forum::DB::Subscriptions->search(allposts => 1, gid => $post->gid);
     $self->_sendmail($it, $mail, \%to);
 
     # People who asked for all the posts in this PAUSEID
-    $it = CPAN::Forum::Subscriptions_pauseid->search(allposts => 1, pauseid => $post->gid->pauseid);
+    $it = CPAN::Forum::DB::Subscriptions_pauseid->search(allposts => 1, pauseid => $post->gid->pauseid);
     $self->_sendmail($it, $mail, \%to);
 
     if ($post->thread == $post->id) { 
         $self->log->debug("Processing messages for thread starter");
 
         # People who are subscribed to all thread starters
-        $it = CPAN::Forum::Subscriptions_all->search(starters => 1);
+        $it = CPAN::Forum::DB::Subscriptions_all->search(starters => 1);
         $self->_sendmail($it, $mail, \%to);
 
         # People who are subscribed to the thread startes in this group
-        $it = CPAN::Forum::Subscriptions->search(starters => 1, gid => $post->gid->id);
+        $it = CPAN::Forum::DB::Subscriptions->search(starters => 1, gid => $post->gid->id);
         $self->_sendmail($it, $mail, \%to);
 
         # People who are subscribed to the thread startes of this PAUSEID
-        $it = CPAN::Forum::Subscriptions_pauseid->search(starters => 1, pauseid => $post->gid->pauseid);
+        $it = CPAN::Forum::DB::Subscriptions_pauseid->search(starters => 1, pauseid => $post->gid->pauseid);
         $self->_sendmail($it, $mail, \%to);
     }
     else {
@@ -1453,19 +1453,19 @@ sub fetch_subscriptions {
 
         # Collect the users who posted in this thread
         my %uids;
-        my $pit = CPAN::Forum::Posts->search(thread => $post->thread);
+        my $pit = CPAN::Forum::DB::Posts->search(thread => $post->thread);
         while (my $p = $pit->next) {
             $uids{$p->uid}=1;
             $self->log->debug("Ids: " . $p->uid);
         }
         
-        $it = CPAN::Forum::Subscriptions_all->search(followups => 1);
+        $it = CPAN::Forum::DB::Subscriptions_all->search(followups => 1);
         $self->_sendmail($it, $mail, \%to, \%uids);
 
-        $it = CPAN::Forum::Subscriptions->search(followups => 1, gid => $post->gid->id);
+        $it = CPAN::Forum::DB::Subscriptions->search(followups => 1, gid => $post->gid->id);
         $self->_sendmail($it, $mail, \%to, \%uids);
         
-        $it = CPAN::Forum::Subscriptions_pauseid->search(followups => 1, pauseid => $post->gid->pauseid);
+        $it = CPAN::Forum::DB::Subscriptions_pauseid->search(followups => 1, pauseid => $post->gid->pauseid);
         $self->_sendmail($it, $mail, \%to);
     }
 }
@@ -1627,7 +1627,7 @@ sub process_missing_dist {
          $self->log->debug("Could not get PAUSEID from download_url");
          return;
     }
-    my $author = eval { CPAN::Forum::Authors->find_or_create({
+    my $author = eval { CPAN::Forum::DB::Authors->find_or_create({
                     pauseid => $pauseid,
                  }); };
     if (not $author) {
@@ -1635,7 +1635,7 @@ sub process_missing_dist {
         return;
     }
 
-    my $group = eval { CPAN::Forum::Groups->create({
+    my $group = eval { CPAN::Forum::DB::Groups->create({
         name    => $dist_name,
         gtype   => $CPAN::Forum::DBI::group_types{Distribution}, 
         version => $d->version,

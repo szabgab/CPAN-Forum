@@ -60,8 +60,8 @@ sub register_user {
     my ($id) = @_;
 
     init_db();
-    require CPAN::Forum::Users;
-    my $user = CPAN::Forum::Users->create($users[$id]);
+    require CPAN::Forum::DB::Users;
+    my $user = CPAN::Forum::DB::Users->create($users[$id]);
     return $user;
 }
 
@@ -69,12 +69,12 @@ sub register_users {
     my ($id, $n) = @_;
 
     init_db();
-    require CPAN::Forum::Users;
+    require CPAN::Forum::DB::Users;
     my @users;
     foreach my $i (1..$n) {
         my %user;
         $user{$_} = $i . $users[$id]{$_} foreach qw(username email);
-        push @users, CPAN::Forum::Users->create(\%user);
+        push @users, CPAN::Forum::DB::Users->create(\%user);
     }
     return @users;
 }

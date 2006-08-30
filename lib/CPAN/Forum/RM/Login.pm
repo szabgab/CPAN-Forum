@@ -41,7 +41,7 @@ sub login_process {
         return $self->login({no_login_data => 1});
     }
 
-    my ($user) = CPAN::Forum::Users->search({
+    my ($user) = CPAN::Forum::DB::Users->search({
                     username => $q->param('nickname'),
                     password => $q->param('password'),
             });
@@ -60,7 +60,7 @@ sub login_process {
     $session->param(fname     => $user->fname);
     $session->param(lname     => $user->lname);
     $session->param(email     => $user->email);
-    foreach my $g (CPAN::Forum::Usergroups->search_ugs($user->id)) {
+    foreach my $g (CPAN::Forum::DB::Usergroups->search_ugs($user->id)) {
         $self->log->debug("UserGroups: " . $g->name);
         if ($g->name eq "admin") {
             $session->param(admin     => 1);
@@ -147,7 +147,7 @@ sub pwreminder_process {
         return $self->pwreminder({"no_data" => 1});
     }
 
-    my ($user) = CPAN::Forum::Users->search({$field => $q->param('value')});
+    my ($user) = CPAN::Forum::DB::Users->search({$field => $q->param('value')});
     return $self->pwreminder({"no_data" => 1}) if not $user;
 
     # TODO: put this text in a template

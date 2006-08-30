@@ -34,7 +34,7 @@ sub mypan {
         loop_context_vars => 1,
     );
     my $username = $self->session->param("username");
-    my ($user) = CPAN::Forum::Users->search(username => $username);
+    my ($user) = CPAN::Forum::DB::Users->search(username => $username);
 
     if (not $user) {
         return $self->internal_error(
@@ -56,14 +56,14 @@ sub mypan {
 
     if (@params == 2 and $params[0] eq "dist") { # specific distribution
         my $group = $params[1];
-        my ($grp) = CPAN::Forum::Groups->search(name => $group);
+        my ($grp) = CPAN::Forum::DB::Groups->search(name => $group);
         if (not $grp) {
             return $self->internal_error(
                 "Accessing $ENV{PATH_INFO}\n",
             );
         }
         $gids = $grp->id;
-        my ($s) = CPAN::Forum::Subscriptions->search(uid => $user->id, gid => $grp->id);
+        my ($s) = CPAN::Forum::DB::Subscriptions->search(uid => $user->id, gid => $grp->id);
         if ($s) {
             push @subscriptions, {
                 gid       => $grp->id,
@@ -83,7 +83,7 @@ sub mypan {
             };
         }
     } else { # show all subscriptions
-        my ($s) = CPAN::Forum::Subscriptions_all->search(uid => $user->id);
+        my ($s) = CPAN::Forum::DB::Subscriptions_all->search(uid => $user->id);
         $self->log->debug("all subscriptions " . ($s ? "found" : "not found"));
         push @subscriptions, {
             gid       => "_all",
@@ -94,7 +94,7 @@ sub mypan {
         };
         $gids = "_all";
 
-        my $it = CPAN::Forum::Subscriptions_pauseid->search(uid => $user->id);
+        my $it = CPAN::Forum::DB::Subscriptions_pauseid->search(uid => $user->id);
         while (my $s = $it->next) {
             $gids .= ($gids ? ",_" : "_") . $s->pauseid->id; 
             push @subscriptions, {
@@ -106,7 +106,7 @@ sub mypan {
             };
         }
 
-        $it = CPAN::Forum::Subscriptions->search(uid => $user->id);
+        $it = CPAN::Forum::DB::Subscriptions->search(uid => $user->id);
         while (my $s = $it->next) {
             $gids .= ($gids ? "," : "") . $s->gid->id; 
             push @subscriptions, {
@@ -140,31 +140,31 @@ sub update_subscription {
     }
 
     my $username = $self->session->param("username");
-    my ($user) = CPAN::Forum::Users->search(username => $username);
+    my ($user) = CPAN::Forum::DB::Users->search(username => $username);
 
     foreach my $gid (@gids) {
         if ($gid eq "_all") {
-            my ($s) = CPAN::Forum::Subscriptions_all->search(uid => $user->id);
+            my ($s) = CPAN::Forum::DB::Subscriptions_all->search(uid => $user->id);
             if (not $s) {
-                $s = CPAN::Forum::Subscriptions_all->create({
+                $s = CPAN::Forum::DB::Subscriptions_all->create({
                     uid       => $user->id,
                 });
             }
             $self->_update_subs($s, $gid);
         } elsif ($gid =~ /^_(\d+)$/) {
             my $pauseid = $1;
-            my ($s) = CPAN::Forum::Subscriptions_pauseid->search(pauseid => $pauseid, uid => $user->id);
+            my ($s) = CPAN::Forum::DB::Subscriptions_pauseid->search(pauseid => $pauseid, uid => $user->id);
             if (not $s) {
-                $s = CPAN::Forum::Subscriptions->create({
+                $s = CPAN::Forum::DB::Subscriptions->create({
                     uid       => $user->id,
                     pauseid   => $pauseid,
                 });
             }
             $self->_update_subs($s, $gid);
         } elsif ($gid =~ /^(\d+)$/) {
-            my ($s) = CPAN::Forum::Subscriptions->search(gid => $gid, uid => $user->id);
+            my ($s) = CPAN::Forum::DB::Subscriptions->search(gid => $gid, uid => $user->id);
             if (not $s) {
-                $s = CPAN::Forum::Subscriptions->create({
+                $s = CPAN::Forum::DB::Subscriptions->create({
                     uid       => $user->id,
                     gid       => $gid,
                 });
@@ -191,9 +191,9 @@ sub update_subscription {
     # we should not let the user overwrite it using the new entry box
     if ($q->param("type") eq "pauseid") {
         my $pauseid = uc $q->param("name");
-        my ($author) = CPAN::Forum::Authors->search(pauseid => $pauseid);
+        my ($author) = CPAN::Forum::DB::Authors->search(pauseid => $pauseid);
         if ($author) {
-            my $s = CPAN::Forum::Subscriptions_pauseid->find_or_create({
+            my $s = CPAN::Forum::DB::Subscriptions_pauseid->find_or_create({
                 uid       => $user->id,
                 pauseid   => $author->id,
             });
@@ -205,9 +205,9 @@ sub update_subscription {
     elsif ($q->param("type") eq "distro") {
         my $name = $q->param("name");
         $name =~ s/::/-/g;  
-        my ($grp) = CPAN::Forum::Groups->search(name => $name);
+        my ($grp) = CPAN::Forum::DB::Groups->search(name => $name);
         if ($grp) {
-            my $s = CPAN::Forum::Subscriptions->find_or_create({
+            my $s = CPAN::Forum::DB::Subscriptions->find_or_create({
                 uid       => $user->id,
                 gid       => $grp->id,
             });

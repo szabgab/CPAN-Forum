@@ -8,7 +8,7 @@ sub _search_results {
     
     $params->{per_page} = $self->config("per_page");
 
-    my $pager   = CPAN::Forum::Posts->mysearch($params);
+    my $pager   = CPAN::Forum::DB::Posts->mysearch($params);
     my @results = $pager->search_where();
     my $total   = $pager->total_entries;
     $self->log->debug("number of entries: total=$total");
@@ -53,8 +53,8 @@ sub module_search {
     $txt =~ s/::/-/g;
     $txt = '%' . $txt . '%';
     
-    my $it =  CPAN::Forum::Groups->search_like(name => $txt);
-    my $cnt = CPAN::Forum::Groups->sql_count_like("name", $txt)->select_val;
+    my $it =  CPAN::Forum::DB::Groups->search_like(name => $txt);
+    my $cnt = CPAN::Forum::DB::Groups->sql_count_like("name", $txt)->select_val;
     my @group_names;
     my @group_ids;
     while (my $group  = $it->next) {
@@ -103,11 +103,11 @@ sub search {
         if ($what eq "module" or $what eq "pauseid") {
             my $it;
             if ($what eq "module") {
-               $it =  CPAN::Forum::Groups->search_like(name => '%' . $name . '%');
+               $it =  CPAN::Forum::DB::Groups->search_like(name => '%' . $name . '%');
             } else {
-                my ($author) = CPAN::Forum::Authors->search(pauseid => uc $name);
+                my ($author) = CPAN::Forum::DB::Authors->search(pauseid => uc $name);
                 if ($author) {
-                    $it =  CPAN::Forum::Groups->search(pauseid => $author->id);
+                    $it =  CPAN::Forum::DB::Groups->search(pauseid => $author->id);
                 } 
             }
             my @things;
@@ -121,7 +121,7 @@ sub search {
             $t->param($what => 1);
         } elsif ($what eq "user") {
             my @things;
-            my $it =  CPAN::Forum::Users->search_like(username => '%' . lc($name) . '%');
+            my $it =  CPAN::Forum::DB::Users->search_like(username => '%' . lc($name) . '%');
             while (my $user  = $it->next) {
                 push @things, {username => $user->username};
             }

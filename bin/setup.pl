@@ -43,12 +43,12 @@ chmod 0755, $dbfile;
 
 
 my $from = delete $opt{from};
-CPAN::Forum::Configure->create({field => 'from', value => $from});
+CPAN::Forum::DB::Configure->create({field => 'from', value => $from});
 
-my $user = CPAN::Forum::Users->create({id => 1, update_on_new_user => 1, %opt});
+my $user = CPAN::Forum::DB::Users->create({id => 1, update_on_new_user => 1, %opt});
 $user->password($opt{password});
 $user->update;
-CPAN::Forum::Usergroups->create({id => 1, name => "admin"});
-CPAN::Forum::UserInGroup->create({uid => 1, gid => 1});
+CPAN::Forum::DB::Usergroups->create({id => 1, name => "admin"});
+CPAN::Forum::DB::UserInGroup->create({uid => 1, gid => 1});
 
 

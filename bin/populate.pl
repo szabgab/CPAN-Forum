@@ -12,7 +12,7 @@ use Mail::Sendmail qw(sendmail);
 use Getopt::Long qw(GetOptions);
 
 use CPAN::Forum::DBI;
-use CPAN::Forum::Groups;
+use CPAN::Forum::DB::Groups;
 
 
 
@@ -88,7 +88,7 @@ foreach my $d ($p->latest_distributions) {
     my $p;
     if ($pauseid) {
         eval {
-            $p = CPAN::Forum::Authors->find_or_create({ pauseid => $pauseid });
+            $p = CPAN::Forum::DB::Authors->find_or_create({ pauseid => $pauseid });
         };
         if ($@) {
             warn "$name\n";
@@ -103,7 +103,7 @@ foreach my $d ($p->latest_distributions) {
     $new{pauseid} = $p->id;
 
 
-    my ($g) = CPAN::Forum::Groups->search(name => $name);
+    my ($g) = CPAN::Forum::DB::Groups->search(name => $name);
     if ($g) {
         my $changed;
         foreach my $field (qw(version pauseid)) {
@@ -129,7 +129,7 @@ foreach my $d ($p->latest_distributions) {
     $message{new} .= sprintf "Creating %s   %s\n", $name, $new{version}, $pauseid;
 
     eval {
-        my $g = CPAN::Forum::Groups->create({
+        my $g = CPAN::Forum::DB::Groups->create({
             name    => $name,
             gtype   => $CPAN::Forum::DBI::group_types{Distribution}, 
             version => $new{version},

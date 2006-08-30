@@ -129,7 +129,7 @@ sub read_config {
 
 {
     my ($user) 
-        = CPAN::Forum::Users->search({ username => $users[0]{username} });
+        = CPAN::Forum::DB::Users->search({ username => $users[0]{username} });
     $w_guest->get_ok($url);
     $w_guest->content_like(qr{CPAN Forum});
     $w_guest->get_ok("$url/dist/Acme-Bleach");

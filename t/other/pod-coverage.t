@@ -12,9 +12,9 @@ pod_coverage_ok('CPAN::Forum::Markup');
 TODO: {
     local $TODO = "Write more documentation";
     pod_coverage_ok('CPAN::Forum');
-    pod_coverage_ok('CPAN::Forum::Posts');
-    pod_coverage_ok('CPAN::Forum::Groups');
-    pod_coverage_ok('CPAN::Forum::Users');
-    pod_coverage_ok('CPAN::Forum::Configure');
+    pod_coverage_ok('CPAN::Forum::DB::Posts');
+    pod_coverage_ok('CPAN::Forum::DB::Groups');
+    pod_coverage_ok('CPAN::Forum::DB::Users');
+    pod_coverage_ok('CPAN::Forum::DB::Configure');
 }
 

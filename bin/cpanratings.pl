@@ -6,7 +6,7 @@ use warnings;
 use lib "lib";
 use Text::CSV_XS;
 use CPAN::Forum::DBI;
-use CPAN::Forum::Groups;
+use CPAN::Forum::DB::Groups;
 use FindBin qw ($Bin);
 
 my $dir = "$Bin/../db";
@@ -26,7 +26,7 @@ chomp $line;
 die "File format changed\n" if $line ne '"distribution","rating","review_count"';
 my @header = ("distribution","rating","review_count");
 
-#my @groups = CPAN::Forum::Groups->retrieve_all();
+#my @groups = CPAN::Forum::DB::Groups->retrieve_all();
 
 while (my $line = <$fh>) {
 	$cnt++;
@@ -36,7 +36,7 @@ while (my $line = <$fh>) {
 	}
 	my %field;
 	@field{@header} = $csv->fields();
-	my ($g) = CPAN::Forum::Groups->search(name => $field{distribution});
+	my ($g) = CPAN::Forum::DB::Groups->search(name => $field{distribution});
 	if ($g) {
 		#print "    FOUND\n";
 	} else {

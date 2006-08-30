@@ -32,7 +32,7 @@ sub dist {
     $t->param(group => $group_name);
     $t->param(title => "CPAN Forum - $group_name");
 
-    my ($gr) = CPAN::Forum::Groups->search(name => $group_name);
+    my ($gr) = CPAN::Forum::DB::Groups->search(name => $group_name);
     if (not $gr) {
         $self->log->warning("Invalid group $group_name called in $ENV{PATH_INFO}");
         $gr = $self->process_missing_dist($group_name);

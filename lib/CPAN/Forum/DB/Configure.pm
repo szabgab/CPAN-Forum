@@ -1,4 +1,4 @@
-package CPAN::Forum::Configure;
+package CPAN::Forum::DB::Configure;
 use strict;
 use warnings;
 use Carp;
@@ -14,7 +14,7 @@ my %default = (
 sub param {
     my ($self, $field, $value) = @_;
 
-    my ($handle) = CPAN::Forum::Configure->search({field => $field});
+    my ($handle) = CPAN::Forum::DB::Configure->search({field => $field});
     return $handle->value if $handle;
     return $default{$field} if defined $default{$field};
     return;

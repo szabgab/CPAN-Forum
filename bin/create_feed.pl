@@ -8,7 +8,7 @@ use Text::CSV_XS;
 use lib "lib";
 
 use CPAN::Forum::DBI;
-use CPAN::Forum::Posts;
+use CPAN::Forum::DB::Posts;
 
 my %opts;
 GetOptions(\%opts, 'help', 'dir=s', 'csv=s') or usage();
@@ -23,7 +23,7 @@ my $csv          = Text::CSV_XS->new();
 
 ;
 open my $out, '>', $opts{csv} or die $!;
-foreach my $entry (CPAN::Forum::Posts->search_stat_posts(5000)) {
+foreach my $entry (CPAN::Forum::DB::Posts->search_stat_posts(5000)) {
     if ($csv->combine($entry->{gname}, $entry->{cnt})) {
         print {$out} $csv->string(), "\n";
     } else {

@@ -29,7 +29,7 @@ sub users {
                 
     $t->param(hide_username => 1);
 
-    my ($user) = CPAN::Forum::Users->search(username => $username);
+    my ($user) = CPAN::Forum::DB::Users->search(username => $username);
 
     if (not $user) {
         return $self->internal_error(

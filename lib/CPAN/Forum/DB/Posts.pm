@@ -1,14 +1,15 @@
-package CPAN::Forum::Posts;
+package CPAN::Forum::DB::Posts;
 use strict;
 use warnings;
 use Carp;
 use base 'CPAN::Forum::DBI';
 __PACKAGE__->table('posts');
 __PACKAGE__->columns(All => qw/id gid uid parent subject text date thread hidden/);
-#__PACKAGE__->has_many(responses => "CPAN::Forum::Posts");
-__PACKAGE__->has_a(parent => "CPAN::Forum::Posts");
-__PACKAGE__->has_a(uid => "CPAN::Forum::Users");
-__PACKAGE__->has_a(gid => "CPAN::Forum::Groups");
+#__PACKAGE__->has_many(responses => "CPAN::Forum::DB::Posts");
+__PACKAGE__->has_a(parent => "CPAN::Forum::DB::Posts");
+__PACKAGE__->has_a(uid    => "CPAN::Forum::DB::Users");
+__PACKAGE__->has_a(gid    => "CPAN::Forum::DB::Groups");
+
 __PACKAGE__->set_sql(latest => "SELECT __ESSENTIAL__ FROM __TABLE__ ORDER BY DATE DESC LIMIT %s");
 __PACKAGE__->set_sql(count_thread => "SELECT count(*) FROM __TABLE__ WHERE thread=%s");
 __PACKAGE__->set_sql(count_where  => "SELECT count(*) FROM __TABLE__ WHERE %s='%s'");

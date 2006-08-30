@@ -11,7 +11,7 @@ Send out e-mails upon receiving a submission.
 sub notify {
     my ($self, $post_id) = @_;
     
-    my $post = CPAN::Forum::Posts->retrieve($post_id);
+    my $post = CPAN::Forum::DB::Posts->retrieve($post_id);
 
     my $message = 
         _text2mail ($post->text) .
@@ -57,7 +57,7 @@ sub notify_admin {
 
     # TODO: the admin should be able to configure if she wants to get messages on
     # every new user (field update_on_new_user)
-    my $admin = CPAN::Forum::Users->retrieve(1);
+    my $admin = CPAN::Forum::DB::Users->retrieve(1);
     my %mail = (
         To      => $admin->email,
         From     => $FROM,
@@ -86,20 +86,20 @@ sub rss {
         if ($params[0] eq 'dist') {
             my $dist = $params[1];
             $self->log->debug("rss of dist: '$dist'");
-            my ($group) = CPAN::Forum::Groups->search({ name => $dist });
-            $it = CPAN::Forum::Posts->search(gid => $group->id, {order_by => 'date DESC'});
+            my ($group) = CPAN::Forum::DB::Groups->search({ name => $dist });
+            $it = CPAN::Forum::DB::Posts->search(gid => $group->id, {order_by => 'date DESC'});
         }
         elsif ($params[0] eq 'author') {
             my $pauseid = uc $params[1];
             $self->log->debug("rss of author: '$pauseid'");
-            $it = CPAN::Forum::Posts->search_post_by_pauseid($pauseid);
+            $it = CPAN::Forum::DB::Posts->search_post_by_pauseid($pauseid);
         }
         else {
             $self->log->warning("rss requested for $params[0]");
         }
     }
     else {
-        $it = CPAN::Forum::Posts->retrieve_latest($limit);
+        $it = CPAN::Forum::DB::Posts->retrieve_latest($limit);
     }
 
     require XML::RSS::SimpleGen;
@@ -107,7 +107,7 @@ sub rss {
     my $rss = XML::RSS::SimpleGen->new( $url, "CPAN Forum", "Discussing Perl CPAN modules");
     $rss->language( 'en' );
 
-    my $admin = CPAN::Forum::Users->retrieve(1); # TODO this is a hard coded user id of the administrator !
+    my $admin = CPAN::Forum::DB::Users->retrieve(1); # TODO this is a hard coded user id of the administrator !
     # and this reveals the e-mail of the administrator. not a good idea I guess.
     $rss->webmaster($admin->email);
 
