@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use Test::More "no_plan";
+use Test::More;
 use Test::Exception;
 
 
@@ -14,11 +14,6 @@ my $long = "x234567890" x 6 . "qwertyuiop" x 4;
 my $long_new = "x234567890" x 6 . "\n" . "+" . "qwertyuiop" x 4;
 my $long2 = "x234567890" x 10 . "abcdef" x 20;
 my $long2_new = "x234567890" x 6 . "\n" . "+" . "1234567890" x 4 . "\n" . "+" . "abcdef" x 13 . "\n" . "+" . "abcdef" x 7;
-is(CPAN::Forum::Markup::split_rows("some text", 60), "some text");
-#is(CPAN::Forum::Markup::split_rows($long, 61), $long_new);
-#is(CPAN::Forum::Markup::split_rows($long2, 61), $long2_new);
-
-my $markup = CPAN::Forum::Markup->new();
 
 my $TEXT = '<div class="text">';
 my $END  = '</div>';
@@ -89,6 +84,15 @@ my %fails = (
 	'<a href=htt://bla>text</a>' => undef,
 	'<a href=javascript>text</a>' => undef,
 );
+
+
+plan tests => 1 + (2 * keys %cases) + (1 * keys %fails) + (2 * 3);
+
+is(CPAN::Forum::Markup::split_rows("some text", 60), "some text");
+#is(CPAN::Forum::Markup::split_rows($long, 61), $long_new);
+#is(CPAN::Forum::Markup::split_rows($long2, 61), $long2_new);
+
+my $markup = CPAN::Forum::Markup->new();
 
 
 foreach my $c (sort keys %cases) {
