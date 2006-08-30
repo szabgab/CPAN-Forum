@@ -10,11 +10,6 @@ use Test::Exception;
 use lib "blib/lib";
 use CPAN::Forum::Markup;
 
-my $long = "x234567890" x 6 . "qwertyuiop" x 4;
-my $long_new = "x234567890" x 6 . "\n" . "+" . "qwertyuiop" x 4;
-my $long2 = "x234567890" x 10 . "abcdef" x 20;
-my $long2_new = "x234567890" x 6 . "\n" . "+" . "1234567890" x 4 . "\n" . "+" . "abcdef" x 13 . "\n" . "+" . "abcdef" x 7;
-
 my $TEXT = '<div class="text">';
 my $END  = '</div>';
 my $CODE = '<div class="code">';
@@ -86,11 +81,19 @@ my %fails = (
 );
 
 
-plan tests => 1 + (2 * keys %cases) + (1 * keys %fails) + (2 * 3);
+plan tests => 6 + (2 * keys %cases) + (1 * keys %fails) + (2 * 3);
 
-is(CPAN::Forum::Markup::split_rows("some text", 60), "some text");
-#is(CPAN::Forum::Markup::split_rows($long, 61), $long_new);
-#is(CPAN::Forum::Markup::split_rows($long2, 61), $long2_new);
+is(CPAN::Forum::Markup->get_nextmark(), '<span class="nextmark">+</span>');
+is(CPAN::Forum::Markup->set_nextmark('|'), '|');
+is(CPAN::Forum::Markup->get_nextmark(), '|');
+
+is(CPAN::Forum::Markup::split_rows('some text', 60), 'some text');
+
+TODO: {
+    local $TODO = 'fix split_rows';
+    is(CPAN::Forum::Markup::split_rows('some text with more content', 10), "some text\n|with more\n|content");
+    is(CPAN::Forum::Markup::split_rows('some text with morecontent', 10), "some text\n|with\n|morecontent");
+}
 
 my $markup = CPAN::Forum::Markup->new();
 

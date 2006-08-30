@@ -70,6 +70,16 @@ sub new {
 }
 
 
+my $NEXTMARK = '<span class="nextmark">+</span>';
+
+sub get_nextmark {
+    return $NEXTMARK;
+}
+sub set_nextmark {
+    die 'This internal functiom needs 2 paramters' if @_ != 2;
+    $NEXTMARK = pop @_;
+    return $NEXTMARK;
+}
 
 =head2 split_rows
 
@@ -82,7 +92,7 @@ Makes sure every line is max N characters long in it
 sub split_rows {
     my ($text, $N) = @_;
     $N ||= 100;
-    my $NEXTMARK = '<span class="nextmark">+</span>';
+    my $NEXTMARK = __PACKAGE__->get_nextmark();
 
     my @text = split /\n/, $text;
     my @new;
