@@ -62,6 +62,9 @@ use CPAN::Forum::DB::Posts;
     $w->get_ok("$url/rss/all");
     $w->content_like(qr{<item>});
 
+    $w->get_ok("$url/rss/threads");
+    $w->content_like(qr{<item>});
+
     #TODO: also test Content type
 
     $w->get_ok("$url/dist/CPAN-Forum");
@@ -79,9 +82,10 @@ use CPAN::Forum::DB::Posts;
     #$w->content_like(qr{<item>});
 
     $w->get_ok("$url/rss/no_such_feed/xyz");
-    $w->content_like(qr{No such RSS feed.});
+    #$w->content_like(qr{No such RSS feed.});
+    $w->content_like(qr{No posts yet});
 
-    BEGIN { $tests += 12; }
+    BEGIN { $tests += 14; }
 }
 
 {

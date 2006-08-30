@@ -14,7 +14,7 @@ sub notify {
     my $post = CPAN::Forum::DB::Posts->retrieve($post_id);
 
     my $message = 
-        _text2mail ($post->text) .
+        $self->_text2mail ($post->text) .
         "\n\n" .
         "To write a respons, access\n".
         "http://$ENV{HTTP_HOST}/response_form/" . $post->id .
@@ -94,14 +94,14 @@ sub _feed {
 
     my $limit  = $self->config("${type}_size") || 10;
     my $it = $self->get_feed($limit);
-    if ($it) {
+    #if ($it) {
         my $call = "generate_$type";
         return $self->$call($it, $limit);
-    }
-    else {
-        $self->log->warning("Invalid $type feed requested for $ENV{PATH_INFO}");
-        return $self->notes("no_such_${type}_feed");
-    }
+    #}
+    #else {
+    #    $self->log->warning("Invalid $type feed requested for $ENV{PATH_INFO}");
+    #    return $self->notes("no_such_${type}_feed");
+    #}
 }
 
 sub generate_atom {
@@ -121,9 +121,16 @@ sub generate_rss {
     # TODO: replace this e-mail address with a configurable value
     $rss->webmaster('admin@cpanforum.com');
 
-    while (my $post = $it->next() and $limit--) {
-        my $title = sprintf "[%s] %s", $post->gid->name, $post->subject;
-        $rss->item($url. "posts/" . $post->id(), $title); # TODO _subject_escape ?
+    if ($it) {
+        while (my $post = $it->next() and $limit--) {
+            my $title = sprintf "[%s] %s", $post->gid->name, $post->subject;
+            $rss->item($url. "posts/" . $post->id(), $title); # TODO _subject_escape ?
+        }
+    }
+    else {
+        # TODO: maybe we should put a link here to search that module ot that
+        # PAUSEID?
+        $rss->item($url, "No posts yet");
     }
 
     $self->header_props(-type => 'application/rss+xml');
@@ -143,6 +150,7 @@ sub get_feed {
         $self->log->debug("rss of dist: '$dist'");
         my ($group) = CPAN::Forum::DB::Groups->search({ name => $dist });
         if ($group) {
+            $self->log->debug("aha");
             return scalar CPAN::Forum::DB::Posts->search(gid => $group->id, {order_by => 'date DESC'});
         }
     }
@@ -165,6 +173,18 @@ sub get_feed {
 
     return;
 }
+
+=head2 _text2mail
+
+replace the markup used in the posting by things we can use in 
+e-mail messages.
+
+=cut
+
+sub _text2mail {
+    return $_[1];
+}
+
 
 1;
 

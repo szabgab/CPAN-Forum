@@ -1515,17 +1515,6 @@ sub status {
 }
 
 
-=head2 _text2mail
-
-replace the markup used in the posting by things we can use in 
-e-mail messages.
-
-=cut
-
-sub _text2mail {
-    return $_[0];
-}
-
 
 sub help {
     $_[0]->load_tmpl("help.tmpl")->output;
