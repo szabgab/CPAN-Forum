@@ -24,13 +24,22 @@ __PACKAGE__->set_sql(post_by_pauseid => qq{
                             FROM groups, authors
                             WHERE groups.pauseid=authors.id and authors.pauseid=?)
                         ORDER BY date DESC});
-__PACKAGE__->set_sql(stat_posts => qq{
+__PACKAGE__->set_sql(stat_posts_by_group => qq{
             SELECT COUNT(*) cnt, groups.name gname
             FROM posts,groups 
             WHERE posts.gid=groups.id
             GROUP BY gname
             ORDER BY cnt DESC
-            LIMIT ? 
+            LIMIT ?
+            });
+
+__PACKAGE__->set_sql(stat_posts_by_user => qq{
+            SELECT COUNT(*) cnt, users.username username 
+            FROM posts,users
+            WHERE posts.uid=users.id
+            GROUP BY username
+            ORDER BY cnt DESC
+            LIMIT ?
             });
 
 sub retrieve_latest { 
