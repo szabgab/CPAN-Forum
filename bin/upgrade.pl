@@ -38,12 +38,14 @@ foreach my $table (qw(subscriptions_all groups authors subscriptions_pauseid)) {
 
 # some INSERT statements can come here:
 =pod
+
 foreach my $sql (
 )
 {
 	eval {$dbh->do($sql);};
 	restore_and_exit() if $@;
 }
+
 =cut
 
 $dbh->disconnect;
