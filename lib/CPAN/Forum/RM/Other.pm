@@ -44,6 +44,12 @@ sub stats {
     $t->output;
 }
 
+=head2 faq
+
+Show FAQ
+
+=cut
+
 sub faq {
     my $self = shift;
     my $t = $self->load_tmpl("faq.tmpl");

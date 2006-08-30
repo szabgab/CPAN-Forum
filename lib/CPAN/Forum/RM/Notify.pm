@@ -95,7 +95,8 @@ sub rss {
             $it = CPAN::Forum::DB::Posts->search_post_by_pauseid($pauseid);
         }
         else {
-            $self->log->warning("rss requested for $params[0]");
+            $self->log->warning("Invalid rss feed requested for $params[0]");
+            return $self->notes('no_such_rss_feed');
         }
     }
     else {
@@ -120,6 +121,7 @@ sub rss {
     
     return $rss->as_string();
 }
+
 
 
 1;
