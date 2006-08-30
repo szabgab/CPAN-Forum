@@ -72,6 +72,16 @@ sub new {
 
 my $NEXTMARK = '<span class="nextmark">+</span>';
 
+=head2 get_nextmark
+
+get the current value of the separator string
+
+=head2 set_nextmark
+
+set the current value of the separator string
+
+=cut
+
 sub get_nextmark {
     return $NEXTMARK;
 }

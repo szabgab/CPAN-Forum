@@ -90,7 +90,7 @@ sub _feed {
     my ($self, $type) = @_;
 
     die "invalid _feed call '$type'" 
-        if not defined $type or $type ne 'rss' or $type ne 'atom';
+        if not defined $type or ($type ne 'rss' and  $type ne 'atom');
 
     my $limit  = $self->config("${type}_size") || 10;
     my $it = $self->get_feed($limit);
@@ -99,8 +99,8 @@ sub _feed {
         return $self->$call($it, $limit);
     }
     else {
-        $self->log->warning("Invalid $type feed requested for $params[0] $ENV{PATH_INFO}");
-        return $self->notes('no_such_${type}_feed');
+        $self->log->warning("Invalid $type feed requested for $ENV{PATH_INFO}");
+        return $self->notes("no_such_${type}_feed");
     }
 }
 
@@ -135,30 +135,35 @@ sub get_feed {
     my ($self, $limit) = @_;
 
     my @params = @{$self->param("path_parameters")};
-    my $it;
-    if (@params > 1) {
+
+    return if not @params;
+
     if ($params[0] eq 'dist') {
         my $dist = $params[1] || '';
         $self->log->debug("rss of dist: '$dist'");
         my ($group) = CPAN::Forum::DB::Groups->search({ name => $dist });
         if ($group) {
-            $it = CPAN::Forum::DB::Posts->search(gid => $group->id, {order_by => 'date DESC'});
+            return scalar CPAN::Forum::DB::Posts->search(gid => $group->id, {order_by => 'date DESC'});
         }
     }
-    elsif ($params[0] eq 'author') {
+
+    if ($params[0] eq 'author') {
         my $pauseid = uc($params[1]) || '';
-        $self->log->debug("rss of author: '$pauseid'");
         if ($pauseid) {
-            $it = CPAN::Forum::DB::Posts->search_post_by_pauseid($pauseid);
+            $self->log->debug("rss of author: '$pauseid'");
+            return scalar CPAN::Forum::DB::Posts->search_post_by_pauseid($pauseid);
         }
     }
-    elsif ($params[0] eq 'all') {
-        $it = CPAN::Forum::DB::Posts->retrieve_latest($limit);
+
+    if ($params[0] eq 'all') {
+        return scalar CPAN::Forum::DB::Posts->retrieve_latest($limit);
     }
-    elsif ($params[0] eq 'threads') {
-        $it = CPAN::Forum::DB::Posts->search_latest_threads($limit);
+
+    if ($params[0] eq 'threads') {
+        return scalar CPAN::Forum::DB::Posts->search_latest_threads($limit);
     }
-    return $it;
+
+    return;
 }
 
 1;
