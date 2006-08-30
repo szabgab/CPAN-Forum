@@ -11,7 +11,20 @@ __PACKAGE__->has_a(uid    => "CPAN::Forum::DB::Users");
 __PACKAGE__->has_a(gid    => "CPAN::Forum::DB::Groups");
 
 __PACKAGE__->set_sql(latest         => "SELECT __ESSENTIAL__ FROM __TABLE__ ORDER BY DATE DESC LIMIT %s");
-__PACKAGE__->set_sql(latest_threads => "SELECT __ESSENTIAL__ FROM __TABLE__ WHERE parent is NULL ORDER BY DATE DESC LIMIT ?");
+#__PACKAGE__->set_sql(latest_threads => "SELECT A.id, A.thread, A.date FROM posts A WHERE 
+#            thread IN (SELECT DISTINCT B.thread FROM posts B ORDER BY B.date DESC LIMIT ?) 
+#            AND 
+#            id IN (SELECT max(id) FROM posts C WHERE C.thread=A.thread)
+#            ORDER BY A.date DESC");
+
+__PACKAGE__->set_sql(latest_threads => "SELECT A.id, A.thread, A.date FROM posts A WHERE 
+            thread IN (
+                SELECT DISTINCT X.thread FROM posts X WHERE X.thread IN (
+                    SELECT B.thread FROM posts B ORDER BY B.date DESC LIMIT ?)) 
+            AND 
+            id IN (SELECT max(id) FROM posts C WHERE C.thread=A.thread)
+            ORDER BY A.date DESC");
+
 __PACKAGE__->set_sql(count_thread   => "SELECT count(*) FROM __TABLE__ WHERE thread=%s");
 __PACKAGE__->set_sql(count_where    => "SELECT count(*) FROM __TABLE__ WHERE %s='%s'");
 __PACKAGE__->set_sql(count_like     => "SELECT count(*) FROM __TABLE__ WHERE %s LIKE '%s'");
@@ -66,4 +79,3 @@ sub mysearch {
 
 1;
  
-
