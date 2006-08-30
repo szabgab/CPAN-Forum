@@ -1545,11 +1545,21 @@ sub search {
     $self->session->param(search_name => $name);
 
     if ($what and $name) {
-        if ($what eq "module") {
+        if ($what eq "module" or $what eq "pauseid") {
+            my $it;
+            if ($what eq "module") {
+               $it =  CPAN::Forum::Groups->search_like(name => '%' . $name . '%');
+            } else {
+                my ($author) = CPAN::Forum::Authors->search(pauseid => uc $name);
+                if ($author) {
+                    $it =  CPAN::Forum::Groups->search(pauseid => $author->id);
+                } 
+            }
             my @things;
-            my $it =  CPAN::Forum::Groups->search_like(name => '%' . $name . '%');
-            while (my $group  = $it->next) {
-                push @things, {name => $group->name};
+            if ($it) {
+                while (my $group  = $it->next) {
+                    push @things, {name => $group->name};
+                }
             }
             $any_result = 1 if @things;
             $t->param(groups => \@things);
