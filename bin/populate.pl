@@ -32,8 +32,6 @@ my $csv          = Text::CSV_XS->new();
 
 print "This operation can take a couple of minutes\n";
 
-# use this file to retreive list of CPAN authors and their e-mail address 
-# http://www.cpan.org/authors/01mailrc.txt.gz
 
 if (not $opts{source}) {
     my $file = "02packages.details.txt";

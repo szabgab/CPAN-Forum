@@ -21,6 +21,8 @@
   Improve the populate.pl, look at CPANTS for ideas:
   http://search.cpan.org/src/DOMM/Module-CPANTS-ProcessCPAN-0.62/bin/update_authors.pl
   Finish the recent.pl file and maybe replace the populate.pl by using recent.pl
+# use this file to retreive list of CPAN authors and their e-mail address 
+# http://www.cpan.org/authors/01mailrc.txt.gz
 
 
   Cleanup the schema. Currently the schema/schema.sql is not the same as the
@@ -47,6 +49,7 @@
   
   Include number of AnnoCPAN posts
   
+  Provide atom feed
 
   BUG:
   When I try to reply and the original subject is already 50 chars long
