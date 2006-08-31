@@ -411,6 +411,7 @@ Registered users
 
 sub cgiapp_init {
     my $self = shift;
+    $self->param('start_time', time);
     
     my $db_connect = $self->param("DB_CONNECT");
     CPAN::Forum::DBI->myinit($db_connect);
@@ -1558,6 +1559,13 @@ sub teardown {
     # flush added as the Test::WWW::Mechanize::CGI did not work well without
     # it after we started to use file based session objects
     $self->session->flush();
+
+    my $ellapsed_time = time() - $self->param('start_time');
+    # first let's try to resolve the really big problems
+    if ($ellapsed_time > 3) {
+        my $rm = $self->get_current_runmode();
+        $self->log->warning("Long request. Ellapsed time: $ellapsed_time on run-mode: $rm, $ENV{PATH_INFO}"); 
+    }
 }
 
 sub _my_sendmail {
