@@ -99,42 +99,49 @@ sub _feed {
 
     my $limit  = $self->config("${type}_size") || 10;
     my $it = $self->get_feed($limit);
-    #if ($it) {
-        my $call = "_generate_$type";
-        return $self->$call($it, $limit);
-    #}
-    #else {
-    #    $self->log->warning("Invalid $type feed requested for $ENV{PATH_INFO}");
-    #    return $self->notes("no_such_${type}_feed");
-    #}
+
+    my $call = "_generate_$type";
+    my $url = "http://$ENV{HTTP_HOST}";
+    return $self->$call($url, $it, $limit);
 }
 
 sub _generate_atom {
-    my ($self, $it, $limit) = @_;
+    my ($self, $url, $it, $limit) = @_;
 
     require XML::Atom::SimpleFeed;
- 
-    my $url = "http://$ENV{HTTP_HOST}/";
 
     my $feed = XML::Atom::SimpleFeed->new(
         title    => 'CPAN::Forum',
-        link     => $url,
+        link     => "$url/",
         author   => 'admin@cpanforum.com',
+        id       => "$url/",
     );
  
     if ($it) {
         while (my $post = $it->next() and $limit--) {
             my $title = sprintf "[%s] %s", $post->gid->name, $post->subject;
+            my $author = {
+                            name => sprintf("%s %s (%s)", 
+                                        ($post->uid->fname || ''),
+                                        ($post->uid->lname || ''),
+                                        $post->uid->username),
+                            uri  => "$url/users/" . $post->uid->username,
+                        };
+            my $link = "$url/posts/" . $post->id();
             $feed->add_entry(
+                author => $author,
                 title  => $title, # TODO _subject_escape ?
-                link   => $url. "posts/" . $post->id(), 
+                link   => $link,
+                id     => $link,
             );
         }
     }
     else {
         $feed->add_entry(
-            title => 'No posts yet',
-            link  => $url,
+            author => 'No author yet',
+            title  => 'No posts yet',
+            link   => "$url/",
+            id     => "$url/",
         );
     }
 
@@ -145,11 +152,10 @@ sub _generate_atom {
 
 
 sub _generate_rss {
-    my ($self, $it, $limit) = @_;
+    my ($self, $url, $it, $limit) = @_;
 
     require XML::RSS::SimpleGen;
-    my $url = "http://$ENV{HTTP_HOST}/";
-    my $rss = XML::RSS::SimpleGen->new( $url, "CPAN Forum", "Discussing Perl CPAN modules");
+    my $rss = XML::RSS::SimpleGen->new( "$url/", "CPAN Forum", "Discussing Perl CPAN modules");
     $rss->language( 'en' );
 
     # TODO: replace this e-mail address with a configurable value
@@ -158,13 +164,13 @@ sub _generate_rss {
     if ($it) {
         while (my $post = $it->next() and $limit--) {
             my $title = sprintf "[%s] %s", $post->gid->name, $post->subject;
-            $rss->item($url. "posts/" . $post->id(), $title); # TODO _subject_escape ?
+            $rss->item("$url/posts/" . $post->id(), $title); # TODO _subject_escape ?
         }
     }
     else {
         # TODO: maybe we should put a link here to search that module ot that
         # PAUSEID?
-        $rss->item($url, "No posts yet");
+        $rss->item("$url/", "No posts yet");
     }
 
     $self->header_props(-type => 'application/rss+xml');

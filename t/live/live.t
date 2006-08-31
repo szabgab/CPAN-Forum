@@ -89,6 +89,32 @@ use CPAN::Forum::DB::Posts;
 }
 
 {
+    $w->get_ok("$url/atom/all");
+    $w->content_like(qr{<entry>});
+
+    $w->get_ok("$url/atom/threads");
+    $w->content_like(qr{<entry>});
+
+    #TODO: also test Content type
+
+    $w->get_ok("$url/atom/dist/CPAN-Forum");
+    $w->content_like(qr{<entry>});
+    $w->content_like(qr{No forum for libnet});
+
+    $w->get_ok("$url/atom/author/SZABGAB");
+    $w->content_like(qr{<entry>});
+
+    #$w->get_ok("$url/atom/author/no_such_author");
+    #diag $w->content;
+    #$w->content_like(qr{<entry>});
+
+    $w->get_ok("$url/atom/no_such_feed/xyz");
+    $w->content_like(qr{No posts yet});
+
+    BEGIN { $tests += 11; }
+}
+
+{
     $w->get_ok("$url/about/");
     $w->content_like(qr{Tools used});
 
