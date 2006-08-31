@@ -99,51 +99,54 @@ sub search {
     $self->session->param(search_what => $what);
     $self->session->param(search_name => $name);
 
-    if ($what and $name) {
-        if ($what eq "module" or $what eq "pauseid") {
-            my $it;
-            if ($what eq "module") {
-               $it =  CPAN::Forum::DB::Groups->search_like(name => '%' . $name . '%');
-            } else {
-                my ($author) = CPAN::Forum::DB::Authors->search(pauseid => uc $name);
-                if ($author) {
-                    $it =  CPAN::Forum::DB::Groups->search(pauseid => $author->id);
-                } 
-            }
-            my @things;
-            if ($it) {
-                while (my $group  = $it->next) {
-                    push @things, {name => $group->name};
-                }
-            }
-            $any_result = 1 if @things;
-            $t->param(groups => \@things);
-            $t->param($what => 1);
-        } elsif ($what eq "user") {
-            my @things;
-            my $it =  CPAN::Forum::DB::Users->search_like(username => '%' . lc($name) . '%');
-            while (my $user  = $it->next) {
-                push @things, {username => $user->username};
-            }
-            $any_result = 1 if @things;
-            $t->param(users => \@things);
-            $t->param($what => 1);
+    if (not $what or not $name) {
+        $t->output;
+    }
+
+    if ($what eq "module" or $what eq "pauseid") {
+        my $it;
+        if ($what eq "module") {
+            $it =  CPAN::Forum::DB::Groups->search_like(name => '%' . $name . '%');
         } else {
-            my %where;
-            if ($what eq "subject") { %where = (subject => {'LIKE', '%' . $name . '%'}); }
-            if ($what eq "text")    { %where = (text    => {'LIKE', '%' . $name . '%'}); }
-            $self->log->debug("Search 1: " . join "|", %where);
-            if (%where) {
-
-                $self->log->debug("Search 2: " . join "|", %where);
-
-                my $page = $q->param('page') || 1;
-                $any_result = $self->_search_results($t, {where => \%where, page => $page});
-                $t->param($what => 1);
+            my ($author) = CPAN::Forum::DB::Authors->search(pauseid => uc $name);
+            if ($author) {
+                $it =  CPAN::Forum::DB::Groups->search(pauseid => $author->id);
+            } 
+            $t->param(pauseid_name => uc $name)
+        }
+        my @things;
+        if ($it) {
+            while (my $group  = $it->next) {
+                push @things, {name => $group->name};
             }
         }
-        $t->param(no_results => not $any_result);
+        $any_result = 1 if @things;
+        $t->param(groups => \@things);
+        $t->param($what => 1);
+    } elsif ($what eq "user") {
+        my @things;
+        my $it =  CPAN::Forum::DB::Users->search_like(username => '%' . lc($name) . '%');
+        while (my $user  = $it->next) {
+            push @things, {username => $user->username};
+        }
+        $any_result = 1 if @things;
+        $t->param(users => \@things);
+        $t->param($what => 1);
+    } else {
+        my %where;
+        if ($what eq "subject") { %where = (subject => {'LIKE', '%' . $name . '%'}); }
+        if ($what eq "text")    { %where = (text    => {'LIKE', '%' . $name . '%'}); }
+        $self->log->debug("Search 1: " . join "|", %where);
+        if (%where) {
+
+            $self->log->debug("Search 2: " . join "|", %where);
+
+            my $page = $q->param('page') || 1;
+            $any_result = $self->_search_results($t, {where => \%where, page => $page});
+            $t->param($what => 1);
+        }
     }
+    $t->param(no_results => not $any_result);
     $t->output;
 }
 

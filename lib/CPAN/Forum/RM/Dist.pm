@@ -56,7 +56,8 @@ sub dist {
     my $page = $q->param('page') || 1;
     $self->_search_results($t, {where => {gid => $gid}, page => $page});
     $self->_subscriptions($t, $gr);
-    $t->output;
+    $t->param(pauseid_name => $gr->pauseid->pauseid);
+    return $t->output;
 }
 
 1;

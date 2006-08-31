@@ -4,6 +4,13 @@
 <TMPL_INCLUDE NAME="navigation.tmpl">
 <TMPL_INCLUDE NAME="search_form.tmpl">
 
+<TMPL_IF pauseid_name>
+    <p>
+    All the posts related to modules of 
+       <a href="/author/<TMPL_VAR pauseid_name>"><TMPL_VAR pauseid_name></a>.
+    </p>
+</TMPL_IF>
+
 <TMPL_LOOP groups>
    <a href="/dist/<TMPL_VAR name>"><TMPL_VAR name></a><br />
 </TMPL_LOOP>

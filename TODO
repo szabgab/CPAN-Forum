@@ -32,25 +32,19 @@
 
   Make the data restrictions stricter in the schema (UNIQUE, NOT NULL)
 
-  Enable listing modules based on module author
-
   Provide the alerts in rss feed as well, not only in e-mail.
   Let people subscribe to alerts but ask to have the RSS feed only, no e-mails.
   /rss/user/username
-
 
   Check if the database (and its parent directory) is writable by the process 
   and give appropriate error message if not.
   BUG: If the directory of the database is not writable and logging was setup the
    application fails.
 
-
   Logging: enable logging based on a single client IP address
   
   Include number of AnnoCPAN posts
   
-  Provide atom feed
-
   BUG:
   When I try to reply and the original subject is already 50 chars long
   in offers a new subject with Re: prefix but then when I try to submit
@@ -60,11 +54,8 @@
   subject and press preview again
   it returns the same error message as it put back the word where it was earlier.
 
- 
-  Clean up the listing of the subscribers at the bottom of the pages:
-  Separate people who will receive all messages
-  Thread starters
-  And show names of people with "followup set" only within the threads they posted.
+  At the bottom of the pages add subscribers to specific threads
+  and thread started in separate listsings.
   
   Script that populates database should not lock the whole database for a long time
   Maybe it should fetch all the data to memory and work there.

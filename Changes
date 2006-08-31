@@ -1,6 +1,11 @@
 
 v0.12 
 
+  Added /atom feed.
+  Added /rss/threads feed with the latest threads
+  Enable listing modules based on module author
+
+
   Add /author/PAUSEID to show all posts related to modules maintained by
   PAUSEID
 
