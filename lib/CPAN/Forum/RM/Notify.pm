@@ -81,6 +81,11 @@ sub rss {
     $self->_feed('rss');
 }
 
+=head2 atom
+
+adom feed
+
+=cut
 sub atom {
     my ($self) = @_;
     $self->_feed('atom');
@@ -95,7 +100,7 @@ sub _feed {
     my $limit  = $self->config("${type}_size") || 10;
     my $it = $self->get_feed($limit);
     #if ($it) {
-        my $call = "generate_$type";
+        my $call = "_generate_$type";
         return $self->$call($it, $limit);
     #}
     #else {
@@ -104,13 +109,42 @@ sub _feed {
     #}
 }
 
-sub generate_atom {
-    # TODO
-    die "TODO";
+sub _generate_atom {
+    my ($self, $it, $limit) = @_;
+
+    require XML::Atom::SimpleFeed;
+ 
+    my $url = "http://$ENV{HTTP_HOST}/";
+
+    my $feed = XML::Atom::SimpleFeed->new(
+        title    => 'CPAN::Forum',
+        link     => $url,
+        author   => 'admin@cpanforum.com',
+    );
+ 
+    if ($it) {
+        while (my $post = $it->next() and $limit--) {
+            my $title = sprintf "[%s] %s", $post->gid->name, $post->subject;
+            $feed->add_entry(
+                title  => $title, # TODO _subject_escape ?
+                link   => $url. "posts/" . $post->id(), 
+            );
+        }
+    }
+    else {
+        $feed->add_entry(
+            title => 'No posts yet',
+            link  => $url,
+        );
+    }
+
+    $self->header_props(-type => 'application/atom+xml');
+    
+    return $feed->as_string();
 }
 
 
-sub generate_rss {
+sub _generate_rss {
     my ($self, $it, $limit) = @_;
 
     require XML::RSS::SimpleGen;

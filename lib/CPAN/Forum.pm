@@ -507,7 +507,9 @@ my @free_modes = qw(
     search all 
     site_is_closed
     help
-    rss ); 
+    rss
+    atom
+); 
 my @restricted_modes = qw(
     new_post process_post
     mypan 
@@ -532,7 +534,9 @@ my @urls = qw(
     admin
     admin_edit_user
     mypan selfconfig 
-    search all rss 
+    search all 
+    rss
+    atom
 ); 
 
 use base 'CPAN::Forum::RM::Author';

@@ -34,6 +34,7 @@ my $builder = Module::Build->new(
         'Parse::CPAN::Packages'                 => '2.26',  # for populating and maybe also later ?
         'LWP::Simple'                           => 0,  # for populate
         'XML::RSS::SimpleGen'                   => 0,  # for, well RSS generation
+        'XML::Atom::SimpleFeed'                 => 0,
         'Mail::Sendmail'                        => 0,  
         'CGI::Session::SQLite'                  => 0,
         'Parse::RecDescent'                     => 0,
