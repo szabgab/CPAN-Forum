@@ -8,9 +8,7 @@ use base 'CGI::Application';
 use CGI::Application::Plugin::Session;
 use CGI::Application::Plugin::LogDispatch;
 use Data::Dumper qw(Dumper);
-#use Fcntl qw(:flock);
 use POSIX qw(strftime);
-#use Carp qw(cluck carp);
 use Mail::Sendmail qw(sendmail);
 use CGI ();
 use List::MoreUtils qw(any);
@@ -534,7 +532,8 @@ my @urls = qw(
     admin
     admin_edit_user
     mypan selfconfig 
-    search all rss); 
+    search all rss 
+); 
 
 use base 'CPAN::Forum::RM::Author';
 use base 'CPAN::Forum::RM::Dist';
@@ -697,15 +696,27 @@ sub autoload {
 
 =head2 home
 
-This the default run mode, it shows the home page that includes the list of
-most recent posts.
+This the default run mode, it shows the home page.
+Currently aliased to C<all()>;
+
 
 =cut
 sub home {
+    all(@_);
+}
+
+
+=head2 all
+
+List the most recent posts.
+
+=cut
+
+sub all {
     my $self = shift;
     my $q = $self->query;
     
-    $self->log->debug("home");
+    $self->log->debug("all");
     my $t = $self->load_tmpl("home.tmpl",
         loop_context_vars => 1,
     );
@@ -716,14 +727,22 @@ sub home {
     $t->output;
 }
 
+=head2 recent_thread
 
-=head2 all
+Display the posts of the most recent threads
+Not yet working.
 
-An alias of the C<home()> run-mode.
 =cut
 
-sub all {
-    home(@_);
+sub recent_threads {
+    my ($self) = @_;
+    my $q = $self->query;
+
+    $self->log->debug("recent_threads");
+    my $t = $self->load_tmpl("home.tmpl",
+        loop_context_vars => 1,
+    );
+    $t->output; 
 }
 
 
