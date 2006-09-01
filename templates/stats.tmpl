@@ -13,14 +13,16 @@
 </table>
 </div>
 
-<div class="about_list">
-<p class="about_title">10 most active users (number of posts)</p>
-<table>
-<TMPL_LOOP users>
-  <tr><td><a href="/users/<TMPL_VAR username>"><TMPL_VAR username></a></td><td><TMPL_VAR cnt></td></tr>
-</TMPL_LOOP>
-</table>
-</div>
+<TMPL_IF users>
+    <div class="about_list">
+    <p class="about_title">10 most active users (number of posts)</p>
+    <table>
+    <TMPL_LOOP users>
+      <tr><td><a href="/users/<TMPL_VAR username>"><TMPL_VAR username></a></td><td><TMPL_VAR cnt></td></tr>
+    </TMPL_LOOP>
+    </table>
+    </div>
+</TMPL_IF>
 
 <TMPL_INCLUDE NAME="footer.tmpl">
 

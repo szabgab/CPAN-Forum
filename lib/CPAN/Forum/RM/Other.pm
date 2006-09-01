@@ -39,10 +39,12 @@ sub stats {
     my $self = shift;
     my $t = $self->load_tmpl("stats.tmpl");
     my @groups = CPAN::Forum::DB::Posts->search_stat_posts_by_group(50);
-    my @users  = CPAN::Forum::DB::Posts->search_stat_posts_by_user(10);
-    
+    #my @users  = CPAN::Forum::DB::Posts->search_stat_posts_by_user(10);
+    #
+    # TODO: user stats removed as it was extreamly slow..
+    #     
     $t->param(groups => \@groups);
-    $t->param(users  => \@users);
+    #$t->param(users  => \@users);
     $t->output;
 }
 
