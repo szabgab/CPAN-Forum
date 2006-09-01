@@ -5,4 +5,5 @@ Disallow: /admin/
 Disallow: /rss/dist/
 Disallow: /rss/author/
 Disallow: /rss/user/
+Disallow: /response_form/
 
