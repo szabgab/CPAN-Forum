@@ -5,6 +5,7 @@ use Carp;
 use base 'CPAN::Forum::DBI';
 __PACKAGE__->table('posts');
 __PACKAGE__->columns(All => qw/id gid uid parent subject text date thread hidden/);
+__PACKAGE__->columns(Essential => qw/id gid uid parent subject text date thread hidden/);
 #__PACKAGE__->has_many(responses => "CPAN::Forum::DB::Posts");
 __PACKAGE__->has_a(parent => "CPAN::Forum::DB::Posts");
 __PACKAGE__->has_a(uid    => "CPAN::Forum::DB::Users");
