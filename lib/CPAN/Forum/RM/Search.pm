@@ -100,7 +100,7 @@ sub search {
     $self->session->param(search_name => $name);
 
     if (not $what or not $name) {
-        $t->output;
+        return $t->output;
     }
 
     if ($what eq "module" or $what eq "pauseid") {

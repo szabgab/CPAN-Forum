@@ -56,7 +56,12 @@ sub dist {
     my $page = $q->param('page') || 1;
     $self->_search_results($t, {where => {gid => $gid}, page => $page});
     $self->_subscriptions($t, $gr);
-    $t->param(pauseid_name => $gr->pauseid->pauseid);
+
+    # TODO: is is not clear to me how can here anything be undef, but I got
+    # several exceptions on eith $gr or $gr->pauseid being undef:
+    if ($gr and  $gr->pauseid and $gr->pauseid->pauseid) {
+        $t->param(pauseid_name => $gr->pauseid->pauseid);
+    }
     return $t->output;
 }
 
