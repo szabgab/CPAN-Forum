@@ -287,7 +287,10 @@ personal infromation:
 Removed the use of CPAN::Forum::Build - need to see what was it doing and
 replace its functionality with something better
 
+Allow the module author to put an announcement in front of their module forum.  
+Just some arbitrary block of HTML is fine.  
 
+Allow the author to delete their forum.  "Opt out".  ????
 
 Shlomi:
 The Forum uses cgiapp_prerun to set the mode according to the PATH_INFO instead of 
