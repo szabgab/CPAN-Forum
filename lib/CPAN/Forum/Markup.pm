@@ -5,6 +5,8 @@ use warnings;
 use CGI qw();
 use Parse::RecDescent;
 
+my $parser;
+
 =head2 new
 
 Create the markup grammar
@@ -13,6 +15,7 @@ Create the markup grammar
 
 sub new {
     my ($class) = @_;
+
     my $self = bless {}, $class;
     
     $self->{grammar} = q {
@@ -130,7 +133,10 @@ Run the Parse::RecDescent parser
 
 sub parser {
     my ($self) = @_;
-    return Parse::RecDescent->new($self->{grammar});
+    if (not $parser) {
+        $parser = Parse::RecDescent->new($self->{grammar});
+    }
+    return $parser;
 }
 
 =head2 posting_process
