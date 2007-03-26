@@ -71,6 +71,7 @@ sub notify_admin {
 
 Provide RSS feed
 /rss/all  latest N entries
+/rss/threads  latest N active threads
 /rss/dist/Distro-Name  latest N entries of that distro name
 /rss/author/PAUSEID
 

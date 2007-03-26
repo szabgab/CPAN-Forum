@@ -7,6 +7,10 @@
 <TMPL_INCLUDE NAME="links.tmpl">
 </TMPL_IF>
 
+<TMPL_IF admin>
+    <a href="/?rm=hide&amp;post=<TMPL_VAR id>">hide this post</a>
+</TMPL_IF>
+
 <TMPL_IF post>
 	<p>
 	<TMPL_INCLUDE NAME="message.tmpl">

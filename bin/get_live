@@ -1,0 +1,2 @@
+mkdir live
+scp cpanforum.com:/var/www/cpanforum.com/live/db/forum.db live/
