@@ -12,12 +12,6 @@ sub notify {
     my ($self, $post_id) = @_;
     
     my $post = CPAN::Forum::DB::Posts->retrieve($post_id);
-    if ($self->config("disable_email_notification")) {
-        warn "disabled";
-    } else {
-        warn "enabled";
-    }
-    return $self->config("disable_email_notification");
 
     my $message = 
         $self->_text2mail ($post->text) .

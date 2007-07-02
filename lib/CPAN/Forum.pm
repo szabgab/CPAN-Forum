@@ -7,7 +7,7 @@ our $VERSION = '0.12';
 use base 'CGI::Application';
 use CGI::Application::Plugin::Session;
 use CGI::Application::Plugin::LogDispatch;
-use Data::Dumper qw(Dumper);
+use Data::Dumper qw();
 use POSIX qw(strftime);
 use Mail::Sendmail qw(sendmail);
 use CGI ();
@@ -1498,13 +1498,13 @@ sub _sendmail {
     my ($self, $it, $mail, $to, $uids) = @_;
 
     while (my $s = $it->next) {
+        #$self->log->debug(Data::Dumper->Dump([$mail], ['mail']));
         my $email = $s->uid->email;
-        $self->log->debug("Sending to $email ?");
         $mail->{To} = $email;
         $self->log->debug("Processing uid: " . $s->uid->username) if $uids;
         next if $uids and not $uids->{$s->uid->username};
         $self->log->debug("Sending to $email id was found");
-        next if $_[2]->{$email}++;
+        next if $_[3]->{$email}++; #TODO: stop using hardcoded reference to position!!!!!
         $self->log->debug("Sending to $email first time sending");
         $self->_my_sendmail(%$mail);
         $self->log->debug("Sent to $email");
@@ -1570,9 +1570,12 @@ sub teardown {
 
 sub _my_sendmail {
     my ($self, @args) = @_;
+    #$self->log->debug(Data::Dumper->Dump([\@args], ['_my_sendmail']));
 
     return if $ENV{NO_CPAN_FORUM_MAIL};
     # for testing
+    return if $self->config("disable_email_notification");
+
     if (defined &_test_my_sendmail) {
         $self->_test_my_sendmail(@_);
         return;
