@@ -16,9 +16,11 @@ use CPAN::Forum::DB::Groups;
 
 
 
-my %opts;
+my %opts = (
+    cpan => 'http://www.cpan.org',
+);
 
-GetOptions(\%opts, "sendmail", "source=s", "dir=s", "fetch", "help") 
+GetOptions(\%opts, "sendmail", "source=s", "dir=s", "fetch", "help", "cpan") 
     or usage();
 usage() if $opts{help};
 usage() if not $opts{dir};
@@ -43,7 +45,7 @@ if ($opts{fetch}) {
     # must have downloaded and un-gzip-ed
     # ~/mirror/cpan/modules/02packages.details.txt.gz 
     print "Fecthing  $opts{source} from CPAN\n";
-    getstore("http://www.cpan.org/modules/02packages.details.txt.gz", "$opts{source}.gz");
+    getstore("$opts{cpan}/modules/02packages.details.txt.gz", "$opts{source}.gz");
     print "Unzipping $opts{source}\n";
     system("gunzip $opts{source}.gz");
 }
@@ -182,7 +184,14 @@ $0
     --source FILE   path to the 02packages.details.txt
     --dir DIR       directory of the database
     --fetch
+    --cpan URL      (default http://www.cpan.org ) 
     --help          this help
+
+If you have a local mirror:
+ cp /home/gabor/download/cpan/02packages.details.txt.gz db/
+ gunzip db/02packages.details.txt.gz
+ perl bin/populate.pl --dir db/
+
 END_USAGE
     exit;
 }

@@ -31,6 +31,8 @@ Data updated. <a href="/admin/">look at it again</a>
 </p>
 <table>
 <tr><td>From address:</td><td><input name="from" value="<TMPL_VAR from>" size="50"></td></tr>
+<tr><td>Disable e-mail notification:</td>
+    <td><input name="disable_email_notification" type="checkbox" <TMPL_IF disable_email_notification>CHECKED</TMPL_IF> size="50"></td></tr>
 <tr><td>Page size:</td><td><input name="per_page" value="<TMPL_VAR per_page>" size="5"></td></tr>
 <tr><td>RSS size:</td><td><input name="rss_size" value="<TMPL_VAR rss_size>" size="5"></td></tr>
 <tr><td>Status:</td><td><select name="status">

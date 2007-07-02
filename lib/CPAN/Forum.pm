@@ -161,7 +161,7 @@ we need to have the first values.
 
 Run:
 
-    perl bin/setup.pl 
+    perl bin/setup.pl --config CONFIG --dir db
 
 (you can now delete the CONFIG file)
 

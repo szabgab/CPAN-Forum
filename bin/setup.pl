@@ -39,7 +39,9 @@ unlink $dbfile if -e $dbfile;
 mkdir $opts{dir} if not -e $opts{dir};
 CPAN::Forum::DBI->myinit("dbi:SQLite:$dbfile");
 CPAN::Forum::DBI->init_db("schema/schema.sql", $dbfile);
-chmod 0755, $dbfile;
+print "Turning database directory and database word writable, for now\n";
+chmod 0777, $opts{dir};
+chmod 0777, $dbfile;
 
 
 my $from = delete $opt{from};

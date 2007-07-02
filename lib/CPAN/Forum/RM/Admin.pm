@@ -59,7 +59,8 @@ sub admin_process {
     my $q = $self->query;
 
     # fields that can have only one value
-    foreach my $field (qw(rss_size per_page from flood_control_time_limit )) {
+    foreach my $field (qw(rss_size per_page from flood_control_time_limit 
+                disable_email_notification)) {
         if (my ($conf) = CPAN::Forum::DB::Configure->find_or_create({field => $field})) {
             $conf->value($q->param($field));
             $conf->update;
