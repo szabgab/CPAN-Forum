@@ -510,6 +510,7 @@ my @free_modes = qw(
     help
     rss
     atom
+    update
 ); 
 my @restricted_modes = qw(
     new_post process_post
@@ -538,6 +539,7 @@ my @urls = qw(
     search all 
     rss
     atom
+    update
 ); 
 
 use base 'CPAN::Forum::RM::Author';
@@ -550,6 +552,7 @@ use base 'CPAN::Forum::RM::Notify';
 use base 'CPAN::Forum::RM::Search';
 use base 'CPAN::Forum::RM::Subscriptions';
 use base 'CPAN::Forum::RM::UserAccounts';
+use base 'CPAN::Forum::RM::Update';
 my %RM_MAP = (
     author                  => 'CPAN::Forum::RM::Author',
 
@@ -696,7 +699,8 @@ rm=something
 
 sub autoload {
     my $self = shift;
-    $self->log->debug("autoload called: @ARGV");
+    my $rm = $self->get_current_runmode();
+    $self->log->debug("autoload called run-mode='$rm' ARGV='@ARGV'");
     $self->internal_error();
 }
 

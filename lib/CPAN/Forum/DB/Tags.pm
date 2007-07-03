@@ -6,18 +6,34 @@ use CPAN::Forum::DBI;
 
 use Carp qw();
 
+sub get_tags_hash_of {
+    my ($self, $group_id, $uid) = @_;
+    my $dbh = CPAN::Forum::DBI::db_Main();
+    my $sql = "SELECT tags.name, tags.id
+                             FROM tag_cloud, tags
+                             WHERE tag_cloud.tag_id=tags.id AND tag_cloud.uid=? AND tag_cloud.group_id=?";
+    my $sth = $dbh->prepare($sql);
+    $sth->execute($uid, $group_id);
+    my %tags;
+    while (my ($name, $id) = $sth->fetchrow_array) {
+        $tags{$name} = $id;
+    }
+    return \%tags;
+}
+
+
 sub get_tags_of {
     my ($self, $group_id, $uid) = @_;
     if (not defined $uid) {
         return $self->get_tags_of_module($group_id);
     }
     my $dbh = CPAN::Forum::DBI::db_Main();
-    my $sql = "SELECT tags.name name 
+    my $sql = "SELECT tags.name name
                              FROM tag_cloud, tags
                              WHERE tag_cloud.tag_id=tags.id AND tag_cloud.uid=? AND tag_cloud.group_id=?";
     my $sth = $dbh->prepare($sql);
     $sth->execute($uid, $group_id);
-    my $ar = $sth->fetchrow_arrayref;
+    my $ar = $sth->fetchall_arrayref;
     my @names = map { {name => $_->[0]} } @$ar;
     return \@names;
 }
@@ -30,14 +46,15 @@ sub get_tags_of_module {
                              WHERE tag_cloud.tag_id=tags.id AND tag_cloud.group_id=?";
     my $sth = $dbh->prepare($sql);
     $sth->execute($group_id);
-    my $ar = $sth->fetchrow_arrayref;
+    my $ar = $sth->fetchall_arrayref;
     my @names = map { {name => $_->[0]} } @$ar;
     return \@names;
 }
 
 sub attach_tag {
-    my ($self, $group_id, $text) = @_;
-    Carp::croak("Invalid tag") if not defined $text or $text !~ /^\w+$/;
+    my ($self, $uid, $group_id, $text) = @_;
+    Carp::croak("Missing tag") if not defined $text;
+    #Carp::croak("Invalid tag") if not defined $text or $text !~ /^\w+$/;
 
     $text = lc $text;
 
@@ -48,8 +65,17 @@ sub attach_tag {
     return if not $tag_id;
 
     my $dbh = CPAN::Forum::DBI::db_Main();
-    return $dbh->do("INSERT INTO tags_on_groups (tag_id, group_id) VALUES (?, ?)",
-            undef, $tag_id, $group_id);
+    return $dbh->do("INSERT INTO tag_cloud (tag_id, group_id, uid) VALUES (?, ?, ?)",
+            undef, $tag_id, $group_id, $uid);
+}
+
+sub remove_tag {
+    my ($self, $uid, $group_id, $tag_id) = @_;
+
+    my $dbh = CPAN::Forum::DBI::db_Main();
+    return $dbh->do("DELETE FROM tag_cloud WHERE uid=? AND group_id=? AND tag_id=?",
+                undef,
+                $uid, $group_id, $tag_id);
 }
 
 # assume valid text
@@ -57,7 +83,7 @@ sub _add_tag {
     my ($self, $text) = @_;
     
     my $dbh = CPAN::Forum::DBI::db_Main();
-    my $sth->do("INSERT INTO tags (name) VALUES (?)", undef, $text);
+    $dbh->do("INSERT INTO tags (name) VALUES (?)", undef, $text);
     return $self->_get_tag_id($text);
 }
 

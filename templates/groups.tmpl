@@ -16,9 +16,9 @@ All the posts related to modules of <a href="/author/<TMPL_VAR pauseid_name>"><T
 My Tags: <TMPL_LOOP tags><TMPL_VAR name>, </TMPL_LOOP>
 </TMPL_IF><br />
 <form method="post" action="/update/">
-<input type="hidden" name="rm" value="tags" />
-<input type="hidden" name="group" value="<TMPL_VAR group>" />
-<input name="tag" value="<TMPL_LOOP tags><TMPL_VAR name>, </TMPL_LOOP>" />
+<input type="hidden" name="what" value="tags" />
+<input type="hidden" name="group_id" value="<TMPL_VAR group_id>" />
+<input name="new_tags" value="<TMPL_LOOP tags><TMPL_VAR name>, </TMPL_LOOP>" />
 <input type="submit" value="Update tags" />
 </form>
 </p>
