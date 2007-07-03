@@ -586,6 +586,8 @@ my %RM_MAP = (
     selfconfig              => 'CPAN::Forum::RM::UserAccounts',
     change_info             => 'CPAN::Forum::RM::UserAccounts',
     change_password         => 'CPAN::Forum::RM::UserAccounts',
+
+    tags                    => 'CPAN::Forum::RM::Tags',
 );
 
 =head2 setup

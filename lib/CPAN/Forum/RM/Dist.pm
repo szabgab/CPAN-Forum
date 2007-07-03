@@ -62,6 +62,10 @@ sub dist {
     if ($gr and  $gr->pauseid and $gr->pauseid->pauseid) {
         $t->param(pauseid_name => $gr->pauseid->pauseid);
     }
+
+    #my (@tags) = CPAN::Forum::DB::Tags->list_tags($gid);
+    #$t->param(tags => join ", ", @tags);
+
     return $t->output;
 }
 

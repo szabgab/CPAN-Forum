@@ -24,6 +24,7 @@ lib/CPAN/Forum/DB/Posts.pm
 lib/CPAN/Forum/DB/Subscriptions_all.pm
 lib/CPAN/Forum/DB/Subscriptions_pauseid.pm
 lib/CPAN/Forum/DB/Subscriptions.pm
+lib/CPAN/Forum/DB/Tags.pm
 lib/CPAN/Forum/DB/Users.pm
 lib/CPAN/Forum/DB/Usergroups.pm
 lib/CPAN/Forum/DB/UserInGroup.pm
@@ -36,6 +37,7 @@ lib/CPAN/Forum/RM/Notify.pm
 lib/CPAN/Forum/RM/Other.pm
 lib/CPAN/Forum/RM/Search.pm
 lib/CPAN/Forum/RM/Subscriptions.pm
+lib/CPAN/Forum/RM/Tags.pm
 lib/CPAN/Forum/RM/UserAccounts.pm
 lib/CPAN/Forum/RM/Users.pm
 

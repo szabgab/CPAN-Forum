@@ -38,6 +38,18 @@ distribution and get alerted when someone posts a new message.
 </p>
 <TMPL_INCLUDE NAME="listing.tmpl">
 
+<!--
+<p>
+Tags: <TMPL_VAR tags><br />
+
+<form method="post" action="/update/">
+<input type="hidden" name="rm" value="tags" />
+<input type="hidden" name="group" value="<TMPL_VAR group>" />
+<input name="tag" value="<TMPL_VAR tag>" />
+<input type="submit" value="Add tag" />
+</form>
+</p>
+-->
 <p>
 Users currently monitoring this forum:
 <TMPL_LOOP users>
