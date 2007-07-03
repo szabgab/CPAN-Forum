@@ -14,7 +14,7 @@ All the posts related to modules of <a href="/author/<TMPL_VAR pauseid_name>"><T
 <TMPL_IF show_tags>
 <p>
 <TMPL_IF tags>
-My Tags: <TMPL_LOOP tags><TMPL_VAR name>, </TMPL_LOOP>
+My Tags: <TMPL_LOOP tags><a href="/tags/name/<TMPL_VAR name>"><TMPL_VAR name></a>, </TMPL_LOOP>
 </TMPL_IF><br />
 <form method="post" action="/update/">
 <input type="hidden" name="what" value="tags" />

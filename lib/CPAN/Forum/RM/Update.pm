@@ -24,6 +24,7 @@ sub _update_tags {
     $self->log->debug("_update_tags in group '$group_id' tags='$new_tags'");
     $new_tags =~ s/^\s+//;
     $new_tags =~ s/\s+$//;
+    $new_tags =~ s{<>/}{};
     my @tags = split /,/, lc $new_tags;
 
     my $uid = $self->session->param('uid');

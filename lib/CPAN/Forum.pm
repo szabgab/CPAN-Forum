@@ -510,7 +510,7 @@ my @free_modes = qw(
     help
     rss
     atom
-    update
+    tags
 ); 
 my @restricted_modes = qw(
     new_post process_post
@@ -522,7 +522,9 @@ my @restricted_modes = qw(
     add_new_group
     response_form 
     module_search
-    selfconfig change_password change_info update_subscription); 
+    selfconfig change_password change_info update_subscription
+    update
+); 
             
 my @urls = qw(
     logout 
@@ -540,6 +542,7 @@ my @urls = qw(
     rss
     atom
     update
+    tags
 ); 
 
 use base 'CPAN::Forum::RM::Author';
@@ -553,45 +556,6 @@ use base 'CPAN::Forum::RM::Search';
 use base 'CPAN::Forum::RM::Subscriptions';
 use base 'CPAN::Forum::RM::UserAccounts';
 use base 'CPAN::Forum::RM::Update';
-my %RM_MAP = (
-    author                  => 'CPAN::Forum::RM::Author',
-
-    dist                    => 'CPAN::Forum::RM::Dist',
-
-    login                   => 'CPAN::Forum::RM::Login',
-    login_process           => 'CPAN::Forum::RM::Login',
-    logout                  => 'CPAN::Forum::RM::Login',
-    pwreminder              => 'CPAN::Forum::RM::Login',
-    pwreminder_process      => 'CPAN::Forum::RM::Login',
-
-    users                   => 'CPAN::Forum::RM::Users',
-
-    admin                   => 'CPAN::Forum::RM::Admin',
-    admin_process           => 'CPAN::Forum::RM::Admin',
-    admin_edit_user         => 'CPAN::Forum::RM::Admin',
-    admin_edit_user_process => 'CPAN::Forum::RM::Admin',
-
-    faq                     => 'CPAN::Forum::RM::Other',
-    about                   => 'CPAN::Forum::RM::Other',
-    stats                   => 'CPAN::Forum::RM::Other',
-
-    mypan                   => 'CPAN::Forum::RM::Subscriptions',
-    update_subscription     => 'CPAN::Forum::RM::Subscriptions',
-
-    notify                  => 'CPAN::Forum::RM::Notify',
-    notify_admin            => 'CPAN::Forum::RM::Notify',
-    rss                     => 'CPAN::Forum::RM::Notify',
-
-    module_search_form      => 'CPAN::Forum::RM::Search',
-    module_search           => 'CPAN::Forum::RM::Search',
-    search                  => 'CPAN::Forum::RM::Search',
-
-    selfconfig              => 'CPAN::Forum::RM::UserAccounts',
-    change_info             => 'CPAN::Forum::RM::UserAccounts',
-    change_password         => 'CPAN::Forum::RM::UserAccounts',
-
-    tags                    => 'CPAN::Forum::RM::Tags',
-);
 
 =head2 setup
 
@@ -627,14 +591,6 @@ sub cgiapp_prerun {
     }
 
     my $rm = $self->_set_run_mode();
-    if ($RM_MAP{$rm}) {
-        ## no critic (ProhibitStringyEval)
-        $self->log->debug("Loading $RM_MAP{$rm}");
-        #eval "use base $RM_MAP{$rm}";
-        #if ($@) {
-        #    $self->log->critical("Could not load $RM_MAP{$rm}: $@");
-        #}
-    }
 
     $self->log->debug("Current runmode:  $rm");
     $self->log->debug("Current user:  " . ($self->session->param("username") || ""));
