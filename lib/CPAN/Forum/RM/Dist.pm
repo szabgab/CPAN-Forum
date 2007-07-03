@@ -64,8 +64,11 @@ sub dist {
     }
 
     my $uid = $self->session->param('uid');
-    my $tags = CPAN::Forum::DB::Tags->get_tags_of($gid, $uid);
-    $t->param(tags => $tags);
+    if ($uid) {
+        my $tags = CPAN::Forum::DB::Tags->get_tags_of($gid, $uid);
+        $t->param(tags      => $tags);
+        $t->param(show_tags => 1);
+    }
     $t->param(group_id => $gid);
 
     return $t->output;
