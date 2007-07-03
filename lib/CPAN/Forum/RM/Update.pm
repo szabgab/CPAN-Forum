@@ -25,7 +25,7 @@ sub _update_tags {
     $new_tags =~ s/^\s+//;
     $new_tags =~ s/\s+$//;
     $new_tags =~ s{<>/}{};
-    my @tags = split /,/, lc $new_tags;
+    my @tags = map {s/^\s+|\s+$//g; $_}  split /,/, lc $new_tags;
 
     my $uid = $self->session->param('uid');
 

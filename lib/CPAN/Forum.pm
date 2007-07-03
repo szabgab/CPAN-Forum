@@ -554,6 +554,7 @@ use base 'CPAN::Forum::RM::Other';
 use base 'CPAN::Forum::RM::Notify';
 use base 'CPAN::Forum::RM::Search';
 use base 'CPAN::Forum::RM::Subscriptions';
+use base 'CPAN::Forum::RM::Tags';
 use base 'CPAN::Forum::RM::UserAccounts';
 use base 'CPAN::Forum::RM::Update';
 

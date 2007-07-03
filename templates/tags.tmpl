@@ -1,0 +1,12 @@
+<TMPL_INCLUDE NAME="head.tmpl">
+<p id="pageTitle"><b>Tags</b></p>
+<TMPL_INCLUDE NAME="navigation.tmpl">
+<TMPL_INCLUDE NAME="search_form.tmpl">
+<TMPL_INCLUDE NAME="links.tmpl">
+
+<TMPL_LOOP tags>
+<a href="/tags/name/<TMPL_VAR name>"><TMPL_VAR name></a>
+<TMPL_UNLESS __last__>, </TMPL_UNLESS>
+</TMPL_LOOP>
+
+<TMPL_INCLUDE NAME="footer.tmpl">

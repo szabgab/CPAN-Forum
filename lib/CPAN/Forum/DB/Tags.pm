@@ -99,6 +99,22 @@ sub _get_tag_id {
     return $id;
 }
 
+sub get_all_tags {
+    my ($self) = @_;
+
+    my $dbh = CPAN::Forum::DBI::db_Main();
+    my $sql = "SELECT name
+                FROM tags
+                WHERE id IN (SELECT DISTINCT tag_id FROM tag_cloud) ORDER BY name ASC";
+    my $sth = $dbh->prepare($sql);
+    $sth->execute;
+    my @tags;
+    while (my $hr = $sth->fetchrow_hashref) {
+        push @tags, $hr;
+    }
+    return \@tags;
+}
+
 
 =head1 Design
 
