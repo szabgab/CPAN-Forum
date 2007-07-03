@@ -63,8 +63,9 @@ sub dist {
         $t->param(pauseid_name => $gr->pauseid->pauseid);
     }
 
-    #my (@tags) = CPAN::Forum::DB::Tags->list_tags($gid);
-    #$t->param(tags => join ", ", @tags);
+    my $uid = $self->session->param('uid');
+    my $tags = CPAN::Forum::DB::Tags->get_tags_of($gid, $uid);
+    $t->param(tags => $tags);
 
     return $t->output;
 }

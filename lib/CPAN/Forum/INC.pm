@@ -18,7 +18,7 @@ use CPAN::Forum::DB::Usergroups;
 use CPAN::Forum::DB::UserInGroup;
 use CPAN::Forum::DB::Users;
 
-#use CPAN::Forum::DB::Tags;
+use CPAN::Forum::DB::Tags;
 
 
 1;
