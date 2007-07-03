@@ -115,6 +115,22 @@ sub get_all_tags {
     return \@tags;
 }
 
+sub get_modules_with_tag {
+    my ($self, $tag_name) = @_;
+
+    my $sql = "SELECT groups.name
+               FROM groups, tags, tag_cloud
+               WHERE groups.id=tag_cloud.group_id AND tag_cloud.tag_id=tags.id AND tags.name=?";
+    my $dbh = CPAN::Forum::DBI::db_Main();
+    my $sth = $dbh->prepare($sql);
+    $sth->execute($tag_name);
+    my @res;
+    while (my $hr = $sth->fetchrow_hashref) {
+        push @res, $hr;
+    }
+    return \@res;
+}
+
 
 =head1 Design
 
