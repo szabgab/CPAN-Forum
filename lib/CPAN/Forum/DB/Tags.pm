@@ -118,9 +118,10 @@ sub get_all_tags {
 sub get_modules_with_tag {
     my ($self, $tag_name) = @_;
 
-    my $sql = "SELECT groups.name
+    my $sql = "SELECT groups.name, COUNT(*) cnt
                FROM groups, tags, tag_cloud
-               WHERE groups.id=tag_cloud.group_id AND tag_cloud.tag_id=tags.id AND tags.name=?";
+               WHERE groups.id=tag_cloud.group_id AND tag_cloud.tag_id=tags.id AND tags.name=?
+               GROUP BY groups.name";
     my $dbh = CPAN::Forum::DBI::db_Main();
     my $sth = $dbh->prepare($sql);
     $sth->execute($tag_name);
