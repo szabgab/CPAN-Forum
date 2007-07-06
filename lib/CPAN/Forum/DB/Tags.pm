@@ -65,8 +65,8 @@ sub attach_tag {
     return if not $tag_id;
 
     my $dbh = CPAN::Forum::DBI::db_Main();
-    return $dbh->do("INSERT INTO tag_cloud (tag_id, group_id, uid) VALUES (?, ?, ?)",
-            undef, $tag_id, $group_id, $uid);
+    return $dbh->do("INSERT INTO tag_cloud (tag_id, group_id, uid, stamp) VALUES (?, ?, ?, ?)",
+            undef, $tag_id, $group_id, $uid, time);
 }
 
 sub remove_tag {

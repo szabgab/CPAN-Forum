@@ -18,3 +18,4 @@ CREATE INDEX tags_cloud_uid ON tag_cloud (uid);
 CREATE INDEX tags_cloud_tag_id ON tag_cloud (tag_id);
 CREATE INDEX tags_cloud_group_id ON tag_cloud (group_id);
 
+ALTER TABLE tag_cloud ADD stamp TEXT;
