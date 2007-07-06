@@ -61,10 +61,7 @@ sub admin_process {
     # fields that can have only one value
     foreach my $field (qw(rss_size per_page from flood_control_time_limit 
                 disable_email_notification)) {
-        if (my ($conf) = CPAN::Forum::DB::Configure->find_or_create({field => $field})) {
-            $conf->value($q->param($field));
-            $conf->update;
-        }
+        CPAN::Forum::DB::Configure->set_field_value($field, $q->param($field));
     }
 
     $self->status($q->param('status'));
@@ -81,13 +78,13 @@ sub admin {
     if (not $self->session->param("admin")) {
         return $self->internal_error("", "restricted_area");
     }
-    my %data;
-    foreach my $c (CPAN::Forum::DB::Configure->retrieve_all()) {
-        $data{$c->field} = $c->value;
-    }
+
+    my $data = CPAN::Forum::DB::Configure->get_all_pairs;
+    $self->log->debug(Data::Dumper->Dump([$data], ['config']));
+
     my $t = $self->load_tmpl("admin.tmpl");
     $t->param("status_" . $self->status() => 1);
-    $t->param(%data);
+    $t->param(%$data);
     $t->output;
 }
 

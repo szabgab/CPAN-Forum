@@ -71,11 +71,20 @@ sub _fetch_single_hashref {
     my $dbh = CPAN::Forum::DBI::db_Main();
     my $sth = $dbh->prepare($sql);
     $sth->execute(@args);
-    my @values;
     my $hr = $sth->fetchrow_hashref;
     $sth->finish;
     return $hr;
-    
+}
+
+sub _fetch_single_value {
+    my ($self, $sql, @args) = @_;
+
+    my $dbh = CPAN::Forum::DBI::db_Main();
+    my $sth = $dbh->prepare($sql);
+    $sth->execute(@args);
+    my ($value) = $sth->fetchrow_array;
+    $sth->finish;
+    return $value;
 }
 
 
