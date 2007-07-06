@@ -12,33 +12,12 @@ __PACKAGE__->has_a(uid    => "CPAN::Forum::DB::Users");
 __PACKAGE__->has_a(gid    => "CPAN::Forum::DB::Groups");
 
 __PACKAGE__->set_sql(latest         => "SELECT __ESSENTIAL__ FROM __TABLE__ ORDER BY DATE DESC LIMIT %s");
-#__PACKAGE__->set_sql(latest_threads => "SELECT A.id, A.thread, A.date FROM posts A WHERE 
-#            thread IN (SELECT DISTINCT B.thread FROM posts B ORDER BY B.date DESC LIMIT ?) 
-#            AND 
-#            id IN (SELECT max(id) FROM posts C WHERE C.thread=A.thread)
-#            ORDER BY A.date DESC");
-
-__PACKAGE__->set_sql(latest_threads => "SELECT A.id, A.thread, A.date FROM posts A WHERE 
-            thread IN (
-                SELECT DISTINCT X.thread FROM posts X WHERE X.thread IN (
-                    SELECT B.thread FROM posts B ORDER BY B.date DESC LIMIT ?)) 
-            AND 
-            id IN (SELECT max(id) FROM posts C WHERE C.thread=A.thread)
-            ORDER BY A.date DESC");
 
 __PACKAGE__->set_sql(count_thread   => "SELECT count(*) FROM __TABLE__ WHERE thread=%s");
 __PACKAGE__->set_sql(count_where    => "SELECT count(*) FROM __TABLE__ WHERE %s='%s'");
 __PACKAGE__->set_sql(count_like     => "SELECT count(*) FROM __TABLE__ WHERE %s LIKE '%s'");
 #__PACKAGE__->add_constraint('subject_too_long', subject => sub { length $_[0] <= 70 and $_[0] !~ /</});
 #__PACKAGE__->add_constraint('text_format', text => \&check_text_format);
-__PACKAGE__->set_sql(post_by_pauseid => qq{
-                        SELECT posts.id id
-                        FROM posts
-                        WHERE gid IN (
-                            SELECT DISTINCT groups.id 
-                            FROM groups, authors
-                            WHERE groups.pauseid=authors.id and authors.pauseid=?)
-                        ORDER BY date DESC});
 __PACKAGE__->set_sql(stat_posts_by_group => qq{
             SELECT COUNT(*) cnt, groups.name gname
             FROM posts,groups 
@@ -56,12 +35,82 @@ __PACKAGE__->set_sql(stat_posts_by_user => qq{
             ORDER BY cnt DESC
             LIMIT ?
             });
+my $MORE_SQL = 'groups.name group_name, users.fname user_fname, users.lname user_lname, users.username user_username';
 
 sub retrieve_latest { 
-    my ($class, $count) = @_;
-    
-#   $where = $where ? "WHERE $where" : "";
-    return $class->sth_to_objects($class->sql_latest($count));
+    my ($self, $limit) = @_;
+
+    $limit ||= 10;
+    my $sql = "SELECT posts.id id, posts.subject, 
+                $MORE_SQL
+                FROM posts, groups, users
+                WHERE posts.gid=groups.id AND posts.uid=users.id
+                ORDER BY date DESC LIMIT ?";
+    #$self->log->debug("SQL: $sql");
+
+    return $self->_fetch_arrayref_of_hashes($sql, $limit);
+}
+
+sub search_post_by_groupname {
+    my ($self, $groupname, $limit) = @_;
+
+    return [] if not $groupname;
+    $limit ||= 10;
+    my $sql = qq{SELECT posts.id id, posts.subject,
+                        $MORE_SQL
+                        FROM posts, groups, users
+                        WHERE groups.name=?
+                            AND posts.gid=groups.id AND posts.uid=users.id
+                        ORDER BY date DESC LIMIT ?};
+    return $self->_fetch_arrayref_of_hashes($sql, $groupname, $limit);
+}
+sub search_post_by_pauseid {
+    my ($self, $pauseid, $limit) = @_;
+
+    return [] if not $pauseid;
+    $limit ||= 10;
+    my $sql = qq{SELECT posts.id id, posts.subject,
+                        $MORE_SQL
+                        FROM posts, groups, users
+                        WHERE gid IN (
+                            SELECT DISTINCT groups.id 
+                            FROM groups, authors
+                            WHERE groups.pauseid=authors.id and authors.pauseid=?)
+                            AND posts.gid=groups.id AND posts.uid=users.id
+                        ORDER BY date DESC LIMIT ?};
+    return $self->_fetch_arrayref_of_hashes($sql, $pauseid, $limit);
+}
+
+
+sub search_latest_threads {
+    my ($self, $limit) = @_;
+
+    $limit ||= 10;
+    my $sql = "SELECT A.id, A.thread, A.subject subject, A.date,
+            $MORE_SQL
+            FROM posts A, groups, users
+            WHERE 
+            thread IN (
+                SELECT DISTINCT X.thread FROM posts X WHERE X.thread IN (
+                    SELECT B.thread FROM posts B ORDER BY B.date DESC LIMIT ?)) 
+            AND 
+            A.id IN (SELECT max(id) FROM posts C WHERE C.thread=A.thread)
+            AND A.gid=groups.id AND A.uid=users.id
+            ORDER BY A.date DESC";
+
+    return $self->_fetch_arrayref_of_hashes($sql, $limit);
+}
+sub _fetch_arrayref_of_hashes {
+    my ($self, $sql, @args) = @_;
+
+    my $dbh = CPAN::Forum::DBI::db_Main();
+    my $sth = $dbh->prepare($sql);
+    $sth->execute(@args);
+    my @values;
+    while (my $hr = $sth->fetchrow_hashref) {
+        push @values, $hr;
+    }
+    return \@values;
 }
 
 sub mysearch {

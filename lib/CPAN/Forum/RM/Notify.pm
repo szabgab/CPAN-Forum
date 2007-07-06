@@ -118,17 +118,17 @@ sub _generate_atom {
         id       => "$url/",
     );
  
-    if ($it) {
-        while (my $post = $it->next() and $limit--) {
-            my $title = sprintf "[%s] %s", $post->gid->name, $post->subject;
+    if (@$it) {
+        foreach my $post (@$it) {
+            my $title = sprintf "[%s] %s", $post->{group_name}, $post->{subject};
             my $author = {
                             name => sprintf("%s %s (%s)", 
-                                        ($post->uid->fname || ''),
-                                        ($post->uid->lname || ''),
-                                        $post->uid->username),
-                            uri  => "$url/users/" . $post->uid->username,
+                                        ($post->{user_fname} || ''),
+                                        ($post->{user_lname} || ''),
+                                        $post->{user_username}),
+                            uri  => "$url/users/" . $post->{user_username},
                         };
-            my $link = "$url/posts/" . $post->id();
+            my $link = "$url/posts/" . $post->{id};
             $feed->add_entry(
                 author => $author,
                 title  => $title, # TODO _subject_escape ?
@@ -162,10 +162,14 @@ sub _generate_rss {
     # TODO: replace this e-mail address with a configurable value
     $rss->webmaster('admin@cpanforum.com');
 
-    if ($it) {
-        while (my $post = $it->next() and $limit--) {
-            my $title = sprintf "[%s] %s", $post->gid->name, $post->subject;
-            $rss->item("$url/posts/" . $post->id(), $title); # TODO _subject_escape ?
+    if (@$it) {
+        #while (my $post = $it->next() and $limit--) {
+        #    my $title = sprintf "[%s] %s", $post->gid->name, $post->subject;
+        #    $rss->item("$url/posts/" . $post->id(), $title); # TODO _subject_escape ?
+        #}
+        foreach my $post (@$it) {
+            my $title = sprintf "[%s] %s", $post->{group_name}, $post->{subject};
+            $rss->item("$url/posts/" . $post->{id}, $title); # TODO _subject_escape ?
         }
     }
     else {
@@ -184,32 +188,28 @@ sub get_feed {
 
     my @params = @{$self->param("path_parameters")};
 
-    return if not @params;
+    return [] if not @params;
 
     if ($params[0] eq 'dist') {
         my $dist = $params[1] || '';
         $self->log->debug("rss of dist: '$dist'");
-        my ($group) = CPAN::Forum::DB::Groups->search({ name => $dist });
-        if ($group) {
-            $self->log->debug("aha");
-            return scalar CPAN::Forum::DB::Posts->search(gid => $group->id, {order_by => 'date DESC'});
-        }
+        return CPAN::Forum::DB::Posts->search_post_by_groupname($dist, $limit); #gid => $group->id, {order_by => 'date DESC'});
     }
 
     if ($params[0] eq 'author') {
         my $pauseid = uc($params[1]) || '';
         if ($pauseid) {
             $self->log->debug("rss of author: '$pauseid'");
-            return scalar CPAN::Forum::DB::Posts->search_post_by_pauseid($pauseid);
+            return CPAN::Forum::DB::Posts->search_post_by_pauseid($pauseid, $limit);
         }
     }
 
     if ($params[0] eq 'all') {
-        return scalar CPAN::Forum::DB::Posts->retrieve_latest($limit);
+        return CPAN::Forum::DB::Posts->retrieve_latest($limit);
     }
 
     if ($params[0] eq 'threads') {
-        return scalar CPAN::Forum::DB::Posts->search_latest_threads($limit);
+        return CPAN::Forum::DB::Posts->search_latest_threads($limit);
     }
 
     return;
