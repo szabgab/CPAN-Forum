@@ -51,5 +51,33 @@ sub init_db {
     return 1;
 }
 
+
+# helper function for plain DBI calls
+sub _fetch_arrayref_of_hashes {
+    my ($self, $sql, @args) = @_;
+
+    my $dbh = CPAN::Forum::DBI::db_Main();
+    my $sth = $dbh->prepare($sql);
+    $sth->execute(@args);
+    my @values;
+    while (my $hr = $sth->fetchrow_hashref) {
+        push @values, $hr;
+    }
+    return \@values;
+}
+sub _fetch_single_hashref {
+    my ($self, $sql, @args) = @_;
+
+    my $dbh = CPAN::Forum::DBI::db_Main();
+    my $sth = $dbh->prepare($sql);
+    $sth->execute(@args);
+    my @values;
+    my $hr = $sth->fetchrow_hashref;
+    $sth->finish;
+    return $hr;
+    
+}
+
+
 1;
 

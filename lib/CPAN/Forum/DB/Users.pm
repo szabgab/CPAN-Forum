@@ -25,6 +25,16 @@ sub _generate_pw {
     return $pw;
 }
 
+sub get_user {
+    my ($self, $user_id) = @_;
+    return if not $user_id;
+
+    my $sql = "SELECT id, email, fname, lname, username
+                FROM users
+                WHERE id=?";
+    return $self->_fetch_single_hashref($sql, $user_id);
+}
+
 
 1;
 
