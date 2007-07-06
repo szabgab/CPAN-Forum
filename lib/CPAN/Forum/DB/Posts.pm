@@ -37,6 +37,18 @@ __PACKAGE__->set_sql(stat_posts_by_user => qq{
             });
 my $MORE_SQL = 'groups.name group_name, users.fname user_fname, users.lname user_lname, users.username user_username';
 
+sub get_post {
+    my ($self, $post_id) = @_;
+    return if not $post_id;
+    #Carp::croak("No post_id given") if not $post_id;
+
+    my $sql = "SELECT posts.id, gid, uid, parent, thread, hidden, subject, text, date,
+                groups.name group_name, groups.pauseid
+                FROM posts, groups
+                WHERE posts.id=? AND posts.gid=groups.id";
+    return $self->_fetch_single_hashref($sql, $post_id);
+}
+
 sub retrieve_latest { 
     my ($self, $limit) = @_;
 
@@ -111,6 +123,18 @@ sub _fetch_arrayref_of_hashes {
         push @values, $hr;
     }
     return \@values;
+}
+sub _fetch_single_hashref {
+    my ($self, $sql, @args) = @_;
+
+    my $dbh = CPAN::Forum::DBI::db_Main();
+    my $sth = $dbh->prepare($sql);
+    $sth->execute(@args);
+    my @values;
+    my $hr = $sth->fetchrow_hashref;
+    $sth->finish;
+    return $hr;
+    
 }
 
 sub mysearch {

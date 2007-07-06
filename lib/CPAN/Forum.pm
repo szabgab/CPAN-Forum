@@ -1413,14 +1413,14 @@ sub fetch_subscriptions {
     $self->_sendmail($it, $mail, \%to);
 
     # People who asked for all the posts in this group
-    $it = CPAN::Forum::DB::Subscriptions->search(allposts => 1, gid => $post->gid);
+    $it = CPAN::Forum::DB::Subscriptions->search(allposts => 1, gid => $post->{gid});
     $self->_sendmail($it, $mail, \%to);
 
     # People who asked for all the posts in this PAUSEID
-    $it = CPAN::Forum::DB::Subscriptions_pauseid->search(allposts => 1, pauseid => $post->gid->pauseid);
+    $it = CPAN::Forum::DB::Subscriptions_pauseid->search(allposts => 1, pauseid => $post->{pauseid});
     $self->_sendmail($it, $mail, \%to);
 
-    if ($post->thread == $post->id) { 
+    if ($post->{thread} == $post->{id}) { 
         $self->log->debug("Processing messages for thread starter");
 
         # People who are subscribed to all thread starters
@@ -1428,11 +1428,11 @@ sub fetch_subscriptions {
         $self->_sendmail($it, $mail, \%to);
 
         # People who are subscribed to the thread startes in this group
-        $it = CPAN::Forum::DB::Subscriptions->search(starters => 1, gid => $post->gid->id);
+        $it = CPAN::Forum::DB::Subscriptions->search(starters => 1, gid => $post->{gid});
         $self->_sendmail($it, $mail, \%to);
 
         # People who are subscribed to the thread startes of this PAUSEID
-        $it = CPAN::Forum::DB::Subscriptions_pauseid->search(starters => 1, pauseid => $post->gid->pauseid);
+        $it = CPAN::Forum::DB::Subscriptions_pauseid->search(starters => 1, pauseid => $post->{pauseid});
         $self->_sendmail($it, $mail, \%to);
     }
     else {
@@ -1440,7 +1440,7 @@ sub fetch_subscriptions {
 
         # Collect the users who posted in this thread
         my %uids;
-        my $pit = CPAN::Forum::DB::Posts->search(thread => $post->thread);
+        my $pit = CPAN::Forum::DB::Posts->search(thread => $post->{thread});
         while (my $p = $pit->next) {
             $uids{$p->uid}=1;
             $self->log->debug("Ids: " . $p->uid);
@@ -1449,12 +1449,14 @@ sub fetch_subscriptions {
         $it = CPAN::Forum::DB::Subscriptions_all->search(followups => 1);
         $self->_sendmail($it, $mail, \%to, \%uids);
 
-        $it = CPAN::Forum::DB::Subscriptions->search(followups => 1, gid => $post->gid->id);
+        $it = CPAN::Forum::DB::Subscriptions->search(followups => 1, gid => $post->{gid});
         $self->_sendmail($it, $mail, \%to, \%uids);
         
-        $it = CPAN::Forum::DB::Subscriptions_pauseid->search(followups => 1, pauseid => $post->gid->pauseid);
+        $it = CPAN::Forum::DB::Subscriptions_pauseid->search(followups => 1, pauseid => $post->{pauseid});
         $self->_sendmail($it, $mail, \%to);
     }
+    
+    $self->log->debug("Number of e-mails sent: ", scalar keys %to);
 }
 
 sub _sendmail {
@@ -1532,8 +1534,9 @@ sub teardown {
 }
 
 sub _my_sendmail {
-    my ($self, @args) = @_;
-    #$self->log->debug(Data::Dumper->Dump([\@args], ['_my_sendmail']));
+    my ($self, %args) = @_;
+    #$self->log->debug(Data::Dumper->Dump([\%args], ['_my_sendmail']));
+    #$self->log->debug("_my_sendmail to '$args{To}'");
 
     return if $ENV{NO_CPAN_FORUM_MAIL};
     # for testing
@@ -1544,7 +1547,7 @@ sub _my_sendmail {
         return;
     }
     else {
-        return sendmail(@args);
+        return sendmail(%args);
     }
 }
 

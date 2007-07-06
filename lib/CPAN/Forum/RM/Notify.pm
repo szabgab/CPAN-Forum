@@ -11,16 +11,18 @@ Send out e-mails upon receiving a submission.
 sub notify {
     my ($self, $post_id) = @_;
     
-    my $post = CPAN::Forum::DB::Posts->retrieve($post_id);
+    my $post = CPAN::Forum::DB::Posts->get_post($post_id);
+    return if not $post;
+    # TODO what if it does not find it?
 
     my $message = 
-        $self->_text2mail ($post->text) .
+        $self->_text2mail ($post->{text}) .
         "\n\n" .
         "To write a respons, access\n".
-        "http://$ENV{HTTP_HOST}/response_form/" . $post->id .
+        "http://$ENV{HTTP_HOST}/response_form/" . $post->{id} .
         "\n\n" .
         "To see the full thread, access\n" .
-        "http://$ENV{HTTP_HOST}/threads/" . $post->thread .
+        "http://$ENV{HTTP_HOST}/threads/" . $post->{thread} .
         "\n\n" .
         "--\n" .
         "You are getting this messages from $ENV{HTTP_HOST}\n" .
@@ -28,7 +30,7 @@ sub notify {
     # disclaimer ?
     # X-lits: field ?
 
-    my $subject = sprintf ("[%s] %s",  $post->gid->name, $post->subject); # TODO _subject_escape ?
+    my $subject = sprintf ("[%s] %s",  $post->{group_name}, $post->{subject}); # TODO _subject_escape ?
 
     my $FROM = $self->config("from");
     $self->log->debug("FROM field set to be $FROM");
@@ -37,9 +39,11 @@ sub notify {
         Subject  => $subject,
         Message  => $message,
     );
+    $self->log->debug(Data::Dumper->Dump([\%mail], ['mail']));
 
 
     $self->fetch_subscriptions(\%mail, $post);
+    return;
 }
 
 =head2 notify_admin
@@ -193,7 +197,7 @@ sub get_feed {
     if ($params[0] eq 'dist') {
         my $dist = $params[1] || '';
         $self->log->debug("rss of dist: '$dist'");
-        return CPAN::Forum::DB::Posts->search_post_by_groupname($dist, $limit); #gid => $group->id, {order_by => 'date DESC'});
+        return CPAN::Forum::DB::Posts->search_post_by_groupname($dist, $limit);
     }
 
     if ($params[0] eq 'author') {
