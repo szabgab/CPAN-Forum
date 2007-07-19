@@ -460,7 +460,7 @@ sub cgiapp_init {
 
 sub _logger {
     my ($self, %h) = @_;
-    return sprintf "[%s] - %s - [REMOTE_ADDR=%s] [HTTP_REFERER=%s] [REQUES=%s] %s\n",
+    return sprintf "[%s] - %s - [%s] [%s] [%s] %s\n",
             scalar(localtime), 
             $h{level}, 
             ($ENV{REMOTE_ADDR} || ''),
