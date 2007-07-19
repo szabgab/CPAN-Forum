@@ -123,7 +123,7 @@ sub _generate_atom {
         id       => "$url/",
     );
  
-    if (@$it) {
+    if ($it and @$it) {
         foreach my $post (@$it) {
             my $title = sprintf "[%s] %s", $post->{group_name}, $post->{subject};
             my $author = {
@@ -167,7 +167,7 @@ sub _generate_rss {
     # TODO: replace this e-mail address with a configurable value
     $rss->webmaster('admin@cpanforum.com');
 
-    if (@$it) {
+    if ($it and @$it) {
         #while (my $post = $it->next() and $limit--) {
         #    my $title = sprintf "[%s] %s", $post->gid->name, $post->subject;
         #    $rss->item("$url/posts/" . $post->id(), $title); # TODO _subject_escape ?

@@ -3,8 +3,6 @@ use strict;
 use warnings;
 use Carp;
 use base 'CPAN::Forum::DBI';
-#__PACKAGE__->table('configure');
-#__PACKAGE__->columns(All => qw/field value/);
 
 my %default = (
     flood_control_time_limit => 10,
