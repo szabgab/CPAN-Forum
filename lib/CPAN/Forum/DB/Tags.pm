@@ -127,6 +127,12 @@ sub list_modules_and_tags {
     return $self->_fetch_arrayref_of_hashes($sql);
 }
 
+sub dump_tags {
+    my ($self) = @_;
+    my $sql = "SELECT id, name FROM tags ORDER BY id";
+    return $self->_dump($sql); 
+}
+
 =head1 Design
 
 Every person can put any tage on any module

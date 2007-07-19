@@ -87,6 +87,11 @@ sub _fetch_single_value {
     return $value;
 }
 
+sub _dump {
+    my ($self, $sql, %args) = @_;
+    my $dbh = CPAN::Forum::DBI::db_Main();
+    return $dbh->selectall_arrayref($sql, \%args);
+}
 
 1;
 

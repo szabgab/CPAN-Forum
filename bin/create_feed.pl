@@ -4,6 +4,7 @@ use warnings;
 
 use Getopt::Long qw(GetOptions);
 use Text::CSV_XS;
+use Cwd           qw(cwd);
 
 use lib "lib";
 
@@ -22,6 +23,7 @@ CPAN::Forum::DBI->myinit("dbi:SQLite:$dbfile");
 
 posts_count_csv();
 tags();
+db_dump();
 exit;
 
 sub posts_count_csv {
@@ -52,6 +54,29 @@ sub tags {
     }
     close $out;
     system "/bin/bzip2 -f $opts{out}/module_tags.csv";
+}
+
+sub db_dump {
+    my $cwd = cwd;
+    mkdir "$opts{out}/cpanforum";
+    chdir "$opts{out}/cpanforum";
+
+    my $tags = CPAN::Forum::DB::Tags->dump_tags;
+    _save_file("tags.csv", $tags);
+
+    chdir $cwd;
+    chdir $opts{out};
+    system "/bin/tar cjf db_dump.tar.bz2 cpanforum"; 
+}
+
+sub _save_file {
+    my ($file, $ar) = @_;
+
+    open my $out, '>', $file or die "Could not open '$file': $!";
+    foreach my $r (@$ar) {
+        print $out join ",", @$r;
+        print $out "\n";
+    }
 }
 
 sub usage {
