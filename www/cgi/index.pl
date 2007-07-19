@@ -2,29 +2,17 @@
 use warnings;
 use strict;
 
-$| = 1;
-
 # Enable for DBI debugging
 #BEGIN { $ENV{DBI_TRACE}='1=/tmp/dbitrace.log'; }
 #chmod 0666, '/tmp/dbitrace.log';
 
-use FindBin qw($Bin);
-my $ROOT;
-BEGIN {$ROOT = "$Bin/../..";}
-use lib ("$ROOT/lib");
-
 use CPAN::Forum;
 
-binmode STDOUT, ":utf8";      
-binmode STDIN,  ":utf8";      
-binmode STDERR,  ":utf8";      
-
-
 my $app = CPAN::Forum->new(
-	TMPL_PATH => "$ROOT/templates",
+	TMPL_PATH => "$ENV{CPANFORUM_ROOT}/templates",
 	PARAMS => {
-		ROOT => $ROOT,
-        DB_CONNECT => "dbi:SQLite:$ROOT/db/forum.db"
+		ROOT => $ENV{CPANFORUM_ROOT},
+        DB_CONNECT => "dbi:SQLite:$ENV{CPANFORUM_ROOT}/db/forum.db"
 	},
 );
 $app->run();
