@@ -776,9 +776,10 @@ Print short notification messages to the user.
 
 =cut
 sub notes {
-    my ($self, $msg) = @_;
+    my ($self, $msg, %params) = @_;
     my $t = $self->load_tmpl("notes.tmpl");
     $t->param($msg => 1);
+    $t->param(%params);
     $t->output;
 }
 

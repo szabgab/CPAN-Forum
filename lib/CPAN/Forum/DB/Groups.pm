@@ -16,5 +16,14 @@ __PACKAGE__->set_sql(count_like     => "SELECT count(*) FROM __TABLE__ WHERE %s 
 __PACKAGE__->set_sql(count          => "SELECT count(*) FROM __TABLE__ WHERE %s = '%s'");
 #use Data::Dumper;
 #__PACKAGE__->add_trigger(before_update => sub {warn Dumper $_[0]});
+
+sub info {
+    my ($self, $group_id) = @_;
+    my $sql = "SELECT id, name, status
+               FROM groups
+               WHERE id=?";
+    return $self->_fetch_single_hashref($sql, $group_id);
+}
+
 1;
 

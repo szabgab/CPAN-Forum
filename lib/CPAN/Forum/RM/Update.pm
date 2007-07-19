@@ -20,6 +20,7 @@ sub _update_tags {
 
     my $q = $self->query;
     my $group_id = $q->param('group_id');
+    my $group = CPAN::Forum::DB::Groups->info($group_id);
     my $new_tags = $q->param('new_tags'); 
     $self->log->debug("_update_tags in group '$group_id' tags='$new_tags'");
     $new_tags =~ s/^\s+//;
@@ -43,7 +44,7 @@ sub _update_tags {
         CPAN::Forum::DB::Tags->remove_tag($uid, $group_id, $tags_hr->{$old_tag});
     }
 
-    return $self->notes('tags_updated');
+    return $self->notes('tags_updated', dist_name => $group->{name});
 }
 
 
