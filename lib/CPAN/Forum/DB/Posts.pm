@@ -126,5 +126,15 @@ sub mysearch {
     );
 }
 
+sub list_counted_posts {
+    my ($self) = @_;
+    my $sql = "SELECT groups.name gname, COUNT(*) cnt
+               FROM posts, groups
+               WHERE posts.gid=groups.id
+               GROUP BY gname
+               ORDER BY cnt DESC";
+    return $self->_fetch_arrayref_of_hashes($sql);
+}
+
 1;
  

@@ -119,6 +119,13 @@ sub get_modules_with_tag {
     return $self->_fetch_arrayref_of_hashes($sql, $tag_name);
 }
 
+sub list_modules_and_tags {
+    my ($self) = @_;
+    my $sql = "SELECT groups.name module, tags.name tag 
+               FROM groups, tags, tag_cloud 
+               WHERE tag_cloud.group_id=groups.id AND tag_cloud.tag_id=tags.id";
+    return $self->_fetch_arrayref_of_hashes($sql);
+}
 
 =head1 Design
 
