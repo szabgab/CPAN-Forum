@@ -849,7 +849,7 @@ sub register_process {
     }
    
     my $user = eval {
-        CPAN::Forum::DB::Users->create({
+        CPAN::Forum::DB::Users->add_user({
                 username => $q->param('nickname'),
                 email    => $q->param('email'),
             });
@@ -867,7 +867,7 @@ sub send_password {
     my ($self, $user) = @_;
 
     # TODO: put this text in a template
-    my $password = $user->password;
+    my $password = $user->{password};
     my $subject = "CPAN::Forum registration";
     my $message = <<MSG;
 
@@ -883,7 +883,7 @@ MSG
     $self->log->debug("FROM field set to be $FROM");
 
     my %mail = (
-        To       => $user->email,
+        To       => $user->{email},
         From     => $FROM,
         Subject  => $subject,
         Message  => $message,

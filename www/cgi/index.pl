@@ -5,7 +5,8 @@ use strict;
 $| = 1;
 
 # Enable for DBI debugging
-BEGIN { $ENV{DBI_TRACE}='1=/tmp/dbitrace.log'; }
+#BEGIN { $ENV{DBI_TRACE}='1=/tmp/dbitrace.log'; }
+#chmod 0666, '/tmp/dbitrace.log';
 
 use FindBin qw($Bin);
 my $ROOT;

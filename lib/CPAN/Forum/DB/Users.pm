@@ -16,6 +16,18 @@ __PACKAGE__->add_trigger(before_create => sub {
     $_[0]->{username} = lc $_[0]->{username};
     });
 
+sub add_user {
+    my ($self, $args) = @_;
+ 
+    my $dbh = CPAN::Forum::DBI::db_Main();
+    $dbh->do("INSERT INTO users (username, email, password) VALUES (?, ?, ?)",
+              undef,
+              lc($args->{username}), lc($args->{email}), _generate_pw(7));
+
+    my $sql = "SELECT id, username, password, email FROM users WHERE username=?";
+    return $self->_fetch_single_hashref($sql, lc $args->{username});
+}
+
 
 sub _generate_pw {
     my ($n) = @_;

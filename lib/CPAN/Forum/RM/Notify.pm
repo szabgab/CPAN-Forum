@@ -57,7 +57,7 @@ sub notify_admin {
 
     my $FROM = $self->config("from");
 
-    my $msg = "\nUsername: " . $user->username . "\n"; 
+    my $msg = "\nUsername: " . $user->{username} . "\n"; 
 
     # TODO: the admin should be able to configure if she wants to get messages on
     # every new user (field update_on_new_user)
@@ -65,7 +65,7 @@ sub notify_admin {
     my %mail = (
         To      => $admin->{email},
         From     => $FROM,
-        Subject => "New Forum user: " . $user->username,
+        Subject => "New Forum user: " . $user->{username},
         Message => $msg,
     );
     $self->log->debug(Data::Dumper->Dump([\%mail], ['mail']));
