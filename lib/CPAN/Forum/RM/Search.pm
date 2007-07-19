@@ -108,9 +108,9 @@ sub search {
         if ($what eq "module") {
             $it =  CPAN::Forum::DB::Groups->search_like(name => '%' . $name . '%');
         } else {
-            my ($author) = CPAN::Forum::DB::Authors->search(pauseid => uc $name);
+            my $author = CPAN::Forum::DB::Authors->get_author_by_pauseid($name);
             if ($author) {
-                $it =  CPAN::Forum::DB::Groups->search(pauseid => $author->id);
+                $it =  CPAN::Forum::DB::Groups->search(pauseid => $author->{id});
             } 
             $t->param(pauseid_name => uc $name)
         }

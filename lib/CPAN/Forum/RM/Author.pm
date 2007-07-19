@@ -23,7 +23,7 @@ sub author {
     $t->param(pauseid => $pauseid);
     $t->param(title => "CPAN Forum - $pauseid");
 
-    my ($author) = CPAN::Forum::DB::Authors->search(pauseid => $pauseid);
+    my $author = CPAN::Forum::DB::Authors->get_author_by_pauseid($pauseid);
     if (not $author) {
         $self->log->warning("Invalid pauseid $pauseid called in $ENV{PATH_INFO}");
         return $self->internal_error(
@@ -33,7 +33,7 @@ sub author {
     }
     # TODO: simplify query!
     my @group_ids = map {$_->id}
-                    CPAN::Forum::DB::Groups->search( pauseid => $author->id );
+                    CPAN::Forum::DB::Groups->search( pauseid => $author->{id} );
     $self->log->debug("Group IDs: @group_ids");
     my $page = $q->param('page') || 1;
     $self->_search_results($t, {where => {gid => \@group_ids}, page => $page});

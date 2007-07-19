@@ -191,11 +191,11 @@ sub update_subscription {
     # we should not let the user overwrite it using the new entry box
     if ($q->param("type") eq "pauseid") {
         my $pauseid = uc $q->param("name");
-        my ($author) = CPAN::Forum::DB::Authors->search(pauseid => $pauseid);
+        my $author = CPAN::Forum::DB::Authors->get_author_by_pauseid($pauseid);
         if ($author) {
             my $s = CPAN::Forum::DB::Subscriptions_pauseid->find_or_create({
                 uid       => $user->id,
-                pauseid   => $author->id,
+                pauseid   => $author->{id},
             });
             $self->_update_subs($s, "_new");
         } else {
