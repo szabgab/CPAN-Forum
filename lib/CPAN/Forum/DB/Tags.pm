@@ -96,12 +96,16 @@ sub _get_tag_id {
     return $self->_fetch_single_value("SELECT id FROM tags WHERE name=?", $text);
 }
 
+# list tags currently in use, along with frequency
 sub get_all_tags {
     my ($self) = @_;
 
-    my $sql = "SELECT name
-                FROM tags 
-                WHERE id IN (SELECT DISTINCT tag_id FROM tag_cloud) ORDER BY name ASC";
+    my $sql = "SELECT tags.name name, COUNT(name) total
+                FROM tags, tag_cloud 
+                WHERE tag_cloud.tag_id=tags.id
+                GROUP BY name
+                ORDER BY name ASC
+                ";
     return $self->_fetch_arrayref_of_hashes($sql);
 }
 
