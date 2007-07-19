@@ -7,6 +7,8 @@ use warnings;
 List last few posts belonging to this group, provides a link to post a new 
 message within this group
 
+/dist/XYZ
+
 =cut
 
 sub dist {
@@ -63,10 +65,14 @@ sub dist {
         $t->param(pauseid_name => $gr->pauseid->pauseid);
     }
 
+    my $frequent_tags = CPAN::Forum::DB::Tags->get_tags_of_module($gid);
+    $t->param(frequent_tags      => $frequent_tags);
+
+
     my $uid = $self->session->param('uid');
     if ($uid) {
-        my $tags = CPAN::Forum::DB::Tags->get_tags_of($gid, $uid);
-        $t->param(tags      => $tags);
+        my $mytags = CPAN::Forum::DB::Tags->get_tags_of($gid, $uid);
+        $t->param(mytags      => $mytags);
         $t->param(show_tags => 1);
     }
     $t->param(group_id => $gid);

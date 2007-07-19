@@ -39,15 +39,18 @@ sub get_tags_of {
 
 sub get_tags_of_module {
     my ($self, $group_id) = @_;
-    my $dbh = CPAN::Forum::DBI::db_Main();
-    my $sql = "SELECT tags.name name 
+    #my $dbh = CPAN::Forum::DBI::db_Main();
+    my $sql = "SELECT tags.name name, COUNT(tags.name) cnt 
                              FROM tag_cloud, tags
-                             WHERE tag_cloud.tag_id=tags.id AND tag_cloud.group_id=?";
-    my $sth = $dbh->prepare($sql);
-    $sth->execute($group_id);
-    my $ar = $sth->fetchall_arrayref;
-    my @names = map { {name => $_->[0]} } @$ar;
-    return \@names;
+                             WHERE tag_cloud.tag_id=tags.id AND tag_cloud.group_id=?
+                             GROUP BY name";
+    return $self->_fetch_arrayref_of_hashes($sql, $group_id);
+
+    #my $sth = $dbh->prepare($sql);
+    #$sth->execute($group_id);
+    #my $ar = $sth->fetchall_arrayref;
+    #my @names = map { {name => $_->[0]} } @$ar;
+    #return \@names;
 }
 
 sub attach_tag {

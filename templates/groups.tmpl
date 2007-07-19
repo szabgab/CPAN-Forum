@@ -11,16 +11,25 @@ This section of the site is for discussing the <b><TMPL_VAR group></b> CPAN dist
 All the posts related to modules of <a href="/author/<TMPL_VAR pauseid_name>"><TMPL_VAR pauseid_name></a>.
 </p>
 
+<p>
+<TMPL_IF frequent_tags>
+Current tags: <TMPL_LOOP frequent_tags><a href="/tags/name/<TMPL_VAR name>"><TMPL_VAR name></a>(<TMPL_VAR cnt>)<TMPL_UNLESS __last__>, </TMPL_UNLESS></TMPL_LOOP>
+<br />
+</TMPL_IF>
+</p>
+
 <TMPL_IF show_tags>
 <p>
-<TMPL_IF tags>
-My Tags: <TMPL_LOOP tags><a href="/tags/name/<TMPL_VAR name>"><TMPL_VAR name></a><TMPL_UNLESS __last__>, </TMPL_UNLESS></TMPL_LOOP>
-</TMPL_IF><br />
+
+<TMPL_IF mytags>
+My Tags: <TMPL_LOOP mytags><a href="/tags/name/<TMPL_VAR name>"><TMPL_VAR name></a><TMPL_UNLESS __last__>, </TMPL_UNLESS></TMPL_LOOP>
+<br />
+</TMPL_IF>
 <form method="post" action="/update/">
 <input type="hidden" name="what" value="tags" />
 <input type="hidden" name="group_id" value="<TMPL_VAR group_id>" />
-<input name="new_tags" value="<TMPL_LOOP tags><TMPL_VAR name><TMPL_UNLESS __last__>,</TMPL_UNLESS> </TMPL_LOOP>" />
-<input type="submit" value="Update tags" />
+<input name="new_tags" value="<TMPL_LOOP mytags><TMPL_VAR name><TMPL_UNLESS __last__>,</TMPL_UNLESS> </TMPL_LOOP>" />
+<input type="submit" value="Update my tags" />
 </form>
 </p>
 </TMPL_IF>
