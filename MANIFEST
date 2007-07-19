@@ -7,6 +7,7 @@ Changes
 
 bin/populate.pl
 bin/setup.pl
+bin/create_feed.pl
 
 schema/schema.sql
 
@@ -38,6 +39,7 @@ lib/CPAN/Forum/RM/Other.pm
 lib/CPAN/Forum/RM/Search.pm
 lib/CPAN/Forum/RM/Subscriptions.pm
 lib/CPAN/Forum/RM/Tags.pm
+lib/CPAN/Forum/RM/Update.pm
 lib/CPAN/Forum/RM/UserAccounts.pm
 lib/CPAN/Forum/RM/Users.pm
 
@@ -74,6 +76,7 @@ templates/message_in_thread.tmpl
 templates/message.tmpl
 templates/module_search_form.tmpl
 templates/module_select_form.tmpl
+templates/modules_with_tags.tmpl
 templates/mypan.tmpl
 templates/navigation.tmpl
 templates/notes.tmpl
@@ -84,6 +87,7 @@ templates/search_form.tmpl
 templates/search.tmpl
 templates/site_is_closed.tmpl
 templates/stats.tmpl
+templates/tags.tmpl
 templates/threads.tmpl
 templates/users.tmpl
 
@@ -105,3 +109,4 @@ www/img/stars-4.5.png
 www/img/stars-5.0.png
 
 www/img/rss1.gif
+www/img/atom.gif
