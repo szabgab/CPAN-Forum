@@ -460,11 +460,12 @@ sub cgiapp_init {
 
 sub _logger {
     my ($self, %h) = @_;
-    return sprintf "[%s] - %s - [%s] [%s] %s\n",
+    return sprintf "[%s] - %s - [%s] [%s] [%s] %s\n",
             scalar(localtime), 
             $h{level}, 
             ($ENV{REMOTE_ADDR} || ''),
             ($ENV{HTTP_REFERER} || ''),
+            ($ENV{PATH_INFO} || ''),
             $h{message};
             # keys of the hash: level, message, name
 }
