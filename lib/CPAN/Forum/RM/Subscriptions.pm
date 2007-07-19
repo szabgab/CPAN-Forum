@@ -38,7 +38,7 @@ sub mypan {
 
     if (not $user) {
         return $self->internal_error(
-            "Trouble accessing personal information of: '$username' $ENV{PATH_INFO}",
+            "Trouble accessing personal information of: '$username'",
             );
     }
     my $fullname = "";
@@ -58,9 +58,7 @@ sub mypan {
         my $group = $params[1];
         my ($grp) = CPAN::Forum::DB::Groups->search(name => $group);
         if (not $grp) {
-            return $self->internal_error(
-                "Accessing $ENV{PATH_INFO}\n",
-            );
+            return $self->internal_error("Accessing");
         }
         $gids = $grp->id;
         my ($s) = CPAN::Forum::DB::Subscriptions->search(uid => $user->id, gid => $grp->id);

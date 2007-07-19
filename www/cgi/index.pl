@@ -11,8 +11,9 @@ use CPAN::Forum;
 my $app = CPAN::Forum->new(
 	TMPL_PATH => "$ENV{CPANFORUM_ROOT}/templates",
 	PARAMS => {
-		ROOT => $ENV{CPANFORUM_ROOT},
-        DB_CONNECT => "dbi:SQLite:$ENV{CPANFORUM_ROOT}/db/forum.db"
+		ROOT       => $ENV{CPANFORUM_ROOT},
+        DB_CONNECT => "dbi:SQLite:$ENV{CPANFORUM_ROOT}/db/forum.db",
+        REQUEST    => $ENV{PATH_INFO},
 	},
 );
 $app->run();

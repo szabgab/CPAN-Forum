@@ -25,7 +25,7 @@ sub author {
 
     my $author = CPAN::Forum::DB::Authors->get_author_by_pauseid($pauseid);
     if (not $author) {
-        $self->log->warning("Invalid pauseid $pauseid called in $ENV{PATH_INFO}");
+        $self->log->warning("Invalid pauseid '$pauseid'");
         return $self->internal_error(
                 "",
                 "no_such_pauseid",

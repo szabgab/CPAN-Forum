@@ -17,9 +17,7 @@ sub users {
     $username = ${$self->param("path_parameters")}[0];
 
     if (not $username) {
-        return $self->internal_error(
-            "No username: PATH_INFO: $ENV{PATH_INFO}",
-            );
+        return $self->internal_error("No username");
     }
 
     my $t = $self->load_tmpl("users.tmpl",
@@ -32,9 +30,7 @@ sub users {
     my ($user) = CPAN::Forum::DB::Users->search(username => $username);
 
     if (not $user) {
-        return $self->internal_error(
-            "Non existing user was accessed: $ENV{PATH_INFO}",
-            );
+        return $self->internal_error("Non existing user was accessed");
     }
 
 

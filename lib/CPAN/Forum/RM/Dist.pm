@@ -20,7 +20,7 @@ sub dist {
         $group_name = $1;
     } else {
         return $self->internal_error(
-            "Probably bad regex when checking group name for $group_name called in $ENV{PATH_INFO}",
+            "Probably bad regex when checking group name for '$group_name'",
             );
     }
     $self->log->debug("show dist: '$group_name'");
@@ -36,7 +36,7 @@ sub dist {
 
     my ($gr) = CPAN::Forum::DB::Groups->search(name => $group_name);
     if (not $gr) {
-        $self->log->warning("Invalid group $group_name called in $ENV{PATH_INFO}");
+        $self->log->warning("Invalid group '$group_name'");
         $gr = $self->process_missing_dist($group_name);
         if (not $gr) {
             return $self->internal_error(
@@ -50,7 +50,7 @@ sub dist {
         $gid = $1;
     } else {
         return $self->internal_error(
-            "Invalid gid received $gid called in $ENV{PATH_INFO}",
+            "Invalid gid received '$gid'",
             );
     }
 

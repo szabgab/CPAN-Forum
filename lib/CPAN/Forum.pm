@@ -460,12 +460,12 @@ sub cgiapp_init {
 
 sub _logger {
     my ($self, %h) = @_;
-    return sprintf "[%s] - %s - [%s] [%s] [%s] %s\n",
+    return sprintf "[%s] - %s - [REMOTE_ADDR=%s] [HTTP_REFERER=%s] [REQUES=%s] %s\n",
             scalar(localtime), 
             $h{level}, 
             ($ENV{REMOTE_ADDR} || ''),
             ($ENV{HTTP_REFERER} || ''),
-            ($ENV{PATH_INFO} || ''),
+            ($self->param('REQUEST')),
             $h{message};
             # keys of the hash: level, message, name
 }
@@ -574,7 +574,7 @@ sub setup {
 
 =head2 cgiapp_prerun
 
-We use it to change the run mode according to the requested URL (PATH_INFO).
+We use it to change the run mode according to the requested URL.
 Maybe we should move his code to the mode_param method ?
 
 =cut
@@ -626,8 +626,11 @@ sub _set_run_mode {
     return $rm if $rm and $rm ne 'home'; # alredy has run-mode
     $rm = 'home'; # set to default ???
 
-    # override rm based on PATH_INFO
-    if ($ENV{PATH_INFO} =~ m{^/
+    my $q = $self->query;
+
+    # override rm based on REQUEST
+    my $request = $self->param('REQUEST');
+    if ($request =~ m{^/
                     ([^/]+)        # first word till after the first /
                     (?:/(.*))?     # the rest, after the (optional) second /
                     }x) {
@@ -637,11 +640,11 @@ sub _set_run_mode {
             my @params = split /\//, $params;
             $self->param(path_parameters => @params ? \@params : []);
             $rm = $newrm;
-        } elsif ($ENV{PATH_INFO} eq "/cgi/index.pl") {
+        } elsif ($request eq "/cgi/index.pl") {
             # this should be ok here
-            #$self->log->error("Invalid PATH_INFO: $ENV{PATH_INFO}");
+            #$self->log->error("Invalid request: $request}");
         } else {
-            $self->log->error("Invalid PATH_INFO: $ENV{PATH_INFO}");
+            $self->log->error("Invalid request: $request");
         }
     }
     $self->prerun_mode($rm);
@@ -1001,12 +1004,12 @@ sub posts {
                     $new_group_id = $gr->id;
                 } else {
                     return $self->internal_error(
-                        "Group '$new_group' was not in database when accessed PATH_INFO: '$ENV{PATH_INFO}'",
+                        "Group '$new_group' was not in database",
                         );
                 }
             } else {
                 return $self->internal_error(
-                    "Bad regex for '$new_group' ? Accessed PATH_INFO: '$ENV{PATH_INFO}'",
+                    "Bad regex for '$new_group' ?",
                     );
             }
         } elsif ($new_group_id) {
@@ -1015,7 +1018,7 @@ sub posts {
                 $new_group = $gr->name;
             } else {
                 return $self->internal_error(
-                    "Group '$new_group_id' was not in database when accessed PATH_INFO: '$ENV{PATH_INFO}'",
+                    "Group '$new_group_id' was not in database",
                 );
             }
         } elsif ($q->param('q')) {
@@ -1030,7 +1033,7 @@ sub posts {
         $new_group_id = $q->param("new_group_id");
         if (not $new_group_id) {
             return $self->internal_error(
-                "Missing new_group_id. Accessed PATH_INFO: '$ENV{PATH_INFO}'",
+                "Missing new_group_id.",
                 );
         }
 
@@ -1041,12 +1044,12 @@ sub posts {
                 $new_group = $grp->name;
             } else {
                 return $self->internal_error(
-                    "Bad value for new_group (id) '$new_group_id' ? Accessed PATH_INFO: '$ENV{PATH_INFO}'",
+                    "Bad value for new_group (id) '$new_group_id' ?",
                     );
             } 
         } else {
             return $self->internal_error(
-                "Bad value for new_group (id) '$new_group_id' ? Accessed PATH_INFO: '$ENV{PATH_INFO}'",
+                "Bad value for new_group (id) '$new_group_id' ?",
                 );
         }
     }
@@ -1066,7 +1069,7 @@ sub posts {
         my $post = CPAN::Forum::DB::Posts->retrieve($id);
         if (not $post) {
             return $self->internal_error(
-                "PATH_INFO: $ENV{PATH_INFO}",
+                "in request",
                 );
         }
         my $thread_count = CPAN::Forum::DB::Posts->count_threads($post->thread);
@@ -1227,7 +1230,7 @@ sub process_post {
         #push @errors, "subject_too_long" if $@ =~ /subject_too_long/;
         if (not @errors) {
             return $self->internal_error(
-                "PATH_INFO: '$ENV{PATH_INFO}'\nUNKNOWN_ERROR: $@",
+                "UNKNOWN_ERROR: $@",
             );
         }
         return $self->posts(\@errors);
@@ -1307,7 +1310,7 @@ sub threads {
     my @posts = CPAN::Forum::DB::Posts->search(thread => $id);
     if (not @posts) {
         return $self->internal_error(
-            "PATH_INFO: $ENV{PATH_INFO}",
+            "in request",
             );
     }
 
@@ -1532,7 +1535,7 @@ sub teardown {
     # first let's try to resolve the really big problems
     if ($ellapsed_time > 3) {
         my $rm = $self->get_current_runmode();
-        $self->log->warning("Long request. Ellapsed time: $ellapsed_time on run-mode: $rm, $ENV{PATH_INFO}"); 
+        $self->log->warning("Long request. Ellapsed time: $ellapsed_time on run-mode: $rm"); 
     }
 }
 
