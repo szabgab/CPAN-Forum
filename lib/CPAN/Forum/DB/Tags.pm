@@ -2,8 +2,7 @@ package CPAN::Forum::DB::Tags;
 use strict;
 use warnings;
 
-use CPAN::Forum::DBI;
-
+use base 'CPAN::Forum::DBI';
 use Carp qw();
 
 sub get_tags_hash_of {
@@ -91,28 +90,16 @@ sub _add_tag {
 sub _get_tag_id {
     my ($self, $text) = @_;
 
-    my $dbh = CPAN::Forum::DBI::db_Main();
-    my $sth = $dbh->prepare("SELECT id FROM tags WHERE name=?");
-    $sth->execute($text);
-    my ($id) = $sth->fetchrow_array;
-    $sth->finish;
-    return $id;
+    return $self->_fetch_single_value("SELECT id FROM tags WHERE name=?", $text);
 }
 
 sub get_all_tags {
     my ($self) = @_;
 
-    my $dbh = CPAN::Forum::DBI::db_Main();
     my $sql = "SELECT name
-                FROM tags
+                FROM tags 
                 WHERE id IN (SELECT DISTINCT tag_id FROM tag_cloud) ORDER BY name ASC";
-    my $sth = $dbh->prepare($sql);
-    $sth->execute;
-    my @tags;
-    while (my $hr = $sth->fetchrow_hashref) {
-        push @tags, $hr;
-    }
-    return \@tags;
+    return $self->_fetch_arrayref_of_hashes($sql);
 }
 
 sub get_modules_with_tag {
@@ -122,14 +109,7 @@ sub get_modules_with_tag {
                FROM groups, tags, tag_cloud
                WHERE groups.id=tag_cloud.group_id AND tag_cloud.tag_id=tags.id AND tags.name=?
                GROUP BY groups.name";
-    my $dbh = CPAN::Forum::DBI::db_Main();
-    my $sth = $dbh->prepare($sql);
-    $sth->execute($tag_name);
-    my @res;
-    while (my $hr = $sth->fetchrow_hashref) {
-        push @res, $hr;
-    }
-    return \@res;
+    return $self->_fetch_arrayref_of_hashes($sql, $tag_name);
 }
 
 
