@@ -2,6 +2,10 @@ package CPAN::Forum::RM::Notify;
 use strict;
 use warnings;
 
+use XML::RSS::SimpleGen;
+use XML::Atom::SimpleFeed;
+use URI;
+
 =head2 notify
 
 Send out e-mails upon receiving a submission.
@@ -80,6 +84,8 @@ Provide RSS feed
 /rss/dist/Distro-Name  latest N entries of that distro name
 /rss/author/PAUSEID
 
+/rss/tags latest N tags
+
 =cut
 
 sub rss {
@@ -106,15 +112,21 @@ sub _feed {
     my $limit  = $self->config("${type}_size") || 10;
     my $it = $self->get_feed($limit);
 
-    my $call = "_generate_$type";
     my $url = "http://$ENV{HTTP_HOST}";
-    return $self->$call($url, $it, $limit);
+    my $call = "_generate_$type";
+
+    my @params = @{$self->param("path_parameters")};
+    my $type;
+    if ($params[0] eq 'tags') {
+        $type = 'tags';
+    }
+
+    return $self->$call($url, $it, $type);
 }
 
 sub _generate_atom {
-    my ($self, $url, $it, $limit) = @_;
+    my ($self, $url, $it, $type) = @_;
 
-    require XML::Atom::SimpleFeed;
 
     my $feed = XML::Atom::SimpleFeed->new(
         title    => 'CPAN::Forum',
@@ -156,11 +168,11 @@ sub _generate_atom {
     return $feed->as_string();
 }
 
-
 sub _generate_rss {
-    my ($self, $url, $it, $limit) = @_;
+    my ($self, $url, $it, $type) = @_;
 
-    require XML::RSS::SimpleGen;
+    my $q = $self->query;
+
     my $rss = XML::RSS::SimpleGen->new( "$url/", "CPAN Forum", "Discussing Perl CPAN modules");
     $rss->language( 'en' );
 
@@ -168,13 +180,18 @@ sub _generate_rss {
     $rss->webmaster('admin@cpanforum.com');
 
     if ($it and @$it) {
-        #while (my $post = $it->next() and $limit--) {
-        #    my $title = sprintf "[%s] %s", $post->gid->name, $post->subject;
-        #    $rss->item("$url/posts/" . $post->id(), $title); # TODO _subject_escape ?
-        #}
-        foreach my $post (@$it) {
-            my $title = sprintf "[%s] %s", $post->{group_name}, $post->{subject};
-            $rss->item("$url/posts/" . $post->{id}, $title); # TODO _subject_escape ?
+        if ($type and $type eq 'tags') {
+            foreach my $post (@$it) {
+                my $title = sprintf "%s on %s at %s", $post->{tag}, $post->{dist},
+                        POSIX::strftime("%Y%m%d %H:%S", localtime($post->{stamp}));
+                my $uri = URI->new("$url/tags/name/" . $post->{tag});
+                $rss->item($uri->as_string, $title);
+            }
+        } else {
+            foreach my $post (@$it) {
+                my $title = sprintf "[%s] %s", $post->{group_name}, $post->{subject};
+                $rss->item("$url/posts/" . $post->{id}, $title); # TODO _subject_escape ?
+            }
         }
     }
     else {
@@ -215,6 +232,10 @@ sub get_feed {
 
     if ($params[0] eq 'threads') {
         return CPAN::Forum::DB::Posts->search_latest_threads($limit);
+    }
+
+    if ($params[0] eq 'tags') {
+        return CPAN::Forum::DB::Tags->retrieve_latest($limit);
     }
 
     return;

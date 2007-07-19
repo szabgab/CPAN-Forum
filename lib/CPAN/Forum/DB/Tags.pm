@@ -138,6 +138,17 @@ sub dump_tag_cloud {
     return $self->_dump($sql); 
 }
 
+sub retrieve_latest {
+    my ($self, $limit) = @_;
+
+    my $sql = qq{SELECT tags.name tag, tag_cloud.stamp stamp, groups.name dist
+                 FROM tags,tag_cloud,groups
+                 WHERE tags.id=tag_cloud.tag_id AND tag_cloud.group_id=groups.id
+                 ORDER BY tag_cloud.stamp DESC
+                 LIMIT ?};
+    return $self->_fetch_arrayref_of_hashes($sql, $limit);
+}
+
 =head1 Design
 
 Every person can put any tage on any module
