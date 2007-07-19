@@ -11,6 +11,8 @@ use lib "lib";
 use CPAN::Forum::DBI;
 use CPAN::Forum::DB::Posts;
 use CPAN::Forum::DB::Tags;
+use CPAN::Forum::DB::Groups;
+use CPAN::Forum::DB::Users;
 
 my %opts;
 GetOptions(\%opts, 'help', 'dbdir=s', 'out=s') or usage();
@@ -61,8 +63,10 @@ sub db_dump {
     mkdir "$opts{out}/cpanforum";
     chdir "$opts{out}/cpanforum";
 
-    my $tags = CPAN::Forum::DB::Tags->dump_tags;
-    _save_file("tags.csv", $tags);
+    _save_file("tags.csv",      "id,name",            CPAN::Forum::DB::Tags->dump_tags);
+    _save_file("tag_cloud.csv", "uid,tag_id,dist_id", CPAN::Forum::DB::Tags->dump_tag_cloud);
+    _save_file("dists.csv",     "id,name",            CPAN::Forum::DB::Groups->dump_groups);
+    _save_file("users.csv",     "id,username",        CPAN::Forum::DB::Users->dump_users);
 
     chdir $cwd;
     chdir $opts{out};
@@ -70,9 +74,10 @@ sub db_dump {
 }
 
 sub _save_file {
-    my ($file, $ar) = @_;
+    my ($file, $header, $ar) = @_;
 
     open my $out, '>', $file or die "Could not open '$file': $!";
+    print $out "$header\n";
     foreach my $r (@$ar) {
         print $out join ",", @$r;
         print $out "\n";

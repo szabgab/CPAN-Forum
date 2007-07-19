@@ -47,6 +47,12 @@ sub get_user {
     return $self->_fetch_single_hashref($sql, $user_id);
 }
 
+sub dump_users {
+    my ($self) = @_;
+    my $sql = "SELECT id, username FROM users";
+    return $self->_dump($sql); 
+}
+
 
 1;
 

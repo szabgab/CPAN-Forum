@@ -25,5 +25,11 @@ sub info {
     return $self->_fetch_single_hashref($sql, $group_id);
 }
 
+sub dump_groups {
+    my ($self) = @_;
+    my $sql = "SELECT id, name FROM groups";
+    return $self->_dump($sql); 
+}
+
 1;
 

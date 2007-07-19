@@ -132,6 +132,11 @@ sub dump_tags {
     my $sql = "SELECT id, name FROM tags ORDER BY id";
     return $self->_dump($sql); 
 }
+sub dump_tag_cloud {
+    my ($self) = @_;
+    my $sql = "SELECT uid, tag_id, group_id FROM tag_cloud";
+    return $self->_dump($sql); 
+}
 
 =head1 Design
 
