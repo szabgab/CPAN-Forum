@@ -728,7 +728,8 @@ sub build_listing {
     
     my @resp;
     foreach my $post (@$it) {
-        my $thread_count = CPAN::Forum::DB::Posts->sql_count_thread($post->thread)->select_val;
+#warn "called too many times";
+        my $thread_count = CPAN::Forum::DB::Posts->count_threads($post->thread);
         push @resp, {
             subject      => _subject_escape($post->subject), 
             id           => $post->id, 
@@ -1068,7 +1069,7 @@ sub posts {
                 "PATH_INFO: $ENV{PATH_INFO}",
                 );
         }
-        my $thread_count = CPAN::Forum::DB::Posts->sql_count_thread($post->thread)->select_val;
+        my $thread_count = CPAN::Forum::DB::Posts->count_threads($post->thread);
         if ($thread_count > 1) {
             $t->param(thread_id    => $post->thread);
             $t->param(thread_count => $thread_count);

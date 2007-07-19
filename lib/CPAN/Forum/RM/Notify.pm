@@ -116,12 +116,12 @@ sub _feed {
     my $call = "_generate_$type";
 
     my @params = @{$self->param("path_parameters")};
-    my $type;
+    my $content;
     if ($params[0] eq 'tags') {
-        $type = 'tags';
+        $content = 'tags';
     }
 
-    return $self->$call($url, $it, $type);
+    return $self->$call($url, $it, $content);
 }
 
 sub _generate_atom {
