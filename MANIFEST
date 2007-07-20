@@ -15,6 +15,7 @@ lib/CPAN/Forum.pm
 lib/CPAN/Forum/Markup.pm
 lib/CPAN/Forum/Build.pm
 lib/CPAN/Forum/DBI.pm
+lib/CPAN/Forum/Handler.pm
 lib/CPAN/Forum/INC.pm
 
 lib/CPAN/Forum/DB/Authors.pm
