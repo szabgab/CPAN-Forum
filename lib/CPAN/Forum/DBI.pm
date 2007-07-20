@@ -93,5 +93,10 @@ sub _dump {
     return $dbh->selectall_arrayref($sql, \%args);
 }
 
+sub count_rows_in {
+    my ($self, $table) = @_;
+    return $self->_fetch_single_value("SELECT COUNT(*) FROM $table");
+}
+
 1;
 

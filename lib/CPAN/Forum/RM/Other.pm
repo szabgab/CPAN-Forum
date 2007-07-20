@@ -13,10 +13,11 @@ sub about {
     my $self = shift;
     my $t = $self->load_tmpl("about.tmpl");
     
-    $t->param(distro_cnt        => CPAN::Forum::DB::Groups->count_all());
-    $t->param(posts_cnt         => CPAN::Forum::DB::Posts->count_all());
-    $t->param(users_cnt         => CPAN::Forum::DB::Users->count_all());
-    $t->param(subscription_cnt  => CPAN::Forum::DB::Subscriptions->count_all());
+    $t->param(distro_cnt        => CPAN::Forum::DBI->count_rows_in('groups'));
+    $t->param(posts_cnt         => CPAN::Forum::DBI->count_rows_in('posts'));
+    $t->param(users_cnt         => CPAN::Forum::DBI->count_rows_in('users'));
+    $t->param(subscription_cnt  => CPAN::Forum::DBI->count_rows_in('subscriptions'));
+    $t->param(tag_cloud_cnt     => CPAN::Forum::DBI->count_rows_in('tag_cloud'));
     $t->param(version           => $self->version);
     # number of posts per group name, can create some xml feed from it that can
     # be used by search.cpan.org and Kobes to add a number of posts next to the link
