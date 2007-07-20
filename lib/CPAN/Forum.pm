@@ -8,7 +8,7 @@ use base 'CGI::Application';
 use CGI::Application::Plugin::Session;
 use CGI::Application::Plugin::LogDispatch;
 use Data::Dumper qw();
-use POSIX qw(strftime);
+use POSIX        qw();
 use Mail::Sendmail qw(sendmail);
 use CGI ();
 use List::MoreUtils qw(any);
@@ -25,7 +25,6 @@ my %errors = (
     "ERR line_too_long"             => "Line too long",
     "ERR open_code_without_closing" => "open <code> tag without closing tag",
 );
-
 
 =head1 NAME
 
@@ -460,12 +459,16 @@ sub cgiapp_init {
 
 sub _logger {
     my ($self, %h) = @_;
-    return sprintf "[%s] - %s - [%s] [%s] [%s] %s\n",
-            scalar(localtime), 
+    my ($package, $filename, $line, $sub) = caller(6);
+    my $root = $self->param("ROOT");
+    $filename =~ s/^$root//;
+    return sprintf "[%s] - %s - [%s] [%s] [%s] [%s(%s)] %s\n",
+            POSIX::strftime("%Y-%m-%d %H:%M:%S", localtime), 
             $h{level}, 
             ($ENV{REMOTE_ADDR} || ''),
             ($ENV{HTTP_REFERER} || ''),
             ($self->param('REQUEST')),
+            $filename, $line,
             $h{message};
             # keys of the hash: level, message, name
 }
@@ -740,7 +743,7 @@ sub build_listing {
             thread       => ($thread_count > 1 ? 1 : 0),
             thread_id    => $post->thread,
             thread_count => $thread_count-1,
-            #date         => strftime("%e/%b", localtime $post->date),
+            #date         => POSIX::strftime("%e/%b", localtime $post->date),
             date         => scalar localtime $post->date,
             postername   => $post->uid->username,
             };
