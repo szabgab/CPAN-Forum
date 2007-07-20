@@ -4,7 +4,9 @@ use warnings;
 
 =head2 author
 
-List posts by module author (PAUSEID)
+List posts to dists grouped by author of the dists (PAUSEID)
+
+/author/XYZ
 
 =cut
 
@@ -36,7 +38,9 @@ sub author {
                     CPAN::Forum::DB::Groups->search( pauseid => $author->{id} );
     $self->log->debug("Group IDs: @group_ids");
     my $page = $q->param('page') || 1;
-    $self->_search_results($t, {where => {gid => \@group_ids}, page => $page});
+    if (@group_ids) {
+        $self->_search_results($t, {where => {gid => \@group_ids}, page => $page});
+    }
     #$self->_subscriptions($t, $gr);
     $t->output;
 }
