@@ -7,17 +7,28 @@ sub tags {
 
     my $path = ${$self->param("path_parameters")}[0] || '';
     my $value = ${$self->param("path_parameters")}[1] || '';
+
+    # support tag tcp/ip  but not a/b/c
+    if (${$self->param("path_parameters")}[2]) {
+        $value .= "/" . ${$self->param("path_parameters")}[2];
+    }
+
     $self->log->debug("tags path='$path' value='$value'");
     if ($path eq 'name' and $value) {
         return $self->_list_modules_with_tag($value);
     }
-     
 
     my $t = $self->load_tmpl("tags.tmpl",
         loop_context_vars => 1,
         global_vars => 1,
     );
     my $tags = CPAN::Forum::DB::Tags->get_all_tags();
+
+    # maximize tag size to 24
+    foreach my $t (@$tags) {
+        $t->{total} = 24 if $t->{total} > 24;
+    }
+   
     $t->param(tags => $tags);
     return $t->output; 
 }
