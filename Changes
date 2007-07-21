@@ -1,4 +1,6 @@
   Added option to disable all e-mail notifications
+  Enable adding tags to CPAN modules
+  Replace Class::DBI by plain SQL calls in most of the application
 
 v0.12 
 

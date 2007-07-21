@@ -17,12 +17,14 @@ __PACKAGE__->set_sql(count          => "SELECT count(*) FROM __TABLE__ WHERE %s 
 #use Data::Dumper;
 #__PACKAGE__->add_trigger(before_update => sub {warn Dumper $_[0]});
 
-sub info {
-    my ($self, $group_id) = @_;
+sub info_by {
+    my ($self, $field, $value) = @_;
+    Carp::croak("Invalid field '$field'") if $field ne 'id' and $field ne 'name';
+
     my $sql = "SELECT id, name, status
                FROM groups
-               WHERE id=?";
-    return $self->_fetch_single_hashref($sql, $group_id);
+               WHERE $field=?";
+    return $self->_fetch_single_hashref($sql, $value);
 }
 
 sub dump_groups {

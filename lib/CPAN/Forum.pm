@@ -1006,9 +1006,9 @@ sub posts {
         if ($new_group) {
             if ($new_group =~ /^([\w-]+)$/) {
                 $new_group = $1;
-                my ($gr) = CPAN::Forum::DB::Groups->search(name => $new_group);
+                my ($gr) = CPAN::Forum::DB::Groups->info_by(name => $new_group); # SQL
                 if ($gr) {
-                    $new_group_id = $gr->id;
+                    $new_group_id = $gr->{id};
                 } else {
                     return $self->internal_error(
                         "Group '$new_group' was not in database",
@@ -1020,9 +1020,9 @@ sub posts {
                     );
             }
         } elsif ($new_group_id) {
-            my ($gr) = CPAN::Forum::DB::Groups->retrieve($new_group_id);
+            my ($gr) = CPAN::Forum::DB::Groups->info_by(id => $new_group_id); # SQL
             if ($gr) {
-                $new_group = $gr->name;
+                $new_group = $gr->{name};
             } else {
                 return $self->internal_error(
                     "Group '$new_group_id' was not in database",
@@ -1046,9 +1046,9 @@ sub posts {
 
         if ($new_group_id =~ /^(\d+)$/) {
             $new_group_id = $1;
-            my ($grp) = CPAN::Forum::DB::Groups->retrieve($new_group_id);
+            my ($grp) = CPAN::Forum::DB::Groups->info_by(id => $new_group_id);
             if ($grp) {
-                $new_group = $grp->name;
+                $new_group = $grp->{name};
             } else {
                 return $self->internal_error(
                     "Bad value for new_group (id) '$new_group_id' ?",

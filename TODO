@@ -1,6 +1,23 @@
 
   Tests  *  Tests   *   Tests
 
+  stop using Class::DBI, use plain SQL calls
+
+  move database to PostgreSQL
+
+  move to mod_perl
+
+  Session information: remember logged in user, 
+  have check-box on the main form to say user wants to be remembered
+
+  Enable users to connect their CPAN::Forum id with their PAUSE id:
+    Let logged in user type in their PAUSEid
+    send an e-mail with code to PAUSEID@cpan.org and save the same id in
+      the session object
+    tell the user to check their e-mail and copy the code to the approval form
+   
+
+
   Unite and clean up the code that fetches list of people who need to be
   notified. Test both the interface to manage this and the the actually
   retreival of addresses to be notified.
