@@ -5,9 +5,9 @@ use warnings;
 sub selfconfig {
     my ($self, $errs) = @_;
     my $t = $self->load_tmpl("change_password.tmpl");
-    my ($user) = CPAN::Forum::DB::Users->retrieve($self->session->param('uid'));
-    $t->param(fname => $user->fname);
-    $t->param(lname => $user->lname);
+    my $user = CPAN::Forum::DB::Users->info_by(id => $self->session->param('uid')); # SQL
+    $t->param(fname => $user->{fname});
+    $t->param(lname => $user->{lname});
 
     $t->param($errs) if $errs;
     $t->output;
@@ -24,13 +24,12 @@ sub change_info {
         return $self->selfconfig({"bad_lname" => 1});
     }
 
-    my ($user) = CPAN::Forum::DB::Users->retrieve($self->session->param('uid'));
-    $user->fname($q->param('fname'));
-    $user->lname($q->param('lname'));
-    $user->update;
+    my $user = CPAN::Forum::DB::Users->update($self->session->param('uid'), # SQL
+                    fname => $q->param('fname'),
+                    lname => $q->param('lname'),
+                );
 
     return $self->selfconfig({done => 1});
-
 }
 
 

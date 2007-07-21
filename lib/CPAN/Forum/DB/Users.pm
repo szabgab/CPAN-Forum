@@ -47,6 +47,23 @@ sub dump_users {
     return $self->_dump($sql); 
 }
 
+sub update {
+    my ($self, $id, %args) = @_;
+    my @valid_fields = qw(fname lname);
+    my @fields;
+    my @values;
+
+    foreach my $f (@valid_fields) {
+        if (exists $args{$f}) {
+            push @fields, "$f=?";
+            push @values, $args{$f};
+        }
+    }
+
+    my $sql = "UPDATE users SET " . join(",", @fields) . " WHERE id=?";
+    my $dbh = CPAN::Forum::DBI::db_Main();
+    $dbh->do($sql, undef, @values, $id);
+}
 
 1;
 
