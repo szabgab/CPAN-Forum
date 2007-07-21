@@ -14,8 +14,6 @@ __PACKAGE__->has_a   (pauseid       => "CPAN::Forum::DB::Authors");
 
 __PACKAGE__->set_sql(count_like     => "SELECT count(*) FROM __TABLE__ WHERE %s LIKE '%s'");
 __PACKAGE__->set_sql(count          => "SELECT count(*) FROM __TABLE__ WHERE %s = '%s'");
-#use Data::Dumper;
-#__PACKAGE__->add_trigger(before_update => sub {warn Dumper $_[0]});
 
 sub info_by {
     my ($self, $field, $value) = @_;
@@ -45,6 +43,15 @@ sub groups_by_name {
     $value = '%' . $value . '%';
     my $sql = "SELECT id, name FROM groups WHERE name LIKE ?";
     return $self->_fetch_hashref($sql, $value);
+}
+
+sub add {
+    my ($self, %args) = @_;
+    my $sql = "INSERT INTO groups (name, version, gtype, pauseid) VALUES (?, ?, ?, ?)";
+    my $dbh = CPAN::Forum::DBI::db_Main();
+    $dbh->do($sql, undef, @args{qw(name version gtype pauseid)});
+
+    return $self->info_by(name => $args{name});
 }
 
 

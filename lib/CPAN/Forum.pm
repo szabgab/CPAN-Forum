@@ -12,6 +12,8 @@ use POSIX        qw();
 use Mail::Sendmail qw(sendmail);
 use CGI ();
 use List::MoreUtils qw(any);
+use WWW::Mechanize;
+use CPAN::DistnameInfo;
 
 use CPAN::Forum::INC;
 use CPAN::Forum::DBI;
@@ -1578,7 +1580,63 @@ sub process_missing_dist {
     my ($self, $dist_name) = @_;
     $self->log->debug("Fetch info regarding $dist_name from search.cpan.org");
 
-    # Cehck if client is approved
+    return if not $self->_approved_client();
+
+    my $download_url = $self->_check_on_search_cpan_org($dist_name);
+    return if not $download_url;
+
+    my ($version, $pauseid) = $self->_check_dist_info($download_url, $dist_name);
+
+    my $author = CPAN::Forum::DB::Authors->get_author_by_pauseid($pauseid); # SQL
+    if (not $author) {
+        $author = eval { CPAN::Forum::DB::Authors->add( pauseid => $pauseid ) }; # SQL
+    }
+    if (not $author) {
+        $self->log->debug("Could not find or add author: '$pauseid'");
+        return;
+    }
+
+    my $group = eval { CPAN::Forum::DB::Groups->add(   # SQL
+        name    => $dist_name,
+        gtype   => $CPAN::Forum::DBI::group_types{Distribution}, 
+        version => $version,
+        pauseid => $author->{id},
+    ); };
+    if ($group) {
+        $self->log->notice("Distribution $dist_name added");
+        return $group;
+    }
+    else {
+        $self->log->debug("Could not add distribution $dist_name: $@");
+        return;
+    }
+}
+
+sub _check_dist_info {
+    my ($self, $download_url, $dist_name) = @_;
+    my $d = CPAN::DistnameInfo->new($download_url);
+    if (not $d) {
+        $self->log->debug("Could not parse download URL");
+        return;
+    }
+    if ($dist_name ne $d->dist) {
+        $self->log->debug("Distname '$dist_name' is different from '" . $d->dist . "'");
+        return; # this was not here!!
+    }
+
+    my $pauseid = $d->cpanid;
+    if (not $pauseid) {
+         $self->log->debug("Could not get PAUSEID from download_url");
+         return;
+    }
+    return ($d->version, $pauseid);
+}
+
+
+sub _approved_client {
+    my ($self) = @_;
+
+    # Check if client is approved
     my %IPS = (
         '66.249.66.3'  => 1,   # GoogleBot
         '65.55.213.74' => 1,   # msnbot
@@ -1588,9 +1646,14 @@ sub process_missing_dist {
         $self->log->debug("Client $ENV{REMOTE_ADDR} is not in the approved list");
         return;
     }
+    return 1;
+}
+
+
+sub _check_on_search_cpan_org {
+    my ($self, $dist_name) = @_;
 
     # Fetch page from search.cpan.org and do a sanity check
-    require WWW::Mechanize;
     my $w = WWW::Mechanize->new;
     my $url = "http://search.cpan.org/dist/$dist_name/";
     $self->log->debug("URL: '$url'");
@@ -1614,45 +1677,8 @@ sub process_missing_dist {
     }
     my $download_url = $download_link->url;
     $self->log->debug("Download url: $download_url");
-    require CPAN::DistnameInfo;
-    my $d = CPAN::DistnameInfo->new($download_url);
-    if (not $d) {
-        $self->log->debug("Could not parse download URL");
-        return;
-    }
-    if ($dist_name ne $d->dist) {
-         $self->log->debug("Distname $dist_name is different from " . $d->dist);
-    }
-
-    my $pauseid = $d->cpanid;
-    if (not $pauseid) {
-         $self->log->debug("Could not get PAUSEID from download_url");
-         return;
-    }
-    my $author = eval { CPAN::Forum::DB::Authors->find_or_create({
-                    pauseid => $pauseid,
-                 }); };
-    if (not $author) {
-        $self->log->debug("Could not find_or_create author: '$pauseid'");
-        return;
-    }
-
-    my $group = eval { CPAN::Forum::DB::Groups->create({
-        name    => $dist_name,
-        gtype   => $CPAN::Forum::DBI::group_types{Distribution}, 
-        version => $d->version,
-        pauseid => $author->id,
-    }); };
-    if ($group) {
-        $self->log->notice("Distribution $dist_name added");
-        return $group;
-    }
-    else {
-        $self->log->debug("Could not add distribution $dist_name: $@");
-        return;
-    }
+    return $download_url;
 }
-
 
 sub version {
     return $VERSION;

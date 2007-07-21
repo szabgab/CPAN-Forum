@@ -34,7 +34,7 @@ sub dist {
     $t->param(group => $group_name);
     $t->param(title => "CPAN Forum - $group_name");
 
-    my ($gr) = CPAN::Forum::DB::Groups->search(name => $group_name);
+    my $gr = CPAN::Forum::DB::Groups->info_by(name => $group_name);
     if (not $gr) {
         $self->log->warning("Invalid group '$group_name'");
         $gr = $self->process_missing_dist($group_name);
@@ -45,7 +45,7 @@ sub dist {
             );
         }
     }
-    my $gid = $gr->id;
+    my $gid = $gr->{id};
     if ($gid =~ /^(\d+)$/) {
         $gid = $1;
     } else {

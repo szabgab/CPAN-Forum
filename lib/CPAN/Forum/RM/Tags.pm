@@ -22,7 +22,7 @@ sub tags {
         loop_context_vars => 1,
         global_vars => 1,
     );
-    my $tags = CPAN::Forum::DB::Tags->get_all_tags();
+    my $tags = CPAN::Forum::DB::Tags->get_all_tags(); # SQL
 
     # maximize tag size to 24
     foreach my $t (@$tags) {
@@ -40,7 +40,7 @@ sub _list_modules_with_tag {
         loop_context_vars => 1,
         global_vars => 1,
     );
-    my $modules = CPAN::Forum::DB::Tags->get_modules_with_tag($value);
+    my $modules = CPAN::Forum::DB::Tags->get_modules_with_tag($value); # SQL
     $t->param(tag => $value);
     $t->param(modules => $modules);
     return $t->output; 

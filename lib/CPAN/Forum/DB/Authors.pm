@@ -16,4 +16,13 @@ sub get_author_by_pauseid {
     return $self->_fetch_single_hashref($sql, uc $pauseid);
 }
 
+sub add {
+    my ($self, $pauseid) = @_;
+    my $sql = "INSERT INTO authors (pauseid) VALUES (?)";
+    my $dbh = CPAN::Forum::DBI::db_Main();
+    $dbh->do($sql, undef, $pauseid);
+
+    return $self->get_author_by_pauseid($pauseid);
+}
+
 1;
