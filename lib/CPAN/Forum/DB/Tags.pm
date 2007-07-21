@@ -7,35 +7,21 @@ use Carp qw();
 
 sub get_tags_hash_of {
     my ($self, $group_id, $uid) = @_;
-    my $dbh = CPAN::Forum::DBI::db_Main();
     my $sql = "SELECT tags.name, tags.id
                              FROM tag_cloud, tags
                              WHERE tag_cloud.tag_id=tags.id AND tag_cloud.uid=? AND tag_cloud.group_id=?";
-    my $sth = $dbh->prepare($sql);
-    $sth->execute($uid, $group_id);
-    my %tags;
-    while (my ($name, $id) = $sth->fetchrow_array) {
-        $tags{$name} = $id;
-    }
-    return \%tags;
+    return $self->_fetch_hashref($sql, $uid, $group_id);
 }
-
 
 sub get_tags_of {
     my ($self, $group_id, $uid) = @_;
     if (not defined $uid) {
         return $self->get_tags_of_module($group_id);
     }
-    my $dbh = CPAN::Forum::DBI::db_Main();
     my $sql = "SELECT tags.name name
                              FROM tag_cloud, tags
                              WHERE tag_cloud.tag_id=tags.id AND tag_cloud.uid=? AND tag_cloud.group_id=?";
-    my $sth = $dbh->prepare($sql);
-    $sth->execute($uid, $group_id);
-    my $ar = $sth->fetchall_arrayref;
-    my @names = map { {name => $_->[0]} } @$ar;
-    return \@names;
-    #return $self->_fetch_arrayref_of_hashes($sql, $uid, $group_id);
+    return $self->_fetch_arrayref_of_hashes($sql, $uid, $group_id);
 }
 
 sub get_tags_of_module {
@@ -46,12 +32,6 @@ sub get_tags_of_module {
                              WHERE tag_cloud.tag_id=tags.id AND tag_cloud.group_id=?
                              GROUP BY name";
     return $self->_fetch_arrayref_of_hashes($sql, $group_id);
-
-    #my $sth = $dbh->prepare($sql);
-    #$sth->execute($group_id);
-    #my $ar = $sth->fetchall_arrayref;
-    #my @names = map { {name => $_->[0]} } @$ar;
-    #return \@names;
 }
 
 sub attach_tag {

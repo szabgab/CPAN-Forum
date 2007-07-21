@@ -103,5 +103,23 @@ sub _selectall_hashref {
     my $dbh = CPAN::Forum::DBI::db_Main();
     return $dbh->selectall_hashref($sql, $key, undef, @args);
 }
+
+# given an SQL statement with two columns selected:
+# SELECT key, value FROM table WHERE ...;
+# returns a hash reference where the keys are built from 
+# the first column and the values from the second column
+sub _fetch_hashref {
+    my ($self, $sql, @args);
+
+    my $dbh = CPAN::Forum::DBI::db_Main();
+    my $sth = $dbh->prepare($sql);
+    $sth->execute(@args);
+    my %h;
+    while (my ($key, $value) = $sth->fetchrow_array) {
+        $h{$key} = $value;
+    }
+    return \%h;
+}
+
 1;
 
