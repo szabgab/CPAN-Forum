@@ -1048,7 +1048,7 @@ sub posts {
 
         if ($new_group_id =~ /^(\d+)$/) {
             $new_group_id = $1;
-            my ($grp) = CPAN::Forum::DB::Groups->info_by(id => $new_group_id);
+            my ($grp) = CPAN::Forum::DB::Groups->info_by(id => $new_group_id); # SQL
             if ($grp) {
                 $new_group = $grp->{name};
             } else {
@@ -1376,8 +1376,8 @@ sub _subscriptions {
     my %people;
     foreach my $s (
             CPAN::Forum::DB::Subscriptions_all->search(allposts => 1),
-            CPAN::Forum::DB::Subscriptions_pauseid->search(allposts => 1, pauseid => $group->pauseid),
-            CPAN::Forum::DB::Subscriptions->search(allposts => 1, gid => $group->id),
+            CPAN::Forum::DB::Subscriptions_pauseid->search(allposts => 1, pauseid => $group->{pauseid}),
+            CPAN::Forum::DB::Subscriptions->search(allposts => 1, gid => $group->{id}),
             ) {
         $people{$s->uid} =  {
             username => $s->uid->username,

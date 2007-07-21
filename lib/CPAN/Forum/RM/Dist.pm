@@ -61,8 +61,8 @@ sub dist {
 
     # TODO: is is not clear to me how can here anything be undef, but I got
     # several exceptions on eith $gr or $gr->pauseid being undef:
-    if ($gr and  $gr->pauseid and $gr->pauseid->pauseid) {
-        $t->param(pauseid_name => $gr->pauseid->pauseid);
+    if ($gr and  $gr->{pauseid_name}) {
+        $t->param(pauseid_name => $gr->{pauseid_name});
     }
 
     my $frequent_tags = CPAN::Forum::DB::Tags->get_tags_of_module($gid);
