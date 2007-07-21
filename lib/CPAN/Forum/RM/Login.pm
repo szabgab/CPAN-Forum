@@ -58,11 +58,8 @@ sub login_process {
     $session->param(fname     => $user->{fname});
     $session->param(lname     => $user->{lname});
     $session->param(email     => $user->{email});
-    foreach my $g (CPAN::Forum::DB::Usergroups->search_ugs($user->{id})) {
-        $self->log->debug("UserGroups: " . $g->name);
-        if ($g->name eq "admin") {
-            $session->param(admin     => 1);
-        }
+    if (CPAN::Forum::DB::Usergroups->is_admin($user->{id})) { # SQL
+        $session->param(admin     => 1);
     }
 
     my $request = $session->param("request") || "home";
