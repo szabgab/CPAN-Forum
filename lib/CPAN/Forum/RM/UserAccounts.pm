@@ -24,7 +24,7 @@ sub change_info {
         return $self->selfconfig({"bad_lname" => 1});
     }
 
-    my $user = CPAN::Forum::DB::Users->update($self->session->param('uid'), # SQL
+    CPAN::Forum::DB::Users->update($self->session->param('uid'), # SQL
                     fname => $q->param('fname'),
                     lname => $q->param('lname'),
                 );
@@ -41,9 +41,9 @@ sub change_password {
         return $self->selfconfig({bad_pw_pair => 1});
     }
     
-    my ($user) = CPAN::Forum::DB::Users->retrieve($self->session->param('uid'));
-    $user->password($q->param('password'));
-    $user->update;
+    CPAN::Forum::DB::Users->update($self->session->param('uid'), # SQL
+                    password => $q->param('password'),
+                );
 
     return $self->selfconfig({done => 1});
 

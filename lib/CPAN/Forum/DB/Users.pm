@@ -49,7 +49,7 @@ sub dump_users {
 
 sub update {
     my ($self, $id, %args) = @_;
-    my @valid_fields = qw(fname lname);
+    my @valid_fields = qw(fname lname password);
     my @fields;
     my @values;
 
