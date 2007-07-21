@@ -1372,7 +1372,6 @@ sub set_ratings {
 sub _subscriptions {
     my ($self, $t, $group) = @_;
 
-
     my %people;
     foreach my $s (
             CPAN::Forum::DB::Subscriptions_all->search(allposts => 1),

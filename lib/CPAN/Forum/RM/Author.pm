@@ -25,7 +25,7 @@ sub author {
     $t->param(pauseid => $pauseid);
     $t->param(title => "CPAN Forum - $pauseid");
 
-    my $author = CPAN::Forum::DB::Authors->get_author_by_pauseid($pauseid);
+    my $author = CPAN::Forum::DB::Authors->get_author_by_pauseid($pauseid); # SQL
     if (not $author) {
         $self->log->warning("Invalid pauseid '$pauseid'");
         return $self->internal_error(
@@ -34,12 +34,11 @@ sub author {
         );
     }
     # TODO: simplify query!
-    my @group_ids = map {$_->id}
-                    CPAN::Forum::DB::Groups->search( pauseid => $author->{id} );
-    $self->log->debug("Group IDs: @group_ids");
+    my $group_ids = CPAN::Forum::DB::Groups->list_ids_by( pauseid => $author->{id} ); # SQL
+    $self->log->debug("Group IDs: @$group_ids");
     my $page = $q->param('page') || 1;
-    if (@group_ids) {
-        $self->_search_results($t, {where => {gid => \@group_ids}, page => $page});
+    if (@$group_ids) {
+        $self->_search_results($t, {where => {gid => $group_ids}, page => $page});
     }
     #$self->_subscriptions($t, $gr);
     $t->output;

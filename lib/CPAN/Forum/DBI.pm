@@ -106,6 +106,13 @@ sub _selectall_hashref {
     return $dbh->selectall_hashref($sql, $key, undef, @args);
 }
 
+sub _select_column {
+    my ($self, $sql, @args) = @_;
+    my $dbh = CPAN::Forum::DBI::db_Main();
+    return $dbh->selectcol_arrayref($sql, undef, @args);
+}
+
+
 # given an SQL statement with two columns selected:
 # SELECT key, value FROM table WHERE ...;
 # returns a hash reference where the keys are built from 

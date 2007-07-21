@@ -34,7 +34,7 @@ sub dist {
     $t->param(group => $group_name);
     $t->param(title => "CPAN Forum - $group_name");
 
-    my $gr = CPAN::Forum::DB::Groups->info_by(name => $group_name);
+    my $gr = CPAN::Forum::DB::Groups->info_by(name => $group_name); # SQL
     if (not $gr) {
         $self->log->warning("Invalid group '$group_name'");
         $gr = $self->process_missing_dist($group_name);
@@ -65,13 +65,13 @@ sub dist {
         $t->param(pauseid_name => $gr->{pauseid_name});
     }
 
-    my $frequent_tags = CPAN::Forum::DB::Tags->get_tags_of_module($gid);
+    my $frequent_tags = CPAN::Forum::DB::Tags->get_tags_of_module($gid); # SQL
     $t->param(frequent_tags      => $frequent_tags);
 
 
     my $uid = $self->session->param('uid');
     if ($uid) {
-        my $mytags = CPAN::Forum::DB::Tags->get_tags_of($gid, $uid);
+        my $mytags = CPAN::Forum::DB::Tags->get_tags_of($gid, $uid); # SQL
         $t->param(mytags      => $mytags);
         $t->param(show_tags => 1);
     }

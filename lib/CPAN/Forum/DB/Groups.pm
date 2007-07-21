@@ -24,6 +24,13 @@ sub info_by {
                WHERE $field=? AND authors.id=groups.pauseid";
     return $self->_fetch_single_hashref($sql, $value);
 }
+sub list_ids_by {
+    my ($self, $field, $value) = @_;
+    Carp::croak("Invalid field '$field'") if $field ne 'pauseid';
+    my $sql = "SELECT id FROM groups WHERE $field=?";
+    return $self->_select_column($sql, $value);
+}
+
 
 sub dump_groups {
     my ($self) = @_;
@@ -53,7 +60,5 @@ sub add {
 
     return $self->info_by(name => $args{name});
 }
-
-
 1;
 
