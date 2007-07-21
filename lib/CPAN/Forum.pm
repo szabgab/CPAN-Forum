@@ -497,7 +497,7 @@ Given a filed name returns the configuration value from the database
 sub config {
     my ($self, $field) = @_;
     
-    CPAN::Forum::DB::Configure->param($field);
+    CPAN::Forum::DB::Configure->param($field); # SQL
 }
 
 # modes that can be accessed without a valid session
@@ -734,7 +734,7 @@ sub build_listing {
     
     my @resp;
     my @threads = map {$_->thread} @$it;
-    my $threads = CPAN::Forum::DB::Posts->count_threads(@threads);
+    my $threads = CPAN::Forum::DB::Posts->count_threads(@threads); #SQL
     
     foreach my $post (@$it) {
 #warn "called for each post";
@@ -861,7 +861,7 @@ sub register_process {
     }
    
     my $user = eval {
-        CPAN::Forum::DB::Users->add_user({
+        CPAN::Forum::DB::Users->add_user({    # SQL
                 username => $q->param('nickname'),
                 email    => $q->param('email'),
             });
@@ -914,7 +914,6 @@ redirection.
 sub _group_selector {
     my ($self, $group_name, $group_id) = @_;
     my $q = $self->query;
-
     my %group_labels;
     my @group_ids;
     
@@ -928,12 +927,14 @@ sub _group_selector {
         }
     }
 
-    if (not @group_ids) {
-        my @groups = CPAN::Forum::DB::Groups->search(gtype => $CPAN::Forum::DBI::group_types{Distribution});
-        foreach my $g (@groups) {
-            push @group_ids, $g->id;
-            $group_labels{$g->id} = $g->name;
-        }
+#    if (not @group_ids) {
+        #my @groups = CPAN::Forum::DB::Groups->search(gtype => $CPAN::Forum::DBI::group_types{Distribution});
+#        my $groups = CPAN::Forum::DB::Groups->groups_by_gtype($CPAN::Forum::DBI::group_types{Distribution});
+#warn Dumper $groups;
+#        %group_labels = %$groups;
+    # id => name
+#        @group_ids = keys %$groups;
+        #@group_ids = sort { $groups->{$a} cmp $groups->{$b} } keys %$groups;
 
 #       @groups = (
 #       "Global", 
@@ -942,7 +943,7 @@ sub _group_selector {
 #       "----",
 #           (sort map {$_->name} CPAN::Forum::DB::Groups->search(gtype => $CPAN::Forum::DBI::group_types{Distribution})),
 #       );
-    }
+#    }
     @group_ids = sort {$group_labels{$a} cmp $group_labels{$b}}  @group_ids;
     
     return $q->popup_menu(-name => "new_group", -values => \@group_ids, -labels => \%group_labels);

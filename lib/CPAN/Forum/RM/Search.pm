@@ -53,14 +53,9 @@ sub module_search {
     $txt =~ s/::/-/g;
     $txt = '%' . $txt . '%';
     
-    my $it =  CPAN::Forum::DB::Groups->search_like(name => $txt);
-    my $cnt = CPAN::Forum::DB::Groups->sql_count_like("name", $txt)->select_val;
-    my @group_names;
-    my @group_ids;
-    while (my $group  = $it->next) {
-        push @group_names, $group->name;
-        push @group_ids, $group->id;
-    }
+    my $groups_hr =  CPAN::Forum::DB::Groups->groups_by_name($txt); # SQL
+    my @group_names = values %$groups_hr;
+    my @group_ids   = keys %$groups_hr;
     if (not @group_names) {
         return $self->module_search_form(['no_module_found']);
     }

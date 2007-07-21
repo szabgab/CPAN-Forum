@@ -31,5 +31,20 @@ sub dump_groups {
     return $self->_dump($sql); 
 }
 
+sub groups_by_gtype {
+    my ($self, $value) = @_;
+    #return {} if not %args; # ?
+    my $sql = "SELECT id, name FROM groups WHERE gtype=?";
+    return $self->_fetch_hashref($sql, $value);
+}
+sub groups_by_name {
+    my ($self, $value) = @_;
+    #return {} if not %args; # ?
+    $value = '%' . $value . '%';
+    my $sql = "SELECT id, name FROM groups WHERE name LIKE ?";
+    return $self->_fetch_hashref($sql, $value);
+}
+
+
 1;
 

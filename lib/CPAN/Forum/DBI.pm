@@ -98,6 +98,8 @@ sub count_rows_in {
     return $self->_fetch_single_value("SELECT COUNT(*) FROM $table");
 }
 
+# TODO this selectall_hashref and the _fetch_hashref seem to server very similar
+# purposes
 sub _selectall_hashref {
     my ($self, $sql, $key, @args) = @_;
     my $dbh = CPAN::Forum::DBI::db_Main();
@@ -109,7 +111,7 @@ sub _selectall_hashref {
 # returns a hash reference where the keys are built from 
 # the first column and the values from the second column
 sub _fetch_hashref {
-    my ($self, $sql, @args);
+    my ($self, $sql, @args) = @_;
 
     my $dbh = CPAN::Forum::DBI::db_Main();
     my $sth = $dbh->prepare($sql);
