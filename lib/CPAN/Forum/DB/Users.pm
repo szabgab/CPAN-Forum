@@ -30,14 +30,15 @@ sub _generate_pw {
     return $pw;
 }
 
-sub get_user {
-    my ($self, $user_id) = @_;
-    return if not $user_id;
+sub info_by {
+    my ($self, $field, $value) = @_;
+    Carp::croak("Invalid field '$field'") if $field ne "id" and $field ne "username";
+    Carp::croak("No value supplied") if not $value;
 
     my $sql = "SELECT id, email, fname, lname, username
                 FROM users
-                WHERE id=?";
-    return $self->_fetch_single_hashref($sql, $user_id);
+                WHERE $field=?";
+    return $self->_fetch_single_hashref($sql, $value);
 }
 
 sub dump_users {

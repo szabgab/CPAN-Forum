@@ -21,7 +21,7 @@ sub info_by {
 
     my $sql = "SELECT groups.id id, name, status, groups.pauseid, authors.pauseid pauseid_name
                FROM groups, authors
-               WHERE $field=? AND authors.id=groups.pauseid";
+               WHERE groups.$field=? AND authors.id=groups.pauseid";
     return $self->_fetch_single_hashref($sql, $value);
 }
 sub list_ids_by {

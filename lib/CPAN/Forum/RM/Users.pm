@@ -27,7 +27,7 @@ sub users {
                 
     $t->param(hide_username => 1);
 
-    my ($user) = CPAN::Forum::DB::Users->search(username => $username);
+    my ($user) = CPAN::Forum::DB::Users->info_by(username => $username);
 
     if (not $user) {
         return $self->internal_error("Non existing user was accessed");
