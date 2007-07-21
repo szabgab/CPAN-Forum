@@ -1,5 +1,5 @@
 BODY { 
-	background: #eeeeee; 
+	background: #ffffff; 
 	font-family: Arial;
 }
 
@@ -212,9 +212,15 @@ INPUT {
 	font-size: 9pt;
 }
 
-.footer {
+.left_footer {
 	font-size: 8pt;
 }
+
+.right_footer {
+	font-size: 8pt;
+    text-align: right;
+}
+
 .error {
 	color: red;
 }
