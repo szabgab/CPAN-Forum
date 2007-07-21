@@ -13,7 +13,6 @@ __PACKAGE__->has_a(gid    => "CPAN::Forum::DB::Groups");
 
 __PACKAGE__->set_sql(latest         => "SELECT __ESSENTIAL__ FROM __TABLE__ ORDER BY DATE DESC LIMIT %s");
 
-#__PACKAGE__->set_sql(count_thread   => "SELECT count(*) FROM __TABLE__ WHERE thread=%s");
 __PACKAGE__->set_sql(count_where    => "SELECT count(*) FROM __TABLE__ WHERE %s='%s'");
 __PACKAGE__->set_sql(count_like     => "SELECT count(*) FROM __TABLE__ WHERE %s LIKE '%s'");
 #__PACKAGE__->add_constraint('subject_too_long', subject => sub { length $_[0] <= 70 and $_[0] !~ /</});
@@ -127,10 +126,24 @@ sub list_counted_posts {
                ORDER BY cnt DESC";
     return $self->_fetch_arrayref_of_hashes($sql);
 }
-sub count_threads {
+
+# returns the number of entries in a single thread
+sub count_thread {
     my ($self, $thread_id) = @_;
     my $sql = "SELECT count(*) FROM posts WHERE thread=?";
     return $self->_fetch_single_value($sql, $thread_id);
+}
+
+# returns a hashref where the keys are the given thread ids
+# the values are the number of entries in the given thread
+sub count_threads {
+    my ($self, @thread_ids) = @_;
+    return {} if not @thread_ids;
+    # TODO check if they are all numbers?
+
+    my $ids = join ",", @thread_ids;
+    my $sql = "SELECT thread, COUNT(*) cnt FROM posts WHERE thread in ($ids) GROUP BY thread";
+    return $self->_selectall_hashref($sql, 'thread');
 }
 
 sub stat_posts_by_group {

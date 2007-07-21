@@ -35,6 +35,7 @@ sub get_tags_of {
     my $ar = $sth->fetchall_arrayref;
     my @names = map { {name => $_->[0]} } @$ar;
     return \@names;
+    #return $self->_fetch_arrayref_of_hashes($sql, $uid, $group_id);
 }
 
 sub get_tags_of_module {

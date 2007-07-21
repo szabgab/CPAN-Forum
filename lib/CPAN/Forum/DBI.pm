@@ -98,5 +98,10 @@ sub count_rows_in {
     return $self->_fetch_single_value("SELECT COUNT(*) FROM $table");
 }
 
+sub _selectall_hashref {
+    my ($self, $sql, $key, @args) = @_;
+    my $dbh = CPAN::Forum::DBI::db_Main();
+    return $dbh->selectall_hashref($sql, $key, undef, @args);
+}
 1;
 
