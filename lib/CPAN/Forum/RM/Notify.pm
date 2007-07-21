@@ -15,7 +15,7 @@ Send out e-mails upon receiving a submission.
 sub notify {
     my ($self, $post_id) = @_;
     
-    my $post = CPAN::Forum::DB::Posts->get_post($post_id);
+    my $post = CPAN::Forum::DB::Posts->get_post($post_id); # SQL
     return if not $post;
     # TODO what if it does not find it?
 
@@ -65,7 +65,7 @@ sub notify_admin {
 
     # TODO: the admin should be able to configure if she wants to get messages on
     # every new user (field update_on_new_user)
-    my $admin = CPAN::Forum::DB::Users->info_by(id => 1);
+    my $admin = CPAN::Forum::DB::Users->info_by(id => 1); # SQL
     my %mail = (
         To      => $admin->{email},
         From     => $FROM,
@@ -215,27 +215,27 @@ sub get_feed {
     if ($params[0] eq 'dist') {
         my $dist = $params[1] || '';
         $self->log->debug("rss of dist: '$dist'");
-        return CPAN::Forum::DB::Posts->search_post_by_groupname($dist, $limit);
+        return CPAN::Forum::DB::Posts->search_post_by_groupname($dist, $limit); # SQL
     }
 
     if ($params[0] eq 'author') {
         my $pauseid = uc($params[1]) || '';
         if ($pauseid) {
             $self->log->debug("rss of author: '$pauseid'");
-            return CPAN::Forum::DB::Posts->search_post_by_pauseid($pauseid, $limit);
+            return CPAN::Forum::DB::Posts->search_post_by_pauseid($pauseid, $limit); # SQL
         }
     }
 
     if ($params[0] eq 'all') {
-        return CPAN::Forum::DB::Posts->retrieve_latest($limit);
+        return CPAN::Forum::DB::Posts->retrieve_latest($limit); # SQL
     }
 
     if ($params[0] eq 'threads') {
-        return CPAN::Forum::DB::Posts->search_latest_threads($limit);
+        return CPAN::Forum::DB::Posts->search_latest_threads($limit); # SQL
     }
 
     if ($params[0] eq 'tags') {
-        return CPAN::Forum::DB::Tags->retrieve_latest($limit);
+        return CPAN::Forum::DB::Tags->retrieve_latest($limit); # SQL
     }
 
     return;

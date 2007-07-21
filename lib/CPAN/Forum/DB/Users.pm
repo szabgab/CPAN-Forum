@@ -41,6 +41,18 @@ sub info_by {
     return $self->_fetch_single_hashref($sql, $value);
 }
 
+sub info_by_credentials {
+    my ($self, $username, $password) = @_;
+    Carp::croak("No username supplied") if not $username;
+    Carp::croak("No password supplied") if not $password;
+
+    my $sql = "SELECT id, email, fname, lname, username
+                FROM users
+                WHERE username=? AND password=?";
+    return $self->_fetch_single_hashref($sql, $username, $password);
+}
+
+
 sub dump_users {
     my ($self) = @_;
     my $sql = "SELECT id, username FROM users";

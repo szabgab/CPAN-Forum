@@ -41,26 +41,24 @@ sub login_process {
         return $self->login({no_login_data => 1});
     }
 
-    my ($user) = CPAN::Forum::DB::Users->search({
-                    username => $q->param('nickname'),
-                    password => $q->param('password'),
-            });
+
+    my $user = CPAN::Forum::DB::Users->info_by_credentials($q->param('nickname'), $q->param('password')); # SQL
     if (not $user) {
         $self->log->debug("No user found");
         return $self->login({bad_login => 1});
     }
-    $self->log->debug("Username: " . $user->username);
+    $self->log->debug("Username: " . $user->{username});
 
     my $session = $self->session;
     $session->param(admin     => 0); # make sure it is clean
 
     $session->param(loggedin  => 1);
-    $session->param(username  => $user->username);
-    $session->param(uid       => $user->id);
-    $session->param(fname     => $user->fname);
-    $session->param(lname     => $user->lname);
-    $session->param(email     => $user->email);
-    foreach my $g (CPAN::Forum::DB::Usergroups->search_ugs($user->id)) {
+    $session->param(username  => $user->{username});
+    $session->param(uid       => $user->{id});
+    $session->param(fname     => $user->{fname});
+    $session->param(lname     => $user->{lname});
+    $session->param(email     => $user->{email});
+    foreach my $g (CPAN::Forum::DB::Usergroups->search_ugs($user->{id})) {
         $self->log->debug("UserGroups: " . $g->name);
         if ($g->name eq "admin") {
             $session->param(admin     => 1);
