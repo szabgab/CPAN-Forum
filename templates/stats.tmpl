@@ -4,25 +4,48 @@
 <TMPL_INCLUDE NAME="navigation.tmpl">
 
 <a name="statistics"></a>
+<table>
+<tr><td>
+
 <div class="about_list">
-<p class="about_title">Top <TMPL_VAR modules_cnt> modules (number of posts)</p>
+<p class="about_title">Top <TMPL_VAR modules_cnt> modules<br />(number of posts)</p>
 <table>
 <TMPL_LOOP groups>
   <tr><td><a href="/dist/<TMPL_VAR gname>"><TMPL_VAR gname></a></td><td><TMPL_VAR cnt></td></tr>
 </TMPL_LOOP>
 </table>
 </div>
+</td>
 
 <TMPL_IF users>
+<td>
     <div class="about_list">
-    <p class="about_title"><TMPL_VAR users_cnt> most active users (number of posts)</p>
+    <p class="about_title"><TMPL_VAR users_cnt> most active users<br />(number of posts)</p>
     <table>
     <TMPL_LOOP users>
       <tr><td><a href="/users/<TMPL_VAR username>"><TMPL_VAR username></a></td><td><TMPL_VAR cnt></td></tr>
     </TMPL_LOOP>
     </table>
     </div>
+</td>
 </TMPL_IF>
 
+
+<TMPL_IF tagging_users>
+<td valign=top>
+    <div class="about_list">
+    <p class="about_title"><TMPL_VAR tagging_users_cnt> most active users<br />(number of tags)</p>
+    <table>
+    <TMPL_LOOP tagging_users>
+      <tr><td><a href="/users/<TMPL_VAR username>"><TMPL_VAR username></a></td><td><TMPL_VAR cnt></td></tr>
+    </TMPL_LOOP>
+    </table>
+    </div>
+</td>
+</TMPL_IF>
+
+
+</tr>
+</table>
 <TMPL_INCLUDE NAME="footer.tmpl">
 

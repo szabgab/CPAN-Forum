@@ -145,4 +145,18 @@ set_tag_on(module, person)
 
 =cut
 
+sub stat_tags_by_user {
+    my ($self, $limit) = @_;
+    my $sql = qq{
+            SELECT COUNT(*) cnt, users.username username 
+            FROM tag_cloud,users
+            WHERE tag_cloud.uid=users.id
+            GROUP BY username
+            ORDER BY cnt DESC
+            LIMIT ?
+            };
+    return $self->_fetch_arrayref_of_hashes($sql, $limit);
+}
+
+
 1;
