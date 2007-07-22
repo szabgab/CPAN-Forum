@@ -2,6 +2,7 @@ package CPAN::Forum::RM::Login;
 use strict;
 use warnings;
 
+use List::MoreUtils qw(none);
 
 =head2 login
 
@@ -138,16 +139,17 @@ sub pwreminder_process {
     my ($self) = @_;
     my $q = $self->query;
     my $field = $q->param('field');
-    if (not $field or $field !~ /^username|email$/ or not $q->param('value')) {
+    my @FIELDS = qw(username email);
+    if (not $field or not $q->param('value') or none {$field eq $_} @FIELDS) {
         return $self->pwreminder({"no_data" => 1});
     }
 
-    my ($user) = CPAN::Forum::DB::Users->search({$field => $q->param('value')});
+    my $user = CPAN::Forum::DB::Users->info_by($field => $q->param('value')); # SQL
     return $self->pwreminder({"no_data" => 1}) if not $user;
 
     # TODO: put this text in a template
-    my $password = $user->password;
-    my $username = $user->username;
+    my $password = $user->{password};
+    my $username = $user->{username};
     my $subject = "CPAN::Forum password reminder";
     my $message = <<MSG;
 
@@ -164,7 +166,7 @@ MSG
     $self->log->debug("FROM field set to be $FROM");
 
     my %mail = (
-        To       => $user->email,
+        To       => $user->{email},
         From     => $FROM,
         Subject  => $subject,
         Message  => $message,

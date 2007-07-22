@@ -8,6 +8,7 @@ __PACKAGE__->columns(All => qw/id username password email fname lname status
                             update_on_new_user/);
 __PACKAGE__->has_many(posts => "CPAN::Forum::DB::Posts");
 
+use List::MoreUtils qw(none);
 
 sub add_user {
     my ($self, $args) = @_;
@@ -32,7 +33,8 @@ sub _generate_pw {
 
 sub info_by {
     my ($self, $field, $value) = @_;
-    Carp::croak("Invalid field '$field'") if $field ne "id" and $field ne "username";
+    my @FIELDS = qw(id username email);
+    Carp::croak("Invalid field '$field'") if none {$field eq $_} @FIELDS;
     Carp::croak("No value supplied") if not $value;
 
     my $sql = "SELECT id, email, fname, lname, username
