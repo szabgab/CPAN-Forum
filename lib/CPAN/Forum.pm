@@ -749,12 +749,35 @@ sub build_listing {
             thread_id    => $post->thread,
             thread_count => $thread_count-1,
             #date         => POSIX::strftime("%e/%b", localtime $post->date),
-            date         => scalar localtime $post->date,
+            #date         => scalar localtime $post->date,
+            date         => _ellapsed($post->date),
             postername   => $post->uid->username,
             };
     }
     return \@resp;
 }
+
+sub _ellapsed {
+    my ($t) = @_;
+    my $now = time;
+    my $diff = $now-$t;
+    return  'now' if not $diff;
+
+    my $sec = $diff % 60;
+    $diff = ($diff -$sec) / 60;
+    return  sprintf(" %s sec ago", $sec) if not $diff;
+
+    my $min = $diff % 60;
+    $diff = ($diff-$min)/60;
+    return  sprintf("%s min ago", $min) if not $diff;  
+
+    my $hours = $diff % 24;
+    $diff = ($diff - $hours) / 24;
+    return  sprintf("%s hours ago", $hours ) if not $diff;  
+
+    return  sprintf("%s days ago", $diff );  
+}
+
 
 sub error {
     my ($self) = @_;
@@ -1176,8 +1199,6 @@ sub process_post {
                 $self->session->param("uid"));
                 
     my $button = $q->param("button");
-    # BUG: we are putting in the usernames instead of the user ids in the uid field of the posts
-    # but for this reason we'll have to use the username in every other place
     if (not @errors and $button eq "Submit") {
         my ($last_post) = CPAN::Forum::DB::Posts->search(uid => $self->session->param("username"), {order_by => 'id DESC', limit => 1});
         if ($last_post) {
