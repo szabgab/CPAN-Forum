@@ -27,7 +27,7 @@ sub users {
                 
     $t->param(hide_username => 1);
 
-    my ($user) = CPAN::Forum::DB::Users->info_by(username => $username); # SQL
+    my $user = CPAN::Forum::DB::Users->info_by(username => $username); # SQL
 
     if (not $user) {
         return $self->internal_error("Non existing user was accessed");
@@ -35,9 +35,9 @@ sub users {
 
 
     my $fullname = "";
-    $fullname .= $user->fname if $user->fname;
+    $fullname .= $user->{fname} if $user->{fname};
     $fullname .= " " if $fullname;
-    $fullname .= $user->lname if $user->lname;
+    $fullname .= $user->{lname} if $user->{lname};
     #$fullname = $username if not $fullname;
 
     $t->param(this_username => $username);
@@ -45,7 +45,7 @@ sub users {
     $t->param(title => "Information about $username");
 
     my $page = $q->param('page') || 1;
-    $self->_search_results($t, {where => {uid => $user->id}, page => $page});
+    $self->_search_results($t, {where => {uid => $user->{id}}, page => $page});
     $t->output;
 }
 

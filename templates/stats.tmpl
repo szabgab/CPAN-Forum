@@ -5,7 +5,7 @@
 
 <a name="statistics"></a>
 <div class="about_list">
-<p class="about_title">Top 50 modules (number of posts)</p>
+<p class="about_title">Top <TMPL_VAR modules_cnt> modules (number of posts)</p>
 <table>
 <TMPL_LOOP groups>
   <tr><td><a href="/dist/<TMPL_VAR gname>"><TMPL_VAR gname></a></td><td><TMPL_VAR cnt></td></tr>
@@ -15,7 +15,7 @@
 
 <TMPL_IF users>
     <div class="about_list">
-    <p class="about_title">10 most active users (number of posts)</p>
+    <p class="about_title"><TMPL_VAR users_cnt> most active users (number of posts)</p>
     <table>
     <TMPL_LOOP users>
       <tr><td><a href="/users/<TMPL_VAR username>"><TMPL_VAR username></a></td><td><TMPL_VAR cnt></td></tr>

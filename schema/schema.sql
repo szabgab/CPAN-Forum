@@ -139,6 +139,7 @@ CREATE TABLE subscriptions_pauseid (
 CREATE UNIQUE INDEX groups_name ON groups (name);
 CREATE INDEX posts_thread ON posts (thread);
 CREATE INDEX posts_gid ON posts (gid);
+CREATE INDEX posts_uid ON posts (uid);
 
 ---- add tagcloud
 --- TODO unique tag_id, group_id pair

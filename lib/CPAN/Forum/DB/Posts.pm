@@ -17,15 +17,6 @@ __PACKAGE__->set_sql(count_where    => "SELECT count(*) FROM __TABLE__ WHERE %s=
 __PACKAGE__->set_sql(count_like     => "SELECT count(*) FROM __TABLE__ WHERE %s LIKE '%s'");
 #__PACKAGE__->add_constraint('subject_too_long', subject => sub { length $_[0] <= 70 and $_[0] !~ /</});
 #__PACKAGE__->add_constraint('text_format', text => \&check_text_format);
-#__PACKAGE__->set_sql(stat_posts_by_user => qq{
-#            SELECT COUNT(*) cnt, users.username username 
-#            FROM posts,users
-#            WHERE posts.uid=users.id
-#            GROUP BY username
-#            ORDER BY cnt DESC
-#            LIMIT ?
-#            });
-
 my $MORE_SQL = 'groups.name group_name, users.fname user_fname, users.lname user_lname, users.username user_username';
 
 sub get_post {
@@ -153,6 +144,19 @@ sub stat_posts_by_group {
             FROM posts,groups 
             WHERE posts.gid=groups.id
             GROUP BY gname
+            ORDER BY cnt DESC
+            LIMIT ?
+            };
+    return $self->_fetch_arrayref_of_hashes($sql, $limit);
+}
+
+sub stat_posts_by_user {
+    my ($self, $limit) = @_;
+    my $sql = qq{
+            SELECT COUNT(*) cnt, users.username username 
+            FROM posts,users
+            WHERE posts.uid=users.id
+            GROUP BY username
             ORDER BY cnt DESC
             LIMIT ?
             };

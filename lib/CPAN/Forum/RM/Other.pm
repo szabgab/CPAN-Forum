@@ -39,12 +39,17 @@ The stats run-mode showing some statistics
 sub stats {
     my $self = shift;
     my $t = $self->load_tmpl("stats.tmpl");
-    my $groups = CPAN::Forum::DB::Posts->stat_posts_by_group(50); # SQL
+    my $modules_cnt = 50;
+    my $groups = CPAN::Forum::DB::Posts->stat_posts_by_group($modules_cnt); # SQL
+    my $users_cnt = 50;
+    my $top_users = CPAN::Forum::DB::Posts->stat_posts_by_user($users_cnt); # SQL
     #
     # TODO: user stats removed as it was extreamly slow..
     #     
+    $t->param(modules_cnt => $modules_cnt);
     $t->param(groups => $groups);
-    #$t->param(users  => \@users);
+    $t->param(users_cnt => $users_cnt);
+    $t->param(users  => $top_users);
     $t->output;
 }
 
