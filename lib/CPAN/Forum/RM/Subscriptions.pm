@@ -34,17 +34,14 @@ sub mypan {
         loop_context_vars => 1,
     );
     my $username = $self->session->param("username");
-    my ($user) = CPAN::Forum::DB::Users->search(username => $username);
+    my $user = CPAN::Forum::DB::Users->info_by(username => $username);
 
     if (not $user) {
         return $self->internal_error(
             "Trouble accessing personal information of: '$username'",
             );
     }
-    my $fullname = "";
-    $fullname .= $user->fname if $user->fname;
-    $fullname .= " " if $fullname;
-    $fullname .= $user->lname if $user->lname;
+    my $fullname = $user->{fullname};
 
     $t->param(fullname => $fullname);
     $t->param(title    => "Information about $username");
@@ -61,7 +58,7 @@ sub mypan {
             return $self->internal_error("Accessing");
         }
         $gids = $grp->id;
-        my ($s) = CPAN::Forum::DB::Subscriptions->search(uid => $user->id, gid => $grp->id);
+        my ($s) = CPAN::Forum::DB::Subscriptions->search(uid => $user->{id}, gid => $grp->id);
         if ($s) {
             push @subscriptions, {
                 gid       => $grp->id,
@@ -81,7 +78,7 @@ sub mypan {
             };
         }
     } else { # show all subscriptions
-        my ($s) = CPAN::Forum::DB::Subscriptions_all->search(uid => $user->id);
+        my ($s) = CPAN::Forum::DB::Subscriptions_all->search(uid => $user->{id});
         $self->log->debug("all subscriptions " . ($s ? "found" : "not found"));
         push @subscriptions, {
             gid       => "_all",
@@ -92,7 +89,7 @@ sub mypan {
         };
         $gids = "_all";
 
-        my $it = CPAN::Forum::DB::Subscriptions_pauseid->search(uid => $user->id);
+        my $it = CPAN::Forum::DB::Subscriptions_pauseid->search(uid => $user->{id});
         while (my $s = $it->next) {
             $gids .= ($gids ? ",_" : "_") . $s->pauseid->id; 
             push @subscriptions, {
@@ -104,7 +101,7 @@ sub mypan {
             };
         }
 
-        $it = CPAN::Forum::DB::Subscriptions->search(uid => $user->id);
+        $it = CPAN::Forum::DB::Subscriptions->search(uid => $user->{id});
         while (my $s = $it->next) {
             $gids .= ($gids ? "," : "") . $s->gid->id; 
             push @subscriptions, {

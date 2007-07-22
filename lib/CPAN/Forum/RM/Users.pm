@@ -34,10 +34,7 @@ sub users {
     }
 
 
-    my $fullname = "";
-    $fullname .= $user->{fname} if $user->{fname};
-    $fullname .= " " if $fullname;
-    $fullname .= $user->{lname} if $user->{lname};
+    my $fullname = $user->{fullname};
     #$fullname = $username if not $fullname;
 
     $t->param(this_username => $username);

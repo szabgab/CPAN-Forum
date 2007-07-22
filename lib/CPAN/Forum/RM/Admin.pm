@@ -83,7 +83,7 @@ sub admin {
         return $self->internal_error("", "restricted_area");
     }
 
-    my $data = CPAN::Forum::DB::Configure->get_all_pairs;
+    my $data = CPAN::Forum::DB::Configure->get_all_pairs; # SQL
     $self->log->debug(Data::Dumper->Dump([$data], ['config']));
 
     my $t = $self->load_tmpl("admin.tmpl");
