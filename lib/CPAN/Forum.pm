@@ -1075,15 +1075,15 @@ sub posts {
     }
     $id ||= $q->param("new_parent");
     if ($id) { # Show post
-        my $post = CPAN::Forum::DB::Posts->retrieve($id);
+        my $post = CPAN::Forum::DB::Posts->get_post($id); # SQL
         if (not $post) {
             return $self->internal_error(
                 "in request",
                 );
         }
-        my $thread_count = CPAN::Forum::DB::Posts->count_thread($post->thread);
+        my $thread_count = CPAN::Forum::DB::Posts->count_thread($post->{thread}); # SQL
         if ($thread_count > 1) {
-            $t->param(thread_id    => $post->thread);
+            $t->param(thread_id    => $post->{thread});
             $t->param(thread_count => $thread_count);
         }
         my %post = %{$self->_post($post)};
@@ -1091,17 +1091,18 @@ sub posts {
         
 #       (my $dashgroup = $post->gid) =~ s/::/-/g;
 #       $t->param(dashgroup    => $dashgroup);
-        my $new_subject = $post->subject;
+        my $new_subject = $post->{subject};
         if ($new_subject !~ /^\s*re:\s*/i) {
             $new_subject = "Re: $new_subject";
         }
         
         $t->param(new_subject  => _subject_escape($new_subject));
-        $t->param(title        => _subject_escape($post->subject));
+        $t->param(title        => _subject_escape($post->{subject}));
         $t->param(post         => 1);
         
-        $new_group        = $post->gid->name;
-        $new_group_id     = $post->gid->id;     
+        my $group = CPAN::Forum::DB::Groups->info_by(id => $post->{gid}); # SQL
+        $new_group        = $group->{name};
+        $new_group_id     = $group->{id};     
     }
     $self->log->debug("D: new_group: '$new_group' and id: '$new_group_id'");
     #$t->param("group_selector" => $self->_group_selector($new_group, $new_group_id));
@@ -1150,11 +1151,11 @@ sub process_post {
     
     my $parent_post;
     if ($parent) { # assume response
-        ($parent_post) = CPAN::Forum::DB::Posts->search(id => $parent);
+        $parent_post = CPAN::Forum::DB::Posts->get_post($parent); # SQL
         push @errors, "bad_thing"  if not $parent_post;
     } else {       # assume new post
         if ($q->param("new_group_id")) {
-            push @errors, "bad_group"  if not CPAN::Forum::DB::Groups->search(id => $q->param("new_group_id"));
+            push @errors, "bad_group"  if not CPAN::Forum::DB::Groups->info_by(id => $q->param("new_group_id")); # SQL
         } else {
             push @errors, "no_group";
         }
@@ -1218,19 +1219,19 @@ sub process_post {
 
     my $post_id;
     my $username = $self->session->param("username");
-    my ($user) = CPAN::Forum::DB::Users->search({ username => $username });
+    my $user = CPAN::Forum::DB::Users->info_by( username => $username ); # SQL
     if (not $user) {
-        return $self->internal_error("Unknonw username: $username");
+        return $self->internal_error("Unknown username: '$username'");
     }
     eval {
         my $post = CPAN::Forum::DB::Posts->create({
-            uid     => $user->id,
-            gid     => $parent_post ? $parent_post->gid : $q->param("new_group_id"),
+            uid     => $user->{id},
+            gid     => $parent_post ? $parent_post->{gid} : $q->param("new_group_id"),
             subject => $q->param("new_subject"),
             text    => $new_text,
             date    => time,
         });
-        $post->thread($parent_post ? $parent_post->thread : $post->id);
+        $post->thread($parent_post ? $parent_post->{thread} : $post->id);
         $post->parent($parent) if $parent_post;
         $post->update;
         $post_id = $post->id;
@@ -1257,18 +1258,19 @@ sub _post_date {
 
 sub _post {
     my ($self, $post) = @_;
-    my @responses = map {{id => $_->id}} CPAN::Forum::DB::Posts->search(parent => $post->id);
+    my @responses = map {{id => $_->id}} CPAN::Forum::DB::Posts->search(parent => $post->{id});
 
+    my $user = CPAN::Forum::DB::Users->info_by(id => $post->{uid}); # SQL
     my %post = (
-        postername  => $post->uid->username,
-        date        => _post_date($post->date),
-        parentid    => $post->parent,
+        postername  => $user->{username},
+        date        => _post_date($post->{date}),
+        parentid    => $post->{parent},
         responses   => \@responses,
-        text        => $self->_text_escape($post->text),
+        text        => $self->_text_escape($post->{text}),
     );
 
-    $post{id}      = $post->id;
-    $post{subject} = _subject_escape($post->subject);
+    $post{id}      = $post->{id};
+    $post{subject} = _subject_escape($post->{subject});
 
     return \%post;
 }
