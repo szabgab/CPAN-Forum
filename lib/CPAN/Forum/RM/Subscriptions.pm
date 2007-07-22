@@ -34,7 +34,7 @@ sub mypan {
         loop_context_vars => 1,
     );
     my $username = $self->session->param("username");
-    my $user = CPAN::Forum::DB::Users->info_by(username => $username);
+    my $user = CPAN::Forum::DB::Users->info_by(username => $username); # SQL
 
     if (not $user) {
         return $self->internal_error(
@@ -52,17 +52,18 @@ sub mypan {
 
 
     if (@params == 2 and $params[0] eq "dist") { # specific distribution
-        my $group = $params[1];
-        my ($grp) = CPAN::Forum::DB::Groups->search(name => $group);
-        if (not $grp) {
+        my $group_name = $params[1];
+        my $group = CPAN::Forum::DB::Groups->info_by(name => $group_name); # SQL
+        if (not $group) {
             return $self->internal_error("Accessing");
         }
-        $gids = $grp->id;
-        my ($s) = CPAN::Forum::DB::Subscriptions->search(uid => $user->{id}, gid => $grp->id);
+        my $gid = $group->{id};
+        $gids = $group->{id};
+        my ($s) = CPAN::Forum::DB::Subscriptions->search(uid => $user->{id}, gid => $gid);
         if ($s) {
             push @subscriptions, {
-                gid       => $grp->id,
-                group     => $group,
+                gid       => $gid,
+                group     => $group_name,
                 allposts  => $s->allposts,
                 starters  => $s->starters,
                 followups => $s->followups,
@@ -70,8 +71,8 @@ sub mypan {
                 
         } else {
             push @subscriptions, {
-                gid       => $grp->id,
-                group     => $group,
+                gid       => $gid,
+                group     => $group_name,
                 allposts  => 0,
                 starters  => 0,
                 followups => 0,
@@ -135,32 +136,33 @@ sub update_subscription {
     }
 
     my $username = $self->session->param("username");
-    my ($user) = CPAN::Forum::DB::Users->search(username => $username);
+    my $user = CPAN::Forum::DB::Users->info_by(username => $username); # SQL
+    my $uid = $user->{id};
 
     foreach my $gid (@gids) {
         if ($gid eq "_all") {
-            my ($s) = CPAN::Forum::DB::Subscriptions_all->search(uid => $user->id);
+            my ($s) = CPAN::Forum::DB::Subscriptions_all->search(uid => $uid);
             if (not $s) {
                 $s = CPAN::Forum::DB::Subscriptions_all->create({
-                    uid       => $user->id,
+                    uid       => $uid,
                 });
             }
             $self->_update_subs($s, $gid);
         } elsif ($gid =~ /^_(\d+)$/) {
             my $pauseid = $1;
-            my ($s) = CPAN::Forum::DB::Subscriptions_pauseid->search(pauseid => $pauseid, uid => $user->id);
+            my ($s) = CPAN::Forum::DB::Subscriptions_pauseid->search(pauseid => $pauseid, uid => $uid);
             if (not $s) {
                 $s = CPAN::Forum::DB::Subscriptions->create({
-                    uid       => $user->id,
+                    uid       => $uid,
                     pauseid   => $pauseid,
                 });
             }
             $self->_update_subs($s, $gid);
         } elsif ($gid =~ /^(\d+)$/) {
-            my ($s) = CPAN::Forum::DB::Subscriptions->search(gid => $gid, uid => $user->id);
+            my ($s) = CPAN::Forum::DB::Subscriptions->search(gid => $gid, uid => $uid);
             if (not $s) {
                 $s = CPAN::Forum::DB::Subscriptions->create({
-                    uid       => $user->id,
+                    uid       => $uid,
                     gid       => $gid,
                 });
             }
@@ -186,10 +188,10 @@ sub update_subscription {
     # we should not let the user overwrite it using the new entry box
     if ($q->param("type") eq "pauseid") {
         my $pauseid = uc $q->param("name");
-        my $author = CPAN::Forum::DB::Authors->get_author_by_pauseid($pauseid);
+        my $author = CPAN::Forum::DB::Authors->get_author_by_pauseid($pauseid); # SQL
         if ($author) {
             my $s = CPAN::Forum::DB::Subscriptions_pauseid->find_or_create({
-                uid       => $user->id,
+                uid       => $uid,
                 pauseid   => $author->{id},
             });
             $self->_update_subs($s, "_new");
@@ -200,11 +202,11 @@ sub update_subscription {
     elsif ($q->param("type") eq "distro") {
         my $name = $q->param("name");
         $name =~ s/::/-/g;  
-        my ($grp) = CPAN::Forum::DB::Groups->search(name => $name);
-        if ($grp) {
+        my $group = CPAN::Forum::DB::Groups->info_by(name => $name); # SQL
+        if ($group) {
             my $s = CPAN::Forum::DB::Subscriptions->find_or_create({
-                uid       => $user->id,
-                gid       => $grp->id,
+                uid       => $uid,
+                gid       => $group->{id},
             });
             $self->_update_subs($s, "_new");
         } else {

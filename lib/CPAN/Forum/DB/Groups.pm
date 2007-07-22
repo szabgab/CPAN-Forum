@@ -15,9 +15,12 @@ __PACKAGE__->has_a   (pauseid       => "CPAN::Forum::DB::Authors");
 __PACKAGE__->set_sql(count_like     => "SELECT count(*) FROM __TABLE__ WHERE %s LIKE '%s'");
 __PACKAGE__->set_sql(count          => "SELECT count(*) FROM __TABLE__ WHERE %s = '%s'");
 
+use List::MoreUtils qw(none);
+
 sub info_by {
     my ($self, $field, $value) = @_;
-    Carp::croak("Invalid field '$field'") if $field ne 'id' and $field ne 'name';
+    my @FIELDS = qw(id name);
+    Carp::croak("Invalid field '$field'") if none {$field  eq $_} @FIELDS;
 
     my $sql = "SELECT groups.id id, name, status, groups.pauseid, authors.pauseid pauseid_name
                FROM groups, authors
