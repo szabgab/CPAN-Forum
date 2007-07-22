@@ -37,15 +37,15 @@ sub admin_edit_user {
     }
     $self->log->debug("admin_edit_user username: '$username'");
 
-    my ($person) = CPAN::Forum::DB::Users->search(username => $username);
+    my $person = CPAN::Forum::DB::Users->info_by(username => $username); # SQL
     if (not $person) {
         return $self->internal_error("", "no_such_user");
     }
 
     my $t = $self->load_tmpl("admin_edit_user.tmpl");
     $t->param(this_username => $username);
-    $t->param(email => $person->email);
-    $t->param(uid   => $person->id);
+    $t->param(email => $person->{email});
+    $t->param(uid   => $person->{id});
 
     if ($errors and ref($errors) eq "ARRAY") {
         $t->param($_ => 1) foreach @$errors;
@@ -65,7 +65,7 @@ sub admin_process {
     # fields that can have only one value
     foreach my $field (qw(rss_size per_page from flood_control_time_limit 
                 disable_email_notification)) {
-        CPAN::Forum::DB::Configure->set_field_value($field, $q->param($field));
+        CPAN::Forum::DB::Configure->set_field_value($field, $q->param($field)); # SQL
     }
 
     $self->status($q->param('status'));
