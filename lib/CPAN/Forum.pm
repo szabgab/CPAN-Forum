@@ -1258,14 +1258,14 @@ sub _post_date {
 
 sub _post {
     my ($self, $post) = @_;
-    my @responses = map {{id => $_->id}} CPAN::Forum::DB::Posts->search(parent => $post->{id});
+    my $responses = CPAN::Forum::DB::Posts->list_posts_by(parent => $post->{id}); # SQL
 
     my $user = CPAN::Forum::DB::Users->info_by(id => $post->{uid}); # SQL
     my %post = (
         postername  => $user->{username},
         date        => _post_date($post->{date}),
         parentid    => $post->{parent},
-        responses   => \@responses,
+        responses   => $responses,
         text        => $self->_text_escape($post->{text}),
     );
 

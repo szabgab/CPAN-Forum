@@ -6,7 +6,6 @@ use base 'CPAN::Forum::DBI';
 __PACKAGE__->table('posts');
 __PACKAGE__->columns(All => qw/id gid uid parent subject text date thread hidden/);
 __PACKAGE__->columns(Essential => qw/id gid uid parent subject text date thread hidden/);
-#__PACKAGE__->has_many(responses => "CPAN::Forum::DB::Posts");
 __PACKAGE__->has_a(parent => "CPAN::Forum::DB::Posts");
 __PACKAGE__->has_a(uid    => "CPAN::Forum::DB::Users");
 __PACKAGE__->has_a(gid    => "CPAN::Forum::DB::Groups");
@@ -15,8 +14,6 @@ __PACKAGE__->set_sql(latest         => "SELECT __ESSENTIAL__ FROM __TABLE__ ORDE
 
 __PACKAGE__->set_sql(count_where    => "SELECT count(*) FROM __TABLE__ WHERE %s='%s'");
 __PACKAGE__->set_sql(count_like     => "SELECT count(*) FROM __TABLE__ WHERE %s LIKE '%s'");
-#__PACKAGE__->add_constraint('subject_too_long', subject => sub { length $_[0] <= 70 and $_[0] !~ /</});
-#__PACKAGE__->add_constraint('text_format', text => \&check_text_format);
 my $MORE_SQL = 'groups.name group_name, users.fname user_fname, users.lname user_lname, users.username user_username';
 
 sub get_post {
@@ -162,6 +159,13 @@ sub stat_posts_by_user {
             };
     return $self->_fetch_arrayref_of_hashes($sql, $limit);
 }
+
+sub list_posts_by {
+    my ($self, $field, $value) = @_;
+    Carp::croak("Invalid field '$field'") if $field ne 'parent';
+    my $sql = "SELECT id FROM posts WHERE $field=?";
+    return $self->_fetch_arrayref_of_hashes($sql, $value);
+};
 
 1;
  
