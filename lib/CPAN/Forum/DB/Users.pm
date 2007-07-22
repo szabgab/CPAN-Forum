@@ -63,14 +63,18 @@ sub dump_users {
 
 sub update {
     my ($self, $id, %args) = @_;
-    my @valid_fields = qw(fname lname password);
+    my @valid_fields = qw(fname lname password email);
     my @fields;
     my @values;
 
     foreach my $f (@valid_fields) {
         if (exists $args{$f}) {
             push @fields, "$f=?";
-            push @values, $args{$f};
+            if ($f eq 'email') {
+                push @values, lc $args{$f};
+            } else {
+                push @values, $args{$f};
+            }
         }
     }
 

@@ -12,14 +12,18 @@ sub admin_edit_user_process {
     my $uid   = $q->param('uid'); # TODO error checking here !
 
     $self->log->debug("admin_edit_user_process uid: '$uid'");
-    my ($person) = CPAN::Forum::DB::Users->retrieve($uid);
+    my $person = CPAN::Forum::DB::Users->info_by(id => $uid); # SQL
     if (not $person) {
         return $self->internal_error("", "no_such_user");
     }
-    $person->email($email);
-    $person->update;
+    eval {
+        my $person = CPAN::Forum::DB::Users->update($uid, email => lc $email); #SQL
+    };
+    if ($@ =~ /column email is not unique/) {
+        return $self->notes("duplicate_email");
+    }
 
-    $self->admin_edit_user($person->username, ['done']);
+    $self->admin_edit_user($person->{username}, ['done']);
 }
 
 sub admin_edit_user {

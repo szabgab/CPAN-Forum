@@ -50,5 +50,10 @@ See list of <a href="/tags/">all the tags</a><br />
 <TMPL_INCLUDE NAME="search_form.tmpl">
 </TMPL_IF>
 
+<TMPL_IF duplicate_email>
+This e-mail already exists in our database. If this is really your e-mail address 
+you can retrieve your password using the <a href="/">password reminder</a>
+</TMPL_IF>
+
 <TMPL_INCLUDE NAME="footer.tmpl">
 
