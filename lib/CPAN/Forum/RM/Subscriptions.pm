@@ -81,19 +81,19 @@ sub _get_all_subscriptions {
     };
     my $gids = "_all";
 
-    my $it = CPAN::Forum::DB::Subscriptions_pauseid->search(uid => $user->{id});
-    while (my $s = $it->next) {
-        $gids .= ($gids ? ",_" : "_") . $s->pauseid->id; 
+    my $it = CPAN::Forum::DB::Subscriptions_pauseid->find(uid => $user->{id}); # SQL
+    foreach my $s (@$it) {
+        $gids .= ($gids ? ",_" : "_") . $s->{pauseid}; 
         push @subscriptions, {
-            gid       => "_" . $s->pauseid->id,
-            group     => $s->pauseid->pauseid,
-            allposts  => $s->allposts,
-            starters  => $s->starters,
-            followups => $s->followups,
+            gid       => "_" . $s->{pauseid},
+            group     => $s->{pauseid_name},
+            allposts  => $s->{allposts},
+            starters  => $s->{starters},
+            followups => $s->{followups},
         };
     }
 
-    $it = CPAN::Forum::DB::Subscriptions->find(uid => $user->{id});
+    $it = CPAN::Forum::DB::Subscriptions->find(uid => $user->{id}); # SQL
     foreach my $s (@$it) {
         $gids .= ($gids ? "," : "") . $s->{gid};
         push @subscriptions, {
