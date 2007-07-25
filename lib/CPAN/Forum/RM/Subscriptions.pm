@@ -47,12 +47,12 @@ sub mypan {
     $t->param(title    => "Information about $username");
 
     my @params = @{$self->param("path_parameters")};
-    my ($gids, @subscriptions) = 
+    my ($gids, $subscriptions) = 
             (@params == 2 and $params[0] eq "dist")
             ?           $self->_get_module_subscription($user, $params[1])
             :           $self->_get_all_subscriptions($user);
 
-    $t->param(subscriptions => \@subscriptions);
+    $t->param(subscriptions => $subscriptions);
     $t->param(gids => $gids);
 
     $t->output;
@@ -96,7 +96,7 @@ sub _get_all_subscriptions {
             followups => $s->followups,
         };
     }
-    return ($gids, @subscriptions);
+    return ($gids, \@subscriptions);
 }
 
 
@@ -128,7 +128,7 @@ sub _get_module_subscription {
             followups => 0,
         };
     }
-    return ($gids, @subscriptions);
+    return ($gids, \@subscriptions);
 }
 
 
