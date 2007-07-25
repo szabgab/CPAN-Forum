@@ -52,32 +52,7 @@ sub mypan {
 
 
     if (@params == 2 and $params[0] eq "dist") { # specific distribution
-        my $group_name = $params[1];
-        my $group = CPAN::Forum::DB::Groups->info_by(name => $group_name); # SQL
-        if (not $group) {
-            return $self->internal_error("Accessing");
-        }
-        my $gid = $group->{id};
-        $gids = $group->{id};
-        my ($s) = CPAN::Forum::DB::Subscriptions->search(uid => $user->{id}, gid => $gid);
-        if ($s) {
-            push @subscriptions, {
-                gid       => $gid,
-                group     => $group_name,
-                allposts  => $s->allposts,
-                starters  => $s->starters,
-                followups => $s->followups,
-            };
-                
-        } else {
-            push @subscriptions, {
-                gid       => $gid,
-                group     => $group_name,
-                allposts  => 0,
-                starters  => 0,
-                followups => 0,
-            };
-        }
+        ($gids, @subscriptions) = $self->_module_subscription($user, $params[1]);
     } else { # show all subscriptions
         my ($s) = CPAN::Forum::DB::Subscriptions_all->search(uid => $user->{id});
         $self->log->debug("all subscriptions " . ($s ? "found" : "not found"));
@@ -120,6 +95,37 @@ sub mypan {
 
     $t->output;
 }
+sub _module_subscription {
+    my ($self, $user, $group_name)  = @_;
+
+    my $group = CPAN::Forum::DB::Groups->info_by(name => $group_name); # SQL
+    if (not $group) {
+        return $self->internal_error("Accessing");
+    }
+    my @subscriptions;
+    my $gid = $group->{id};
+    my $gids = $group->{id};
+    my ($s) = CPAN::Forum::DB::Subscriptions->search(uid => $user->{id}, gid => $gid);
+    if ($s) {
+        push @subscriptions, {
+            gid       => $gid,
+            group     => $group_name,
+            allposts  => $s->allposts,
+            starters  => $s->starters,
+            followups => $s->followups,
+        };
+    } else {
+        push @subscriptions, {
+            gid       => $gid,
+            group     => $group_name,
+            allposts  => 0,
+            starters  => 0,
+            followups => 0,
+        };
+    }
+    return ($gids, @subscriptions);
+}
+
 
 =head2 update_subscription
 
