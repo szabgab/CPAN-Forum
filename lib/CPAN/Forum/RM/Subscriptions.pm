@@ -51,43 +51,10 @@ sub mypan {
     my $gids;
 
 
-    if (@params == 2 and $params[0] eq "dist") { # specific distribution
-        ($gids, @subscriptions) = $self->_module_subscription($user, $params[1]);
-    } else { # show all subscriptions
-        my ($s) = CPAN::Forum::DB::Subscriptions_all->search(uid => $user->{id});
-        $self->log->debug("all subscriptions " . ($s ? "found" : "not found"));
-        push @subscriptions, {
-            gid       => "_all",
-            group     => "All",
-            allposts  => $s ? $s->allposts  : '',
-            starters  => $s ? $s->starters  : '',
-            followups => $s ? $s->followups : '',
-        };
-        $gids = "_all";
-
-        my $it = CPAN::Forum::DB::Subscriptions_pauseid->search(uid => $user->{id});
-        while (my $s = $it->next) {
-            $gids .= ($gids ? ",_" : "_") . $s->pauseid->id; 
-            push @subscriptions, {
-                gid       => "_" . $s->pauseid->id,
-                group     => $s->pauseid->pauseid,
-                allposts  => $s->allposts,
-                starters  => $s->starters,
-                followups => $s->followups,
-            };
-        }
-
-        $it = CPAN::Forum::DB::Subscriptions->search(uid => $user->{id});
-        while (my $s = $it->next) {
-            $gids .= ($gids ? "," : "") . $s->gid->id; 
-            push @subscriptions, {
-                gid       => $s->gid,
-                group     => $s->gid->name,
-                allposts  => $s->allposts,
-                starters  => $s->starters,
-                followups => $s->followups,
-            };
-        }
+    if (@params == 2 and $params[0] eq "dist") {
+        ($gids, @subscriptions) = $self->_get_module_subscription($user, $params[1]);
+    } else {
+        ($gids, @subscriptions) = $self->_get_all_subscriptions($user);
     }
 
     $t->param(subscriptions => \@subscriptions);
@@ -95,7 +62,50 @@ sub mypan {
 
     $t->output;
 }
-sub _module_subscription {
+
+sub _get_all_subscriptions {
+    my ($self, $user) = @_;
+
+    my @subscriptions;
+    my ($s) = CPAN::Forum::DB::Subscriptions_all->search(uid => $user->{id});
+    $self->log->debug("all subscriptions " . ($s ? "found" : "not found"));
+    push @subscriptions, {
+        gid       => "_all",
+        group     => "All",
+        allposts  => $s ? $s->allposts  : '',
+        starters  => $s ? $s->starters  : '',
+        followups => $s ? $s->followups : '',
+    };
+    my $gids = "_all";
+
+    my $it = CPAN::Forum::DB::Subscriptions_pauseid->search(uid => $user->{id});
+    while (my $s = $it->next) {
+        $gids .= ($gids ? ",_" : "_") . $s->pauseid->id; 
+        push @subscriptions, {
+            gid       => "_" . $s->pauseid->id,
+            group     => $s->pauseid->pauseid,
+            allposts  => $s->allposts,
+            starters  => $s->starters,
+            followups => $s->followups,
+        };
+    }
+
+    $it = CPAN::Forum::DB::Subscriptions->search(uid => $user->{id});
+    while (my $s = $it->next) {
+        $gids .= ($gids ? "," : "") . $s->gid->id; 
+        push @subscriptions, {
+            gid       => $s->gid,
+            group     => $s->gid->name,
+            allposts  => $s->allposts,
+            starters  => $s->starters,
+            followups => $s->followups,
+        };
+    }
+    return ($gids, @subscriptions);
+}
+
+
+sub _get_module_subscription {
     my ($self, $user, $group_name)  = @_;
 
     my $group = CPAN::Forum::DB::Groups->info_by(name => $group_name); # SQL
