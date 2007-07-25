@@ -25,14 +25,14 @@ The gids field contains the comma separated list of all the postfixes.
 
 C<update_subscription> will process the submitted form.
 
+ /mypan
+ /mypan/dist/MODULE-NAME
+
 =cut
 
 sub mypan {
     my $self = shift;
 
-    my $t = $self->load_tmpl("mypan.tmpl",
-        loop_context_vars => 1,
-    );
     my $username = $self->session->param("username");
     my $user = CPAN::Forum::DB::Users->info_by(username => $username); # SQL
 
@@ -41,19 +41,27 @@ sub mypan {
             "Trouble accessing personal information of: '$username'",
             );
     }
-    my $fullname = $user->{fullname};
-
-    $t->param(fullname => $fullname);
-    $t->param(title    => "Information about $username");
 
     my @params = @{$self->param("path_parameters")};
-    my ($gids, $subscriptions) = 
-            (@params == 2 and $params[0] eq "dist")
-            ?           $self->_get_module_subscription($user, $params[1])
-            :           $self->_get_all_subscriptions($user);
+    my ($gids, $subscriptions);
+    if (@params == 2 and $params[0] eq "dist") {
+        my $group_name = $params[1];
+        my $group = CPAN::Forum::DB::Groups->info_by(name => $group_name); # SQL
+        if (not $group) {
+            return $self->internal_error("Accessing");
+        }
+        ($gids, $subscriptions) = $self->_get_module_subscription($user, $group_name, $group);
+    } else {
+        ($gids, $subscriptions) = $self->_get_all_subscriptions($user);
+    }
 
+    my $t = $self->load_tmpl("mypan.tmpl",
+        loop_context_vars => 1,
+    );
     $t->param(subscriptions => $subscriptions);
-    $t->param(gids => $gids);
+    $t->param(gids     => $gids);
+    $t->param(fullname => $user->{fullname});
+    $t->param(title    => "Information about $username");
 
     $t->output;
 }
@@ -99,25 +107,20 @@ sub _get_all_subscriptions {
     return ($gids, \@subscriptions);
 }
 
-
 sub _get_module_subscription {
-    my ($self, $user, $group_name)  = @_;
+    my ($self, $user, $group_name, $group)  = @_;
 
-    my $group = CPAN::Forum::DB::Groups->info_by(name => $group_name); # SQL
-    if (not $group) {
-        return $self->internal_error("Accessing");
-    }
     my @subscriptions;
     my $gid = $group->{id};
     my $gids = $group->{id};
-    my ($s) = CPAN::Forum::DB::Subscriptions->search(uid => $user->{id}, gid => $gid);
+    my ($s) = CPAN::Forum::DB::Subscriptions->find_one(uid => $user->{id}, gid => $gid); # SQL
     if ($s) {
         push @subscriptions, {
             gid       => $gid,
             group     => $group_name,
-            allposts  => $s->allposts,
-            starters  => $s->starters,
-            followups => $s->followups,
+            allposts  => $s->{allposts},
+            starters  => $s->{starters},
+            followups => $s->{followups},
         };
     } else {
         push @subscriptions, {
