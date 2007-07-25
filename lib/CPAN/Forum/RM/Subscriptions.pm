@@ -93,15 +93,15 @@ sub _get_all_subscriptions {
         };
     }
 
-    $it = CPAN::Forum::DB::Subscriptions->search(uid => $user->{id});
-    while (my $s = $it->next) {
-        $gids .= ($gids ? "," : "") . $s->gid->id; 
+    $it = CPAN::Forum::DB::Subscriptions->find(uid => $user->{id});
+    foreach my $s (@$it) {
+        $gids .= ($gids ? "," : "") . $s->{gid};
         push @subscriptions, {
-            gid       => $s->gid,
-            group     => $s->gid->name,
-            allposts  => $s->allposts,
-            starters  => $s->starters,
-            followups => $s->followups,
+            gid       => $s->{gid},
+            group     => $s->{group_name},
+            allposts  => $s->{allposts},
+            starters  => $s->{starters},
+            followups => $s->{followups},
         };
     }
     return ($gids, \@subscriptions);
