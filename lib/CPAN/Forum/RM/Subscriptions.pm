@@ -70,14 +70,14 @@ sub _get_all_subscriptions {
     my ($self, $user) = @_;
 
     my @subscriptions;
-    my ($s) = CPAN::Forum::DB::Subscriptions_all->search(uid => $user->{id});
+    my $s = CPAN::Forum::DB::Subscriptions_all->find_one(uid => $user->{id}); # SQL
     $self->log->debug("all subscriptions " . ($s ? "found" : "not found"));
     push @subscriptions, {
         gid       => "_all",
         group     => "All",
-        allposts  => $s ? $s->allposts  : '',
-        starters  => $s ? $s->starters  : '',
-        followups => $s ? $s->followups : '',
+        allposts  => $s ? $s->{allposts}  : '',
+        starters  => $s ? $s->{starters}  : '',
+        followups => $s ? $s->{followups} : '',
     };
     my $gids = "_all";
 
