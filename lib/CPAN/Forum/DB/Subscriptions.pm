@@ -37,4 +37,10 @@ sub _find {
     return ($sql, @args{@fields}); 
 }
 
+sub complex_update {
+    my ($self, @args) = @_;
+    $self->_complex_update(@args, 'subscriptions');
+}
+
+
 1;

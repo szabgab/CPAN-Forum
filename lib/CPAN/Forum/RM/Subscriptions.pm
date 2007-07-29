@@ -83,7 +83,7 @@ sub _get_all_subscriptions {
 
     my $it = CPAN::Forum::DB::Subscriptions_pauseid->find(uid => $user->{id}); # SQL
     foreach my $s (@$it) {
-        $gids .= ($gids ? ",_" : "_") . $s->{pauseid}; 
+        $gids .= ",_" . $s->{pauseid}; 
         push @subscriptions, {
             gid       => "_" . $s->{pauseid},
             group     => $s->{pauseid_name},
@@ -154,39 +154,32 @@ sub update_subscription {
     my $uid = $user->{id};
 
     foreach my $gid (@gids) {
+        my ($on, $data) = $self->_get_subs($gid);
+
         if ($gid eq "_all") {
-            my ($s) = CPAN::Forum::DB::Subscriptions_all->search(uid => $uid);
-            if (not $s) {
-                $s = CPAN::Forum::DB::Subscriptions_all->create({
-                    uid       => $uid,
-                });
-            }
-            $self->_update_subs($s, $gid);
+            CPAN::Forum::DB::Subscriptions_all->complex_update({uid => $uid}, $on, $data);
         } elsif ($gid =~ /^_(\d+)$/) {
             my $pauseid = $1;
-            my ($s) = CPAN::Forum::DB::Subscriptions_pauseid->search(pauseid => $pauseid, uid => $uid);
-            if (not $s) {
-                $s = CPAN::Forum::DB::Subscriptions->create({
-                    uid       => $uid,
-                    pauseid   => $pauseid,
-                });
-            }
-            $self->_update_subs($s, $gid);
+            CPAN::Forum::DB::Subscriptions_pauseid->complex_update({pauseid => $pauseid, uid => $uid}, $on, $data); # SQL
         } elsif ($gid =~ /^(\d+)$/) {
-            my ($s) = CPAN::Forum::DB::Subscriptions->search(gid => $gid, uid => $uid);
-            if (not $s) {
-                $s = CPAN::Forum::DB::Subscriptions->create({
-                    uid       => $uid,
-                    gid       => $gid,
-                });
-            }
-            $self->_update_subs($s, $gid);
+            CPAN::Forum::DB::Subscriptions->complex_update({gid => $gid, uid => $uid}, $on, $data); #SQL 
         } else {
             $self->log->error("Invalid gid: '$gid' provided in the gids entry of mypan");
             # shall we show an error page here?
         }
     }
     
+    return $self->notes("mypanok");
+
+=pod
+    # I think we don't need to provide this
+    # A user either comes from the page of a Module ( /dist/Module-Name) 
+    # and then we already have the value.
+    # There should be also a similar link on the /author/PAUSEID  page
+    # to link to mypan/author/PAUSEID
+    
+
+    # name is the empty textbox to hold an arbitrary values 
     # if there is not name, no need for further processing
     if (not $q->param("name")) {
         return $self->notes("mypanok");
@@ -232,6 +225,8 @@ sub update_subscription {
     }
 
     return $self->notes("mypanok");
+=cut
+
 }
 
 =head2 _update_subs
@@ -261,6 +256,24 @@ sub _update_subs {
         return $s->delete;   # remove the whole line if there are no subscriptions at all.
     }
 }
+
+sub _get_subs {
+    my ($self, $gid) = @_;
+    my $q = $self->query;
+
+    my %data;
+    my $on = 0;
+    foreach my $type (qw(allposts starters followups)) {
+        if (defined $q->param($type ."_$gid") and $q->param($type . "_$gid") eq "on") {
+            $data{$type} = 1;
+            $on++;
+        } else {
+            $data{$type} = 0;
+        }
+    }
+    return ($on, \%data);
+}
+
 
 1;
 

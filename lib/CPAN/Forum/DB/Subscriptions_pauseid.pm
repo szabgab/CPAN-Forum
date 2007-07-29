@@ -28,12 +28,17 @@ sub _find {
     # check if keys of args is uid 
     my @fields = keys %args;
     my $where = join " AND ", map {"$_=?"} @fields;
-    my $sql = "SELECT subscriptions_pauseid.id, uid, allposts, starters, followups, announcements,
+    my $sql = "SELECT subscriptions_pauseid.id pasuseid, uid, allposts, starters, followups, announcements,
         authors.pauseid pauseid_name FROM subscriptions_pauseid, authors WHERE authors.id=subscriptions_pauseid.pauseid";
     if ($where) {
         $sql .= " AND $where";
     }
     return ($sql, @args{@fields}); 
+}
+
+sub complex_update {
+    my ($self, @args) = @_;
+    $self->_complex_update(@args, 'subscriptions');
 }
 
 

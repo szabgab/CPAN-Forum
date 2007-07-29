@@ -133,5 +133,56 @@ sub _fetch_hashref {
     return \%h;
 }
 
+
+# code for the Subscription* tables
+sub _complex_update {
+    my ($self, $where, $on, $data, $table) = @_;
+    if ($on) {
+        my $s = $self->find_one($table, %$where);
+        if ($s) {
+            $self->update($table, $where, $data);
+        } else {
+            $self->add($table, {%$data, %$where} );
+        }
+        
+    } else {
+        $self->delete($table, $where);
+    }
+    return;
+}
+
+sub add {
+    my ($self, $table, $args) = @_;
+    my ($fields, $placeholders, @values) = $self->_prep_insert($args);
+    my $sql = "INSERT INTO subscriptions_all ($fields) VALUES($placeholders)";
+    my $dbh = CPAN::Forum::DBI::db_Main();
+    $dbh->do($sql, undef, @values);
+    return;
+}    
+
+
+sub update {
+    my ($self, $table, $args, $data) = @_;
+    my ($where, @values)   = $self->_prep_where($args);
+    Carp::croak("") if not $where;
+    my ($set, @new_values) = $self->_prep_set($data);
+    my $sql = "UPDATE subscriptions_all $set $where";
+    my $dbh = CPAN::Forum::DBI::db_Main();
+    $dbh->do($sql, undef, @new_values, @values);
+    return;
+}
+
+sub delete {
+    my ($self, $table, $args) = @_;
+    my ($where, @values) = $self->_prep_where($args);
+    my $sql = "DELETE FROM $table";
+    if ($where) {
+        $sql .= " WHERE $where";
+    }
+    my $dbh = CPAN::Forum::DBI::db_Main();
+    $dbh->do($sql, undef, @values);
+    return;
+}
+
 1;
 
