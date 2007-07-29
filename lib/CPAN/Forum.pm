@@ -510,7 +510,7 @@ my @free_modes = qw(
     register register_process 
     logout 
     about faq stats
-    posts threads dist users author
+    posts threads dist users author privacy_policy
     search all 
     site_is_closed
     help
@@ -543,7 +543,7 @@ my @urls = qw(
     faq 
     admin
     admin_edit_user
-    mypan selfconfig 
+    mypan selfconfig privacy_policy
     search all 
     rss
     atom
@@ -1538,6 +1538,10 @@ sub status {
         chomp $value;
         return $value;
     }
+}
+
+sub privacy_policy {
+    $_[0]->load_tmpl("privacy_policy.tmpl")->output;
 }
 
 
