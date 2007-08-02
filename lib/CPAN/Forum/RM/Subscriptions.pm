@@ -155,12 +155,14 @@ sub update_subscription {
 
     foreach my $gid (@gids) {
         my ($on, $data) = $self->_get_subs($gid);
+        $self->log->debug("Processing GID: '$gid'");
 
         if ($gid eq "_all") {
             $self->log->debug("Subscription_all: '$uid', '$on', " . Data::Dumper->Dump([$data], ['data']));
-            CPAN::Forum::DB::Subscriptions_all->complex_update({uid => $uid}, $on, $data);
+            CPAN::Forum::DB::Subscriptions_all->complex_update({uid => $uid}, $on, $data); # SQL
         } elsif ($gid =~ /^_(\d+)$/) {
             my $pauseid = $1;
+            $self->log->debug("Subscription_pauseid: pauseid='$pauseid', uid='$uid', on='$on', " . Data::Dumper->Dump([$data], ['data']));
             CPAN::Forum::DB::Subscriptions_pauseid->complex_update({pauseid => $pauseid, uid => $uid}, $on, $data); # SQL
         } elsif ($gid =~ /^(\d+)$/) {
             CPAN::Forum::DB::Subscriptions->complex_update({gid => $gid, uid => $uid}, $on, $data); #SQL 

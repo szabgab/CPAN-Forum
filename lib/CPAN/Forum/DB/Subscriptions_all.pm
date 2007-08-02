@@ -36,35 +36,6 @@ sub _find {
     return ($sql, @values);
 }
 
-sub _prep_where {
-    my ($self, $args) = @_;
-    #Carp::cluck (Data::Dumper->Dump([$args], ['args']));
-
-    my @fields = keys %$args;
-    my $where = join " AND ", map {"$_=?"} @fields;
-    my %args = %$args;
-    return ($where, @args{@fields}); 
-}
-
-sub _prep_set {
-    my ($self, $args) = @_;
-    my @fields = keys %$args;
-
-    my $where = join ", ", map {"$_=?"} @fields;
-    my %args = %$args;
-    return ($where, @args{@fields}); 
-    #return ($where, @{ $args->{@fields} }); 
-}
-
-sub _prep_insert {
-    my ($self, $args) = @_;
-
-    my @fields = keys %$args;
-    my $fields = join ", ", @fields;
-    my $placeholders = join ", ", (("?") x scalar @fields);
-    return ($fields, $placeholders, @{ $args->{@fields} }); 
-}
-
 sub complex_update {
     my ($self, @args) = @_;
     $self->_complex_update(@args, 'subscriptions_all');

@@ -59,6 +59,7 @@ sub init_db {
 sub _fetch_arrayref_of_hashes {
     my ($self, $sql, @args) = @_;
 
+    $CPAN::Forum::logger->debug("SQL:$sql, " . Data::Dumper->Dump([\@args], ['args'])); 
     my $dbh = CPAN::Forum::DBI::db_Main();
     my $sth = $dbh->prepare($sql);
     $sth->execute(@args);
@@ -71,6 +72,7 @@ sub _fetch_arrayref_of_hashes {
 sub _fetch_single_hashref {
     my ($self, $sql, @args) = @_;
 
+    $CPAN::Forum::logger->debug("SQL:$sql, " . Data::Dumper->Dump([\@args], ['args'])); 
     my $dbh = CPAN::Forum::DBI::db_Main();
     my $sth = $dbh->prepare($sql);
     $sth->execute(@args);
@@ -157,6 +159,9 @@ sub add {
     my ($fields, $placeholders, @values) = $self->_prep_insert($args);
     my $sql = "INSERT INTO $table ($fields) VALUES($placeholders)";
     my $dbh = CPAN::Forum::DBI::db_Main();
+    $CPAN::Forum::logger->debug("SQL:$sql, " 
+            . Data::Dumper->Dump([\@values], ['values'])
+            ); 
     $dbh->do($sql, undef, @values);
     return;
 }    
@@ -165,12 +170,16 @@ sub add {
 sub update {
     my ($self, $table, $args, $data) = @_;
     # check if $table is one of the subscription tables?
-    my ($where, @values)   = $self->_prep_where($args);
+    my ($where, @where_values)   = $self->_prep_where($args);
     Carp::croak("") if not $where;
     my ($set, @new_values) = $self->_prep_set($data);
     my $sql = "UPDATE $table SET $set WHERE $where";
     my $dbh = CPAN::Forum::DBI::db_Main();
-    $dbh->do($sql, undef, @new_values, @values);
+    $CPAN::Forum::logger->debug("SQL:$sql, " 
+            . Data::Dumper->Dump([\@new_values], ['new_values'])
+            . Data::Dumper->Dump([\@where_values], ['where_value'])
+            ); 
+    $dbh->do($sql, undef, @new_values, @where_values);
     return;
 }
 
@@ -185,6 +194,38 @@ sub delete {
     $dbh->do($sql, undef, @values);
     return;
 }
+
+sub _prep_where {
+    my ($self, $args) = @_;
+    #Carp::cluck (Data::Dumper->Dump([$args], ['args']));
+
+    my @fields = keys %$args;
+    my $where = join " AND ", map {"$_=?"} @fields;
+    my %args = %$args;
+    return ($where, @args{@fields}); 
+}
+
+sub _prep_set {
+    my ($self, $args) = @_;
+    my @fields = keys %$args;
+
+    my $where = join ", ", map {"$_=?"} @fields;
+    my %args = %$args;
+    return ($where, @args{@fields}); 
+    #return ($where, @{ $args->{@fields} }); 
+}
+
+sub _prep_insert {
+    my ($self, $args) = @_;
+
+    my @fields = keys %$args;
+    my $fields = join ", ", @fields;
+    my $placeholders = join ", ", (("?") x scalar @fields);
+    my %args = %$args;
+    return ($fields, $placeholders, @args{@fields}); 
+    #return ($fields, $placeholders, @{ $args->{@fields} }); 
+}
+
 
 1;
 

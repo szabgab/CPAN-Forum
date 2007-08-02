@@ -28,6 +28,15 @@ my %errors = (
     "ERR open_code_without_closing" => "open <code> tag without closing tag",
 );
 
+our $logger;
+$SIG{__WARN__} = sub {
+    if ($logger) {
+        $logger->warning($_[0]);
+    } else {
+        print STDERR $_[0];
+    }
+};
+
 =head1 NAME
 
 CPAN::Forum - Web forum application to discuss CPAN modules
@@ -438,6 +447,7 @@ sub cgiapp_init {
     );
 
     $self->log->debug("--- START ---");
+    $CPAN::Forum::logger = $self->log;
     
 
     $self->log->debug("Cookie received: "  . ($self->query->cookie($cookiename) || "") );
