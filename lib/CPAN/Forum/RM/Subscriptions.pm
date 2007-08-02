@@ -51,6 +51,13 @@ sub mypan {
             return $self->internal_error("Accessing");
         }
         ($gids, $subscriptions) = $self->_get_module_subscription($user, $group_name, $group);
+    } elsif (@params == 2 and $params[0] eq "author") {
+        my $pauseid_str = $params[1];
+        my $subs = CPAN::Forum::DB::Authors->get_author_by_pauseid($pauseid_str); # SQL
+        if (not $subs) {
+            return $self->internal_error("Accessing");
+        }
+        ($gids, $subscriptions) = $self->_get_pauseid_subscription($user, $pauseid_str, $subs->{id});
     } else {
         ($gids, $subscriptions) = $self->_get_all_subscriptions($user);
     }
@@ -126,6 +133,32 @@ sub _get_module_subscription {
         push @subscriptions, {
             gid       => $gid,
             group     => $group_name,
+            allposts  => 0,
+            starters  => 0,
+            followups => 0,
+        };
+    }
+    return ($gids, \@subscriptions);
+}
+
+sub _get_pauseid_subscription {
+    my ($self, $user, $pauseid_str, $pauseid_id)  = @_;
+
+    my @subscriptions;
+    my $gids = "_" . $pauseid_id;
+    my ($s) = CPAN::Forum::DB::Subscriptions_pauseid->find_one(uid => $user->{id}, pauseid => $pauseid_id); # SQL
+    if ($s) {
+        push @subscriptions, {
+            gid       => "_" . $pauseid_id,
+            group     => $pauseid_str,
+            allposts  => $s->{allposts},
+            starters  => $s->{starters},
+            followups => $s->{followups},
+        };
+    } else {
+        push @subscriptions, {
+            gid       => "_" . $pauseid_id,
+            group     => $pauseid_str,
             allposts  => 0,
             starters  => 0,
             followups => 0,
