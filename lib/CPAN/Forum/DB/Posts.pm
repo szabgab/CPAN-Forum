@@ -167,5 +167,27 @@ sub list_posts_by {
     return $self->_fetch_arrayref_of_hashes($sql, $value);
 };
 
+sub add_post {
+    my ($self, $data, $parent_post, $parent) = @_;
+    $self->add('posts', $data);
+    my $dbh = CPAN::Forum::DBI::db_Main();
+    my $post_id = $dbh->func('last_insert_rowid');
+
+    my $sql = "UPDATE posts SET thread=?";
+    my @values = (
+            ($parent_post ? $parent_post->{thread} : $post_id),
+    );
+    if ($parent_post) {
+        $sql .= ", parent=?";
+        push @values, $parent;
+    }
+    $sql .= " WHERE id=?";
+    push @values, $post_id;
+    $dbh->do($sql, undef, @values);
+    return $post_id;
+}
+
+
+
 1;
  

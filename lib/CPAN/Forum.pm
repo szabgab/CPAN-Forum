@@ -1248,25 +1248,21 @@ sub process_post {
             );
     }
 
-    my $post_id;
     my $username = $self->session->param("username");
     my $user = CPAN::Forum::DB::Users->info_by( username => $username ); # SQL
     if (not $user) {
         return $self->internal_error("Unknown username: '$username'");
     }
-    eval {
-        my $post = CPAN::Forum::DB::Posts->create({
+
+    
+    my %data = (
             uid     => $user->{id},
-            gid     => $parent_post ? $parent_post->{gid} : $q->param("new_group_id"),
+            gid     => ($parent_post ? $parent_post->{gid} : $q->param("new_group_id")),
             subject => $q->param("new_subject"),
             text    => $new_text,
             date    => time,
-        });
-        $post->thread($parent_post ? $parent_post->{thread} : $post->id);
-        $post->parent($parent) if $parent_post;
-        $post->update;
-        $post_id = $post->id;
-    };
+    );
+    my $post_id = eval { CPAN::Forum::DB::Posts->add_post(\%data, $parent_post, $parent); }; #SQL
     if ($@) {
         #push @errors, "subject_too_long" if $@ =~ /subject_too_long/;
         if (not @errors) {
