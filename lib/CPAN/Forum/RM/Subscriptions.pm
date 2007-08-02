@@ -157,6 +157,7 @@ sub update_subscription {
         my ($on, $data) = $self->_get_subs($gid);
 
         if ($gid eq "_all") {
+            $self->log->debug("Subscription_all: '$uid', '$on', " . Data::Dumper->Dump([$data], ['data']));
             CPAN::Forum::DB::Subscriptions_all->complex_update({uid => $uid}, $on, $data);
         } elsif ($gid =~ /^_(\d+)$/) {
             my $pauseid = $1;

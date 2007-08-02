@@ -51,7 +51,9 @@ sub _prep_set {
     my @fields = keys %$args;
 
     my $where = join ", ", map {"$_=?"} @fields;
-    return ($where, @{ $args->{@fields} }); 
+    my %args = %$args;
+    return ($where, @args{@fields}); 
+    #return ($where, @{ $args->{@fields} }); 
 }
 
 sub _prep_insert {

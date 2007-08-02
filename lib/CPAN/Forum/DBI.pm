@@ -138,7 +138,7 @@ sub _fetch_hashref {
 sub _complex_update {
     my ($self, $where, $on, $data, $table) = @_;
     if ($on) {
-        my $s = $self->find_one($table, %$where);
+        my $s = $self->find_one(%$where);
         if ($s) {
             $self->update($table, $where, $data);
         } else {
@@ -153,8 +153,9 @@ sub _complex_update {
 
 sub add {
     my ($self, $table, $args) = @_;
+    # check if $table is one of the subscription tables?
     my ($fields, $placeholders, @values) = $self->_prep_insert($args);
-    my $sql = "INSERT INTO subscriptions_all ($fields) VALUES($placeholders)";
+    my $sql = "INSERT INTO $table ($fields) VALUES($placeholders)";
     my $dbh = CPAN::Forum::DBI::db_Main();
     $dbh->do($sql, undef, @values);
     return;
@@ -163,10 +164,11 @@ sub add {
 
 sub update {
     my ($self, $table, $args, $data) = @_;
+    # check if $table is one of the subscription tables?
     my ($where, @values)   = $self->_prep_where($args);
     Carp::croak("") if not $where;
     my ($set, @new_values) = $self->_prep_set($data);
-    my $sql = "UPDATE subscriptions_all $set $where";
+    my $sql = "UPDATE $table SET $set WHERE $where";
     my $dbh = CPAN::Forum::DBI::db_Main();
     $dbh->do($sql, undef, @new_values, @values);
     return;
