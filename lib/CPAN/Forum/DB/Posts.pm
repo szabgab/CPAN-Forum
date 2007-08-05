@@ -16,6 +16,7 @@ __PACKAGE__->set_sql(count_where    => "SELECT count(*) FROM __TABLE__ WHERE %s=
 __PACKAGE__->set_sql(count_like     => "SELECT count(*) FROM __TABLE__ WHERE %s LIKE '%s'");
 my $MORE_SQL = 'groups.name group_name, users.fname user_fname, users.lname user_lname, users.username user_username';
 
+
 sub get_post {
     my ($self, $post_id) = @_;
     return if not $post_id;
@@ -26,6 +27,22 @@ sub get_post {
                 FROM posts, groups
                 WHERE posts.id=? AND posts.gid=groups.id";
     return $self->_fetch_single_hashref($sql, $post_id);
+}
+sub _get_latest_pid_by_uid {
+    my ($self, $uid) = @_;
+    my $sql = "SELECT id, text, subject FROM posts WHERE uid=? ORDER BY date DESC LIMIT 1";
+    return $self->_fetch_single_value($sql, $uid);
+}
+
+sub get_latest_post_by_uid {
+    my ($self, $uid) = @_;
+    Carp::croak("no uid provided") if not $uid;
+    my $post_id = $self->_get_latest_pid_by_uid($uid);
+    if ($post_id) {
+        return $self->get_post($post_id);
+    } else {
+        return;
+    }
 }
 
 sub retrieve_latest { 

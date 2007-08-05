@@ -1193,13 +1193,16 @@ sub process_post {
                 
     my $button = $q->param("button");
     if (not @errors and $button eq "Submit") {
-        my ($last_post) = CPAN::Forum::DB::Posts->search(uid => $self->session->param("username"), {order_by => 'id DESC', limit => 1});
+        my $last_post = CPAN::Forum::DB::Posts->get_latest_post_by_uid($self->session->param('uid'));
+        # TODO, maybe also check if the post is the same as the last post to avoid duplicates
         if ($last_post) {
             $self->log->debug("username: " . 
                 $self->session->param("username") . 
-                " last post: " . $last_post->date . " now: " . time());
-            if ($last_post->date > time() - $self->config("flood_control_time_limit")) {
+                " last post: " . $last_post->{date} . " now: " . time());
+            if ($last_post->{date} > time() - $self->config("flood_control_time_limit")) {
                 push @errors, "flood_control";
+            } elsif ($last_post->{text} eq $new_text) {
+                push @errors, "duplicate_post";
             }
         }
     }

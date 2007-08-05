@@ -10,10 +10,13 @@
 	<TMPL_IF subject_too_long>Subject must be up to 50 characters.<br /></TMPL_IF>
 	<TMPL_IF flood_control>Trying to submit posts too quickly. 
 	         Please wait 10 more seconds before posting again.</TMPL_IF>
-	<TMPL_IF text_format>Text format is not correct. As we are still in development
-	this might be either a bug or on purpose. If after reading again the rules of posting
-	at the bottom of this page you still think your post should work, please send a copy of
-	it to <a href="mailto:gabor@perl.org.il">szabgab</a><br /></TMPL_IF>
+    <TMPL_IF duplicate_post>Identical to your last post. You might have tried to reload the page.</TMPL_IF>
+	<TMPL_IF text_format>Text format is not correct.<br />
+    Most likely you need to replace &lt; characters by &amp;lt;<br />
+    or wrap your code snippets in &lt;code&gt;&lt;/code&gt; tags.
+    <br />
+    If that still does not work you can send the text to <a href="mailto:gabor@perl.org.il">szabgab</a> I might be
+    able to tell what is the problem.<br /></TMPL_IF>
 
 	<TMPL_IF bad_thing>Bad thing<br /></TMPL_IF>
 </div>
