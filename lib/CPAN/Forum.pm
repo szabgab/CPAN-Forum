@@ -962,23 +962,6 @@ sub _group_selector {
         }
     }
 
-#    if (not @group_ids) {
-        #my @groups = CPAN::Forum::DB::Groups->search(gtype => $CPAN::Forum::DBI::group_types{Distribution});
-#        my $groups = CPAN::Forum::DB::Groups->groups_by_gtype($CPAN::Forum::DBI::group_types{Distribution});
-#warn Dumper $groups;
-#        %group_labels = %$groups;
-    # id => name
-#        @group_ids = keys %$groups;
-        #@group_ids = sort { $groups->{$a} cmp $groups->{$b} } keys %$groups;
-
-#       @groups = (
-#       "Global", 
-#       "----",
-#       (sort map {$_->name} CPAN::Forum::DB::Groups->search(gtype => $CPAN::Forum::DBI::group_types{Fields})),
-#       "----",
-#           (sort map {$_->name} CPAN::Forum::DB::Groups->search(gtype => $CPAN::Forum::DBI::group_types{Distribution})),
-#       );
-#    }
     @group_ids = sort {$group_labels{$a} cmp $group_labels{$b}}  @group_ids;
     
     return $q->popup_menu(-name => "new_group", -values => \@group_ids, -labels => \%group_labels);
