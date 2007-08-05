@@ -7,6 +7,9 @@ Last name: <TMPL_VAR lname><br />
 <TMPL_IF admin><a href="/admin_edit_user/<TMPL_VAR this_username>">EDIT</TMPL_IF>
 
 <TMPL_INCLUDE NAME="navigation.tmpl">
+<p>
+Tags by <a href="/tags/user/<TMPL_VAR this_username>"><TMPL_VAR this_username></a>
+</p>
 
 <TMPL_INCLUDE NAME="listing.tmpl">
 
