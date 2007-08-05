@@ -89,6 +89,17 @@ sub get_all_tags {
                 ";
     return $self->_fetch_arrayref_of_hashes($sql);
 }
+sub get_tags_of_user {
+    my ($self, $username) = @_;
+
+    my $sql = "SELECT tags.name name, COUNT(name) total
+                FROM tags, tag_cloud, users
+                WHERE tag_cloud.tag_id=tags.id AND tag_cloud.uid=users.id AND users.username=?
+                GROUP BY name
+                ORDER BY name ASC
+                ";
+    return $self->_fetch_arrayref_of_hashes($sql, $username);
+}
 
 sub get_modules_with_tag {
     my ($self, $tag_name) = @_;
