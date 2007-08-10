@@ -1431,64 +1431,38 @@ sub fetch_subscriptions {
 
     my %to; # keys are e-mail addresses that have already received an e-mail
 
-    # subscriptions to "all" messages in the current group
     $self->log->debug("Processing messages for allposts");
-
-
     my $users = CPAN::Forum::DB::Subscriptions->get_subscriptions('allposts', $post->{gid}, $post->{pauseid}); # SQL
     $self->_sendmail($users, $mail, \%to);
 
-    my $it;
     if ($post->{thread} == $post->{id}) { 
         $self->log->debug("Processing messages for thread starter");
+        my $users = CPAN::Forum::DB::Subscriptions->get_subscriptions('starters', $post->{gid}, $post->{pauseid}); # SQL
+        $self->_sendmail($users, $mail, \%to);
+    } else {
+        $self->log->debug("Processing messages for followups, users who posted in this thread");
 
-        # People who are subscribed to all thread starters
-        $it = CPAN::Forum::DB::Subscriptions_all->search(starters => 1);
-        $self->_sendmail($it, $mail, \%to);
-
-        # People who are subscribed to the thread startes in this group
-        $it = CPAN::Forum::DB::Subscriptions->search(starters => 1, gid => $post->{gid});
-        $self->_sendmail($it, $mail, \%to);
-
-        # People who are subscribed to the thread startes of this PAUSEID
-        $it = CPAN::Forum::DB::Subscriptions_pauseid->search(starters => 1, pauseid => $post->{pauseid});
-        $self->_sendmail($it, $mail, \%to);
+        my $uids = CPAN::Forum::DB::Posts->list_uids_who_posted_in_thread($post->{thread});
+        $self->log->debug(Data::Dumper->Dump([$uids], ['uids']));
+        my %uids = map {{ $_ => 1 }} @$uids;
+ 
+        my $users = CPAN::Forum::DB::Subscriptions->get_subscriptions('followups', $post->{gid}, $post->{pauseid}); # SQL
+        my @users_who_posted = grep { !$uids{ $_->{id} } } @$users;
+        $self->_sendmail(\@users_who_posted, $mail, \%to);
     }
-    else {
-        $self->log->debug("Processing messages for followups");
-
-        # Collect the users who posted in this thread
-        my %uids;
-        my $pit = CPAN::Forum::DB::Posts->search(thread => $post->{thread});
-        while (my $p = $pit->next) {
-            $uids{$p->uid}=1;
-            $self->log->debug("Ids: " . $p->uid);
-        }
-        
-        $it = CPAN::Forum::DB::Subscriptions_all->search(followups => 1);
-        $self->_sendmail($it, $mail, \%to, \%uids);
-
-        $it = CPAN::Forum::DB::Subscriptions->search(followups => 1, gid => $post->{gid});
-        $self->_sendmail($it, $mail, \%to, \%uids);
-        
-        $it = CPAN::Forum::DB::Subscriptions_pauseid->search(followups => 1, pauseid => $post->{pauseid});
-        $self->_sendmail($it, $mail, \%to);
-    }
-    
+ 
     $self->log->debug("Number of e-mails sent: ", scalar keys %to);
 }
 
 sub _sendmail {
-    my ($self, $users, $mail, $to, $uids) = @_;
+    my ($self, $users, $mail, $to) = @_;
 
     foreach my $user (@$users) {
         #$self->log->debug(Data::Dumper->Dump([$mail], ['mail']));
         my $email = $user->{email};
         $mail->{To} = $email;
-        $self->log->debug("Processing uid: " . $user->{username}) if $uids;
-        next if $uids and not $uids->{$user->{username}};
         $self->log->debug("Sending to $email id was found");
-        next if $_[3]->{$email}++; #TODO: stop using hardcoded reference to position!!!!!
+        next if $to->{$email}++; #TODO: stop using hardcoded reference to position!!!!!
         $self->log->debug("Sending to $email first time sending");
         $self->_my_sendmail(%$mail);
         $self->log->debug("Sent to $email");

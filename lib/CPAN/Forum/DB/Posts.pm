@@ -205,6 +205,11 @@ sub add_post {
     return $post_id;
 }
 
+sub list_uids_who_posted_in_thread {
+    my ($self, $thread) = @_;
+    my $sql = "SELECT DISTINCT uid FROM posts WHERE thread=?";
+    return $self->_select_column($sql, $thread);
+}
 
 
 1;

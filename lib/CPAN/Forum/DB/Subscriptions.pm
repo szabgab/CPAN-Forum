@@ -45,7 +45,7 @@ sub complex_update {
 
 sub get_subscriptions {
     my ($self, $field, $gid, $pauseid) = @_;
-    if (not grep {$field eq $_} qw(allposts)) {
+    if (not grep {$field eq $_} qw(allposts starters followups)) {
         Carp::croak("Invalid field '$field'");
     }
 
@@ -53,15 +53,15 @@ sub get_subscriptions {
     # People who asked for all the posts in this group
     # People who asked for all the posts in this PAUSEID
 
-    my $sql = "  SELECT DISTINCT username, email
+    my $sql = "  SELECT DISTINCT username, email, users.id id
                    FROM users, subscriptions_all
                    WHERE (users.id=subscriptions_all.uid AND subscriptions_all.$field=1)
                UNION
-                 SELECT DISTINCT username, email
+                 SELECT DISTINCT username, email, users.id id
                    FROM users, subscriptions
                    WHERE  (users.id=subscriptions.uid AND subscriptions.$field=1 AND gid=?)
                UNION
-                 SELECT DISTINCT username, email
+                 SELECT DISTINCT username, email, users.id id
                    FROM users, subscriptions_pauseid
                    WHERE  
                      (users.id=subscriptions_pauseid.uid 
