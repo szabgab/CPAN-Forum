@@ -1387,7 +1387,7 @@ sub set_ratings {
 sub _subscriptions {
     my ($self, $t, $group) = @_;
 
-    my $usernames = CPAN::Forum::DB::Subscriptions->get_subscriptions($group->{id}, $group->{pauseid}); # SQL
+    my $usernames = CPAN::Forum::DB::Subscriptions->get_subscriptions('allposts', $group->{id}, $group->{pauseid}); # SQL
     my @users = map {{username => $_}} @$usernames;
     #$self->log->debug(Data::Dumper->Dump([\@users], ['users']));
     $t->param(users => \@users);
