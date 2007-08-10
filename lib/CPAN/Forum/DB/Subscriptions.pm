@@ -49,22 +49,26 @@ sub get_subscriptions {
         Carp::croak("Invalid field '$field'");
     }
 
-    my $sql = "  SELECT DISTINCT username
+    # People who asked for all the posts
+    # People who asked for all the posts in this group
+    # People who asked for all the posts in this PAUSEID
+
+    my $sql = "  SELECT DISTINCT username, email
                    FROM users, subscriptions_all
                    WHERE (users.id=subscriptions_all.uid AND subscriptions_all.$field=1)
                UNION
-                 SELECT DISTINCT username
+                 SELECT DISTINCT username, email
                    FROM users, subscriptions
                    WHERE  (users.id=subscriptions.uid AND subscriptions.$field=1 AND gid=?)
                UNION
-                 SELECT DISTINCT username
+                 SELECT DISTINCT username, email
                    FROM users, subscriptions_pauseid
                    WHERE  
                      (users.id=subscriptions_pauseid.uid 
                            AND subscriptions_pauseid.$field=1 
                            AND subscriptions_pauseid.pauseid=?)
                ORDER BY username";
-    return $self->_select_column($sql, $gid, $pauseid);
+    return $self->_fetch_arrayref_of_hashes($sql, $gid, $pauseid);
 }
 
 1;

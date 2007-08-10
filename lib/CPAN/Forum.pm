@@ -1387,10 +1387,10 @@ sub set_ratings {
 sub _subscriptions {
     my ($self, $t, $group) = @_;
 
-    my $usernames = CPAN::Forum::DB::Subscriptions->get_subscriptions('allposts', $group->{id}, $group->{pauseid}); # SQL
-    my @users = map {{username => $_}} @$usernames;
+    my $users = CPAN::Forum::DB::Subscriptions->get_subscriptions('allposts', $group->{id}, $group->{pauseid}); # SQL
+    my @usernames = map {{ username => $_->{username} }} @$users;
     #$self->log->debug(Data::Dumper->Dump([\@users], ['users']));
-    $t->param(users => \@users);
+    $t->param(users => \@usernames);
 }
 
 sub add_new_group {
@@ -1434,20 +1434,11 @@ sub fetch_subscriptions {
     # subscriptions to "all" messages in the current group
     $self->log->debug("Processing messages for allposts");
 
+
+    my $users = CPAN::Forum::DB::Subscriptions->get_subscriptions('allposts', $post->{gid}, $post->{pauseid}); # SQL
+    $self->_sendmail($users, $mail, \%to);
+
     my $it;
-
-    # People who asked for all the posts
-    $it = CPAN::Forum::DB::Subscriptions_all->search(allposts => 1);
-    $self->_sendmail($it, $mail, \%to);
-
-    # People who asked for all the posts in this group
-    $it = CPAN::Forum::DB::Subscriptions->search(allposts => 1, gid => $post->{gid});
-    $self->_sendmail($it, $mail, \%to);
-
-    # People who asked for all the posts in this PAUSEID
-    $it = CPAN::Forum::DB::Subscriptions_pauseid->search(allposts => 1, pauseid => $post->{pauseid});
-    $self->_sendmail($it, $mail, \%to);
-
     if ($post->{thread} == $post->{id}) { 
         $self->log->debug("Processing messages for thread starter");
 
@@ -1488,14 +1479,14 @@ sub fetch_subscriptions {
 }
 
 sub _sendmail {
-    my ($self, $it, $mail, $to, $uids) = @_;
+    my ($self, $users, $mail, $to, $uids) = @_;
 
-    while (my $s = $it->next) {
+    foreach my $user (@$users) {
         #$self->log->debug(Data::Dumper->Dump([$mail], ['mail']));
-        my $email = $s->uid->email;
+        my $email = $user->{email};
         $mail->{To} = $email;
-        $self->log->debug("Processing uid: " . $s->uid->username) if $uids;
-        next if $uids and not $uids->{$s->uid->username};
+        $self->log->debug("Processing uid: " . $user->{username}) if $uids;
+        next if $uids and not $uids->{$user->{username}};
         $self->log->debug("Sending to $email id was found");
         next if $_[3]->{$email}++; #TODO: stop using hardcoded reference to position!!!!!
         $self->log->debug("Sending to $email first time sending");
