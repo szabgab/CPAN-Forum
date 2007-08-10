@@ -43,4 +43,25 @@ sub complex_update {
 }
 
 
+sub get_subscriptions {
+    my ($self, $gid, $pauseid) = @_;
+
+    my $sql = "  SELECT DISTINCT username
+                   FROM users, subscriptions_all
+                   WHERE (users.id=subscriptions_all.uid AND subscriptions_all.allposts=1)
+               UNION
+                 SELECT DISTINCT username
+                   FROM users, subscriptions
+                   WHERE  (users.id=subscriptions.uid AND subscriptions.allposts=1 AND gid=?)
+               UNION
+                 SELECT DISTINCT username
+                   FROM users, subscriptions_pauseid
+                   WHERE  
+                     (users.id=subscriptions_pauseid.uid 
+                           AND subscriptions_pauseid.allposts=1 
+                           AND subscriptions_pauseid.pauseid=?)
+               ORDER BY username";
+    return $self->_select_column($sql, $gid, $pauseid);
+}
+
 1;

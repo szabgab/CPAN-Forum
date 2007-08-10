@@ -1387,20 +1387,10 @@ sub set_ratings {
 sub _subscriptions {
     my ($self, $t, $group) = @_;
 
-    my %people;
-    foreach my $s (
-            CPAN::Forum::DB::Subscriptions_all->search(allposts => 1),
-            CPAN::Forum::DB::Subscriptions_pauseid->search(allposts => 1, pauseid => $group->{pauseid}),
-            CPAN::Forum::DB::Subscriptions->search(allposts => 1, gid => $group->{id}),
-            ) {
-        $people{$s->uid} =  {
-            username => $s->uid->username,
-        };
-    }
-    if (%people) {
-        my @usernames = values %people;
-        $t->param(users => [sort {$a->{username} cmp $b->{username}} @usernames])
-    }
+    my $usernames = CPAN::Forum::DB::Subscriptions->get_subscriptions($group->{id}, $group->{pauseid}); # SQL
+    my @users = map {{username => $_}} @$usernames;
+    #$self->log->debug(Data::Dumper->Dump([\@users], ['users']));
+    $t->param(users => \@users);
 }
 
 sub add_new_group {
