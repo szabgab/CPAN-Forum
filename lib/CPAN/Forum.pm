@@ -1193,7 +1193,7 @@ sub process_post {
                 
     my $button = $q->param("button");
     if (not @errors and $button eq "Submit") {
-        my $last_post = CPAN::Forum::DB::Posts->get_latest_post_by_uid($self->session->param('uid'));
+        my $last_post = CPAN::Forum::DB::Posts->get_latest_post_by_uid($self->session->param('uid')); # SQL
         # TODO, maybe also check if the post is the same as the last post to avoid duplicates
         if ($last_post) {
             $self->log->debug("username: " . 
@@ -1410,12 +1410,21 @@ sub add_new_group {
     }
     my $q = $self->query;
     my $group_name = $q->param("group");
+    # TODO pausid is currently free text on the form
+    # but it has been disabled for now
+    # we will have to provide the full list of PAUSEID on the form
+    # or check the id from the string
+    my $pauseid    = $q->param("pauseid");
+    if ($group_name !~ /^[\w-]+$/) {
+        return $self->notes("invalid_group_name");
+    }
+
     $self->log->debug("Adding group with name: '$group_name'");
     my $group = eval {
-            CPAN::Forum::DB::Groups->create({
+            CPAN::Forum::DB::Groups->add(   # SQL
                 name  => $group_name,
                 gtype => 3,
-                });
+                );
             };
     if ($@) {
         $self->log->debug("Failed to add group with name: '$group_name'");

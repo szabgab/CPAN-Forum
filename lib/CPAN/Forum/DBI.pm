@@ -215,6 +215,15 @@ sub _prep_set {
     #return ($where, @{ $args->{@fields} }); 
 }
 
+
+# gets a hash reference of  field names mapped to values
+# return 
+#    a partial SQL statement of the fieldnames
+#    a partial SQL statement of the placeholders
+#    list of values matching
+#
+#    $obj->_prep_insert({ fname => "Foo", lname => "Bar" })
+#    returns( "fname, lname",   "?, ?",    "Foo", "Bar" );
 sub _prep_insert {
     my ($self, $args) = @_;
 

@@ -57,11 +57,17 @@ sub groups_by_name {
 
 sub add {
     my ($self, %args) = @_;
-    my $sql = "INSERT INTO groups (name, version, gtype, pauseid) VALUES (?, ?, ?, ?)";
+
+    Carp::croak("DB::Groups->add requires name and gtype fields") 
+        if not $args{name} or not defined $args{gtype} or not $args{pauseid};  #version
+
+    my ($fields, $placeholders, @values) = $self->_prep_insert(\%args);
+    my $sql = "INSERT INTO groups ($fields) VALUES ($placeholders)";
     my $dbh = CPAN::Forum::DBI::db_Main();
-    $dbh->do($sql, undef, @args{qw(name version gtype pauseid)});
+    $dbh->do($sql, undef, @values);
 
     return $self->info_by(name => $args{name});
 }
+
 1;
 

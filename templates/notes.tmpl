@@ -55,5 +55,13 @@ This e-mail already exists in our database. If this is really your e-mail addres
 you can retrieve your password using the <a href="/">password reminder</a>
 </TMPL_IF>
 
+<TMPL_IF invalid_group_name>
+<p class="error">
+Group names are restricted to Alphanumeric characters and dash (-).
+<br />
+Press back, correct the value and submit it again.
+</p>
+</TMPL_IF>
+
 <TMPL_INCLUDE NAME="footer.tmpl">
 
