@@ -74,7 +74,6 @@ sub search {
     my $name   = $q->param("name")    || '';
     my $what   = $q->param("what")    || '';
     $name      =~ s/^\s+|\s+$//g;
-    my $any_result = 0;
 
     # kill the taint checking (why do I use taint checking if I kill it then ?)
     if ($name =~ /(.*)/) { $name    = $1; }
@@ -98,23 +97,13 @@ sub search {
         return $t->output;
     }
 
+    my $any_result = 0;
     if ($what eq "module" or $what eq "pauseid") {
         $any_result = $self->_search_modules($t, $name, $what);
     } elsif ($what eq "user") {
         $any_result = $self->_search_users($t, $name, $what);
     } else {
-        my %where;
-        if ($what eq "subject") { %where = (subject => {'LIKE', '%' . $name . '%'}); }
-        if ($what eq "text")    { %where = (text    => {'LIKE', '%' . $name . '%'}); }
-        $self->log->debug("Search 1: " . join "|", %where);
-        if (%where) {
-
-            $self->log->debug("Search 2: " . join "|", %where);
-
-            my $page = $q->param('page') || 1;
-            $any_result = $self->_search_results($t, {where => \%where, page => $page});
-            $t->param($what => 1);
-        }
+        $any_result = $self->_search_posts($t, $name, $what);
     }
     $t->param(no_results => not $any_result);
     $t->output;
@@ -155,6 +144,26 @@ sub _search_users {
     $t->param(users => \@things);
     $t->param($what => 1);
     return @things ? 1 : 0;
+}
+
+sub _search_posts {
+    my ($self, $t, $name, $what) = @_;
+
+    my $q = $self->query;
+
+    my %where;
+    if ($what eq "subject") { %where = (subject => {'LIKE', '%' . $name . '%'}); }
+    if ($what eq "text")    { %where = (text    => {'LIKE', '%' . $name . '%'}); }
+    $self->log->debug("Search 1: " . join "|", %where);
+    if (%where) {
+
+        $self->log->debug("Search 2: " . join "|", %where);
+
+        my $page = $q->param('page') || 1;
+        $t->param($what => 1);
+        return $self->_search_results($t, {where => \%where, page => $page});
+    }
+    return 0;
 }
 
 1;
