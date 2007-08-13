@@ -109,34 +109,25 @@ sub search {
     $t->output;
 }
 
+# $what: module or pauseid
 sub _search_modules {
     my ($self, $t, $name, $what) = @_;
 
-    my $it;
+    my $groups;
     if ($what eq "module") {
-        $it =  CPAN::Forum::DB::Groups->search_like(name => '%' . $name . '%');
+        $groups =  CPAN::Forum::DB::Groups->names_by_name($name); # SQL
     } else {
-        my $author = CPAN::Forum::DB::Authors->get_author_by_pauseid($name);
-        if ($author) {
-            $it =  CPAN::Forum::DB::Groups->search(pauseid => $author->{id});
-        } 
+        $groups =  CPAN::Forum::DB::Groups->names_by_pauseidstr(uc $name); # SQL
         $t->param(pauseid_name => uc $name)
     }
-    my @things;
-    if ($it) {
-        while (my $group  = $it->next) {
-            push @things, {name => $group->name};
-        }
-    }
-    $t->param(groups => \@things);
+    $t->param(groups => $groups);
     $t->param($what => 1);
-    return @things ? 1 : 0;
+    return @$groups ? 1 : 0;
 }
 
 sub _search_users {
     my ($self, $t, $name, $what) = @_;
 
-    my @things;
     my $users =  CPAN::Forum::DB::Users->list_users_like(lc($name)); # SQL
     $t->param(users => $users);
     $t->param($what => 1);

@@ -69,5 +69,21 @@ sub add {
     return $self->info_by(name => $args{name});
 }
 
+sub names_by_name {
+    my ($self, $value) = @_;
+    $value = '%' . $value . '%';
+    my $sql = "SELECT name FROM groups WHERE name LIKE ? ORDER BY name";
+    return $self->_fetch_arrayref_of_hashes($sql, $value);
+}
+
+sub names_by_pauseidstr {
+    my ($self, $value) = @_;
+    my $sql = "SELECT name FROM groups, authors WHERE authors.pauseid=? AND authors.id=groups.pauseid";
+    return $self->_fetch_arrayref_of_hashes($sql, $value);
+}
+
+
+#        my $author = CPAN::Forum::DB::Authors->get_author_by_pauseid($name);
+
 1;
 
