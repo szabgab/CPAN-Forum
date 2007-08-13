@@ -99,16 +99,9 @@ sub search {
     }
 
     if ($what eq "module" or $what eq "pauseid") {
-        $any_result = $self->_search_modules($t, $what, $name);
+        $any_result = $self->_search_modules($t, $name, $what);
     } elsif ($what eq "user") {
-        my @things;
-        my $it =  CPAN::Forum::DB::Users->search_like(username => '%' . lc($name) . '%');
-        while (my $user  = $it->next) {
-            push @things, {username => $user->username};
-        }
-        $any_result = 1 if @things;
-        $t->param(users => \@things);
-        $t->param($what => 1);
+        $any_result = $self->_search_users($t, $name, $what);
     } else {
         my %where;
         if ($what eq "subject") { %where = (subject => {'LIKE', '%' . $name . '%'}); }
@@ -128,7 +121,7 @@ sub search {
 }
 
 sub _search_modules {
-    my ($self, $t, $what, $name) = @_;
+    my ($self, $t, $name, $what) = @_;
 
     my $it;
     if ($what eq "module") {
@@ -151,6 +144,18 @@ sub _search_modules {
     return @things ? 1 : 0;
 }
 
+sub _search_users {
+    my ($self, $t, $name, $what) = @_;
+
+    my @things;
+    my $it =  CPAN::Forum::DB::Users->search_like(username => '%' . lc($name) . '%');
+    while (my $user  = $it->next) {
+        push @things, {username => $user->username};
+    }
+    $t->param(users => \@things);
+    $t->param($what => 1);
+    return @things ? 1 : 0;
+}
 
 1;
 
