@@ -195,6 +195,8 @@ sub delete {
     return;
 }
 
+# _prep_where({ field => value, field2 => value2 });
+# return("field=? AND field2=?",    value, value2);
 sub _prep_where {
     my ($self, $args) = @_;
     #Carp::cluck (Data::Dumper->Dump([$args], ['args']));

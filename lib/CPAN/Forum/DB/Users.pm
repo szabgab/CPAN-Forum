@@ -83,5 +83,13 @@ sub update {
     $dbh->do($sql, undef, @values, $id);
 }
 
+sub list_users_like {
+    my ($self, $username) = @_;
+    $username = "%" . $username . "%";
+    my $sql = "SELECT username FROM users WHERE username LIKE ? ORDER BY username";
+    
+    return $self->_fetch_arrayref_of_hashes($sql, $username);
+}
+
 1;
 

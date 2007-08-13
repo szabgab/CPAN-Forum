@@ -137,13 +137,10 @@ sub _search_users {
     my ($self, $t, $name, $what) = @_;
 
     my @things;
-    my $it =  CPAN::Forum::DB::Users->search_like(username => '%' . lc($name) . '%');
-    while (my $user  = $it->next) {
-        push @things, {username => $user->username};
-    }
-    $t->param(users => \@things);
+    my $users =  CPAN::Forum::DB::Users->list_users_like(lc($name)); # SQL
+    $t->param(users => $users);
     $t->param($what => 1);
-    return @things ? 1 : 0;
+    return @$users ? 1 : 0;
 }
 
 sub _search_posts {
