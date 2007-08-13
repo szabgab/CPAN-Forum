@@ -58,7 +58,7 @@ sub groups_by_name {
 sub add {
     my ($self, %args) = @_;
 
-    Carp::croak("DB::Groups->add requires name and gtype fields") 
+    Carp::croak("add requires name and gtype fields") 
         if not $args{name} or not defined $args{gtype} or not $args{pauseid};  #version
 
     my ($fields, $placeholders, @values) = $self->_prep_insert(\%args);

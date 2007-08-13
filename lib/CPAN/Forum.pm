@@ -1442,7 +1442,7 @@ sub fetch_subscriptions {
     } else {
         $self->log->debug("Processing messages for followups, users who posted in this thread");
 
-        my $uids = CPAN::Forum::DB::Posts->list_uids_who_posted_in_thread($post->{thread});
+        my $uids = CPAN::Forum::DB::Posts->list_uids_who_posted_in_thread($post->{thread}); #SQL
         $self->log->debug(Data::Dumper->Dump([$uids], ['uids']));
         my %uids = map {{ $_ => 1 }} @$uids;
  

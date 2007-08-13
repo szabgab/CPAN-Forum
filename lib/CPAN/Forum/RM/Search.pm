@@ -99,25 +99,7 @@ sub search {
     }
 
     if ($what eq "module" or $what eq "pauseid") {
-        my $it;
-        if ($what eq "module") {
-            $it =  CPAN::Forum::DB::Groups->search_like(name => '%' . $name . '%');
-        } else {
-            my $author = CPAN::Forum::DB::Authors->get_author_by_pauseid($name);
-            if ($author) {
-                $it =  CPAN::Forum::DB::Groups->search(pauseid => $author->{id});
-            } 
-            $t->param(pauseid_name => uc $name)
-        }
-        my @things;
-        if ($it) {
-            while (my $group  = $it->next) {
-                push @things, {name => $group->name};
-            }
-        }
-        $any_result = 1 if @things;
-        $t->param(groups => \@things);
-        $t->param($what => 1);
+        $any_result = $self->_search_modules($t, $what, $name);
     } elsif ($what eq "user") {
         my @things;
         my $it =  CPAN::Forum::DB::Users->search_like(username => '%' . lc($name) . '%');
@@ -144,6 +126,31 @@ sub search {
     $t->param(no_results => not $any_result);
     $t->output;
 }
+
+sub _search_modules {
+    my ($self, $t, $what, $name) = @_;
+
+    my $it;
+    if ($what eq "module") {
+        $it =  CPAN::Forum::DB::Groups->search_like(name => '%' . $name . '%');
+    } else {
+        my $author = CPAN::Forum::DB::Authors->get_author_by_pauseid($name);
+        if ($author) {
+            $it =  CPAN::Forum::DB::Groups->search(pauseid => $author->{id});
+        } 
+        $t->param(pauseid_name => uc $name)
+    }
+    my @things;
+    if ($it) {
+        while (my $group  = $it->next) {
+            push @things, {name => $group->name};
+        }
+    }
+    $t->param(groups => \@things);
+    $t->param($what => 1);
+    return @things ? 1 : 0;
+}
+
 
 1;
 

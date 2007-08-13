@@ -233,7 +233,7 @@ sub update_subscription {
         my $pauseid = uc $q->param("name");
         my $author = CPAN::Forum::DB::Authors->get_author_by_pauseid($pauseid); # SQL
         if ($author) {
-            my $s = CPAN::Forum::DB::Subscriptions_pauseid->find_or_create({
+            my $s = CPAN::Forum::DB::Subscriptions_pauseid->find_or_create({ # not SQL
                 uid       => $uid,
                 pauseid   => $author->{id},
             });
@@ -247,7 +247,7 @@ sub update_subscription {
         $name =~ s/::/-/g;  
         my $group = CPAN::Forum::DB::Groups->info_by(name => $name); # SQL
         if ($group) {
-            my $s = CPAN::Forum::DB::Subscriptions->find_or_create({
+            my $s = CPAN::Forum::DB::Subscriptions->find_or_create({  # not SQL
                 uid       => $uid,
                 gid       => $group->{id},
             });
