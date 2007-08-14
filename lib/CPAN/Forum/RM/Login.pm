@@ -59,7 +59,7 @@ sub login_process {
     $session->param(fname     => $user->{fname});
     $session->param(lname     => $user->{lname});
     $session->param(email     => $user->{email});
-    if (CPAN::Forum::DB::Usergroups->is_admin($user->{id})) { # SQL
+    if (CPAN::Forum::DB::Users->is_admin($user->{id})) { # SQL
         $session->param(admin     => 1);
     }
 

@@ -27,7 +27,6 @@ lib/CPAN/Forum/DB/Subscriptions_pauseid.pm
 lib/CPAN/Forum/DB/Subscriptions.pm
 lib/CPAN/Forum/DB/Tags.pm
 lib/CPAN/Forum/DB/Users.pm
-lib/CPAN/Forum/DB/Usergroups.pm
 lib/CPAN/Forum/DB/UserInGroup.pm
 
 lib/CPAN/Forum/RM/Admin.pm

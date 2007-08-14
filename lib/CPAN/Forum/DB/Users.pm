@@ -7,6 +7,7 @@ __PACKAGE__->table('users');
 __PACKAGE__->columns(All => qw/id username password email fname lname status
                             update_on_new_user/);
 __PACKAGE__->has_many(posts => "CPAN::Forum::DB::Posts");
+ 
 
 use List::MoreUtils qw(none);
 
@@ -90,6 +91,19 @@ sub list_users_like {
     
     return $self->_fetch_arrayref_of_hashes($sql, $username);
 }
+
+sub is_admin {
+    my ($self, $id) = @_;
+
+    my $sql = "SELECT id FROM usergroups, user_in_group
+               WHERE 
+               usergroups.name='admin' AND
+               user_in_group.uid = ? AND
+               user_in_group.gid=usergroups.id
+               ";
+    $self->_fetch_single_value($sql, $id);
+}
+
 
 1;
 
