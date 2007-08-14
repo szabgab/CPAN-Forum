@@ -1355,7 +1355,7 @@ sub threads {
     foreach my $p (@$posts) {
         $p->{responses} = [];
         foreach my $response (@$posts) {
-            if ($response->{parent} eq $p->{id}) {
+            if ($response->{parent} and $response->{parent} eq $p->{id}) {
                 push @{ $p->{responses} }, {id => $response->{id} };
             }
         }
