@@ -1271,7 +1271,9 @@ sub _post_date {
 
 sub _post {
     my ($self, $post) = @_;
-    my $responses = CPAN::Forum::DB::Posts->list_posts_by(parent => $post->{id}); # SQL
+    my $responses = $post->{responses} || CPAN::Forum::DB::Posts->list_posts_by(parent => $post->{id}); # SQL
+    $self->log->debug(Data::Dumper->Dump([$responses], ['responses']));
+    
 
     my %post = (
         postername  => $post->{username},
@@ -1338,7 +1340,16 @@ sub threads {
             );
     }
     $self->log->debug(Data::Dumper->Dump([$posts], ['posts']));
-    
+ 
+    # fill in the responses
+    foreach my $p (@$posts) {
+        $p->{responses} = [];
+        foreach my $response (@$posts) {
+            if ($response->{parent} eq $p->{id}) {
+                push @{ $p->{responses} }, {id => $response->{id} };
+            }
+        }
+    }
 
     my @posts_html;
     foreach my $p (@$posts) {
