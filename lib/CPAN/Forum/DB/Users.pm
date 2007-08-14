@@ -3,10 +3,6 @@ use strict;
 use warnings;
 use Carp;
 use base 'CPAN::Forum::DBI';
-__PACKAGE__->table('users');
-__PACKAGE__->columns(All => qw/id username password email fname lname status
-                            update_on_new_user/);
-__PACKAGE__->has_many(posts => "CPAN::Forum::DB::Posts");
  
 
 use List::MoreUtils qw(none);

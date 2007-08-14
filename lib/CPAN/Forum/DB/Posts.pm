@@ -3,17 +3,7 @@ use strict;
 use warnings;
 use Carp;
 use base 'CPAN::Forum::DBI';
-__PACKAGE__->table('posts');
-__PACKAGE__->columns(All => qw/id gid uid parent subject text date thread hidden/);
-__PACKAGE__->columns(Essential => qw/id gid uid parent subject text date thread hidden/);
-__PACKAGE__->has_a(parent => "CPAN::Forum::DB::Posts");
-__PACKAGE__->has_a(uid    => "CPAN::Forum::DB::Users");
-__PACKAGE__->has_a(gid    => "CPAN::Forum::DB::Groups");
 
-__PACKAGE__->set_sql(latest         => "SELECT __ESSENTIAL__ FROM __TABLE__ ORDER BY DATE DESC LIMIT %s");
-
-__PACKAGE__->set_sql(count_where    => "SELECT count(*) FROM __TABLE__ WHERE %s='%s'");
-__PACKAGE__->set_sql(count_like     => "SELECT count(*) FROM __TABLE__ WHERE %s LIKE '%s'");
 my $MORE_SQL = 'groups.name group_name, users.fname user_fname, users.lname user_lname, users.username user_username';
 
 
@@ -127,7 +117,7 @@ sub mysearch {
     #%where = (1 => 1) if not %where;
     $CPAN::Forum::logger->debug(Data::Dumper->Dump([\%where], ['where']));
 
-    my $pager = __PACKAGE__->mypager(
+    my $pager = $self->mypager(
         where         => \%where,
         per_page      => $params->{per_page} || 10,
         page          => $params->{page}     || 1,
