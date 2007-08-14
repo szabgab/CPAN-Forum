@@ -1273,17 +1273,15 @@ sub _post {
     my ($self, $post) = @_;
     my $responses = CPAN::Forum::DB::Posts->list_posts_by(parent => $post->{id}); # SQL
 
-    #my $user = CPAN::Forum::DB::Users->info_by(id => $post->{uid}); # SQL
     my %post = (
         postername  => $post->{username},
         date        => _post_date($post->{date}),
         parentid    => $post->{parent},
         responses   => $responses,
         text        => $self->_text_escape($post->{text}),
+        id          => $post->{id},
+        subject     => _subject_escape($post->{subject}),
     );
-
-    $post{id}      = $post->{id};
-    $post{subject} = _subject_escape($post->{subject});
 
     return \%post;
 }
@@ -1333,26 +1331,27 @@ sub threads {
     my $id = $q->param("id");
     $id = ${$self->param("path_parameters")}[0] if ${$self->param("path_parameters")}[0];
 
-    #my @posts = CPAN::Forum::DB::Posts->posts_in_thread($id);
-    my @posts = CPAN::Forum::DB::Posts->search(thread => $id);
-    if (not @posts) {
+    my $posts = CPAN::Forum::DB::Posts->posts_in_thread($id); # SQL
+    if (not @$posts) {
         return $self->internal_error(
             "in request",
             );
     }
+    $self->log->debug(Data::Dumper->Dump([$posts], ['posts']));
+    
 
     my @posts_html;
-    foreach my $p (@posts) {
+    foreach my $p (@$posts) {
         push @posts_html, $self->_post($p);
     }
     $t->param(posts => \@posts_html);
     
 #   (my $dashgroup = $posts[0]->gid) =~ s/::/-/g;
-    $t->param(group => $posts[0]->gid->name);
+    $t->param(group => $posts->[0]->{group_name});
 #   $t->param(dashgroup => $dashgroup);
-    $t->param(title => _subject_escape($posts[0]->subject));
+    $t->param(title => _subject_escape($posts->[0]->{subject}));
 
-    $self->set_ratings($t, $posts[0]->gid->name);
+    $self->set_ratings($t, $posts->[0]->{group_name});
 
     return $t->output;
 }

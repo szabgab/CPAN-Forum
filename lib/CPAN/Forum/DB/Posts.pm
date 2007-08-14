@@ -28,6 +28,18 @@ sub get_post {
                 WHERE posts.id=? AND posts.gid=groups.id AND users.id=posts.uid";
     return $self->_fetch_single_hashref($sql, $post_id);
 }
+
+sub posts_in_thread {
+    my ($self, $thread) = @_;
+    my $sql = "SELECT posts.id, gid, uid, parent, thread, hidden, subject, text, date,
+                groups.name group_name, groups.pauseid, username, fname, lname
+                FROM posts, groups, users
+                WHERE posts.thread=? AND posts.gid=groups.id AND users.id=posts.uid";
+    $self->_fetch_arrayref_of_hashes($sql, $thread);
+}
+
+
+
 sub _get_latest_pid_by_uid {
     my ($self, $uid) = @_;
     my $sql = "SELECT id, text, subject FROM posts WHERE uid=? ORDER BY date DESC LIMIT 1";
@@ -184,17 +196,6 @@ sub list_posts_by {
     my $sql = "SELECT id FROM posts WHERE $field=?";
     return $self->_fetch_arrayref_of_hashes($sql, $value);
 };
-
-sub posts_in_thread {
-    my ($self, $thread) = @_;
-    my $sql = "SELECT id,  FROM posts WHERE thread=?";
-
-    my $sql = "SELECT posts.id, gid, uid, parent, thread, hidden, subject, text, date,
-                groups.name group_name, groups.pauseid
-                FROM posts, groups
-                WHERE posts.thread=? AND posts.gid=groups.id ";
-    $self->_fetch_arrayref_of_hashes($sql, $thread);
-}
 
 sub add_post {
     my ($self, $data, $parent_post, $parent) = @_;
