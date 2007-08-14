@@ -161,7 +161,7 @@ sub count_threads {
     return {} if not @thread_ids;
     # TODO check if they are all numbers?
 
-    #Carp::cluck(Data::Dumper->Dump([\@thread_ids],['thread_ids']));
+    $CPAN::Forum::logger->debug(Data::Dumper->Dump([\@thread_ids], ['thread_ids']));
     my $ids = join ",", @thread_ids;
     my $sql = "SELECT thread, COUNT(*) cnt FROM posts WHERE thread in ($ids) GROUP BY thread";
     return $self->_selectall_hashref($sql, 'thread');
