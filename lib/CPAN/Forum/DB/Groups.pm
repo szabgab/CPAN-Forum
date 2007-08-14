@@ -83,7 +83,7 @@ sub names_by_pauseidstr {
 }
 
 
-#        my $author = CPAN::Forum::DB::Authors->get_author_by_pauseid($name);
+#        my $author = CPAN::Forum::DB::Authors->get_author_by_pauseid($name); # SQL
 
 1;
 

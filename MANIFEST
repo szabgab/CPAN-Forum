@@ -21,7 +21,6 @@ lib/CPAN/Forum/INC.pm
 lib/CPAN/Forum/DB/Authors.pm
 lib/CPAN/Forum/DB/Configure.pm
 lib/CPAN/Forum/DB/Groups.pm
-lib/CPAN/Forum/DB/GroupsRelations.pm
 lib/CPAN/Forum/DB/Posts.pm
 lib/CPAN/Forum/DB/Subscriptions_all.pm
 lib/CPAN/Forum/DB/Subscriptions_pauseid.pm
