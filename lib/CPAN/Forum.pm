@@ -749,8 +749,8 @@ sub build_listing {
     # eliminate undefs and duplicates (TODO: I don't know why are there such values)
     my %seen;
     foreach my $p (@$it) {
-        next if not defined $p->thread;
-        $seen{$p->thread}++;
+        next if not defined $p->{thread};
+        $seen{$p->{thread}}++;
     }
     my @threads = keys %seen;
 
@@ -760,19 +760,19 @@ sub build_listing {
         #$self->log->debug(Data::Dumper->Dump([$post], ['post']));
         #$self->log->debug("id=" . $post->id);
 #warn "called for each post";
-        my $thread = $post->thread;
+        my $thread = $post->{thread};
         my $thread_count = ($thread and $threads->{$thread}) ? $threads->{$thread}{cnt} : 0;
         push @resp, {
-            subject      => _subject_escape($post->subject), 
-            id           => $post->id, 
-            group        => $post->gid->name, 
+            subject      => _subject_escape($post->{subject}),
+            id           => $post->{id},
+            group        => $post->{group_name},
             thread       => ($thread_count > 1 ? 1 : 0),
-            thread_id    => $post->thread,
+            thread_id    => $post->{thread},
             thread_count => $thread_count-1,
-            #date         => POSIX::strftime("%e/%b", localtime $post->date),
-            #date         => scalar localtime $post->date,
-            date         => _ellapsed($post->date),
-            postername   => $post->uid->username,
+            #date         => POSIX::strftime("%e/%b", localtime $post->{date}),
+            #date         => scalar localtime $post->{date},
+            date         => _ellapsed($post->{date}),
+            postername   => $post->{username},
             };
     }
     return \@resp;

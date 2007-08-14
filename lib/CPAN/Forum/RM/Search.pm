@@ -11,21 +11,21 @@ sub _search_results {
     $params->{per_page} = $self->config("per_page");
 
     my $pager   = CPAN::Forum::DB::Posts->mysearch($params);
-    my @results = $pager->search_where();
-    $self->log->debug(Data::Dumper->Dump([\@results], ['results']));
-    my $total   = $pager->total_entries;
+    my $results = $pager->{results};
+    #$self->log->debug(Data::Dumper->Dump([$results], ['results']));
+    my $total   = $pager->{total_entries};
     $self->log->debug("number of entries: total=$total");
-    my $data = $self->build_listing(\@results);
+    my $data = $self->build_listing($results);
 
     $t->param(messages       => $data);
     $t->param(total          => $total);
-    $t->param(previous_page  => $pager->previous_page);
-    $t->param(next_page      => $pager->next_page);
-    $t->param(first_entry    => $pager->first);
-    $t->param(last_entry     => $pager->last);
-    $t->param(first_page     => 1)                      if $pager->current_page != 1;
-    $t->param(last_page      => $pager->last_page)      if $pager->current_page != $pager->last_page;
-    return $pager->total_entries;
+#    $t->param(previous_page  => $pager->previous_page);
+#    $t->param(next_page      => $pager->next_page);
+#    $t->param(first_entry    => $pager->first);
+#    $t->param(last_entry     => $pager->last);
+#    $t->param(first_page     => 1)                      if $pager->current_page != 1;
+#    $t->param(last_page      => $pager->last_page)      if $pager->current_page != $pager->last_page;
+    return $pager->{total_entries};
 }
 
 sub module_search_form {

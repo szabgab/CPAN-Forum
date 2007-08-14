@@ -262,14 +262,25 @@ sub mypager {
     my ($where, @values) = $self->_prep_where($args{where});
     $CPAN::Forum::logger->debug("where='$where'");
 
-    my $fetch_sql = "";
+    my $fetch_sql = "SELECT posts.id, subject, thread, date, username FROM posts, users";
     my $count_sql = "SELECT COUNT(*) FROM posts";
-    my @fetch_values;
+    my @fetch_values = @values;
 
     if ($where) {
         $fetch_sql .= " WHERE $where";
         $count_sql .= " WHERE $where";
     }
+
+    if ($where) {
+        $fetch_sql .= " AND ";
+    } else {
+        $fetch_sql = " WHERE ";
+    }
+    $fetch_sql .= " users.id=posts.uid";
+
+    my $order_by = $args{order_by};
+    $order_by =~ s/^\s*id/posts.id/;
+    $fetch_sql .= " ORDER BY $order_by";
 
     $fetch_sql .= " LIMIT ?";
     my $limit = $args{per_page} || 10;
@@ -281,12 +292,20 @@ sub mypager {
         push @fetch_values, $limit*($page-1);
     }
 
-    $fetch_sql .= "ORDER BY $args{order_by}";
     $CPAN::Forum::logger->debug("count_sql='$count_sql' " . Data::Dumper->Dump([\@values], ['values']));
     my $total = $self->_fetch_single_value($count_sql, @values);
     $CPAN::Forum::logger->debug("total='$total'");
 
-    return {};
+    $CPAN::Forum::logger->debug("fetch_sql='$fetch_sql' " . Data::Dumper->Dump([\@fetch_values], ['fetch_values']));
+    my $results = $self->_fetch_arrayref_of_hashes($fetch_sql, @fetch_values);
+    $CPAN::Forum::logger->debug(Data::Dumper->Dump([$results], ['results']));
+
+    my %pager = (
+        total_entries => $total,
+        results       => $results,
+    );
+
+    return \%pager;
 }
 1;
 
