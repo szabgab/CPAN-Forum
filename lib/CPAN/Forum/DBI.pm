@@ -274,7 +274,7 @@ sub mypager {
     if ($where) {
         $fetch_sql .= " AND ";
     } else {
-        $fetch_sql = " WHERE ";
+        $fetch_sql .= " WHERE ";
     }
     $fetch_sql .= " users.id=posts.uid AND groups.id=posts.gid";
 
@@ -286,10 +286,11 @@ sub mypager {
     my $limit = $args{per_page} || 10;
     push @fetch_values, $limit;
 
-    my $page = $args{page} || 1;
+    my $page   = $args{page} || 1;
+    my $offset = $limit*($page-1);
     if ($page > 1) {
         $fetch_sql .= " OFFSET ?";
-        push @fetch_values, $limit*($page-1);
+        push @fetch_values, $offset;
     }
 
     $CPAN::Forum::logger->debug("count_sql='$count_sql' " . Data::Dumper->Dump([\@values], ['values']));
@@ -300,12 +301,26 @@ sub mypager {
     my $results = $self->_fetch_arrayref_of_hashes($fetch_sql, @fetch_values);
     $CPAN::Forum::logger->debug(Data::Dumper->Dump([$results], ['results']));
 
+    my $last_page = int($total/$limit);
+    if ($last_page != $total/$limit) {
+        $last_page++;
+    }
+
     my %pager = (
         total_entries => $total,
+        first_entry   => 1+$offset,
+        last_entry    => $offset+@$results,
+
         results       => $results,
+        first_page    => 1,
+        last_page     => $last_page,
+        previous_page => ($page > 1 ? $page-1 : 0),
+        next_page     => ($page < $last_page ? $page+1 : 0),
+        current_page  => $page,
     );
 
     return \%pager;
 }
+
 1;
 

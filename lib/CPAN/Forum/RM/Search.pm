@@ -19,12 +19,12 @@ sub _search_results {
 
     $t->param(messages       => $data);
     $t->param(total          => $total);
-#    $t->param(previous_page  => $pager->previous_page);
-#    $t->param(next_page      => $pager->next_page);
-#    $t->param(first_entry    => $pager->first);
-#    $t->param(last_entry     => $pager->last);
-#    $t->param(first_page     => 1)                      if $pager->current_page != 1;
-#    $t->param(last_page      => $pager->last_page)      if $pager->current_page != $pager->last_page;
+    $t->param(previous_page  => $pager->{previous_page});
+    $t->param(next_page      => $pager->{next_page});
+    $t->param(first_entry    => $pager->{first_entry});
+    $t->param(last_entry     => $pager->{last_entry});
+    $t->param(first_page     => 1)                      if $pager->{current_page} != 1;
+    $t->param(last_page      => $pager->{last_page})    if $pager->{current_page} != $pager->{last_page};
     return $pager->{total_entries};
 }
 
