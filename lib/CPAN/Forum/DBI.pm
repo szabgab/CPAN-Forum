@@ -262,7 +262,7 @@ sub mypager {
     my ($where, @values) = $self->_prep_where($args{where});
     $CPAN::Forum::logger->debug("where='$where'");
 
-    my $fetch_sql = "SELECT posts.id, subject, thread, date, username FROM posts, users";
+    my $fetch_sql = "SELECT posts.id, subject, thread, date, username, groups.name group_name FROM posts, users, groups";
     my $count_sql = "SELECT COUNT(*) FROM posts";
     my @fetch_values = @values;
 
@@ -276,7 +276,7 @@ sub mypager {
     } else {
         $fetch_sql = " WHERE ";
     }
-    $fetch_sql .= " users.id=posts.uid";
+    $fetch_sql .= " users.id=posts.uid AND groups.id=posts.gid";
 
     my $order_by = $args{order_by};
     $order_by =~ s/^\s*id/posts.id/;
