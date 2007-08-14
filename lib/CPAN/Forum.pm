@@ -758,7 +758,7 @@ sub build_listing {
     
     foreach my $post (@$it) {
         #$self->log->debug(Data::Dumper->Dump([$post], ['post']));
-        $self->log->debug("id=" . $post->id);
+        #$self->log->debug("id=" . $post->id);
 #warn "called for each post";
         my $thread = $post->thread;
         my $thread_count = ($thread and $threads->{$thread}) ? $threads->{$thread}{cnt} : 0;

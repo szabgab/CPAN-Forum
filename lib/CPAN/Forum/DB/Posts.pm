@@ -127,14 +127,12 @@ sub mysearch {
     #%where = (1 => 1) if not %where;
     $CPAN::Forum::logger->debug(Data::Dumper->Dump([\%where], ['where']));
 
-    my $pager = __PACKAGE__->pager(
+    my $pager = __PACKAGE__->mypager(
         where         => \%where,
         per_page      => $params->{per_page} || 10,
         page          => $params->{page}     || 1,
         order_by      => $params->{order_by} || "id DESC",
     );
-
-    #my $sql = "SELECT COUNT(*) FROM posts";
 }
 
 sub list_counted_posts {

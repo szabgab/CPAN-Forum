@@ -202,9 +202,29 @@ sub _prep_where {
     #Carp::cluck (Data::Dumper->Dump([$args], ['args']));
 
     my @fields = keys %$args;
-    my $where = join " AND ", map {"$_=?"} @fields;
+    my @FIELDS;
+    my @values;
+    foreach my $f (@fields) {
+        if (not ref $args->{$f}) {
+            push @FIELDS, "$f=?";
+            push @values, $args->{$f};
+        } elsif ('HASH' eq ref $args->{$f}) {
+            my @k = keys %{ $args->{$f} };
+            Carp::croak("don't know how to handle more than one keys in $f") if @k != 1;
+            if ($k[0] eq 'LIKE') {
+                push @FIELDS, "$f LIKE ?";
+                push @values, $args->{$f}{$k[0]};
+            } else {
+                Carp::croak("don't know how to handle $k[0] in $f");
+            }
+        } else {
+            Carp::croak("don't know how to handle $args->{$f}");
+        }
+    }
+
+    my $where = join " AND ", @FIELDS;
     my %args = %$args;
-    return ($where, @args{@fields}); 
+    return ($where, @values); 
 }
 
 sub _prep_set {
@@ -237,6 +257,36 @@ sub _prep_insert {
     #return ($fields, $placeholders, @{ $args->{@fields} }); 
 }
 
+sub mypager {
+    my ($self, %args) = @_;
+    my ($where, @values) = $self->_prep_where($args{where});
+    $CPAN::Forum::logger->debug("where='$where'");
 
+    my $fetch_sql = "";
+    my $count_sql = "SELECT COUNT(*) FROM posts";
+    my @fetch_values;
+
+    if ($where) {
+        $fetch_sql .= " WHERE $where";
+        $count_sql .= " WHERE $where";
+    }
+
+    $fetch_sql .= " LIMIT ?";
+    my $limit = $args{per_page} || 10;
+    push @fetch_values, $limit;
+
+    my $page = $args{page} || 1;
+    if ($page > 1) {
+        $fetch_sql .= " OFFSET ?";
+        push @fetch_values, $limit*($page-1);
+    }
+
+    $fetch_sql .= "ORDER BY $args{order_by}";
+    $CPAN::Forum::logger->debug("count_sql='$count_sql' " . Data::Dumper->Dump([\@values], ['values']));
+    my $total = $self->_fetch_single_value($count_sql, @values);
+    $CPAN::Forum::logger->debug("total='$total'");
+
+    return {};
+}
 1;
 
