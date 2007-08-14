@@ -3,6 +3,8 @@ use strict;
 use warnings;
 
 # currently returning the number of results but this might change
+# ->_search_results($t, {where => {}, page => $n});
+# $t is an HTML::Template to be filled
 sub _search_results {
     my ($self, $t, $params) = @_;
     
@@ -10,6 +12,7 @@ sub _search_results {
 
     my $pager   = CPAN::Forum::DB::Posts->mysearch($params);
     my @results = $pager->search_where();
+    $self->log->debug(Data::Dumper->Dump([\@results], ['results']));
     my $total   = $pager->total_entries;
     $self->log->debug("number of entries: total=$total");
     my $data = $self->build_listing(\@results);
