@@ -13,10 +13,8 @@ use CPAN::Forum::DB::Posts;
 use CPAN::Forum::DB::Subscriptions_all;
 use CPAN::Forum::DB::Subscriptions_pauseid;
 use CPAN::Forum::DB::Subscriptions;
-use CPAN::Forum::DB::UserInGroup;
-use CPAN::Forum::DB::Users;
-
 use CPAN::Forum::DB::Tags;
+use CPAN::Forum::DB::Users;
 
 
 1;
