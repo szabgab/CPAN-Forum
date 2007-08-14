@@ -1273,9 +1273,9 @@ sub _post {
     my ($self, $post) = @_;
     my $responses = CPAN::Forum::DB::Posts->list_posts_by(parent => $post->{id}); # SQL
 
-    my $user = CPAN::Forum::DB::Users->info_by(id => $post->{uid}); # SQL
+    #my $user = CPAN::Forum::DB::Users->info_by(id => $post->{uid}); # SQL
     my %post = (
-        postername  => $user->{username},
+        postername  => $post->{username},
         date        => _post_date($post->{date}),
         parentid    => $post->{parent},
         responses   => $responses,
@@ -1315,7 +1315,9 @@ sub _text_escape {
 
 =head2 threads
 
-Show all the posts of a thread.
+Show all the posts of a single thread.
+
+/threads/NNN
 
 =cut
 
@@ -1331,6 +1333,7 @@ sub threads {
     my $id = $q->param("id");
     $id = ${$self->param("path_parameters")}[0] if ${$self->param("path_parameters")}[0];
 
+    #my @posts = CPAN::Forum::DB::Posts->posts_in_thread($id);
     my @posts = CPAN::Forum::DB::Posts->search(thread => $id);
     if (not @posts) {
         return $self->internal_error(
