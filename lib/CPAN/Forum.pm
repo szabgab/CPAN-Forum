@@ -745,7 +745,15 @@ sub build_listing {
     my ($self, $it) = @_;
     
     my @resp;
-    my @threads = map {$_->thread} @$it;
+
+    # eliminate undefs and duplicates (TODO: I don't know why are there such values)
+    my %seen;
+    foreach my $p (@$it) {
+        next if not defined $p->thread;
+        $seen{$p->thread}++;
+    }
+    my @threads = keys %seen;
+
     my $threads = CPAN::Forum::DB::Posts->count_threads(@threads); #SQL
     
     foreach my $post (@$it) {
