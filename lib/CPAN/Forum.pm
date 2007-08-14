@@ -1102,6 +1102,7 @@ sub posts {
             $t->param(thread_id    => $post->{thread});
             $t->param(thread_count => $thread_count);
         }
+        $post->{responses} = CPAN::Forum::DB::Posts->list_posts_by(parent => $post->{id}); # SQL
         my %post = %{$self->_post($post)};
         $t->param(%post);
         
@@ -1271,15 +1272,13 @@ sub _post_date {
 
 sub _post {
     my ($self, $post) = @_;
-    my $responses = $post->{responses} || CPAN::Forum::DB::Posts->list_posts_by(parent => $post->{id}); # SQL
-    $self->log->debug(Data::Dumper->Dump([$responses], ['responses']));
-    
+    $self->log->debug(Data::Dumper->Dump([$post], ['post']));
 
     my %post = (
         postername  => $post->{username},
         date        => _post_date($post->{date}),
         parentid    => $post->{parent},
-        responses   => $responses,
+        responses   => $post->{responses},
         text        => $self->_text_escape($post->{text}),
         id          => $post->{id},
         subject     => _subject_escape($post->{subject}),
