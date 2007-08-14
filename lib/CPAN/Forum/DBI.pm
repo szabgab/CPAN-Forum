@@ -199,6 +199,7 @@ sub delete {
 }
 
 # _prep_where({ field => value, field2 => value2 });
+# _prep_where({ field => [v1, v2, v3]);
 # return("field=? AND field2=?",    value, value2);
 sub _prep_where {
     my ($self, $args) = @_;
@@ -218,10 +219,13 @@ sub _prep_where {
                 push @FIELDS, "$f LIKE ?";
                 push @values, $args->{$f}{$k[0]};
             } else {
-                Carp::croak("don't know how to handle $k[0] in $f");
+                Carp::croak("don't know how to handle $k[0] of field $f " . Data::Dumper->Dump([$args], ['args']));
             }
+        } elsif ('ARRAY' eq ref $args->{$f}) {
+            push @FIELDS, "$f IN (" . (join ", ", (("?") x @{ $args->{$f} })) . ")";
+            push @values, @{ $args->{$f} };
         } else {
-            Carp::croak("don't know how to handle $args->{$f}");
+            Carp::croak("don't know how to handle $args->{$f} of field $f " . Data::Dumper->Dump([$args], ['args']));
         }
     }
 
