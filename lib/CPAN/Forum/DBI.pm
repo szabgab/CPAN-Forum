@@ -1,28 +1,31 @@
 package CPAN::Forum::DBI;
 use strict;
 use warnings;
-use base 'Class::DBI';
 use Carp qw();
 
-use Class::DBI::Plugin::AbstractCount;      # pager needs this
-use Class::DBI::Plugin::Pager;
-
 use DBI;
-my $dbh_connected;
+my $dbh;
 
 sub myinit {
     my $class = shift;
     my $db_connect = shift;
-    if (not $dbh_connected) {
-        $dbh_connected = __PACKAGE__->connection($db_connect, '', '', 
+    if (not $dbh) {
+        $dbh = DBI->connect($db_connect, '', '', 
                     {
+                        RaiseError       => 1,
+                        PrintError       => 1,
+                        AutoCommit       => 1,
+                        FetchHashKeyName => 'NAME_lc',
                     });
-        my $dbh = CPAN::Forum::DBI::db_Main();
-        #warn $dbh;
         $dbh->{HandleError} = sub { Carp::confess(shift); };
     }
-    return $dbh_connected;
+    return $dbh;
 }
+
+sub db_Main {
+    return $dbh;
+}
+
 
 our @group_types = ("None", "Global", "Field", "Distribution", "Module");
 our %group_types;

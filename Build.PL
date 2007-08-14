@@ -29,7 +29,6 @@ my $builder = Module::Build->new(
         'WWW::Mechanize'                        => 0,
         'DBI'                                   => 0,
         'DBD::SQLite'                           => 0.31,
-        'Class::DBI'                            => 0,  # It was complaining: ERROR: Version v3.0.14 of Class::DBI is installed, but we need version >= 0.96
 #       'Crypt::SSLeay'                         => 0,  # needed for http access to PAUSE
         'Parse::CPAN::Packages'                 => '2.26',  # for populating and maybe also later ?
         'LWP::Simple'                           => 0,  # for populate
@@ -38,8 +37,6 @@ my $builder = Module::Build->new(
         'Mail::Sendmail'                        => 0,  
         'CGI::Session::SQLite'                  => 0,
         'Parse::RecDescent'                     => 0,
-        'Class::DBI::Plugin::AbstractCount'     => 0,
-        'Class::DBI::Plugin::Pager'             => 0,
         'Text::CSV_XS'                          => 0,
         'List::MoreUtils'                       => 0,
         'Test::WWW::Mechanize'                  => 0.02,
