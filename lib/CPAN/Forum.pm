@@ -527,7 +527,8 @@ my @free_modes = qw(
     rss
     atom
     tags
-); 
+    m
+);
 my @restricted_modes = qw(
     new_post process_post
     mypan 
@@ -559,6 +560,7 @@ my @urls = qw(
     atom
     update
     tags
+    m
 ); 
 
 use base 'CPAN::Forum::RM::Author';
@@ -1615,6 +1617,31 @@ sub process_missing_dist {
         $self->log->debug("Could not add distribution $dist_name: $@");
         return;
     }
+}
+
+sub m {
+    my ($self) = @_;
+    my $path = ${$self->param("path_parameters")}[0] || '';
+    my $value = ${$self->param("path_parameters")}[1] || '';
+
+
+    my $tags = '';
+print STDERR "here '$path'\n";
+    if ($path eq "list_tags") {
+        my $gr = CPAN::Forum::DB::Groups->info_by(name => $value); # SQL
+        if ($gr) {
+            my $gid = $gr->{id};
+            my $modules = CPAN::Forum::DB::Tags->get_tags_of_module($gid); # SQL
+            use Data::Dumper;
+            print STDERR Dumper $modules;
+            $tags = join ",", map {"$_->{name},$_->{cnt}"} @$modules;
+        }
+    }
+
+    return <<"END_JAVASCRIPT";
+var cpan_forum_tags = "$tags";
+END_JAVASCRIPT
+
 }
 
 sub _check_dist_info {
