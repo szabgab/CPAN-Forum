@@ -1,0 +1,10 @@
+
+#cpanforum_tags {
+    display: inline;
+}
+
+#cpanforum_tags li {
+    display: inline;
+    padding: 2px;
+    /* background-color: red; */
+}
