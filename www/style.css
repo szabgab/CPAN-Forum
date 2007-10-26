@@ -47,11 +47,11 @@ BODY {
 	color: #000000;
 }
 TABLE.message {
-	border-width: 3;
+	border-width: 3px;
 	border-style: groove;
-	border-collapse: no;
+	/*border-collapse: no; */
 	table-layout: fixed;
-	align: 
+	/*align: */
 	width: 90%;
 }
 .message_row_head {
@@ -235,7 +235,7 @@ INPUT {
 .text {
 	background: #eeeeee;
 /*	white-space: pre;*/
-	table-width: 80%;
+	/*table-width: 80%;*/
 }
 .code {
 	background: #dddddd;

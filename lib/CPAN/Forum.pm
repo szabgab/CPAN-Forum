@@ -1626,15 +1626,14 @@ sub m {
 
 
     my $tags = '';
-print STDERR "here '$path'\n";
     if ($path eq "list_tags") {
         my $gr = CPAN::Forum::DB::Groups->info_by(name => $value); # SQL
         if ($gr) {
             my $gid = $gr->{id};
             my $modules = CPAN::Forum::DB::Tags->get_tags_of_module($gid); # SQL
-            use Data::Dumper;
-            print STDERR Dumper $modules;
-            $tags = join ",", map {"$_->{name},$_->{cnt}"} @$modules;
+            #use Data::Dumper;
+            #print STDERR Dumper $modules;
+            $tags = join ",", map {"$_->{name}:$_->{cnt}"} @$modules;
         }
     }
 

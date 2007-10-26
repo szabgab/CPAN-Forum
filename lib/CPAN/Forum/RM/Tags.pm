@@ -16,6 +16,8 @@ sub tags {
     $self->log->debug("tags path='$path' value='$value'");
     if ($path eq 'name' and $value) {
         return $self->_list_modules_with_tag($value);
+    } elsif ($path eq 'name_popup') {
+        return $self->_list_modules_with_tag($value, 'popup/');
     } elsif ($path eq 'user' and $value) {
         my $tags = CPAN::Forum::DB::Tags->get_tags_of_user($value); # SQL
         return $self->_list_tags($tags, {user_name => $value});
@@ -49,9 +51,10 @@ sub _list_tags {
 }
 
 sub _list_modules_with_tag {
-    my ($self, $value) = @_;
+    my ($self, $value, $type) = @_;
+    $type ||= '';
 
-    my $t = $self->load_tmpl("modules_with_tags.tmpl",
+    my $t = $self->load_tmpl("${type}modules_with_tags.tmpl",
         loop_context_vars => 1,
         global_vars => 1,
     );
@@ -59,7 +62,6 @@ sub _list_modules_with_tag {
     $t->param(tag => $value);
     $t->param(modules => $modules);
     return $t->output; 
-    
 }
 
 1;
