@@ -1,7 +1,19 @@
+<html>
+<head>
+<script language="javascript">
+
+function show(url) {
+    window.opener.location = url;
+    window.close();
+}
+</script>
+
+</head>
+<body>
 <TMPL_IF loggedin>You are logged in to CPAN::Forum as <TMPL_VAR username></TMPL_IF>
 <TMPL_IF admin></TMPL_IF>
 <TMPL_IF test_site_warning>
-<p class="warning">Warning: this is a test site, the data here will be deleted.<br />
-For real use, please visit the <a href="http://www.cpanforum.com/">the live site</a>.</p>
+<p class="warning">Warning: this is a test site, the data here will be deleted.</p>
 </TMPL_IF>
+
 

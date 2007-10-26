@@ -61,6 +61,10 @@ sub _list_modules_with_tag {
     my $modules = CPAN::Forum::DB::Tags->get_modules_with_tag($value); # SQL
     $t->param(tag => $value);
     $t->param(modules => $modules);
+
+    my $referer = $ENV{HTTP_REFERER} || '';
+    $referer =~ s{^(https?://[^/]+).*}{$1};
+    $t->param(referer => "$referer/dist");
     return $t->output; 
 }
 

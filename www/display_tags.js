@@ -32,11 +32,7 @@ function cpan_forum_show_tags_as_li() {
 }
 
 function cpan_forum_popup_tag(tag) {
-    var w = window.open(cpan_forum_url + '/tags/name_popup/' + tag, 'cpan_forum_list_distros', "width=600,height=300");
-    //w.document.write("Tag: '" + tag + "'<br/>");
-    //var distros = cpan_forum_get_distros_by_tag(tag);
-    //for(var i=0; i<distros.length; i++) {
-    //    w.document.write('<a href="/dist/' + distros[i] + '">' + distros[i] + '</a><br>');
-    //}
+    var w = window.open(cpan_forum_url + '/tags/name_popup/' + tag, 'cpan_forum_list_distros', "width=600,height=300,resizable=1");
+    w.focus(1);
 }
 
