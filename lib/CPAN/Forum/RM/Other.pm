@@ -49,7 +49,7 @@ sub stats {
     $t->param(users_cnt => $users_cnt);
     $t->param(users  => $top_users);
 
-    my $tagging_users_cnt = 10;
+    my $tagging_users_cnt = 20;
     my $top_tagging_users = CPAN::Forum::DB::Tags->stat_tags_by_user($tagging_users_cnt); # SQL
     $t->param(tagging_users_cnt => $tagging_users_cnt);
     $t->param(tagging_users  => $top_tagging_users);
