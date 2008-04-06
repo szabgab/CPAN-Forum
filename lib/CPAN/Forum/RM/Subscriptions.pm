@@ -208,6 +208,7 @@ sub update_subscription {
     return $self->notes("mypanok");
 
 =pod
+
     # I think we don't need to provide this
     # A user either comes from the page of a Module ( /dist/Module-Name) 
     # and then we already have the value.
@@ -261,6 +262,7 @@ sub update_subscription {
     }
 
     return $self->notes("mypanok");
+
 =cut
 
 }

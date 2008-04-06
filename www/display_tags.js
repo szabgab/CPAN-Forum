@@ -19,7 +19,6 @@ function cpan_forum_show_tags_as_li() {
     var tags = cpan_forum_list_tags()
     var t =  document.getElementById('cpanforum_tags');
     for(var i=0; i<tags.length; i++) {
-        //alert(tags[i]);
         li = document.createElement('li');
         a  = document.createElement('a');
         a.setAttribute('href', 'javascript:cpan_forum_popup_tag("' + tags[i] + '")');
@@ -28,8 +27,19 @@ function cpan_forum_show_tags_as_li() {
         li.appendChild(a);
         t.appendChild(li);
     }
-//    alert(tags.length);
+    
+    //text should be either add tags or update tags
+    
+    var link_text = (tags.length > 0 ? "update" : "add") + " tags";
+    li = document.createElement('li');
+    a  = document.createElement('a');
+    a.setAttribute('href', 'javascript:cpan_forum_popup("' + "qq" + '")');
+    var text = document.createTextNode(tags.length);
+    a.appendChild(text);
+    li.appendChild(a);
+    t.appendChild(li);
 }
+
 
 function cpan_forum_popup_tag(tag) {
     var w = window.open(cpan_forum_url + '/tags/name_popup/' + tag, 'cpan_forum_list_distros', "width=600,height=300,resizable=1");

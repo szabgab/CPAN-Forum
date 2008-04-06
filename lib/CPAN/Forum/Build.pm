@@ -22,7 +22,7 @@ sub ACTION_build {
     
     system "rm -rf blib";
     copy_tree(from => ".", dir => "blib");
-    replace_sh_bang("$Bin/blib", <blib/bin/* blib/www/cgi/*>);
+    replace_sh_bang("$Bin/blib", glob "blib/bin/* blib/www/cgi/*";
 }
 
 sub ACTION_install {
@@ -34,7 +34,7 @@ sub ACTION_install {
     }
 
     copy_tree(from => "blib", dir => $dir);
-    replace_sh_bang("$dir", <$dir/bin/* $dir/www/cgi/*>);
+    replace_sh_bang("$dir", glob "$dir/bin/* $dir/www/cgi/*");
 }
 
 # Replace the sh_bang line on each one of the scripts in the build directory

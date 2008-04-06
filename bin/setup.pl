@@ -45,7 +45,7 @@ chmod 0777, $dbfile;
 
 
 my $from = delete $opt{from};
-CPAN::Forum::DB::Configure->create({field => 'from', value => $from});
+CPAN::Forum::DB::Configure->set_field_value('from', $from);
 
 my $user = CPAN::Forum::DB::Users->create({id => 1, update_on_new_user => 1, %opt});
 $user->password($opt{password});

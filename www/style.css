@@ -42,6 +42,10 @@ BODY {
 	padding-bottom:1px;
 /*	width: 780px;*/
 }
+.perlads li {
+    display: inline;
+    padding: 4px;
+}
 
 .message {
 	color: #000000;

@@ -2,6 +2,7 @@ package CPAN::Forum::DBI;
 use strict;
 use warnings;
 use Carp qw();
+use Data::Dumper ();
 
 use DBI;
 my $dbh;
