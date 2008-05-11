@@ -69,7 +69,7 @@ sub login_process {
     eval {
         if ($request eq 'new_post') {
             my $request_group = $session->param("request_group") || '';
-            $self->param("path_parameters" => [$request_group]);
+            $self->query->param("path_parameters" => [$request_group]);
         }
         $response = $self->$request();
     };

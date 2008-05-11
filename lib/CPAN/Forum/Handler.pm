@@ -22,7 +22,7 @@ sub handler {
 	    PARAMS => {
 		    ROOT       => $ENV{CPANFORUM_ROOT},
             DB_CONNECT => "dbi:SQLite:$ENV{CPANFORUM_ROOT}/db/forum.db",
-            REQUEST    => ($ENV{SCRIPT_NAME} || '') . ($ENV{PATH_INFO} || ''),
+            #REQUEST    => ($ENV{SCRIPT_NAME} || '') . ($ENV{PATH_INFO} || ''),
 	    },
     );
     $app->run();

@@ -14,7 +14,7 @@ sub users {
     my $q = $self->query;
 
     my $username="";
-    $username = ${$self->param("path_parameters")}[0];
+    $username = ${$self->query->param("path_parameters")}[0];
 
     if (not $username) {
         return $self->internal_error("No username");

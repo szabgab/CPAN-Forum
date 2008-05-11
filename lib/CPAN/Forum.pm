@@ -28,15 +28,6 @@ my %errors = (
     "ERR open_code_without_closing" => "open <code> tag without closing tag",
 );
 
-our $logger;
-$SIG{__WARN__} = sub {
-    if ($logger) {
-        $logger->warning($_[0]);
-    } else {
-        print STDERR $_[0];
-    }
-};
-
 =head1 NAME
 
 CPAN::Forum - Web forum application to discuss CPAN modules
@@ -447,10 +438,7 @@ sub cgiapp_init {
     );
 
     $self->log->debug("--- START ---");
-    $CPAN::Forum::logger = $self->log;
     
-
-    $self->log->debug("Cookie received: "  . ($self->query->cookie($cookiename) || "") );
     CGI::Session->name($cookiename);
     $self->session_config(
         #CGI_SESSION_OPTIONS => [ "driver:File", $self->query, {Directory => "/tmp"}],
@@ -462,24 +450,38 @@ sub cgiapp_init {
         SEND_COOKIE         => 0,
 
     );
-    $self->log->debug("sid:  " . ($self->session->id() || ""));
     
-    $self->header_props(
-        -charset => "utf-8",
-    );
+}
+
+# overriding the run method, to momentarily install warnings handler
+# can we use other way then a global $logger? -shmuel
+our $logger;
+sub run {
+    my ($self) = @_;
+    local $logger = sub { $self->log->warning($_[0]) };
+    local $SIG{__WARN__} = $logger;
+    $self->SUPER::run();
+    #$SIG{__WARN__} = sub {
+    #    if ($logger) {
+    #        $logger->warning($_[0]);
+    #    } else {
+    #        print STDERR $_[0];
+    #    }
+    #};
 }
 
 sub _logger {
     my ($self, %h) = @_;
     my ($package, $filename, $line, $sub) = caller(6);
     my $root = $self->param("ROOT");
+    my $q = $self->query;
     $filename =~ s/^$root//;
     return sprintf "[%s] - %s - [%s] [%s] [%s] [%s(%s)] %s\n",
             POSIX::strftime("%Y-%m-%d %H:%M:%S", localtime), 
             $h{level}, 
             ($ENV{REMOTE_ADDR} || ''),
             ($ENV{HTTP_REFERER} || ''),
-            ($self->param('REQUEST')),
+            $q->script_name . $q->path_info, #($self->param('REQUEST')),
             $filename, $line,
             $h{message};
             # keys of the hash: level, message, name
@@ -587,6 +589,7 @@ sub setup {
     $self->start_mode("home");
     $self->run_modes([@free_modes, @restricted_modes]);
     $self->run_modes(AUTOLOAD => "autoload");
+    $self->error_mode('error');
 }
 
 =head2 cgiapp_prerun
@@ -599,7 +602,9 @@ Maybe we should move his code to the mode_param method ?
 sub cgiapp_prerun {
     my $self = shift;
 
-    $self->error_mode('error');
+    $self->header_props(
+        -charset => "utf-8",
+    );
 
     my $status = $self->status();
     $self->log->debug("Status:  $status"); 
@@ -614,6 +619,7 @@ sub cgiapp_prerun {
     $self->log->debug("Current runmode:  $rm");
     $self->log->debug("Current user:  " . ($self->session->param("username") || ""));
     $self->log->debug("Current sid:  " . ($self->session->id() || ""));
+    $self->log->debug("Cookie received: "  . ($self->query->cookie($cookiename) || "") );
 
     if (any {$rm eq $_} @free_modes) {
         $self->log->debug('Free mode');
@@ -625,7 +631,7 @@ sub cgiapp_prerun {
         $self->log->debug("Showing login");
         $self->session->param(request => $rm);
         if ($rm eq 'new_post') {
-            my $group = ${$self->param("path_parameters")}[0];
+            my $group = ${$self->query->param("path_parameters")}[0];
             $self->session->param(request_group => $group);
         }
         $self->prerun_mode('login');
@@ -637,7 +643,7 @@ sub cgiapp_prerun {
 sub _set_run_mode {
     my ($self) = @_;
 
-    $self->param(path_parameters => []);
+    $self->query->param(path_parameters => []);
 
     my $rm = $self->get_current_runmode();
     return $rm if $rm and $rm ne 'home'; # alredy has run-mode
@@ -646,7 +652,7 @@ sub _set_run_mode {
     my $q = $self->query;
 
     # override rm based on REQUEST
-    my $request = $self->param('REQUEST');
+    my $request = $q->script_name . $q->path_info; # $self->param('REQUEST');
     if ($request =~ m{^/
                     ([^/]+)        # first word till after the first /
                     (?:/(.*))?     # the rest, after the (optional) second /
@@ -655,7 +661,7 @@ sub _set_run_mode {
         my $params = $2 || "";
         if (any {$newrm eq $_} @urls) {
             my @params = split /\//, $params;
-            $self->param(path_parameters => @params ? \@params : []);
+            $self->query->param(path_parameters => @params ? \@params : []);
             $rm = $newrm;
         } elsif ($request eq "/cgi/index.pl") {
             # this should be ok here
@@ -1030,7 +1036,7 @@ sub posts {
     my $new_group_id = "";
     
     if ($rm eq "new_post") {
-        $new_group = ${$self->param("path_parameters")}[0] || "";
+        $new_group = ${$self->query->param("path_parameters")}[0] || "";
         $new_group_id = $q->param('new_group') if $q->param('new_group');
         $self->log->debug("A: new_group: '$new_group' and id: '$new_group_id'");
         
@@ -1100,7 +1106,7 @@ sub posts {
     
     my $id = $q->param("id");  # there was an id 
     if ($rm eq "response_form" or $rm eq "posts") {
-        $id = ${$self->param("path_parameters")}[0] if ${$self->param("path_parameters")}[0];
+        $id = ${$self->query->param("path_parameters")}[0] if ${$self->query->param("path_parameters")}[0];
     }
     $id ||= $q->param("new_parent");
     if ($id) { # Show post
@@ -1343,7 +1349,7 @@ sub threads {
     );
     
     my $id = $q->param("id");
-    $id = ${$self->param("path_parameters")}[0] if ${$self->param("path_parameters")}[0];
+    $id = ${$self->query->param("path_parameters")}[0] if ${$self->query->param("path_parameters")}[0];
 
     my $posts = CPAN::Forum::DB::Posts->posts_in_thread($id); # SQL
     if (not @$posts) {
@@ -1535,9 +1541,10 @@ sub site_is_closed {
     $_[0]->load_tmpl("site_is_closed.tmpl")->output;
 }
 
-sub teardown {
-    my ($self) = @_;
-    $self->log->debug("teardown called");
+sub cgiapp_postrun {
+    my $self = shift;
+    my $output_ref = shift;
+
     my $rm = $self->get_current_runmode();
     if (not  $self->session->param('loggedin')  and $rm ne "login") {
         $self->log->debug("not logged in, deleting session");
@@ -1553,6 +1560,11 @@ sub teardown {
         my $rm = $self->get_current_runmode();
         $self->log->warning("Long request. Ellapsed time: $ellapsed_time on run-mode: $rm"); 
     }
+}
+
+sub teardown {
+    my ($self) = @_;
+    $self->log->debug("teardown called");
 }
 
 sub _my_sendmail {
@@ -1621,8 +1633,8 @@ sub process_missing_dist {
 
 sub m {
     my ($self) = @_;
-    my $path = ${$self->param("path_parameters")}[0] || '';
-    my $value = ${$self->param("path_parameters")}[1] || '';
+    my $path = ${$self->query->param("path_parameters")}[0] || '';
+    my $value = ${$self->query->param("path_parameters")}[1] || '';
 
 
     my $tags = '';

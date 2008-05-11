@@ -42,7 +42,7 @@ sub mypan {
             );
     }
 
-    my @params = @{$self->param("path_parameters")};
+    my @params = @{$self->query->param("path_parameters")};
     my ($gids, $subscriptions);
     if (@params == 2 and $params[0] eq "dist") {
         my $group_name = $params[1];
