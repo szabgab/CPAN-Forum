@@ -2,6 +2,7 @@
   Tests  *  Tests   *   Tests
 
   stop using Class::DBI, use plain SQL calls
+    shmuel: I don't see where we use Class::DBI
 
   move database to PostgreSQL
 

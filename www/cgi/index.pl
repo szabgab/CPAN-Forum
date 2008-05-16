@@ -13,7 +13,7 @@ my $app = CPAN::Forum->new(
 	PARAMS => {
 		ROOT       => $ENV{CPANFORUM_ROOT},
         DB_CONNECT => "dbi:SQLite:$ENV{CPANFORUM_ROOT}/db/forum.db",
-        REQUEST    => $ENV{PATH_INFO},
+        #REQUEST    => $ENV{PATH_INFO},
 	},
 );
 $app->run();

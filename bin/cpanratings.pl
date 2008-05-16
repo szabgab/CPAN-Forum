@@ -19,7 +19,7 @@ my $dbfile = "$dir/forum.db";
 CPAN::Forum::DBI->myinit($dbfile);
 
 
-open my $fh, $file or die "Could not open '$file'\n";
+open my $fh, "<", $file or die "Could not open '$file'\n";
 my $line = <$fh>;
 chomp $line;
 

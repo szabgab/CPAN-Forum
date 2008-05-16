@@ -418,39 +418,8 @@ sub cgiapp_init {
     CPAN::Forum::DBI->myinit($db_connect);
     my $dbh = CPAN::Forum::DBI::db_Main();
     
-    my $log       = $self->param("ROOT") . "/db/messages.log";
     $STATUS_FILE  = $self->param("ROOT") . "/db/status";
-    my $log_level = $self->_set_log_level();
-
-    $self->log_config(
-        LOG_DISPATCH_MODULES => [
-        {
-            module            => 'Log::Dispatch::File',
-            name              => 'messages',
-            filename          => $log,
-            min_level         => $log_level,
-            mode              => 'append',
-            callbacks         => sub { $self->_logger(@_)},
-            close_after_write => 1,
-        },
-        ],
-        APPEND_NEWLINE => 1,
-    );
-
-    $self->log->debug("--- START ---");
-    
     CGI::Session->name($cookiename);
-    $self->session_config(
-        #CGI_SESSION_OPTIONS => [ "driver:File", $self->query, {Directory => "/tmp"}],
-        #CGI_SESSION_OPTIONS => [ "driver:SQLite", $self->query, {Handle => $dbh}],
-        COOKIE_PARAMS       => {
-                -expires => '+14d',
-                -path    => '/',
-        },
-        SEND_COOKIE         => 0,
-
-    );
-    
 }
 
 # overriding the run method, to momentarily install warnings handler
@@ -458,16 +427,9 @@ sub cgiapp_init {
 our $logger;
 sub run {
     my ($self) = @_;
-    local $logger = sub { $self->log->warning($_[0]) };
-    local $SIG{__WARN__} = $logger;
+    local $logger = $self->log;
+    local $SIG{__WARN__} = sub { $self->log->warning($_[0]) };
     $self->SUPER::run();
-    #$SIG{__WARN__} = sub {
-    #    if ($logger) {
-    #        $logger->warning($_[0]);
-    #    } else {
-    #        print STDERR $_[0];
-    #    }
-    #};
 }
 
 sub _logger {
@@ -586,6 +548,38 @@ Standard CGI::Application method
 
 sub setup {
     my $self = shift;
+
+    my $log       = $self->param("ROOT") . "/db/messages.log";
+    my $log_level = $self->_set_log_level();
+
+    $self->log_config(
+        LOG_DISPATCH_MODULES => [
+        {
+            module            => 'Log::Dispatch::File',
+            name              => 'messages',
+            filename          => $log,
+            min_level         => $log_level,
+            mode              => 'append',
+            callbacks         => sub { $self->_logger(@_)},
+            close_after_write => 1,
+        },
+        ],
+        APPEND_NEWLINE => 1,
+    );
+
+    $self->log->debug("--- START ---");
+    
+    $self->session_config(
+        #CGI_SESSION_OPTIONS => [ "driver:File", $self->query, {Directory => "/tmp"}],
+        #CGI_SESSION_OPTIONS => [ "driver:SQLite", $self->query, {Handle => $dbh}],
+        COOKIE_PARAMS       => {
+                -expires => '+14d',
+                -path    => '/',
+        },
+        SEND_COOKIE         => 0,
+
+    );
+
     $self->start_mode("home");
     $self->run_modes([@free_modes, @restricted_modes]);
     $self->run_modes(AUTOLOAD => "autoload");
@@ -604,6 +598,7 @@ sub cgiapp_prerun {
 
     $self->header_props(
         -charset => "utf-8",
+        -type    => 'text/html',
     );
 
     my $status = $self->status();

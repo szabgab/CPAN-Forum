@@ -22,7 +22,7 @@ sub ACTION_build {
     
     system "rm -rf blib";
     copy_tree(from => ".", dir => "blib");
-    replace_sh_bang("$Bin/blib", glob "blib/bin/* blib/www/cgi/*";
+    replace_sh_bang("$Bin/blib", glob "blib/bin/* blib/www/cgi/*");
 }
 
 sub ACTION_install {
