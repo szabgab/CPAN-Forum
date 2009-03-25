@@ -47,10 +47,10 @@ chmod 0777, $dbfile;
 my $from = delete $opt{from};
 CPAN::Forum::DB::Configure->set_field_value('from', $from);
 
-my $user = CPAN::Forum::DB::Users->create({id => 1, update_on_new_user => 1, %opt});
-$user->password($opt{password});
-$user->update;
-CPAN::Forum::DB::Usergroups->create({id => 1, name => "admin"});
+CPAN::Forum::DB::Users->add_user({id => 1, update_on_new_user => 1, %opt});
+CPAN::Forum::DB::Users->update(1, password => $opt{password});
+
+CPAN::Forum::DB::Users->add_usergroup({id => 1, name => "admin"});
 CPAN::Forum::DB::UserInGroup->create({uid => 1, gid => 1});
 
 

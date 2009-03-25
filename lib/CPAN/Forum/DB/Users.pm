@@ -19,6 +19,19 @@ sub add_user {
     return $self->_fetch_single_hashref($sql, lc $args->{username});
 }
 
+sub add_usergroup {
+    my ($self, $args) = @_;
+ 
+    my $dbh = CPAN::Forum::DBI::db_Main();
+    $dbh->do("INSERT INTO users (id, name) VALUES (?, ?)",
+              undef,
+              lc($args->{name}), lc($args->{name}));
+
+#    my $sql = "SELECT id, username, password, email FROM users WHERE username=?";
+#    return $self->_fetch_single_hashref($sql, lc $args->{username});
+    return;
+}
+
 
 sub _generate_pw {
     my ($n) = @_;

@@ -63,7 +63,7 @@ sub init_db {
 sub _fetch_arrayref_of_hashes {
     my ($self, $sql, @args) = @_;
 
-    $CPAN::Forum::logger->debug("SQL:$sql, " . Data::Dumper->Dump([\@args], ['args'])); 
+    #$CPAN::Forum::logger->debug("SQL:$sql, " . Data::Dumper->Dump([\@args], ['args'])); 
     my $dbh = CPAN::Forum::DBI::db_Main();
     my $sth = $dbh->prepare($sql);
     $sth->execute(@args);
@@ -76,7 +76,7 @@ sub _fetch_arrayref_of_hashes {
 sub _fetch_single_hashref {
     my ($self, $sql, @args) = @_;
 
-    $CPAN::Forum::logger->debug("SQL:$sql, " . Data::Dumper->Dump([\@args], ['args'])); 
+    #$CPAN::Forum::logger->debug("SQL:$sql, " . Data::Dumper->Dump([\@args], ['args'])); 
     my $dbh = CPAN::Forum::DBI::db_Main();
     my $sth = $dbh->prepare($sql);
     $sth->execute(@args);
@@ -163,9 +163,9 @@ sub add {
     my ($fields, $placeholders, @values) = $self->_prep_insert($args);
     my $sql = "INSERT INTO $table ($fields) VALUES($placeholders)";
     my $dbh = CPAN::Forum::DBI::db_Main();
-    $CPAN::Forum::logger->debug("SQL:$sql, " 
-            . Data::Dumper->Dump([\@values], ['values'])
-            ); 
+    #$CPAN::Forum::logger->debug("SQL:$sql, " 
+    #        . Data::Dumper->Dump([\@values], ['values'])
+    #        ); 
     $dbh->do($sql, undef, @values);
     return;
 }    
@@ -179,10 +179,10 @@ sub update {
     my ($set, @new_values) = $self->_prep_set($data);
     my $sql = "UPDATE $table SET $set WHERE $where";
     my $dbh = CPAN::Forum::DBI::db_Main();
-    $CPAN::Forum::logger->debug("SQL:$sql, " 
-            . Data::Dumper->Dump([\@new_values], ['new_values'])
-            . Data::Dumper->Dump([\@where_values], ['where_value'])
-            ); 
+    #$CPAN::Forum::logger->debug("SQL:$sql, " 
+    #        . Data::Dumper->Dump([\@new_values], ['new_values'])
+    #        . Data::Dumper->Dump([\@where_values], ['where_value'])
+    #        ); 
     $dbh->do($sql, undef, @new_values, @where_values);
     return;
 }
@@ -268,7 +268,7 @@ sub _prep_insert {
 sub mypager {
     my ($self, %args) = @_;
     my ($where, @values) = $self->_prep_where($args{where});
-    $CPAN::Forum::logger->debug("where='$where'");
+    #$CPAN::Forum::logger->debug("where='$where'");
 
     my $fetch_sql = "SELECT posts.id, subject, thread, date, username, groups.name group_name FROM posts, users, groups";
     my $count_sql = "SELECT COUNT(*) FROM posts";
@@ -301,13 +301,13 @@ sub mypager {
         push @fetch_values, $offset;
     }
 
-    $CPAN::Forum::logger->debug("count_sql='$count_sql' " . Data::Dumper->Dump([\@values], ['values']));
+    #$CPAN::Forum::logger->debug("count_sql='$count_sql' " . Data::Dumper->Dump([\@values], ['values']));
     my $total = $self->_fetch_single_value($count_sql, @values);
-    $CPAN::Forum::logger->debug("total='$total'");
+    #$CPAN::Forum::logger->debug("total='$total'");
 
-    $CPAN::Forum::logger->debug("fetch_sql='$fetch_sql' " . Data::Dumper->Dump([\@fetch_values], ['fetch_values']));
+    #$CPAN::Forum::logger->debug("fetch_sql='$fetch_sql' " . Data::Dumper->Dump([\@fetch_values], ['fetch_values']));
     my $results = $self->_fetch_arrayref_of_hashes($fetch_sql, @fetch_values);
-    $CPAN::Forum::logger->debug(Data::Dumper->Dump([$results], ['results']));
+    #$CPAN::Forum::logger->debug(Data::Dumper->Dump([$results], ['results']));
 
     my $last_page = int($total/$limit);
     if ($last_page != $total/$limit) {
