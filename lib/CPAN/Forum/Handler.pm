@@ -8,7 +8,7 @@ use Apache2::RequestRec ();
 #my $seen;
 
 my $root;
-BEGIN { $root = "$ENV{DOCUMENT_ROOT}/.."; }
+BEGIN { $root = "$ENV{CPANFORUM_ROOT}/.."; }
 use lib "$root/lib";
 use lib "/home/gabor/perl5lib/lib";
 use lib "/home/gabor/perl5lib/lib/i486-linux-gnu-thread-multi";
