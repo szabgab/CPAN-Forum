@@ -51,6 +51,6 @@ CPAN::Forum::DB::Users->add_user({id => 1, update_on_new_user => 1, %opt});
 CPAN::Forum::DB::Users->update(1, password => $opt{password});
 
 CPAN::Forum::DB::Users->add_usergroup({id => 1, name => "admin"});
-CPAN::Forum::DB::UserInGroup->create({uid => 1, gid => 1});
+CPAN::Forum::DB::Users->add_user_to_group(uid => 1, gid => 1);
 
 

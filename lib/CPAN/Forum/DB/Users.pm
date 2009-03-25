@@ -23,9 +23,9 @@ sub add_usergroup {
     my ($self, $args) = @_;
  
     my $dbh = CPAN::Forum::DBI::db_Main();
-    $dbh->do("INSERT INTO users (id, name) VALUES (?, ?)",
+    $dbh->do("INSERT INTO usergroups (id, name) VALUES (?, ?)",
               undef,
-              lc($args->{name}), lc($args->{name}));
+              lc($args->{id}), lc($args->{name}));
 
 #    my $sql = "SELECT id, username, password, email FROM users WHERE username=?";
 #    return $self->_fetch_single_hashref($sql, lc $args->{username});
@@ -111,6 +111,14 @@ sub is_admin {
                user_in_group.gid=usergroups.id
                ";
     $self->_fetch_single_value($sql, $id);
+}
+
+sub add_user_to_group {
+	my ($self, %args) = @_;
+	my $sql = "INSERT INTO user_in_group (uid, gid) VALUES(?, ?)";
+
+    my $dbh = CPAN::Forum::DBI::db_Main();
+    $dbh->do($sql, undef, $args{uid}, $args{gid});
 }
 
 

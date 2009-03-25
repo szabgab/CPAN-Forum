@@ -46,6 +46,7 @@ my $builder = Module::Build->new(
         'Storable'                              => 0,
         'Test::More'                            => 0.47,
         'Test::WWW::Mechanize::CGI'             => 0,
+        'Test::Most'                            => 0,
     },
     dist_author => 'Gabor Szabo <gabor@pti.co.il>',
 );

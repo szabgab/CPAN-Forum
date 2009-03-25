@@ -2,9 +2,11 @@
 use strict;
 use warnings;
 
-use Test::More;
+use Test::Most;
 my $tests;
 plan tests => $tests;
+
+bail_on_fail;
 
 use lib qw(t/lib);
 use CPAN::Forum::Test;
@@ -15,6 +17,7 @@ use CPAN::Forum::Test;
 }
 
 CPAN::Forum::Test::setup_database();
+exit;
 my @users = @CPAN::Forum::Test::users;
 
 CPAN::Forum::Test::init_db();
