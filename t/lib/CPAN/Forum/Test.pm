@@ -1,4 +1,4 @@
-package CPAN::Forum::Test;
+package t::lib::CPAN::Forum::Test;
 use strict;
 use warnings;
 

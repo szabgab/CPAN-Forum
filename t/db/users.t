@@ -8,19 +8,18 @@ plan tests => $tests;
 
 bail_on_fail;
 
-use lib qw(t/lib);
-use CPAN::Forum::Test;
+use t::lib::CPAN::Forum::Test;
 
 {
     require_ok('CPAN::Forum::DB::Users');
     BEGIN { $tests += 1; }
 }
 
-CPAN::Forum::Test::setup_database();
+t::lib::CPAN::Forum::Test::setup_database();
 exit;
-my @users = @CPAN::Forum::Test::users;
+my @users = @t::lib::CPAN::Forum::Test::users;
 
-CPAN::Forum::Test::init_db();
+t::lib::CPAN::Forum::Test::init_db();
 {
     my @db_users = CPAN::Forum::DB::Users->retrieve_all;
     is(@db_users, 1, 'one user');
