@@ -1,5 +1,3 @@
-#!/usr/bin/perl
-
 use strict;
 use warnings;
 
@@ -7,17 +5,16 @@ use Test::More;
 my $tests;
 plan tests => $tests;
 
-use lib qw(t/lib);
-use CPAN::Forum::Test;
+use t::lib::CPAN::Forum::Test;
 
 {
-    CPAN::Forum::Test::setup_database();
+    t::lib::CPAN::Forum::Test::setup_database();
     ok(-e "blib/db/forum.db");
     BEGIN { $tests += 1; }
 }
 
-my $w   = CPAN::Forum::Test::get_mech();
-my $url = CPAN::Forum::Test::get_url();
+my $w   = t::lib::CPAN::Forum::Test::get_mech();
+my $url = t::lib::CPAN::Forum::Test::get_url();
 
 {
     $w->get_ok($url);

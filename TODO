@@ -1,8 +1,15 @@
+Setup stand-alone server 
+
+Write Selenium tests that run against the web server -
+  by default it should run agains the stand-alone server 
+  but should be configurable to run agains the Apache CGI and 
+  against the mod_perl version.
+
+Create a user group that can delete posts, lock (or delete?) users.
+
+
 
   Tests  *  Tests   *   Tests
-
-  stop using Class::DBI, use plain SQL calls
-    shmuel: I don't see where we use Class::DBI
 
   move database to PostgreSQL
 

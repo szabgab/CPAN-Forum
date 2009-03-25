@@ -549,7 +549,7 @@ Standard CGI::Application method
 sub setup {
     my $self = shift;
 
-    my $log       = $self->param("ROOT") . "/db/messages.log";
+    my $log       = $ENV{CPAN_FORUM_LOGFILE} || $self->param("ROOT") . "/db/messages.log";
     my $log_level = $self->_set_log_level();
 
     $self->log_config(

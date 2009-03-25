@@ -1,32 +1,31 @@
-#!/usr/bin/perl
-
 use strict;
 use warnings;
 
-use Test::More;
+use Test::Most;
 my $tests;
 plan tests => $tests;
 
-use lib qw(t/lib);
-use CPAN::Forum::Test;
-my @users = @CPAN::Forum::Test::users;
+bail_on_fail;
+
+use t::lib::CPAN::Forum::Test;
+my @users = @t::lib::CPAN::Forum::Test::users;
 
 {
-    CPAN::Forum::Test::setup_database();
+    t::lib::CPAN::Forum::Test::setup_database();
     ok(-e "blib/db/forum.db");
     BEGIN { $tests += 1; }
 }
 
 
-my $w   = CPAN::Forum::Test::get_mech();
-my $url = CPAN::Forum::Test::get_url();
+my $w   = t::lib::CPAN::Forum::Test::get_mech();
+my $url = t::lib::CPAN::Forum::Test::get_url();
 
 {
     $w->get_ok($url);
     $w->content_like(qr{CPAN Forum});
 
     $w->follow_link_ok({ text => 'register' });
-    $w->content_like(qr{Registration Page});
+    $w->content_like(qr{Registration Page});# or diag $w->content;
 
     BEGIN { $tests += 4; }
 }
