@@ -13,7 +13,7 @@ use Getopt::Long qw(GetOptions);
 
 use CPAN::Forum::DBI;
 use CPAN::Forum::DB::Groups;
-
+use CPAN::Forum::DB::Authors;
 
 
 my %opts = (
@@ -53,7 +53,7 @@ if ($opts{fetch}) {
 print "Processing $opts{source} file, adding distros to database, will take a few minutes\n";
 print "Go get a beer\n";
 my $p = Parse::CPAN::Packages->new($opts{source});
-;
+
 
 my %message = (
     version => "",
@@ -90,7 +90,7 @@ foreach my $d ($p->latest_distributions) {
     my $p;
     if ($pauseid) {
         eval {
-            $p = CPAN::Forum::DB::Authors->find_or_create({ pauseid => $pauseid });
+            $p = CPAN::Forum::DB::Authors->find_or_create($pauseid);
         };
         if ($@) {
             warn "$name\n";
@@ -102,10 +102,10 @@ foreach my $d ($p->latest_distributions) {
         warn "No PAUSEID?" . $d->prefix . "\n";
         next LINE;
     }
-    $new{pauseid} = $p->id;
+    $new{pauseid} = $p->{id};
 
 
-    my ($g) = CPAN::Forum::DB::Groups->search(name => $name);
+    my ($g) = CPAN::Forum::DB::Groups->get_data_by_name($name);
     if ($g) {
         my $changed;
         foreach my $field (qw(version pauseid)) {
@@ -113,17 +113,17 @@ foreach my $d ($p->latest_distributions) {
             #print "NEW: $new{$field}\n";
             #print "OLD: " . $g->$field, "\n";
             #<STDIN>;
-            if (not defined $g->$field or $g->$field ne $new{$field}) {
+            if (not defined $g->{$field} or $g->{$field} ne $new{$field}) {
                 #print "change\n";
                 $message{$field} .= sprintf "The %s of %s has changed from %s to %s\n",
-                                $field, $name, ($g->$field || ""), $new{$field};
-                $g->$field($new{$field});
+                                $field, $name, ($g->{$field} || ""), $new{$field};
+                $g->{$field} = $new{$field};
                 $changed++;
             }
         }
 
         if ($changed) {
-            $g->update;
+        	CPAN::Forum::DB::Groups->update_data_by_name($name, $g);
         }
         next LINE;
     }

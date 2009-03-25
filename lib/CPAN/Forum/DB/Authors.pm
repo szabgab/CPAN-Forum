@@ -21,4 +21,13 @@ sub add {
     return $self->get_author_by_pauseid($pauseid);
 }
 
+sub find_or_create {
+	my ($self, $pauseid) = @_;
+	my $p  = $self->get_author_by_pauseid($pauseid);
+	if (not $p) {
+		$p = $self->add($pauseid);
+	}
+	return $p;
+}
+
 1;

@@ -121,6 +121,17 @@ sub add_user_to_group {
     $dbh->do($sql, undef, $args{uid}, $args{gid});
 }
 
+sub retrieve_all {
+	my $self = shift;
+    my $sql = "SELECT username FROM users ORDER BY username";
+    return $self->_fetch_arrayref_of_hashes($sql);
+}
+
+sub count_all {
+	my $self = shift;
+    my $sql = "SELECT COUNT(username) FROM users";
+	return $self->_fetch_single_value($sql);
+}
 
 1;
 

@@ -3,8 +3,9 @@ use strict;
 use warnings;
 
 use File::Copy qw(copy);
+use File::Temp qw(tempdir);
 
-my $ROOT = "blib";  
+my $ROOT = tempdir( CLEANUP => 1 );
 
 our @users = (
     {
@@ -14,15 +15,19 @@ our @users = (
 );
 
 sub setup_database {
+    copy 't/CONFIG', $ROOT;
+    mkdir "$ROOT/schema";
+    copy 'schema/schema.sql', "$ROOT/schema";
+    copy 't/02packages.details.txt', $ROOT;
+
+    my $dir = Cwd::cwd;
+	
     chdir $ROOT;
-    copy "../t/CONFIG", ".";
-    mkdir "schema";
-    copy "../schema/schema.sql", "schema";
 
-    system "$^X ../bin/setup.pl --config CONFIG --dir db";
-    system "$^X ../bin/populate.pl --source ../t/02packages.details.txt --dir db";
+    system "$^X $dir/bin/setup.pl --config CONFIG --dir db";
+    system "$^X $dir/bin/populate.pl --source 02packages.details.txt --dir db";
 
-    chdir "..";
+    chdir $dir;
 }
 
 sub init_db {

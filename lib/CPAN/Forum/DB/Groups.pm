@@ -71,6 +71,20 @@ sub names_by_pauseidstr {
     return $self->_fetch_arrayref_of_hashes($sql, $value);
 }
 
+sub get_data_by_name {
+	my ($self, $name) = @_;
+	my $sql = "SELECT version, pauseid FROM groups WHERE name = ?";
+    return $self->_fetch_hashref($sql, $name);
+}
+
+sub update_data_by_name {
+	my ($self, $name, $data) = @_;
+	my $sql = "UPDATE groups SET version=?, pauseid=? WHERE name = ?";
+
+    my $dbh = CPAN::Forum::DBI::db_Main();
+    $dbh->do($sql, undef, $data->{version}, $data->{pauseid}, $name);
+
+}
 
 #        my $author = CPAN::Forum::DB::Authors->get_author_by_pauseid($name); # SQL
 
