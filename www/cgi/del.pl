@@ -12,7 +12,8 @@ print $q->header;
 
 my @users = qw(nationshoes njgoogle wowpowerlvl gdoit shoesgreat jordan2008 pickcounty cnbearing);
 push @users, qw(rainyjin angelae8654 nisha jojokinkaid billy001 papu);
-push @users, qw(bettytalk mcgaha digitss adam01);
+push @users, qw(bettytalk mcgaha digitss adam01 mili sales3 sindabearing dpibearing yangmayer);
+push @users, qw(salesplaza);
 my $sql = "delete from posts where id in (select posts.id from posts, users where username ";
 $sql .=   "in(" . join ", ", map {"'$_'"} @users;
 $sql .=  ") and posts.uid=users.id)";
