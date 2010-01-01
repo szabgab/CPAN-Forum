@@ -133,7 +133,7 @@ pointed to your server.
 
 =head2 Install the perl code
 
-    perl Build.PL
+    perl Build.PL       - and make sure the prerequisites are installed
     ./Build
     ./Build test
     ./Build install dir=/path/to/install
