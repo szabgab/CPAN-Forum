@@ -5,18 +5,14 @@ use warnings;
 use Apache2::Const -compile => qw(OK);
 use Apache2::RequestRec ();
 
-#my $seen;
-
+use File::Basename qw(dirname);
 my $root;
-BEGIN { $root = "$ENV{CPANFORUM_ROOT}/.."; }
-use lib "$root/lib";
-use lib "/home/gabor/perl5lib/lib";
-use lib "/home/gabor/perl5lib/lib/i486-linux-gnu-thread-multi";
+BEGIN {
+	$root = dirname(dirname(dirname(dirname(__FILE__))));
+}
+use lib "$ENV{CPANFORUM_ROOT}/lib";
 use CPAN::Forum;
 
-#local @INC = ("$root/lib", "/home/gabor/perl5lib/lib", "/home/gabor/perl5lib/lib/i486-linux-gnu-thread-multi", @INC);
-#use Data::Dumper;
-#warn Dumper \%ENV;
 
 my $app = CPAN::Forum->new(
 	TMPL_PATH => "$ENV{CPANFORUM_ROOT}/templates",
