@@ -1,10 +1,11 @@
-#!/opt/perl584/bin/perl
+#!/usr/bin/perl
 use strict;
 use warnings;
 
 
-use lib "lib";
 use Text::CSV_XS;
+
+use lib "lib";
 use CPAN::Forum::DBI;
 use CPAN::Forum::DB::Groups;
 use FindBin qw ($Bin);
