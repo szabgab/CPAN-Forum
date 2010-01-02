@@ -1,3 +1,11 @@
+v0.13 2010.01.02
+   First release after a long time.
+   The code of CPAN::Forum is probably broken in this distribution. 
+   The reason to release it is the new Populate module and script that
+   for now can use mirror CPAN.
+
+
+
   Added option to disable all e-mail notifications
   Enable adding tags to CPAN modules
   Replace Class::DBI by plain SQL calls in most of the application
