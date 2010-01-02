@@ -108,3 +108,7 @@ www/img/stars-5.0.png
 
 www/img/rss1.gif
 www/img/atom.gif
+
+t/populate/modules.txt
+lib/CPAN/Forum/Populate.pm
+bin/populate_cpan_forum.pl
