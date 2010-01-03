@@ -2,8 +2,15 @@ package t::lib::CPAN::Forum::Server;
 
 use strict;
 use warnings;
+
 use base qw(HTTP::Server::Simple::CGI);
 use HTTP::Server::Simple::Static;
+use File::Basename qw(dirname);
+
+my $root;
+BEGIN {
+	$root = dirname(dirname(dirname(dirname(__FILE__))));
+}
 
 use CPAN::Forum;
 
@@ -15,15 +22,15 @@ sub handle_request {
 	print "HTTP/1.0 200 OK\r\n";
 	my $path = $cgi->path_info;
 	if ($path =~  m{^/img/} or $path eq '/style.css') {
-		return $self->serve_static( $cgi, "$ENV{CPANFORUM_ROOT}/www" );
+		return $self->serve_static( $cgi, "$root/www" );
 	}
 	#warn $path;
 
 	my $app = CPAN::Forum->new(
-		TMPL_PATH => "$ENV{CPANFORUM_ROOT}/templates",
+		TMPL_PATH => "$root/templates",
 		PARAMS => {
-			ROOT       => $ENV{CPANFORUM_ROOT},
-			DB_CONNECT => "dbi:SQLite:$ENV{CPANFORUM_ROOT}/db/forum.db",
+			ROOT       => $root,
+			DB_CONNECT => "dbi:SQLite:$ENV{CPAN_FORUM_DB_FILE}",
 			#REQUEST    => $ENV{PATH_INFO},
 		},
 	);

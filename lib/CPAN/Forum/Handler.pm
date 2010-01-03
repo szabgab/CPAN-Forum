@@ -10,15 +10,16 @@ my $root;
 BEGIN {
 	$root = dirname(dirname(dirname(dirname(__FILE__))));
 }
-use lib "$ENV{CPANFORUM_ROOT}/lib";
+use lib "$root/lib";
+
 use CPAN::Forum;
 
 
 my $app = CPAN::Forum->new(
-	TMPL_PATH => "$ENV{CPANFORUM_ROOT}/templates",
+	TMPL_PATH => "$root/templates",
 	PARAMS => {
-		ROOT       => $ENV{CPANFORUM_ROOT},
-		DB_CONNECT => "dbi:SQLite:$ENV{CPANFORUM_ROOT}/db/forum.db",
+		ROOT       => $root,
+		DB_CONNECT => "dbi:SQLite:$ENV{CPAN_FORUM_DB_FILE}",
 		#REQUEST    => ($ENV{SCRIPT_NAME} || '') . ($ENV{PATH_INFO} || ''),
 	},
 );

@@ -21,7 +21,7 @@ my $w       = CPAN::Forum::Test::get_mech();
 my $url     = CPAN::Forum::Test::get_url();
 CPAN::Forum::Test::init_db();
 
-$ENV{NO_CPAN_FORUM_MAIL} = 1;
+$ENV{CPAN_FORUM_NO_MAIL} = 1;
 
 {
     ok(1);

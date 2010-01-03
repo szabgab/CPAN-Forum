@@ -14,8 +14,8 @@ use lib "$dir/lib";
 use lib "$root/lib";
 
 BEGIN {
-	$ENV{CPANFORUM_ROOT} = $root;
-	$ENV{CPAN_FORUM_LOGFILE} ||= "$root/cpan_forum_server.log"
+	$ENV{CPAN_FORUM_LOGFILE} ||= "$root/cpan_forum_server.log";
+	$ENV{CPAN_FORUM_DB_FILE} = "$root/db/forum.db";
 }
 use t::lib::CPAN::Forum::Server;
 

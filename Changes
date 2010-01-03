@@ -1,5 +1,8 @@
 
    Add simple HTML generation.
+   Fix some tests
+   Rename all the environment variables to be CPAN_FORUM_*
+   Eliminate the need for CPAN_FORUM_ROOT and add a few other env variables.
 
 
 v0.13 2010.01.02

@@ -34,7 +34,7 @@ CPAN::Forum - Web forum application to discuss CPAN modules
 
 =head1 SYNOPSIS
 
-Visit L<http://www.cpanforum.com/>
+Visit L<http://cpanforum.com/>
 
 =head1 DESCRIPTION
 
@@ -42,7 +42,7 @@ This is a Web forum application specifically designed to be used for
 discussing CPAN modules. At one point it might be adapted to be a general
 forum software but for now it is released in the hope that people
 will help improving it and by that improving the 
-L<http://www.cpanforum.com/> site.
+L<http://cpanforum.com/> site.
 
 =head2 Features
 
@@ -132,7 +132,7 @@ For local installations in /etc/hosts I added:
 
 That way, I have a totally separate virtual host just for this application.
 
-In a real setting probably you'll have something like www.cpanforum.com 
+In a real setting probably you'll have something like cpanforum.com 
 pointed to your server.
 
 =head2 Install the perl code
@@ -176,10 +176,34 @@ Run:
     
 (this will fetch a file from www.cpan.org and might take a few minutes to run)
 
-=head2 CPAN_FORUM_URL
+=head1 PATH
 
-For some of the tests you'll have to set the CPAN_FORUM_URL environment 
+The path to the root of the unzipped distribution is 
+determined automatically by the cgi script or the mod_perl
+handle. Path to lib/ and templates/ can be derived from it.
+
+=head2 CPAN_FORUM_DB_FILE
+
+Path to the SQLite file  /path/to/db/forum.db
+
+
+=head2 CPAN_FORUM_LOGFILE
+
+Path to the log file.
+
+
+=head2 CPAN_FORUM_DEV
+
+Indicate that we are on a development machine. (No Google Analytics or advertisements)
+
+=head2 CPAN_FORUM_TEST_URL
+
+For some of the tests you'll have to set the CPAN_FORUM_TEST_URL environment 
 variable to the URL where you installed the forum.
+
+=head2 CPAN_FORUM_NO_MAIL
+
+Turn off mail sending (for testing).
 
 
 =head2 TODO
@@ -552,7 +576,7 @@ Standard CGI::Application method
 sub setup {
     my $self = shift;
 
-    my $log       = $ENV{CPAN_FORUM_LOGFILE} || $self->param("ROOT") . "/db/messages.log";
+    my $log       = $ENV{CPAN_FORUM_LOGFILE};
     my $log_level = $self->_set_log_level();
 
     $self->log_config(
@@ -864,7 +888,7 @@ sub load_tmpl {
     $t->param("username" => $self->session->param("username") || "anonymous");
     $t->param("test_site_warning" => -e $self->param("ROOT") . "/config_test_site");
     $t->param("admin" => $self->session->param('admin'));
-    $t->param("dev_server" => ($ENV{CPANFORUM_DEV} ? 1 : 0));
+    $t->param("dev_server" => ($ENV{CPAN_FORUM_DEV} ? 1 : 0));
     return $t;
 }
 
@@ -1571,7 +1595,7 @@ sub _my_sendmail {
     #$self->log->debug(Data::Dumper->Dump([\%args], ['_my_sendmail']));
     #$self->log->debug("_my_sendmail to '$args{To}'");
 
-    return if $ENV{NO_CPAN_FORUM_MAIL};
+    return if $ENV{CPAN_FORUM_NO_MAIL};
     # for testing
     return if $self->config("disable_email_notification");
 
@@ -1734,7 +1758,7 @@ sub version {
 Thanks to Offer Kaye for his initial help with HTML and CSS.  Thanks
 to Shlomi Fish for some patches. Thanks to all
 the people who develop and maintain the underlying technologies.  See
-L<http://www.cpanforum.com/about/> for a list of tools we used.  In addition to
+L<http://cpanforum.com/about/> for a list of tools we used.  In addition to
 Perl of course.
 
 =head1 DEVELOPMENT
@@ -1746,7 +1770,7 @@ There is a mailing list to see the commits to the repository:
 L<http://perl.org.il/mailman/listinfo/cpan-forum-commit>
 
 Discussion of this module will take place on
-L<http://www.cpanforum.com/dist/CPAN-Forum>
+L<http://cpanforum.com/dist/CPAN-Forum>
 If you need help or if you'd like to offer your help.
 That's the right place to do it.
 

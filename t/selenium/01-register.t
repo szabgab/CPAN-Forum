@@ -8,8 +8,8 @@ use Test::Exception;
 eval {require Test::WWW::Selenium };
 if ($@) {
 	plan skip_all => 'Need Test::WWW::Selenium';
-} elsif (not $ENV{CPANFORUM_URL}) {
-	plan skip_all => 'Need CPANFORUM_URL';
+} elsif (not $ENV{CPAN_FORUM_TEST_URL}) {
+	plan skip_all => 'Need CPAN_FORUM_TEST_URL';
 }
 
 # "http://cgi.cpanforum.local/"
@@ -17,7 +17,7 @@ if ($@) {
 my $sel = Test::WWW::Selenium->new( host => "localhost", 
                                     port => 4444, 
                                     browser => "*chrome", 
-                                    browser_url => $ENV{CPANFORUM_URL} );
+                                    browser_url => $ENV{CPAN_FORUM_TEST_URL} );
 
 $sel->open_ok("/");
 $sel->click_ok("link=register");

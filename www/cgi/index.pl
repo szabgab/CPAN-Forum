@@ -4,10 +4,11 @@ use strict;
 
 # In case the CPAN::Forum files are relative to where the script is
 use File::Basename qw(dirname);
+my $root;
 BEGIN {
-	my $dir = dirname(dirname(dirname($0))) . '/lib';
-	unshift @INC, $dir;
+	$root = dirname(dirname(dirname($0)));
 }
+use lib "$root/lib";
 
 # Enable for DBI debugging
 #BEGIN { $ENV{DBI_TRACE}='1=/tmp/dbitrace.log'; }
@@ -16,10 +17,10 @@ BEGIN {
 use CPAN::Forum;
 
 my $app = CPAN::Forum->new(
-	TMPL_PATH => "$ENV{CPANFORUM_ROOT}/templates",
+	TMPL_PATH => "$root/templates",
 	PARAMS => {
-		ROOT       => $ENV{CPANFORUM_ROOT},
-        DB_CONNECT => "dbi:SQLite:$ENV{CPANFORUM_ROOT}/db/forum.db",
+		ROOT       => $root,
+        DB_CONNECT => "dbi:SQLite:$ENV{CPAN_FORUM_DB_FILE}",
         #REQUEST    => $ENV{PATH_INFO},
 	},
 );
