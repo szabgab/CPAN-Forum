@@ -2,10 +2,14 @@
 
 use strict;
 use warnings;
-use lib "lib";
+
+use Cwd            qw(abs_path cwd);
+use File::Basename qw(dirname);
+use Getopt::Long   qw(GetOptions);
+
+use lib dirname(dirname(abs_path($0))) . '/lib';
+
 use CPAN::Forum::INC;
-use Cwd qw(cwd);
-use Getopt::Long qw(GetOptions);
 
 my %opts;
 GetOptions(\%opts, "config=s", "dir=s") or die;

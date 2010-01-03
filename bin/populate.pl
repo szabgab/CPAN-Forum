@@ -3,13 +3,16 @@
 use strict;
 use warnings;
 
-use lib "lib";
-use Parse::CPAN::Packages;
-use LWP::Simple;
-use FindBin qw ($Bin);
+use Cwd            qw(abs_path cwd);
+use File::Basename qw(dirname);
+use Getopt::Long   qw(GetOptions);
+use FindBin        qw ($Bin);
 use Text::CSV_XS;
 use Mail::Sendmail qw(sendmail);
-use Getopt::Long qw(GetOptions);
+use Parse::CPAN::Packages;
+use LWP::Simple;
+
+use lib dirname(dirname(abs_path($0))) . '/lib';
 
 use CPAN::Forum::DBI;
 use CPAN::Forum::DB::Groups;
