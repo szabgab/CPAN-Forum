@@ -40,7 +40,9 @@
 
 \bprivlib
 
-\btmp\b
+^tmp\b
 .gitignore
 .svn
+^db\b
+^live
 
