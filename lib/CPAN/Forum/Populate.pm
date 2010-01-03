@@ -2,11 +2,12 @@ package CPAN::Forum::Populate;
 
 use Moose;
 
-use CPAN::Mini     ();
-use File::Basename qw(basename dirname);
-use File::HomeDir  ();
-use File::Path     qw(rmtree mkpath);
-use File::Temp     qw(tempdir);
+use CPAN::Mini        ();
+use File::Basename    qw(basename dirname);
+use File::Find::Rule  ();
+use File::HomeDir     ();
+use File::Path        qw(rmtree mkpath);
+use File::Temp        qw(tempdir);
 
 =head1 NAME
 
@@ -25,8 +26,6 @@ CPAN::Forum::Populate - populate the database by date from CPAN and other source
   $p->mirror_cpan();
 
   # tell what kind of processing to do
-  $p->add_generate_html;
-  $p->add_process_yaml;
 
   # start the processing on some of the file
   $p->process;
@@ -47,6 +46,8 @@ has 'dir'         => (is => 'rw');
 has 'cpan'        => (is => 'rw');
 has 'all_modules' => (is => 'rw');
 has 'file'        => (is => 'rw');
+has 'source_path' => (is => 'rw');
+has 'html_path'   => (is => 'rw');
 
 =pod
 
@@ -161,7 +162,13 @@ sub unzip_file {
 	
 	my $target_parent_dir = "$src/$path";
 	mkpath($target_parent_dir);
-	return if -e "$target_parent_dir/$package-$version";
+
+	$self->source_path("$target_parent_dir/$package-$version");
+	my $dir = $self->dir;
+	my $html_parent_dir = "$dir/html/$path";
+	$self->html_path("$html_parent_dir/$package-$version");
+
+	return if -e $self->source_path;
 
 	# TODO: having more control with Archive::Zip or similar module?
 	chdir $target_parent_dir or die;
@@ -171,15 +178,38 @@ sub unzip_file {
 	return;
 }
 
-sub _system {
-	my ($cmd) = @_;
-	debug($cmd);
-	system($cmd);
-	return;
-}
+
 sub generate_html {
 	my ($self) = @_;
+
 	return if not $self->html;
+
+use CPAN::Forum::Pod;
+	my $pod = CPAN::Forum::Pod->new;
+	my $html;
+	$pod->output_string(\$html);
+
+	my $src  = $self->source_path;
+	my $dest = $self->html_path;
+	debug("Generate HTML for $src");
+	die "No source path" if not $src;
+	die "Source path '$src' does not exist'" if not -d $src;
+	foreach my $file (File::Find::Rule->file->name('*.pm', '*.pod')->relative->in("$src/lib")) {
+		$html = '';
+		debug("   POD processing $file");
+		$pod->parse_file("$src/lib/$file");
+		if ($pod->content_seen) {
+			$file =~ s/\.\w+$/.html/;
+			my $outfile = "$dest/lib/$file";
+			mkpath(dirname($outfile));
+			if (open my $out, '>', $outfile) {
+				print $out $html;
+			} else {
+				warn "Could not open '$outfile' for writing $!";
+			}
+		}
+	}
+
 	return;
 }
 
@@ -231,6 +261,13 @@ sub setup {
 
 sub cpan_dir   { return $_[0]->dir . '/cpan_mirror';  }
 sub source_dir { return $_[0]->dir . '/src';  }
+
+sub _system {
+	my ($cmd) = @_;
+	debug($cmd);
+	system($cmd);
+	return;
+}
 
 sub debug {
 	print "@_\n";

@@ -43,12 +43,14 @@ my $builder = Module::Build->new(
         'CPAN::DistnameInfo'                    => 0,
         
         # Populate requires:
-        'CPAN::Mini'     => '0',
-        'DBD::Pg'        => '0',
-        'File::HomeDir'  => '0',
-        'File::Path'     => '0',
-        'File::Temp'     => '0',
-        'Moose'          => '0',
+        'CPAN::Mini'        => '0',
+        'DBD::Pg'           => '0',
+        'File::Find::Rule'  => '0',
+        'File::HomeDir'     => '0',
+        'File::Path'        => '0',
+        'File::Temp'        => '0',
+        'Pod::Simple'       => '0',
+        'Moose'             => '0',
     },
     build_requires => {
         'Storable'                              => 0,
