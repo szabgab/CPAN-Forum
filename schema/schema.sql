@@ -51,20 +51,7 @@ CREATE TABLE groups (
 			,FOREIGN KEY (pauseid)  REFERENCES authors(id)
 );
 
-CREATE TABLE metagroups (
-			id               INTEGER PRIMARY KEY auto_increment,
-			name             VARCHAR(255) UNIQUE NOT NULL,
-			status           INTEGER
-);
 
-CREATE TABLE group_in_meta (
-			mgid             INTEGER NOT NULL,
-			gid              INTEGER NOT NULL
-			,FOREIGN KEY (mgid)  REFERENCES metagroups(id)
-			,FOREIGN KEY (gid)   REFERENCES groups(id)
-);
-
-	
 
 CREATE TABLE grouprelations (
 			parent            INTEGER NOT NULL,
