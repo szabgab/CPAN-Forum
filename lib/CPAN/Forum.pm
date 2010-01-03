@@ -593,7 +593,7 @@ sub setup {
         ],
         APPEND_NEWLINE => 1,
     );
-print STDERR "# $log\n";
+
     $self->log->debug("--- START ---");
     
     $self->session_config(
