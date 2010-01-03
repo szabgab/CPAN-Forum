@@ -48,6 +48,7 @@ sub get_mech {
     mkdir "$ROOT/db";
     $w->cgi(sub {
         require CPAN::Forum;
+        $ENV{CPAN_FORUM_LOGFILE} = "$ROOT/db/message.log";
         my $webapp = CPAN::Forum->new(
                 TMPL_PATH => "templates",
                 PARAMS => {
