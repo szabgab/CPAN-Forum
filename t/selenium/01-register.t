@@ -2,11 +2,15 @@ use strict;
 use warnings;
 
 use Time::HiRes qw(sleep);
-use Test::WWW::Selenium;
-use Test::More 'no_plan';
+use Test::More;
 use Test::Exception;
 
-plan skip_all => 'Need CPANFORUM_URL' if not $ENV{CPANFORUM_URL};
+eval {require Test::WWW::Selenium };
+if ($@) {
+	plan skip_all => 'Need Test::WWW::Selenium';
+} elsif (not $ENV{CPANFORUM_URL}) {
+	plan skip_all => 'Need CPANFORUM_URL';
+}
 
 # "http://cgi.cpanforum.local/"
 

@@ -81,8 +81,12 @@ module belongs to)
 
 =item * We make sure the links are search-engine friendly
 
-- /posts/ID  (link to a post)
-- /threads/ID  (link to a thread)
+  /dist/Dist-Name/
+  /rss/
+  /atom/
+  
+  /posts/ID  (link to a post)
+  /threads/ID  (link to a thread)
 
 =item * We provide RSS feed of the recent posts belonging to any of the groups.
 
@@ -417,7 +421,6 @@ sub cgiapp_init {
     my $db_connect = $self->param("DB_CONNECT");
     CPAN::Forum::DBI->myinit($db_connect);
     my $dbh = CPAN::Forum::DBI::db_Main();
-    
     $STATUS_FILE  = $self->param("ROOT") . "/db/status";
     CGI::Session->name($cookiename);
 }
@@ -566,7 +569,7 @@ sub setup {
         ],
         APPEND_NEWLINE => 1,
     );
-
+print STDERR "# $log\n";
     $self->log->debug("--- START ---");
     
     $self->session_config(

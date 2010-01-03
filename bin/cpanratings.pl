@@ -2,15 +2,21 @@
 use strict;
 use warnings;
 
-
+use Cwd            qw(abs_path cwd);
+use File::Basename qw(dirname);
 use Text::CSV_XS;
-
-use lib "lib";
-use CPAN::Forum::DBI;
-use CPAN::Forum::DB::Groups;
 use FindBin qw ($Bin);
 
-my $dir = "$Bin/../db";
+my $dir;
+BEGIN {
+	$dir = dirname(dirname(abs_path($0)));
+	
+}
+use lib "$dir/lib";
+
+use CPAN::Forum::DBI;
+use CPAN::Forum::DB::Groups;
+
 
 my $csv    = Text::CSV_XS->new();
 my $file   = "$dir/cpan_ratings.csv";

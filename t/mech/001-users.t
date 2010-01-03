@@ -7,9 +7,10 @@ plan tests => $tests;
 
 use t::lib::CPAN::Forum::Test;
 
+my $dir;
 {
-    t::lib::CPAN::Forum::Test::setup_database();
-    ok(-e "blib/db/forum.db");
+    $dir = t::lib::CPAN::Forum::Test::setup_database();
+    ok(-e "$dir/db/forum.db");
     BEGIN { $tests += 1; }
 }
 

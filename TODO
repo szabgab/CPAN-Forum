@@ -9,8 +9,13 @@
     * package name
     * module name
     * Process META.yml
-    
 * add first search engine that is matching package and/or module names
+
+* Fix the unit tests
+* Switch application to use PostgreSQL
+* Switch application to use mod_perl on the live site
+
+
 
 
 
@@ -27,9 +32,6 @@ Create a user group that can delete posts, lock (or delete?) users.
 
   Tests  *  Tests   *   Tests
 
-  move database to PostgreSQL
-
-  move to mod_perl
 
   Session information: remember logged in user, 
   have check-box on the main form to say user wants to be remembered

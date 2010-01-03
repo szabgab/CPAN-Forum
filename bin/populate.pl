@@ -6,13 +6,17 @@ use warnings;
 use Cwd            qw(abs_path cwd);
 use File::Basename qw(dirname);
 use Getopt::Long   qw(GetOptions);
-use FindBin        qw ($Bin);
 use Text::CSV_XS;
 use Mail::Sendmail qw(sendmail);
 use Parse::CPAN::Packages;
 use LWP::Simple;
 
-use lib dirname(dirname(abs_path($0))) . '/lib';
+my $dir;
+BEGIN {
+	$dir = dirname(dirname(abs_path($0)));
+	
+}
+use lib "$dir/lib";
 
 use CPAN::Forum::DBI;
 use CPAN::Forum::DB::Groups;
@@ -162,7 +166,7 @@ my %mail = (
 if ($opts{sendmail}) {
     sendmail(%mail);
 } else {
-    open my $fh, ">", "$Bin/../cpan_version_update";
+    open my $fh, ">", "$dir/cpan_version_update";
     print $fh $message{version};
 }
 
@@ -175,7 +179,7 @@ if ($opts{sendmail}) {
 if ($opts{sendmail}) {
     sendmail(%mail);
 } else {
-    open my $fh, ">", "$Bin/../cpan_new_distros";
+    open my $fh, ">", "$dir/cpan_new_distros";
     print $fh $message{new};
 }
 

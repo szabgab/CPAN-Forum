@@ -17,6 +17,7 @@ our @users = (
 sub setup_database {
     copy 't/CONFIG', $ROOT;
     mkdir "$ROOT/schema";
+    mkdir "$ROOT/db";
     copy 'schema/schema.sql', "$ROOT/schema";
     copy 't/02packages.details.txt', $ROOT;
 
@@ -28,6 +29,8 @@ sub setup_database {
     system "$^X $dir/bin/populate.pl --source 02packages.details.txt --dir db";
 
     chdir $dir;
+    
+    return $ROOT;
 }
 
 sub init_db {

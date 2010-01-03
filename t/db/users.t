@@ -26,15 +26,15 @@ t::lib::CPAN::Forum::Test::init_db();
 #    diag explain $db_users->[0];
     is($db_users->[0]->{username}, 'testadmin');
 
-	is(CPAN::Forum::DB::Users->count_all(), 1);
+    is(CPAN::Forum::DB::Users->count_all(), 1);
     BEGIN { $tests += 3; }
 }
 
 {
     # add user
-	my $user = CPAN::Forum::DB::Users->add_user({
-		username => $users[0]{username},
-		email    => $users[0]{email},
+    my $user = CPAN::Forum::DB::Users->add_user({
+        username => $users[0]{username},
+        email    => $users[0]{email},
     });
     is($user->{username}, $users[0]{username});
     is($user->{email}, $users[0]{email});
@@ -42,7 +42,7 @@ t::lib::CPAN::Forum::Test::init_db();
 
     my $db_users = CPAN::Forum::DB::Users->retrieve_all;
     is(@$db_users, 2);
-	is(CPAN::Forum::DB::Users->count_all(), 2);
+    is(CPAN::Forum::DB::Users->count_all(), 2);
     BEGIN { $tests += 5; }
 }
 
