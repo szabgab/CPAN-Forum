@@ -3,6 +3,7 @@ package CPAN::Forum::Populate;
 use Moose;
 
 use CPAN::Mini     ();
+use File::Basename qw(basename dirname);
 use File::HomeDir  ();
 use File::Path     qw(rmtree mkpath);
 use File::Temp     qw(tempdir);
@@ -28,20 +29,24 @@ CPAN::Forum::Populate - populate the database by date from CPAN and other source
   $p->add_process_yaml;
 
   # start the processing on some of the file
-  $p->process_all_files;
-  $p->process_new_files;
-  $p->process_file('path');
+  $p->process;
   
-  $p->run;
-
 
 =head1 DESCRIPTION
 
 =cut
 
 has 'mirror'      => (is => 'ro');
+has 'process'     => (is => 'ro');
+has 'html'        => (is => 'ro');
+has 'yaml'        => (is => 'ro');
+has 'ppi'         => (is => 'ro');
+
+
 has 'dir'         => (is => 'rw');
+has 'cpan'        => (is => 'rw');
 has 'all_modules' => (is => 'rw');
+has 'file'        => (is => 'rw');
 
 =pod
 
@@ -54,12 +59,11 @@ Should be able to mirror a small subsection using CPAN::Mini or a full CPAN::Min
 sub mirror_cpan {
 	my ($self) = @_;
 
-	if ($self->mirror) {
-		die 'CPAN mirror not yet implemented' if $self->mirror eq 'cpan';
-	}
+	return if not $self->mirror;
+	die 'Full CPAN mirror not yet implemented, use mini of filename' if $self->mirror eq 'cpan';
 
 	debug("Get CPAN");
-	my $cpan = 'http://cpan.hexten.net/';
+	my $cpan = $self->cpan;
 	my $cpan_dir = $self->cpan_dir;
 	my $verbose = 0;
 	my $force   = 1;
@@ -111,7 +115,86 @@ sub mirror_cpan {
 	}
 }
 
+=pod
 
+=head2 process
+
+=cut
+
+sub process_files {
+	my ($self) = @_;
+	return if not $self->process;
+	
+	die '--process all   not yet implemented' if $self->process eq 'all';
+	die '--process new   not yet implemented' if $self->process eq 'new';
+
+
+	$self->file($self->process);
+	$self->unzip_file;
+	$self->generate_html;
+	$self->update_meta_data;
+	$self->process_ppi;
+
+	return;
+}
+
+
+sub unzip_file {
+	my ($self) = @_;
+
+	my $src = $self->source_dir;
+	mkpath($src) if not -e $src;
+
+	my $file = $self->file;
+	# file look like this:
+	# R/RJ/RJBS/CPAN-Mini-0.576.tar.gz
+	if ($file !~ m{^(\w)/(\1\w)/(\2\w+)/([\w-]+)-([\d.]+)\.tar\.gz$}) {
+		die "File '$file' is not a recognized format";
+	}
+	my $pauseid  = $3;
+	my $package  = $4;
+	my $version  = $5;
+	debug("PAUSE '$pauseid' package  '$package' version '$version'");
+	my $filename = basename($file);
+	my $root     = '';
+	my $path     = dirname($file);
+	
+	my $target_parent_dir = "$src/$path";
+	mkpath($target_parent_dir);
+	return if -e "$target_parent_dir/$package-$version";
+
+	# TODO: having more control with Archive::Zip or similar module?
+	chdir $target_parent_dir or die;
+	my $cpan_dir = $self->cpan_dir;
+	_system("tar xzf $cpan_dir/authors/id/$file");
+
+	return;
+}
+
+sub _system {
+	my ($cmd) = @_;
+	debug($cmd);
+	system($cmd);
+	return;
+}
+sub generate_html {
+	my ($self) = @_;
+	return if not $self->html;
+	return;
+}
+
+
+sub update_meta_data {
+	my ($self) = @_;
+	return if not $self->meta;
+	return;
+}
+
+sub process_ppi {
+	my ($self) = @_;
+	return if not $self->ppi;
+	return;
+}
 
 =pod
 
@@ -124,6 +207,7 @@ sub run {
 
 	$self->setup;
 	$self->mirror_cpan;
+	$self->process_files;
 
 	return;
 }
@@ -131,19 +215,22 @@ sub run {
 sub setup {
 	my ($self) = @_;
 
-	# TODO allow --dir command line flag?
 	if (not $self->dir) {
 		my $home    = File::HomeDir->my_home;
 		$self->dir("$home/.cpanforum");
 	}
-	my $src = $self->dir . '/src';
-	mkpath($src) if not -e $src;
 	debug("directory: " . $self->dir);
+
+	# TODO allow --cpan command line flag?
+	if (not $self->cpan) {
+		$self->cpan('http://cpan.hexten.net/')
+	}
 
 	return;
 }
 
-sub cpan_dir { return $_[0]->dir . '/cpan_mirror';  }
+sub cpan_dir   { return $_[0]->dir . '/cpan_mirror';  }
+sub source_dir { return $_[0]->dir . '/src';  }
 
 sub debug {
 	print "@_\n";

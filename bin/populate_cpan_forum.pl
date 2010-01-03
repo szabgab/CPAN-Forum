@@ -14,7 +14,12 @@ usage() if not @ARGV;
 my %opt;
 GetOptions(\%opt, 
 	'help',
+	'dir=s',
 	'mirror=s',
+	'process=s',
+	'html',
+	'yaml',
+	'ppi',
 ) or usage();
 usage() if $opt{help};
 
@@ -26,8 +31,23 @@ $p->run;
 sub usage {
 	print <<"END_USAGE";
 Usage: $0
-      --mirror [cpan|mini|path/to/file]   # full cpan mirror, or Mini::CPAN or
-                                          # list of packages to mirror
+      --dir  PATH                         # root directory (defaults to ~/.cpanforum)
+
+      --mirror [cpan|mini|path/to/file]   # cpan mirror
+			                  # cpan = full (6.5 Gb)
+			                  # mino = using Mini::CPAN (1.4 Gb)
+                                          # list of Package::Names per line to mirror
+   
+      --proces [all|new|path/to/file]     # which packages to process (need other flags to tell what to do)
+                                          # all = rebuilding information about every package
+                                          # new = only those that were added recently
+                                          # list of Package::Names per line
+
+      --html               # the --process will build the HTML files
+      --yaml               # the --process will update the database with mete data (yaml file and others)
+      --ppi                # the --process will use PPI to deep analyse the packages
+
+
       --help         this help
 
 END_USAGE
