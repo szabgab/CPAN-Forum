@@ -5,7 +5,7 @@ use CGI;
 use DBI;
 
 my $q = CGI->new;
-my $dbfile = '/var/www/cpanforum.com/live/db/forum.db';
+my $dbfile = $ENV{CPAN_FORUM_DB_FILE};
 my $dbh = DBI->connect("dbi:SQLite:dbname=$dbfile","","");
 my $name = $q->param('name');
 print $q->header;
