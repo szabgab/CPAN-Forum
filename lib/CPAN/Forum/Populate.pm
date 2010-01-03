@@ -9,6 +9,8 @@ use File::HomeDir     ();
 use File::Path        qw(rmtree mkpath);
 use File::Temp        qw(tempdir);
 
+use CPAN::Forum::Pod;
+
 =head1 NAME
 
 CPAN::Forum::Populate - populate the database by date from CPAN and other sources
@@ -46,6 +48,8 @@ has 'dir'         => (is => 'rw');
 has 'cpan'        => (is => 'rw');
 has 'all_modules' => (is => 'rw');
 has 'file'        => (is => 'rw');
+has 'dist'        => (is => 'rw');
+has 'version'     => (is => 'rw');
 has 'source_path' => (is => 'rw');
 has 'html_path'   => (is => 'rw');
 
@@ -61,7 +65,8 @@ sub mirror_cpan {
 	my ($self) = @_;
 
 	return if not $self->mirror;
-	die 'Full CPAN mirror not yet implemented, use mini of filename' if $self->mirror eq 'cpan';
+	# TODO implement full CPAN mirror (using rsync?)
+	die "Full CPAN mirror not yet implemented, use mini of filename\n" if $self->mirror eq 'cpan'; 
 
 	debug("Get CPAN");
 	my $cpan = $self->cpan;
@@ -149,7 +154,8 @@ sub unzip_file {
 	my $file = $self->file;
 	# file look like this:
 	# R/RJ/RJBS/CPAN-Mini-0.576.tar.gz
-	if ($file !~ m{^(\w)/(\1\w)/(\2\w+)/([\w-]+)-([\d.]+)\.tar\.gz$}) {
+	# A/AA/AADLER/Games-LogicPuzzle-0.20.zip
+	if ($file !~ m{^(\w)/(\1\w)/(\2\w+)/([\w-]+)-([\d.]+)\.(tar\.gz|zip)$}) {
 		die "File '$file' is not a recognized format";
 	}
 	my $pauseid  = $3;
@@ -159,6 +165,8 @@ sub unzip_file {
 	my $filename = basename($file);
 	my $root     = '';
 	my $path     = dirname($file);
+	$self->dist($package);
+	$self->version($version);
 	
 	my $target_parent_dir = "$src/$path";
 	mkpath($target_parent_dir);
@@ -173,7 +181,14 @@ sub unzip_file {
 	# TODO: having more control with Archive::Zip or similar module?
 	chdir $target_parent_dir or die;
 	my $cpan_dir = $self->cpan_dir;
-	_system("tar xzf $cpan_dir/authors/id/$file");
+	# TODO unzip within a temp directory in case the zipped file does not have a main directory in it?
+	if (substr($file, -7) eq '.tar.gz') {
+		_system("tar xzf $cpan_dir/authors/id/$file");
+	} elsif (substr($file, -4) eq '.zip') {
+		_system("unzip $cpan_dir/authors/id/$file");
+	} else {
+		warn "unrecognized file '$file'";
+	}
 
 	return;
 }
@@ -184,7 +199,7 @@ sub generate_html {
 
 	return if not $self->html;
 
-use CPAN::Forum::Pod;
+
 	my $pod = CPAN::Forum::Pod->new;
 	my $html;
 	$pod->output_string(\$html);
@@ -194,6 +209,7 @@ use CPAN::Forum::Pod;
 	debug("Generate HTML for $src");
 	die "No source path" if not $src;
 	die "Source path '$src' does not exist'" if not -d $src;
+	# TODO, deal with packages where the main module is not in the lib/ directory (e.g. id/A/AA/AADLER/Games-LogicPuzzle-0.20.zip )
 	foreach my $file (File::Find::Rule->file->name('*.pm', '*.pod')->relative->in("$src/lib")) {
 		$html = '';
 		debug("   POD processing $file");
@@ -208,7 +224,17 @@ use CPAN::Forum::Pod;
 				warn "Could not open '$outfile' for writing $!";
 			}
 		}
+		
 	}
+
+	# create symbolic link
+
+	my $dir = $self->dir;
+	mkpath("$dir/dist/");
+	my $dist = $self->dist;
+	unlink "$dir/dist/$dist" or die $!;
+	debug( "Unlink $dir/dist/$dist" );
+	_system("ln -s $dest $dir/dist/$dist");
 
 	return;
 }

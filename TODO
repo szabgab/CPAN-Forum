@@ -1,3 +1,19 @@
+
+* process each file and
+  * generate html (description tag should be the text taken from =NAME secion of each module and that of the main module of the package itself
+  * the documentation of each module will be a static page (maybe later enhanced with javascript)
+  * the main page of the package will be static for now but later it might be a dynamic page (or static with Javascript enhancement?)
+  * put some data in the database
+  * create symlink from dist/Module-Name to A/AB/ABC/Module-Name-1.23
+    * author PAUSEID
+    * package name
+    * module name
+    * Process META.yml
+    
+* add first search engine that is matching package and/or module names
+
+
+
 Setup stand-alone server 
 
 Write Selenium tests that run against the web server -
