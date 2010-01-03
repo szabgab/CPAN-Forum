@@ -1,4 +1,5 @@
 
+v0.14 2010.01.03
    Add simple HTML generation.
    Fix some tests
    Rename all the environment variables to be CPAN_FORUM_*
