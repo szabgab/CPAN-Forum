@@ -861,6 +861,7 @@ sub load_tmpl {
     $t->param("username" => $self->session->param("username") || "anonymous");
     $t->param("test_site_warning" => -e $self->param("ROOT") . "/config_test_site");
     $t->param("admin" => $self->session->param('admin'));
+    $t->param("dev_server" => ($ENV{CPANFORUM_DEV} ? 1 : 0));
     return $t;
 }
 
