@@ -3,6 +3,11 @@ use strict;
 use warnings;
 
 use Test::Most;
+
+
+plan skip_all => 'Need CPAN_FORUM_DB_FILE' 
+	if not $ENV{CPAN_FORUM_DB_FILE};
+
 my $tests;
 plan tests => $tests;
 
