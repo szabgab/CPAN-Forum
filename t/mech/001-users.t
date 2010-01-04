@@ -2,42 +2,30 @@ use strict;
 use warnings;
 
 use Test::More;
-my $tests;
-plan tests => $tests;
+plan skip_all => 'Need CPAN_FORUM_DB_FILE and CPAN_FORUM_TEST_URL' 
+	if not $ENV{CPAN_FORUM_DB_FILE} or not $ENV{CPAN_FORUM_TEST_URL};
+
+plan tests => 6;
+
+use Test::WWW::Mechanize;
+my $w = Test::WWW::Mechanize->new;
 
 use t::lib::CPAN::Forum::Test;
 
-my $dir;
 {
-    $dir = t::lib::CPAN::Forum::Test::setup_database();
-    ok(-e "$dir/db/forum.db");
-    BEGIN { $tests += 1; }
+    t::lib::CPAN::Forum::Test::setup_database();
+    ok(-e $ENV{CPAN_FORUM_DB_FILE});
 }
 
-my $w   = t::lib::CPAN::Forum::Test::get_mech();
-my $url = t::lib::CPAN::Forum::Test::get_url();
-
 {
-    $w->get_ok($url);
+    $w->get_ok($ENV{CPAN_FORUM_TEST_URL});
     $w->content_like(qr{CPAN Forum});
-    BEGIN { $tests += 2; }
-}
+    $w->content_unlike(qr/Something went wrong here/);
+} 
 
 
 {
-    #$w->follow_link_ok({ text => 'new post' });
-    #like($r, qr{Location: http://test-host/login});
-
-    BEGIN { $tests += 0; }
-
-#TODO: {
-#   local $TODO = "do real redirection here";
-#   unlike($r, qr{<HTML>}i);
-#   }   
+    $w->follow_link_ok({ text => 'FAQ' });
+    $w->content_like(qr{Frequently Asked Questions}, 'FAQ link');
 }
-
-#{
-#   my $r = $cat->cgiapp(path_info => '/login');
-#   like($r, qr{Login});
-#}
 

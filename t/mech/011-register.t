@@ -1,36 +1,33 @@
 use strict;
 use warnings;
 
+use Test::WWW::Mechanize;
 use Test::Most;
-my $tests;
-plan skip_all => 'temporarily skip these';
 
-plan tests => $tests;
+plan skip_all => 'Need CPAN_FORUM_DB_FILE and CPAN_FORUM_TEST_URL' 
+	if not $ENV{CPAN_FORUM_DB_FILE} or not $ENV{CPAN_FORUM_TEST_URL};
+
+plan tests => 33;
 
 bail_on_fail;
 
 use t::lib::CPAN::Forum::Test;
 my @users = @t::lib::CPAN::Forum::Test::users;
 
-my $dir;
 {
-    $dir = t::lib::CPAN::Forum::Test::setup_database();
-    diag("DIR $dir");
-    ok(-e "$dir/db/forum.db");
-    BEGIN { $tests += 1; }
+    t::lib::CPAN::Forum::Test::setup_database();
+    ok(-e $ENV{CPAN_FORUM_DB_FILE});
 }
 
-my $w   = t::lib::CPAN::Forum::Test::get_mech();
-my $url = t::lib::CPAN::Forum::Test::get_url();
-diag("URL: $url");
+
+my $w = Test::WWW::Mechanize->new;
+
 {
-    $w->get_ok($url);
+    $w->get_ok($ENV{CPAN_FORUM_TEST_URL});
     $w->content_like(qr{CPAN Forum});
 
     $w->follow_link_ok({ text => 'register' });
     $w->content_like(qr{Registration Page}) or diag $w->content;
-
-    BEGIN { $tests += 4; }
 }
 
 {
@@ -69,7 +66,6 @@ diag("URL: $url");
     );
     $w->content_like(qr{Registration Page});
     $w->content_like(qr{Nickname must be lower case alphanumeric between 1-25 characters});
-    BEGIN { $tests += 8; }
 }
 
 # reject bad usernames
@@ -82,7 +78,6 @@ foreach my $username ("ab.c", "Abcde", "asd'er", "ab cd") {
     );
     $w->content_like(qr{Registration Page});
     $w->content_like(qr{Nickname must be lower case alphanumeric between 1-25 characters});
-    BEGIN { $tests += 2*4; }
 }
 
 # reject bad email address 
@@ -95,31 +90,16 @@ foreach my $email ("adb-?", "Abcde", "asd'er", "ab cd") {
     );
     $w->content_like(qr{Registration Page});
     $w->content_like(qr{Email must be a valid address writen in lower case letters});
-    BEGIN { $tests += 2*4; }
 }
 
 
 
 
 my $pw;
-my $password;
-my $sendmail_count;
 # register user
-sub CPAN::Forum::_test_my_sendmail {
-    my %mail = @_;
-    #use Data::Dumper;
-    #print STDERR Dumper \%mail;
-    #print STDERR 
-    if ($mail{Message} =~ /your password is: (\w+)/) {
-        $password = $1;
-    }
-    $sendmail_count++;
-}
 
 # TODO: check if the call to submail contains the correct values
 {
-    $sendmail_count = 0;
-    $password = '';
     $w->submit_form(
         fields => {
             nickname => $users[0]{username}, 
@@ -128,18 +108,15 @@ sub CPAN::Forum::_test_my_sendmail {
     );
     $w->content_like(qr{Registration Page});
     $w->content_like(qr{Thank you for registering});
-    like($password, qr{\w{5}});
+#    like($password, qr{\w{5}}, 'password');
 
-    is($sendmail_count, 2);
-    $pw = $password;
+#    is($sendmail_count, 2);
+#    $pw = $password;
 
-    BEGIN { $tests += 4; }
 }
 
 # try to register the same user again and see it fails
 {
-    $sendmail_count = 0;
-    $password = '';
     $w->back;
     $w->submit_form(
         fields => {
@@ -149,9 +126,8 @@ sub CPAN::Forum::_test_my_sendmail {
     );
     $w->content_like(qr{Registration Page});
     $w->content_like(qr{Nickname or e-mail already in use});
-    is($sendmail_count, 0);
-    is($password, "");
+#    is($sendmail_count, 0);
+#    is($password, "");
 
-    BEGIN { $tests += 4; }
 }
 

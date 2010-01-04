@@ -4,27 +4,32 @@ use strict;
 use warnings;
 
 use Storable qw(dclone);
+use Test::WWW::Mechanize;
+use Test::Most;
 
-use Test::More;
+plan skip_all => 'Need CPAN_FORUM_DB_FILE and CPAN_FORUM_TEST_URL' 
+	if not $ENV{CPAN_FORUM_DB_FILE} or not $ENV{CPAN_FORUM_TEST_URL};
+
 my $tests;
-plan skip_all => 'temporarily skip these';
 plan tests => $tests;
+
+bail_on_fail;
 
 use t::lib::CPAN::Forum::Test;
 my @users = @t::lib::CPAN::Forum::Test::users;
 
-my $dir;
 {
-    $dir = t::lib::CPAN::Forum::Test::setup_database();
-    ok(-e "$dir/db/forum.db");
+    t::lib::CPAN::Forum::Test::setup_database();
+    ok(-e $ENV{CPAN_FORUM_DB_FILE});
     BEGIN { $tests += 1; }
 }
 
 
-my $w_admin = t::lib::CPAN::Forum::Test::get_mech();
-my $w_user  = t::lib::CPAN::Forum::Test::get_mech();
-my $w_guest = t::lib::CPAN::Forum::Test::get_mech();
-my $url     = t::lib::CPAN::Forum::Test::get_url();
+my $w_admin = Test::WWW::Mechanize->new;
+my $w_user  = Test::WWW::Mechanize->new;
+my $w_guest = Test::WWW::Mechanize->new;
+my $url     = $ENV{CPAN_FORUM_TEST_URL};
+$url =~ s{/+$}{};
 
 my %config = read_config();
 sub read_config {
@@ -38,12 +43,11 @@ sub read_config {
     return %c;
 }
 
-{
-    unlink glob "/tmp/cgisess_*";
-    my @session_files = glob "/tmp/cgisess_*";
-    is (@session_files, 0);
-    BEGIN { $tests += 1; }
-}
+#{
+#    my @session_files = glob "/tmp/cgisess_*";
+#    is (@session_files, 0);
+#    BEGIN { $tests += 1; }
+#}
 
 {
     $w_admin->get_ok($url);
@@ -54,20 +58,25 @@ sub read_config {
     $w_admin->follow_link_ok({ text => 'login' });
     $w_admin->content_like(qr{Login});
     $w_admin->content_like(qr{Nickname});
-    my @session_files = glob "/tmp/cgisess_*";
-    is(@session_files, 1);
+#    my @session_files = glob "/tmp/cgisess_*";
+#    is(@session_files, 1);
     my $cookie = '';
     my $cookie_jar = $w_admin->cookie_jar->as_string;
     if ($cookie_jar =~ /cpanforum=(\w+)/) {
         $cookie = $1;
     }
-    is($session_files[0], "/tmp/cgisess_$cookie");
+#    is($session_files[0], "/tmp/cgisess_$cookie");
 
     # submit form without values
     $w_admin->submit_form();
     $w_admin->content_like(qr{Need both nickname and password.});
 
-    is($w_admin->cookie_jar->as_string, $cookie_jar);
+    my $new_cookie = $w_admin->cookie_jar->as_string;
+    
+    # somtimes the seconds don't match and fail the test, getting rid of the time:
+    $cookie_jar =~ s/\d\d:\d\d:\d\dZ//;
+    $new_cookie =~ s/\d\d:\d\d:\d\dZ//;
+    is($new_cookie, $cookie_jar);
     #diag $w_admin->cookie_jar->as_string;
 
     # submit form without password
@@ -98,19 +107,19 @@ sub read_config {
         },
     );
     $w_admin->content_like(qr{You are logged in as.*$config{username}});
-    BEGIN { $tests += 16; }
+    BEGIN { $tests += 14; }
 }
 
-
-{
-    my @session_files = glob "/tmp/cgisess_*";
-    is (@session_files, 1);
-    BEGIN { $tests += 1; }
-}
+#{
+#    my @session_files = glob "/tmp/cgisess_*";
+#    is (@session_files, 1);
+#    BEGIN { $tests += 1; }
+#}
 
 
 {
     my $user = t::lib::CPAN::Forum::Test::register_user(0);
+    #explain $user;
     $w_user->get_ok($url);
     $w_user->content_like(qr{CPAN Forum});
     $w_user->follow_link_ok({ text => 'login' });
@@ -118,8 +127,8 @@ sub read_config {
 
     $w_user->submit_form(
         fields => {
-            nickname => $user->username,
-            password => $user->password,
+            nickname => $user->{username},
+            password => $user->{password},
         },
     );
     $w_user->content_like(qr{You are logged in as.*$users[0]{username}});
@@ -128,29 +137,33 @@ sub read_config {
 
 }
 
+
 {
-    my ($user) 
-        = CPAN::Forum::DB::Users->search({ username => $users[0]{username} });
+    my $user
+        = CPAN::Forum::DB::Users->info_by( username => $users[0]{username} );
+    #explain $user;
     $w_guest->get_ok($url);
     $w_guest->content_like(qr{CPAN Forum});
     $w_guest->get_ok("$url/dist/Acme-Bleach");
+    $w_guest->content_like(qr{subforum of Acme-Bleach});
     $w_guest->follow_link_ok({ text => 'new post' });
-    # check if this is the login form
+
+    # TODO check if this is the login form
 
     # next call causes the warning when running with -w
     $w_guest->submit_form(
         fields => {
-            nickname => $user->username,
-            password => $user->password,
+            nickname => $user->{username},
+            password => $user->{password},
         },
     );
-    
+
     # this seem to be ok when done with real browser
     #diag $w_guest->content;
     $w_guest->content_like(qr{Distribution: Acme-Bleach});
     $w_guest->follow_link_ok({ text => 'logout' });
 
-    BEGIN { $tests += 6; }
+    BEGIN { $tests += 7; }
 }
 
 {
@@ -169,14 +182,14 @@ BEGIN { @input_fields = (
         ['allposts__all',    'checkbox',  'HTML::Form::ListInput',   undef],
         ['starters__all',    'checkbox',  'HTML::Form::ListInput',   undef],
         ['followups__all',   'checkbox',  'HTML::Form::ListInput',   undef],
-        ['allposts__new',    'checkbox',  'HTML::Form::ListInput',   undef],
-        ['starters__new',    'checkbox',  'HTML::Form::ListInput',   undef],
-        ['followups__new',   'checkbox',  'HTML::Form::ListInput',   undef],
-        ['type',             'option',    'HTML::Form::ListInput',   ''],
+#        ['allposts__new',    'checkbox',  'HTML::Form::ListInput',   undef],
+#        ['starters__new',    'checkbox',  'HTML::Form::ListInput',   undef],
+#        ['followups__new',   'checkbox',  'HTML::Form::ListInput',   undef],
+#        ['type',             'option',    'HTML::Form::ListInput',   ''],
         ['rm',               'hidden',    'HTML::Form::TextInput',   'update_subscription'],
         ['gids',             'hidden',    'HTML::Form::TextInput',   '_all'],
         ['submit',           'submit',    'HTML::Form::SubmitInput', 'Update'],
-        ['name',             'text',      'HTML::Form::TextInput',   ''],
+#        ['name',             'text',      'HTML::Form::TextInput',   ''],
     );
 }
 
@@ -190,8 +203,9 @@ BEGIN { @input_fields = (
     is($form->action, "$url/");
     check_form($form, \@input_fields);
 
-    BEGIN { $tests += 7 + @input_fields*2; }
+    BEGIN { $tests += 6 + 1+@input_fields*2; }
 }
+
 
 {
     # submit without any changes
@@ -202,7 +216,7 @@ BEGIN { @input_fields = (
     my ($form) = $w_user->forms;
     check_form($form, \@input_fields);
     
-    BEGIN { $tests += 4 + @input_fields*2 }
+    BEGIN { $tests += 3 +  1+@input_fields*2 }
 }
 
 # set the flags of all modules
@@ -213,12 +227,13 @@ foreach my $i (0..2) {
     $w_user->content_like(qr{Your subscriptions were successfully updated.});
     $w_user->content_like(qr{You can look at them here:});
     $w_user->follow_link_ok({ text => 'subscription information' });
+    $w_user->content_unlike(qr{Acme-Bleach});
     my ($form) = $w_user->forms;
     $input_fields[$i][3] = 'on';
     check_form($form, \@input_fields);
     # TODO: check it in the database as well....    
 
-    BEGIN { $tests += 3*(4 + @input_fields*2) }
+    BEGIN { $tests += 3*(4 + 1 +@input_fields*2) }
 }
 
 # reset the flags of all modules
@@ -229,59 +244,66 @@ foreach my $i (0..2) {
     $w_user->content_like(qr{Your subscriptions were successfully updated.});
     $w_user->content_like(qr{You can look at them here:});
     $w_user->follow_link_ok({ text => 'subscription information' });
+    $w_user->content_unlike(qr{Acme-Bleach});
     my ($form) = $w_user->forms;
     $input_fields[$i][3] = undef;
     check_form($form, \@input_fields);
     # TODO: check it in the database as well....    
 
-    BEGIN { $tests += 3*(4 + @input_fields*2) }
+    BEGIN { $tests += 3*(4 + 1+@input_fields*2) }
 }
 
-my $input_ref;
+# We don't have free text form on the mypan page now
 {
-    $w_user->current_form->find_input('name')->value( 'Acme-Bleach' );
-    $w_user->current_form->find_input('type')->value( 'Distribution' );
-    $w_user->current_form->find_input('allposts__new')->check;
-    $w_user->submit_form();
-    $w_user->content_like(qr{Your subscriptions were successfully updated.});
-    $w_user->content_like(qr{You can look at them here:});
-    $w_user->follow_link_ok({ text => 'subscription information' });
-    my ($form) = $w_user->forms;
-    $input_ref = dclone(\@input_fields);
-    # 3 is the id number of Acme-Bleach
-    push @$input_ref,
-        ['allposts_3',    'checkbox',  'HTML::Form::ListInput',   'on'],
-        ['starters_3',    'checkbox',  'HTML::Form::ListInput',   undef],
-        ['followups_3',   'checkbox',  'HTML::Form::ListInput',   undef];
-    $input_ref->[8][3] = '_all,3';
-    check_form($form, $input_ref);
-    # TODO: check it in the database as well....    
-
-    BEGIN { $tests += (4 + (@input_fields+3)*2) }
+    is($w_user->current_form->find_input('name'), undef, 'no free text input on mypan page');
+    BEGIN { $tests += 1 }
 }
 
-my $input_ref2;
-{
-    $w_user->current_form->find_input('name')->value( 'MARKSTOS' );
-    $w_user->current_form->find_input('type')->value( 'PAUSEID' );
-    $w_user->current_form->find_input('starters__new')->check;
-    $w_user->submit_form();
-    $w_user->content_like(qr{Your subscriptions were successfully updated.});
-    $w_user->content_like(qr{You can look at them here:});
-    $w_user->follow_link_ok({ text => 'subscription information' });
-    my ($form) = $w_user->forms;
-    my $input_ref2 = dclone($input_ref);
-    # 2 is the id number of MARKSTOS
-    push @$input_ref2,
-        ['allposts__2',    'checkbox',  'HTML::Form::ListInput',   undef],
-        ['starters__2',    'checkbox',  'HTML::Form::ListInput',   'on'],
-        ['followups__2',   'checkbox',  'HTML::Form::ListInput',   undef];
-    $input_ref2->[8][3] = '_all,_2,3';
-    check_form($form, $input_ref2);
-    # TODO: check it in the database as well....    
+#my $input_ref;
+#{
+#    $w_user->current_form->find_input('name')->value( 'Acme-Bleach' );
+#    $w_user->current_form->find_input('type')->value( 'Distribution' );
+#    $w_user->current_form->find_input('allposts__new')->check;
+#    $w_user->submit_form();
+#    $w_user->content_like(qr{Your subscriptions were successfully updated.});
+#    $w_user->content_like(qr{You can look at them here:});
+#    $w_user->follow_link_ok({ text => 'subscription information' });
+#    my ($form) = $w_user->forms;
+#    $input_ref = dclone(\@input_fields);
+#    # 3 is the id number of Acme-Bleach
+#    push @$input_ref,
+#        ['allposts_3',    'checkbox',  'HTML::Form::ListInput',   'on'],
+#        ['starters_3',    'checkbox',  'HTML::Form::ListInput',   undef],
+#        ['followups_3',   'checkbox',  'HTML::Form::ListInput',   undef];
+#    $input_ref->[8][3] = '_all,3';
+#    check_form($form, $input_ref);
+#    # TODO: check it in the database as well....    
+#
+#    BEGIN { $tests += (4 + (@input_fields+3)*2) }
+#}
 
-    BEGIN { $tests += (4 + (@input_fields+6)*2) }
-}
+#my $input_ref2;
+#{
+#    $w_user->current_form->find_input('name')->value( 'MARKSTOS' );
+#    $w_user->current_form->find_input('type')->value( 'PAUSEID' );
+#    $w_user->current_form->find_input('starters__new')->check;
+#    $w_user->submit_form();
+#    $w_user->content_like(qr{Your subscriptions were successfully updated.});
+#    $w_user->content_like(qr{You can look at them here:});
+#    $w_user->follow_link_ok({ text => 'subscription information' });
+#    my ($form) = $w_user->forms;
+#    my $input_ref2 = dclone($input_ref);
+#    # 2 is the id number of MARKSTOS
+#    push @$input_ref2,
+#        ['allposts__2',    'checkbox',  'HTML::Form::ListInput',   undef],
+#        ['starters__2',    'checkbox',  'HTML::Form::ListInput',   'on'],
+#        ['followups__2',   'checkbox',  'HTML::Form::ListInput',   undef];
+#    $input_ref2->[8][3] = '_all,_2,3';
+#    check_form($form, $input_ref2);
+#    # TODO: check it in the database as well....    
+#
+#    BEGIN { $tests += (4 + (@input_fields+6)*2) }
+#}
 
 
 =pod
@@ -297,7 +319,6 @@ sqlite> select * from authors;
 3|DCONWAY
 4|CEESHEK
 =cut
-
 
 
 sub check_form {
@@ -319,5 +340,4 @@ sub check_form {
         foreach my $i (@inputs) {    diag $i->name; }
     }
 }
-
 

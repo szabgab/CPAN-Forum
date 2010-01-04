@@ -2,10 +2,14 @@ package t::lib::CPAN::Forum::Test;
 use strict;
 use warnings;
 
-use File::Copy qw(copy);
-use File::Temp qw(tempdir);
+use Cwd            qw(abs_path cwd);
+use File::Basename qw(dirname);
+use File::Copy     qw(copy);
+use File::Path     qw(mkpath);
+use File::Temp     qw(tempdir);
 
-my $ROOT = tempdir( CLEANUP => 1 );
+
+my $ROOT = dirname(dirname(dirname(dirname(dirname(abs_path(__FILE__))))));
 
 our @users = (
     {
@@ -15,22 +19,15 @@ our @users = (
 );
 
 sub setup_database {
-    copy 't/CONFIG', $ROOT;
-    mkdir "$ROOT/schema";
-    mkdir "$ROOT/db";
-    copy 'schema/schema.sql', "$ROOT/schema";
-    copy 't/02packages.details.txt', $ROOT;
+    my $dbdir = dirname($ENV{CPAN_FORUM_DB_FILE});
+    mkpath($dbdir);
 
-    my $dir = Cwd::cwd;
-	
-    chdir $ROOT;
+    system "$^X bin/setup.pl    --config t/CONFIG                 --dbfile $ENV{CPAN_FORUM_DB_FILE}";
+    system "$^X bin/populate.pl --source t/02packages.details.txt --dbfile $ENV{CPAN_FORUM_DB_FILE}";
 
-    system "$^X $dir/bin/setup.pl --config CONFIG --dir db";
-    system "$^X $dir/bin/populate.pl --source 02packages.details.txt --dir db";
 
-    chdir $dir;
-    
-    return $ROOT;
+
+    return;
 }
 
 sub init_db {
@@ -39,38 +36,16 @@ sub init_db {
 }
 
 sub db_connect {
-    return "dbi:SQLite:$ROOT/db/forum.db";
+    return "dbi:SQLite:$ENV{CPAN_FORUM_DB_FILE}";
 }
 
-sub get_mech {
-    use Test::WWW::Mechanize::CGI;
-    my $w = Test::WWW::Mechanize::CGI->new;
-    mkdir "$ROOT/db";
-    $w->cgi(sub {
-        require CPAN::Forum;
-        $ENV{CPAN_FORUM_LOGFILE} = "$ROOT/db/message.log";
-        my $webapp = CPAN::Forum->new(
-                TMPL_PATH => "templates",
-                PARAMS => {
-                    ROOT       => $ROOT,
-                    DB_CONNECT => db_connect(),
-                },
-            );
-        $webapp->run();
-        }); 
-    return $w;
-};
-
-sub get_url {
-    return "http://cpanforum.local";
-}
 
 sub register_user {
     my ($id) = @_;
 
     init_db();
     require CPAN::Forum::DB::Users;
-    my $user = CPAN::Forum::DB::Users->create($users[$id]);
+    my $user = CPAN::Forum::DB::Users->add_user($users[$id]);
     return $user;
 }
 
@@ -83,7 +58,7 @@ sub register_users {
     foreach my $i (1..$n) {
         my %user;
         $user{$_} = $i . $users[$id]{$_} foreach qw(username email);
-        push @users, CPAN::Forum::DB::Users->create(\%user);
+        push @users, CPAN::Forum::DB::Users->add_user(\%user);
     }
     return @users;
 }

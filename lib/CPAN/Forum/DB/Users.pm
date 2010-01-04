@@ -9,7 +9,10 @@ use List::MoreUtils qw(none);
 
 sub add_user {
     my ($self, $args) = @_;
- 
+
+    foreach my $field (qw(username email)) {
+	Carp::croak("No $field") if not $args->{$field};
+    }
     my $dbh = CPAN::Forum::DBI::db_Main();
     $dbh->do("INSERT INTO users (username, email, password) VALUES (?, ?, ?)",
               undef,

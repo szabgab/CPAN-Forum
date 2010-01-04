@@ -27,14 +27,13 @@ my %opts = (
     cpan => 'http://www.cpan.org',
 );
 
-GetOptions(\%opts, "sendmail", "source=s", "dir=s", "fetch", "help", "cpan") 
+GetOptions(\%opts, "sendmail", "source=s", "dbfile=s", "fetch", "help", "cpan") 
     or usage();
 usage() if $opts{help};
-usage() if not $opts{dir};
+usage() if not $opts{dbfile};
 
 
-my $dbfile       = "$opts{dir}/forum.db";
-CPAN::Forum::DBI->myinit("dbi:SQLite:$dbfile");
+CPAN::Forum::DBI->myinit("dbi:SQLite:$opts{dbfile}");
 
 
 my $csv          = Text::CSV_XS->new();
@@ -44,7 +43,7 @@ print "This operation can take a couple of minutes\n";
 
 if (not $opts{source}) {
     my $file = "02packages.details.txt";
-    $opts{source} = "$opts{dir}/$file";
+    #$opts{source} = "$opts{dir}/$file"; #!!!
 }
 
 if ($opts{fetch}) {
@@ -113,7 +112,7 @@ foreach my $d ($p->latest_distributions) {
 
 
     my ($g) = CPAN::Forum::DB::Groups->get_data_by_name($name);
-    if ($g) {
+    if (%$g) {
         my $changed;
         foreach my $field (qw(version pauseid)) {
             #print "$name\n";
@@ -138,12 +137,12 @@ foreach my $d ($p->latest_distributions) {
     $message{new} .= sprintf "Creating %s   %s\n", $name, $new{version}, $pauseid;
 
     eval {
-        my $g = CPAN::Forum::DB::Groups->create({
+        my $g = CPAN::Forum::DB::Groups->add(
             name    => $name,
             gtype   => $CPAN::Forum::DBI::group_types{Distribution}, 
             version => $new{version},
             pauseid => $new{pauseid},
-        });
+        );
     };
     if ($@) {
         warn "$name\n";
@@ -189,7 +188,7 @@ sub usage {
 $0
     --sendmail      to send report to Gabor
     --source FILE   path to the 02packages.details.txt
-    --dir DIR       directory of the database
+    --dbfile PATH   path to the database file
     --fetch
     --cpan URL      (default http://www.cpan.org ) 
     --help          this help

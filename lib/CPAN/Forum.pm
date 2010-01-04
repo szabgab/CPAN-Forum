@@ -675,9 +675,9 @@ sub _set_run_mode {
 
     # override rm based on REQUEST
     my $request = $q->script_name . $q->path_info; # $self->param('REQUEST');
-    if ($request =~ m{^/
+    if ($request =~ m{^/+
                     ([^/]+)        # first word till after the first /
-                    (?:/(.*))?     # the rest, after the (optional) second /
+                    (?:/+(.*))?     # the rest, after the (optional) second /
                     }x) {
         my $newrm = $1;
         my $params = $2 || "";
