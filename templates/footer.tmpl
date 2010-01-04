@@ -19,9 +19,25 @@
 -->
 <div class="right_footer">
 Maintained by <a href="http://szabgab.com/">Gabor Szabo</a> and hosted on the
-servers of <a href="http://m5hosting.com/">M5 hosting</a><br>.
-<a href="http://pti.co.il/"><img border="0" src="/img/pti-round-80.jpg" /></a>
+servers of <a href="http://m5hosting.com/">M5 hosting</a>.<br />
+<a href="http://pti.co.il/"><img src="/img/pti-round-80.jpg" alt="Perl Training Israel" /></a>
 See also <a href="http://perltraining.org/">World Wide Perl Training</a>
 </div>
+
+<TMPL_IF dev_server>
+<TMPL_ELSE>
+<!-- Google Analytics -->
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-12199211-5");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+<!-- Google end -->
+</TMPL_IF>
+
 </body>
 </html>

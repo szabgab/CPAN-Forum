@@ -1,16 +1,16 @@
-<a name="<TMPL_VAR id>">
+<a name="<TMPL_VAR id>"></a>
 <table class="message">
 <tr class="message_row_head"><td>
    Posted on <span class="date"><TMPL_VAR date></span> 
    by <span class="username"><a href="/users/<TMPL_VAR postername>"><TMPL_VAR postername></a></span>
   <TMPL_IF parentid>
-	<span class="inresponse">in response to <a href="#<TMPL_VAR parentid>"><TMPL_VAR parentid></a></div>
+	<span class="inresponse">in response to <a href="#<TMPL_VAR parentid>"><TMPL_VAR parentid></a></span>
 
 
 
   </TMPL_IF>
 </td></tr>
-<tr class="message_row_subject"><td><TMPL_VAR subject></span></td></tr>
+<tr class="message_row_subject"><td><TMPL_VAR subject></td></tr>
 <tr class="message_row_text"><td>
     <TMPL_VAR text>
 </td></tr>

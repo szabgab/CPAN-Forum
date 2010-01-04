@@ -6,21 +6,6 @@
 	<link rel="stylesheet" href="/style.css" type="text/css" />
 </head> 
 
-<TMPL_IF dev_server>
-<TMPL_ELSE>
-<!-- Google Analytics -->
-<script type="text/javascript">
-var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-</script>
-<script type="text/javascript">
-try {
-var pageTracker = _gat._getTracker("UA-12199211-5");
-pageTracker._trackPageview();
-} catch(err) {}</script>
-<!-- Google end -->
-</TMPL_IF>
-
 <body>
 <TMPL_IF test_site_warning>
 <p class="warning">Warning: this is a test site, the data here will be deleted.<br />
