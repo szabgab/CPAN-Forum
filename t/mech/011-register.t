@@ -1,7 +1,6 @@
 use strict;
 use warnings;
 
-use Test::WWW::Mechanize;
 use Test::Most;
 
 plan skip_all => 'Need CPAN_FORUM_DB_FILE and CPAN_FORUM_TEST_URL' 
@@ -13,14 +12,13 @@ bail_on_fail;
 
 use t::lib::CPAN::Forum::Test;
 my @users = @t::lib::CPAN::Forum::Test::users;
+my $w = t::lib::CPAN::Forum::Test::get_mech();
+
 
 {
     t::lib::CPAN::Forum::Test::setup_database();
     ok(-e $ENV{CPAN_FORUM_DB_FILE});
 }
-
-
-my $w = Test::WWW::Mechanize->new;
 
 {
     $w->get_ok($ENV{CPAN_FORUM_TEST_URL});

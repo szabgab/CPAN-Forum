@@ -63,6 +63,32 @@ sub register_users {
     return @users;
 }
 
+sub get_mech {
+    # TODO Enable using an environment variable?
+    #require Test::WWW::Mechanize;
+    #Test::WWW::Mechanize->new;
+    
+    require Test::WWW::Mechanize::CGI;
+    # for some reason the environemnt variable is not visible inside the cgi request
+    # so we use a temporary variable here
+    my $db_file = $ENV{CPAN_FORUM_DB_FILE};
+
+    my $w = Test::WWW::Mechanize::CGI->new;
+    $w->cgi(sub {
+        require CPAN::Forum;
+        $ENV{CPAN_FORUM_LOGFILE} = "/tmp/message.log";
+        my $webapp = CPAN::Forum->new(
+                TMPL_PATH => "templates",
+                PARAMS => {
+                    ROOT       => $ROOT,
+                    DB_CONNECT => "dbi:SQLite:$db_file",
+
+                },
+            );
+        $webapp->run();
+        }); 
+    return $w;
+};
 
 
 1;

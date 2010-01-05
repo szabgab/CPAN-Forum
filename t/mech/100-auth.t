@@ -4,7 +4,6 @@ use strict;
 use warnings;
 
 use Storable qw(dclone);
-use Test::WWW::Mechanize;
 use Test::Most;
 
 plan skip_all => 'Need CPAN_FORUM_DB_FILE and CPAN_FORUM_TEST_URL' 
@@ -17,6 +16,9 @@ bail_on_fail;
 
 use t::lib::CPAN::Forum::Test;
 my @users = @t::lib::CPAN::Forum::Test::users;
+my $w_admin = t::lib::CPAN::Forum::Test::get_mech();
+my $w_user  = t::lib::CPAN::Forum::Test::get_mech();
+my $w_guest = t::lib::CPAN::Forum::Test::get_mech();
 
 {
     t::lib::CPAN::Forum::Test::setup_database();
@@ -25,9 +27,6 @@ my @users = @t::lib::CPAN::Forum::Test::users;
 }
 
 
-my $w_admin = Test::WWW::Mechanize->new;
-my $w_user  = Test::WWW::Mechanize->new;
-my $w_guest = Test::WWW::Mechanize->new;
 my $url     = $ENV{CPAN_FORUM_TEST_URL};
 $url =~ s{/+$}{};
 

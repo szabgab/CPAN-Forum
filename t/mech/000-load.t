@@ -5,8 +5,9 @@ use Test::More;
 plan skip_all => 'Need CPAN_FORUM_DB_FILE and CPAN_FORUM_TEST_URL' 
 	if not $ENV{CPAN_FORUM_DB_FILE} or not $ENV{CPAN_FORUM_TEST_URL};
 
-use Test::WWW::Mechanize;
-my $w = Test::WWW::Mechanize->new;
+use t::lib::CPAN::Forum::Test;
+
+my $w = t::lib::CPAN::Forum::Test::get_mech();
 
 plan tests => 2;
 
