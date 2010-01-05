@@ -1,19 +1,20 @@
 package CPAN::Forum;
 use strict;
 use warnings;
+use 5.008;
 
 our $VERSION = '0.14';
 
 use base 'CGI::Application';
+use CGI ();
 use CGI::Application::Plugin::Session;
 use CGI::Application::Plugin::LogDispatch;
-use Data::Dumper qw();
-use POSIX        qw();
-use Mail::Sendmail qw(sendmail);
-use CGI ();
-use List::MoreUtils qw(any);
-use WWW::Mechanize;
 use CPAN::DistnameInfo;
+use Data::Dumper qw();
+use List::MoreUtils qw(any);
+use Mail::Sendmail qw(sendmail);
+use POSIX        qw();
+use WWW::Mechanize;
 
 use CPAN::Forum::INC;
 use CPAN::Forum::DBI;
