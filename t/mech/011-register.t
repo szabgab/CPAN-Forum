@@ -6,7 +6,7 @@ use Test::Most;
 plan skip_all => 'Need CPAN_FORUM_DB_FILE and CPAN_FORUM_TEST_URL' 
 	if not $ENV{CPAN_FORUM_DB_FILE} or not $ENV{CPAN_FORUM_TEST_URL};
 
-plan tests => 33;
+plan tests => 35;
 
 bail_on_fail;
 
@@ -94,7 +94,19 @@ foreach my $email ("adb-?", "Abcde", "asd'er", "ab cd") {
 
 
 my $pw;
+my $password;
+my $sendmail_count;
 # register user
+sub CPAN::Forum::_test_my_sendmail {
+    my %mail = @_;
+    #use Data::Dumper;
+    #print STDERR Dumper \%mail;
+    #print STDERR 
+    if ($mail{Message} =~ /your password is: (\w+)/) {
+        $password = $1;
+    }
+    $sendmail_count++;
+}
 
 # TODO: check if the call to submail contains the correct values
 {
@@ -106,11 +118,11 @@ my $pw;
     );
     $w->content_like(qr{Registration Page});
     $w->content_like(qr{Thank you for registering});
-#    like($password, qr{\w{5}}, 'password');
-
-#    is($sendmail_count, 2);
-#    $pw = $password;
-
+    
+    # TODO: disable these when testing with real web server
+    like($password, qr{\w{5}}, 'password');
+    is($sendmail_count, 2);
+    $pw = $password;
 }
 
 # try to register the same user again and see it fails
@@ -124,8 +136,9 @@ my $pw;
     );
     $w->content_like(qr{Registration Page});
     $w->content_like(qr{Nickname or e-mail already in use});
-#    is($sendmail_count, 0);
-#    is($password, "");
 
+    # TODO: disable these when testing with real web server
+    #is($sendmail_count, 0);
+    #is($password, "");
 }
 
