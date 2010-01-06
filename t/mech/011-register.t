@@ -6,9 +6,10 @@ use Test::Most;
 plan skip_all => 'Need CPAN_FORUM_TEST_DB and CPAN_FORUM_TEST_USER and CPAN_FORUM_LOGFILE' 
 	if not $ENV{CPAN_FORUM_TEST_DB} or not $ENV{CPAN_FORUM_TEST_USER} or not $ENV{CPAN_FORUM_LOGFILE};
 
-plan tests => 36;
+my $tests;
+plan tests => $tests;
 
-#bail_on_fail;
+bail_on_fail;
 
 use t::lib::CPAN::Forum::Test;
 my @users = @t::lib::CPAN::Forum::Test::users;
@@ -26,6 +27,7 @@ my $w = t::lib::CPAN::Forum::Test::get_mech();
 
     $w->follow_link_ok({ text => 'register' });
     $w->content_like(qr{Registration Page}) or diag $w->content;
+    BEGIN { $tests += 4; }
 }
 
 {
@@ -64,6 +66,7 @@ my $w = t::lib::CPAN::Forum::Test::get_mech();
     );
     $w->content_like(qr{Registration Page});
     $w->content_like(qr{Nickname must be lower case alphanumeric between 1-25 characters});
+    BEGIN { $tests += 8; }
 }
 
 # reject bad usernames
@@ -77,6 +80,7 @@ foreach my $username ("ab.c", "Abcde", "asd'er", "ab cd") {
     $w->content_like(qr{Registration Page});
     $w->content_like(qr{Nickname must be lower case alphanumeric between 1-25 characters});
 }
+    BEGIN { $tests += 4*2; }
 
 # reject bad email address 
 foreach my $email ("adb-?", "Abcde", "asd'er", "ab cd") {
@@ -89,7 +93,7 @@ foreach my $email ("adb-?", "Abcde", "asd'er", "ab cd") {
     $w->content_like(qr{Registration Page});
     $w->content_like(qr{Email must be a valid address writen in lower case letters});
 }
-
+    BEGIN { $tests += 4*2; }
 
 
 
@@ -113,6 +117,7 @@ foreach my $email ("adb-?", "Abcde", "asd'er", "ab cd") {
     my ($pw) = $CPAN::Forum::messages[0]{Message} =~ qr/your password is: (\w+)/;
     diag "Password: $pw";
     like($pw, qr{\w{5}}, 'password send');
+    BEGIN { $tests += 4; }
 }
 
 # try to register the same user again and see it fails
@@ -130,5 +135,6 @@ foreach my $email ("adb-?", "Abcde", "asd'er", "ab cd") {
 
     # TODO: disable these when testing with real web server
     is_deeply(\@CPAN::Forum::messages, [], 'no e-mails sent');
+    BEGIN { $tests += 3; }
 }
 

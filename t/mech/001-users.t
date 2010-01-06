@@ -1,12 +1,14 @@
 use strict;
 use warnings;
 
-use Test::More;
+use Test::Most;
 
 plan skip_all => 'Need CPAN_FORUM_TEST_DB and CPAN_FORUM_TEST_USER and CPAN_FORUM_LOGFILE' 
 	if not $ENV{CPAN_FORUM_TEST_DB} or not $ENV{CPAN_FORUM_TEST_USER} or not $ENV{CPAN_FORUM_LOGFILE};
 
 plan tests => 5;
+bail_on_fail;
+
 
 use t::lib::CPAN::Forum::Test;
 

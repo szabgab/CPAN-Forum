@@ -69,20 +69,23 @@ sub get_mech {
     #Test::WWW::Mechanize->new;
     
     require Test::WWW::Mechanize::CGI;
-    # for some reason the environemnt variable is not visible inside the cgi request
-    # so we use a temporary variable here
-    my $db_file = $ENV{CPAN_FORUM_DB_FILE};
 
+    # for some reason the environemnt variable is not visible inside the cgi request
+    # so we have to pass them this way:
     my $w = Test::WWW::Mechanize::CGI->new;
+    $w->env(
+        CPAN_FORUM_LOGFILE => $ENV{CPAN_FORUM_LOGFILE},
+        CPAN_FORUM_DB      => $ENV{CPAN_FORUM_TEST_DB},
+        CPAN_FORUM_USER    => $ENV{CPAN_FORUM_TEST_USER},
+    );
+
     $w->cgi(sub {
         require CPAN::Forum;
-        $ENV{CPAN_FORUM_LOGFILE} = "/tmp/message.log";
+
         my $webapp = CPAN::Forum->new(
                 TMPL_PATH => "templates",
                 PARAMS => {
                     ROOT       => $ROOT,
-                    DB_CONNECT => "dbi:SQLite:$db_file",
-
                 },
             );
         $webapp->run();
