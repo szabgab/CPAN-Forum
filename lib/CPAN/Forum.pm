@@ -1235,8 +1235,9 @@ sub process_post {
                 " uid: " .  
                 $self->session->param("uid"));
                 
-    my $button = $q->param("button");
-    if (not @errors and $button eq "Submit") {
+    my $preview_button = $q->param("preview_button");
+    my $submit_button = $q->param("submit_button");
+    if (not @errors and $submit_button) {
         my $last_post = CPAN::Forum::DB::Posts->get_latest_post_by_uid($self->session->param('uid')); # SQL
         # TODO, maybe also check if the post is the same as the last post to avoid duplicates
         if ($last_post) {
@@ -1269,12 +1270,12 @@ sub process_post {
     }
 
 
-    if ($button eq "Preview") {
+    if ($preview_button) {
         return $self->posts(["preview"]);
     }
-    if ($button ne "Submit") {
+    if (not $submit_button) {
         return $self->internal_error(
-            "Someone sent in a button called '$button'",
+            "Someone sent in a form without the Preview or Submit button",
             );
     }
 

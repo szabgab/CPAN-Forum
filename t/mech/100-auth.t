@@ -66,7 +66,7 @@ sub read_config {
     }
 #    is($session_files[0], "/tmp/cgisess_$cookie");
 
-    # submit form without values
+    diag("Try to login without filling username or password");
     $w_admin->submit_form();
     $w_admin->content_like(qr{Need both nickname and password.});
 
@@ -78,7 +78,7 @@ sub read_config {
     is($new_cookie, $cookie_jar);
     #diag $w_admin->cookie_jar->as_string;
 
-    # submit form without password
+    diag("Try to login with username but without password");
     $w_admin->submit_form(
         fields => {
             nickname => $config{username},
@@ -87,7 +87,7 @@ sub read_config {
     $w_admin->content_like(qr{Need both nickname and password.});
     $w_admin->content_like(qr{$config{username}});
 
-    # submit form with bad password
+    diag("Try to login with correct username but with bad password");
     $w_admin->submit_form(
         fields => {
             nickname => $config{username},
@@ -98,7 +98,7 @@ sub read_config {
     $w_admin->content_like(qr{$config{username}});
     $w_admin->content_unlike(qr{bad_password});
 
-
+	diag("Try to login with admin username and admin password");
     $w_admin->submit_form(
         fields => {
             nickname => $config{username},
@@ -117,6 +117,7 @@ sub read_config {
 
 
 {
+	diag("Login as a regular user");
     my $user = t::lib::CPAN::Forum::Test::register_user(0);
     #explain $user;
     $w_user->get_ok($url);
@@ -137,6 +138,8 @@ sub read_config {
 }
 
 
+# the next can be probably removed or if we could check here that no e-mail is sent after
+# posting
 {
     my $user
         = CPAN::Forum::DB::Users->info_by( username => $users[0]{username} );
@@ -193,6 +196,7 @@ BEGIN { @input_fields = (
 }
 
 {
+	diag("Subscribe to notification on All entries");
     $w_user->follow_link_ok({ text => 'home' });
     $w_user->follow_link_ok({ text => 'mypan' });
     $w_user->content_like(qr{Personal configuration of}); # fname lname (username)
@@ -235,7 +239,80 @@ foreach my $i (0..2) {
     BEGIN { $tests += 3*(4 + 1 +@input_fields*2) }
 }
 
-# reset the flags of all modules
+my @post_preview_input_fields;
+my @post_submit_input_fields;
+BEGIN { 
+	@post_preview_input_fields = (
+        ['rm',               'hidden',    'HTML::Form::TextInput',   'process_post'],
+        ['new_group_id',     'hidden',    'HTML::Form::TextInput',   '3'],   # really can we know this number for sure?
+        ['new_parent',       'hidden',    'HTML::Form::TextInput',   ''],
+        ['new_subject',      'text',      'HTML::Form::TextInput',   ''],
+        ['new_text',         'textarea',  'HTML::Form::TextInput',   ''],
+        ['preview_button',   'submit',    'HTML::Form::SubmitInput', 'Preview'],
+        ['preview_button',   'submit',    'HTML::Form::SubmitInput', 'Preview'], # there are two preview buttons
+    );
+	@post_submit_input_fields = (
+        ['rm',               'hidden',    'HTML::Form::TextInput',   'process_post'],
+        ['new_group_id',     'hidden',    'HTML::Form::TextInput',   '3'],   # really can we know this number for sure?
+        ['new_parent',       'hidden',    'HTML::Form::TextInput',   ''],
+        ['new_subject',      'text',      'HTML::Form::TextInput',   'A new subject'],
+        ['new_text',         'textarea',  'HTML::Form::TextInput',   "This is supposed to be a posting"],
+        ['preview_button',   'submit',    'HTML::Form::SubmitInput', 'Preview'],
+        ['preview_button',   'submit',    'HTML::Form::SubmitInput', 'Preview'], # there are two preview buttons
+        ['submit_button',    'submit',    'HTML::Form::SubmitInput', 'Submit'],
+        ['submit_button',    'submit',    'HTML::Form::SubmitInput', 'Submit'], # there are two submit buttons
+	);
+
+}
+
+
+{
+    diag "Submit a post";
+    is_deeply(\@CPAN::Forum::messages, [], 'no messages were sent so far');
+    $w_user->get_ok("$url/dist/Acme-Bleach");
+    $w_user->content_like(qr{Be the first one to post a message in the subforum of Acme-Bleach});
+    $w_user->follow_link_ok({ text => 'new post' });
+    $w_user->content_like(qr{Distribution: Acme-Bleach});
+    $w_user->content_unlike(qr{Password:});  # not a login form
+    $w_user->content_unlike(qr{Posted on});
+    my ($serch_form1, $post_form1) = $w_user->forms;
+    #$input_fields[$i][3] = undef;
+    check_form($post_form1, \@post_preview_input_fields);
+
+	diag "Submit to Preview";
+    $w_user->submit_form(
+		form_number => 2,
+		button => 'preview_button',
+        fields => {
+            new_subject   => 'A new subject',
+            new_text      => "This is supposed to be a posting",
+        },
+    );
+    #diag $w_user->content;
+    $w_user->content_like( qr{Posted on.*by.*$users[0]{username}}s );
+    $w_user->content_like(qr{<b>Preview</b>});
+    my ($serch_form2, $post_form2) = $w_user->forms;
+    check_form($post_form2, \@post_submit_input_fields);
+
+    is_deeply(\@CPAN::Forum::messages, [], 'no messages were sent so far');
+	diag "Submit for posting";
+    $w_user->submit_form(
+		form_number => 2,
+		button => 'submit_button',
+    );
+    #diag $w_user->content;
+	#explain \@CPAN::Forum::messages;
+    #is_deeply(\@CPAN::Forum::messages, [], 'no messages were sent so far');
+    is(scalar(@CPAN::Forum::messages), 1, 'one message sent');
+	like($CPAN::Forum::messages[0]{Message}, qr{\($users[0]{username}\) wrote:});
+	# TODO check the e-mail message more in details!
+    
+    BEGIN { $tests += 12 + 1+@post_preview_input_fields*2  + 1+@post_submit_input_fields*2}
+}
+
+
+diag("Unsubscribe form all notifications");
+$w_user->get_ok("$url/mypan");
 foreach my $i (0..2) {
     my $input = $w_user->current_form->find_input( $input_fields[$i][0] );
     $input->value(undef);
@@ -249,14 +326,16 @@ foreach my $i (0..2) {
     check_form($form, \@input_fields);
     # TODO: check it in the database as well....    
 
-    BEGIN { $tests += 3*(4 + 1+@input_fields*2) }
+    BEGIN { $tests += 1+ 3*(4 + 1+@input_fields*2) }
 }
 
 # We don't have free text form on the mypan page now
 {
     is($w_user->current_form->find_input('name'), undef, 'no free text input on mypan page');
     BEGIN { $tests += 1 }
+
 }
+
 
 #my $input_ref;
 #{
@@ -324,8 +403,12 @@ sub check_form {
     my ($form, $input_fields_ref, $diag) = @_;
     foreach my $i (@$input_fields_ref) {
         my ($name, $type, $obj, $value) = @$i;
+		#next if not $name; # skip this test
         my $input = $form->find_input( $name, $type);
-        isa_ok($input, $obj, "$name is $obj") or next;
+        isa_ok($input, $obj, "$name is $obj") or do {
+			diag $input;
+			next;
+		};
         if (defined $value) {
             is($input->value, $value, "$name is $value");
         } else {

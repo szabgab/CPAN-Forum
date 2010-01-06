@@ -23,9 +23,9 @@
 
 <form method="post" action="/">
 <p>
-<input type="submit" name="button" value="Preview" />
+<input type="submit" name="preview_button" value="Preview" />
 <TMPL_IF preview>
-	<input type="submit" name="button" value="Submit" />
+	<input type="submit" name="submit_button" value="Submit" />
 </TMPL_IF>
 <br />
 <input type="hidden" name="rm" value="process_post" />
@@ -36,9 +36,9 @@ Distribution: <TMPL_VAR new_group><br />
 Subject:<br /><input name="new_subject" size="100" value="<TMPL_VAR new_subject>" /><br />
 Text:<br /><textarea name="new_text" rows="15" cols="100"><TMPL_VAR new_text></textarea><br />
 
-<input type="submit" name="button" value="Preview" />
+<input type="submit" name="preview_button" value="Preview" />
 <TMPL_IF preview>
-	<input type="submit" name="button" value="Submit" />
+	<input type="submit" name="submit_button" value="Submit" />
 </TMPL_IF>
 </p>
 </form>

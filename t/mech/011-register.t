@@ -96,8 +96,8 @@ foreach my $email ("adb-?", "Abcde", "asd'er", "ab cd") {
 # register user
 
 # TODO: check if the call to submail contains the correct values
-my $pw;
 {
+    @CPAN::Forum::messages = ();
     $w->submit_form(
         fields => {
             nickname => $users[0]{username}, 
@@ -110,7 +110,7 @@ my $pw;
     
     # TODO: disable these when testing with real web server
     is(scalar(@CPAN::Forum::messages), 2, 'two mails sent');
-    ($pw) = $CPAN::Forum::messages[0]{Message} =~ qr/your password is: (\w+)/;
+    my ($pw) = $CPAN::Forum::messages[0]{Message} =~ qr/your password is: (\w+)/;
     diag "Password: $pw";
     like($pw, qr{\w{5}}, 'password send');
 }

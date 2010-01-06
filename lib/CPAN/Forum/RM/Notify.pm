@@ -19,7 +19,9 @@ sub notify {
     return if not $post;
     # TODO what if it does not find it?
 
+    my $user =  sprintf(" %s %s (%s)", ($post->{fname} || ''), ($post->{lname} || ''), $post->{username});
     my $message = 
+        "$user wrote:\n\n" .
         $self->_text2mail ($post->{text}) .
         "\n\n" .
         "To write a respons, access\n".
