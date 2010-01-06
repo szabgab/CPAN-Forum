@@ -1,4 +1,8 @@
 
+- TODO: Make sure the passwords are long enough and encrypted in the database!
+- Test if the flood_control_time_limit works?
+- Make sure the time shows up correctly
+
 Jan 4
   * Write tests for existing system to cover the important aspects of the system
     1) registration, email verification
@@ -53,7 +57,7 @@ Jan 11
 
 -------------------------------
   * Setup bug and request tracking (or shall we use RT for this?)
-  * Switch to use Git and Github
+  * Switch to use Git and Github  DONE
 
   * Index and display perldoc
   * Index and display perldoc in French and Italian
