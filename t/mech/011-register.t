@@ -6,7 +6,7 @@ use Test::Most;
 plan skip_all => 'Need CPAN_FORUM_DB_FILE and CPAN_FORUM_TEST_URL' 
 	if not $ENV{CPAN_FORUM_DB_FILE} or not $ENV{CPAN_FORUM_TEST_URL};
 
-plan tests => 35;
+plan tests => 36;
 
 bail_on_fail;
 
@@ -93,22 +93,21 @@ foreach my $email ("adb-?", "Abcde", "asd'er", "ab cd") {
 
 
 
-my $pw;
-my $password;
-my $sendmail_count;
-# register user
+my @messages;
 sub CPAN::Forum::_test_my_sendmail {
     my %mail = @_;
+    my @fields = qw(Message From Subject To);
+    my %m;
+    @m{@fields} = @mail{@fields};
+    push @messages, \%m;
     #use Data::Dumper;
     #print STDERR Dumper \%mail;
     #print STDERR 
-    if ($mail{Message} =~ /your password is: (\w+)/) {
-        $password = $1;
-    }
-    $sendmail_count++;
 }
+# register user
 
 # TODO: check if the call to submail contains the correct values
+my $pw;
 {
     $w->submit_form(
         fields => {
@@ -118,15 +117,18 @@ sub CPAN::Forum::_test_my_sendmail {
     );
     $w->content_like(qr{Registration Page});
     $w->content_like(qr{Thank you for registering});
+    #explain \@messages;
     
     # TODO: disable these when testing with real web server
-    like($password, qr{\w{5}}, 'password');
-    is($sendmail_count, 2);
-    $pw = $password;
+    is(scalar(@messages), 2, 'two mails sent');
+    ($pw) = $messages[0]{Message} =~ qr/your password is: (\w+)/;
+    diag "Password: $pw";
+    like($pw, qr{\w{5}}, 'password send');
 }
 
 # try to register the same user again and see it fails
 {
+    @messages = ();
     $w->back;
     $w->submit_form(
         fields => {
@@ -138,7 +140,6 @@ sub CPAN::Forum::_test_my_sendmail {
     $w->content_like(qr{Nickname or e-mail already in use});
 
     # TODO: disable these when testing with real web server
-    #is($sendmail_count, 0);
-    #is($password, "");
+    is_deeply(\@messages, [], 'no e-mails sent');
 }
 
