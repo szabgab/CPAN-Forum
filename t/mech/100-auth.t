@@ -310,13 +310,35 @@ BEGIN {
     BEGIN { $tests += 12 + 1+@post_preview_input_fields*2  + 1+@post_submit_input_fields*2}
 }
 
+
+my @update_tags;
+BEGIN { 
+	@update_tags = (
+#        ['rm',               'hidden',    'HTML::Form::TextInput',   'process_post'],  #  where is the run mode?
+        ['what',     'hidden',    'HTML::Form::TextInput',   'tags'],
+        ['group_id',       'hidden',    'HTML::Form::TextInput',   '3'],    # really can we know this number for sure?
+        ['new_tags',      'text',      'HTML::Form::TextInput',   ''],
+        ['update_button',   'submit',    'HTML::Form::SubmitInput', 'Update my tags'],
+    );
+}
+
 {
 	$w_user->get_ok("$url/tags/");
 	$w_user->content_unlike(qr{Something went wrong here});
 
 	$w_guest->get_ok("$url/tags/");
 	$w_guest->content_unlike(qr{Something went wrong here});
-	BEGIN { $tests += 4; }
+	
+	$w_user->get_ok("$url/dist/Acme-Bleach");
+	$w_user->content_like(qr{Update my tags});
+	
+	$w_guest->get_ok("$url/dist/Acme-Bleach");
+	$w_guest->content_unlike(qr{Update my tags});
+
+	my ($search_form, $tags_form) = $w_user->forms;
+	check_form($tags_form, \@update_tags);
+	
+	BEGIN { $tests += 8  + 1+@update_tags*2; }
 }
 
 
