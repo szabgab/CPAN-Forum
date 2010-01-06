@@ -23,7 +23,7 @@ sub setup_database {
     $ENV{CPAN_FORUM_USER} = $ENV{CPAN_FORUM_TEST_USER};
 
     # TODO capture STDERR and show if there was an error
-    my $out = qx{$^X bin/setup.pl    --email 'test\@perl.org.il' --username testadmin --password pw_of_testadmin --from 'testforum\@perl.org.il' --dbname $ENV{CPAN_FORUM_DB} --dbuser $ENV{CPAN_FORUM_USER} 2>&1};
+    my $out = qx{$^X bin/setup.pl    --email 'test\@perl.org.il' --username testadmin --password pw_of_testadmin --from 'testforum\@perl.org.il' 2>&1};
     if ($out =~ /ERROR/) {
         die $out;
     }
