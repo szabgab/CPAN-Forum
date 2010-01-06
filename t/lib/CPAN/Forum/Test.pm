@@ -90,6 +90,14 @@ sub get_mech {
     return $w;
 };
 
+sub CPAN::Forum::_test_my_sendmail {
+    my %mail = @_;
+    my @fields = qw(Message From Subject To);
+    my %m;
+    @m{@fields} = @mail{@fields};
+    push @CPAN::Forum::messages, \%m;
+    return;
+}
 
 1;
 

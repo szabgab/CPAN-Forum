@@ -93,17 +93,6 @@ foreach my $email ("adb-?", "Abcde", "asd'er", "ab cd") {
 
 
 
-my @messages;
-sub CPAN::Forum::_test_my_sendmail {
-    my %mail = @_;
-    my @fields = qw(Message From Subject To);
-    my %m;
-    @m{@fields} = @mail{@fields};
-    push @messages, \%m;
-    #use Data::Dumper;
-    #print STDERR Dumper \%mail;
-    #print STDERR 
-}
 # register user
 
 # TODO: check if the call to submail contains the correct values
@@ -117,18 +106,18 @@ my $pw;
     );
     $w->content_like(qr{Registration Page});
     $w->content_like(qr{Thank you for registering});
-    #explain \@messages;
+    #explain \@CPAN::Forum::messages;
     
     # TODO: disable these when testing with real web server
-    is(scalar(@messages), 2, 'two mails sent');
-    ($pw) = $messages[0]{Message} =~ qr/your password is: (\w+)/;
+    is(scalar(@CPAN::Forum::messages), 2, 'two mails sent');
+    ($pw) = $CPAN::Forum::messages[0]{Message} =~ qr/your password is: (\w+)/;
     diag "Password: $pw";
     like($pw, qr{\w{5}}, 'password send');
 }
 
 # try to register the same user again and see it fails
 {
-    @messages = ();
+    @CPAN::Forum::messages = ();
     $w->back;
     $w->submit_form(
         fields => {
@@ -140,6 +129,6 @@ my $pw;
     $w->content_like(qr{Nickname or e-mail already in use});
 
     # TODO: disable these when testing with real web server
-    is_deeply(\@messages, [], 'no e-mails sent');
+    is_deeply(\@CPAN::Forum::messages, [], 'no e-mails sent');
 }
 
