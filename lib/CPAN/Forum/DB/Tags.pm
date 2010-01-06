@@ -81,7 +81,7 @@ sub _get_tag_id {
 sub get_all_tags {
     my ($self) = @_;
 
-    my $sql = "SELECT tags.name name, COUNT(name) total
+    my $sql = "SELECT tags.name AS name, COUNT(name) AS total
                 FROM tags, tag_cloud 
                 WHERE tag_cloud.tag_id=tags.id
                 GROUP BY name
@@ -92,7 +92,7 @@ sub get_all_tags {
 sub get_tags_of_user {
     my ($self, $username) = @_;
 
-    my $sql = "SELECT tags.name name, COUNT(name) total
+    my $sql = "SELECT tags.name AS name, COUNT(name) AS total
                 FROM tags, tag_cloud, users
                 WHERE tag_cloud.tag_id=tags.id AND tag_cloud.uid=users.id AND users.username=?
                 GROUP BY name
@@ -104,7 +104,7 @@ sub get_tags_of_user {
 sub get_modules_with_tag {
     my ($self, $tag_name) = @_;
 
-    my $sql = "SELECT groups.name, COUNT(*) cnt
+    my $sql = "SELECT groups.name, COUNT(*) AS cnt
                FROM groups, tags, tag_cloud
                WHERE groups.id=tag_cloud.group_id AND tag_cloud.tag_id=tags.id AND tags.name=?
                GROUP BY groups.name";
@@ -113,7 +113,7 @@ sub get_modules_with_tag {
 
 sub list_modules_and_tags {
     my ($self) = @_;
-    my $sql = "SELECT groups.name module, tags.name tag 
+    my $sql = "SELECT groups.name AS module, tags.name AS tag 
                FROM groups, tags, tag_cloud 
                WHERE tag_cloud.group_id=groups.id AND tag_cloud.tag_id=tags.id";
     return $self->_fetch_arrayref_of_hashes($sql);
@@ -133,7 +133,7 @@ sub dump_tag_cloud {
 sub retrieve_latest {
     my ($self, $limit) = @_;
 
-    my $sql = qq{SELECT tags.name tag, tag_cloud.stamp stamp, groups.name dist
+    my $sql = qq{SELECT tags.name AS tag, tag_cloud.stamp AS stamp, groups.name AS dist
                  FROM tags,tag_cloud,groups
                  WHERE tags.id=tag_cloud.tag_id AND tag_cloud.group_id=groups.id
                  ORDER BY tag_cloud.stamp DESC
@@ -159,7 +159,7 @@ set_tag_on(module, person)
 sub stat_tags_by_user {
     my ($self, $limit) = @_;
     my $sql = qq{
-            SELECT COUNT(*) cnt, users.username username 
+            SELECT COUNT(*) AS cnt, users.username AS username 
             FROM tag_cloud,users
             WHERE tag_cloud.uid=users.id
             GROUP BY username
