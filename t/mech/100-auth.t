@@ -310,6 +310,15 @@ BEGIN {
     BEGIN { $tests += 12 + 1+@post_preview_input_fields*2  + 1+@post_submit_input_fields*2}
 }
 
+{
+	$w_user->get_ok("$url/tags/");
+	$w_user->content_unlike(qr{Something went wrong here});
+
+	$w_guest->get_ok("$url/tags/");
+	$w_guest->content_unlike(qr{Something went wrong here});
+	BEGIN { $tests += 4; }
+}
+
 
 diag("Unsubscribe form all notifications");
 $w_user->get_ok("$url/mypan");
