@@ -1,0 +1,36 @@
+<TMPL_INCLUDE NAME="head.tmpl">
+<p id="pageTitle">Installing a Perl Module from CPAN</p>
+
+<TMPL_INCLUDE NAME="navigation.tmpl">
+
+<div class="blurb">
+There are several ways to install Perl Module from CPAN. 
+</div>
+
+<div class="about_list">
+	<p class="about_title">Native Package management on Linux</p>
+</div>
+
+<div class="blurb">
+On Linux if you have root rights or if you can get the system administrator to do it then
+usually the best way is to check if the package management system of your distribution 
+provides the package. Given a module called Acme-Dosomething on Ubuntu or Debian 
+try <code>aptitude search acme-dosomthing</code>. In Red Hat, Fedora, CentOS, Mandriva or SuSE
+you can try to type <code>yum search Acme-Dosomething</code>.
+
+If they have the relevant module - and all its dependencies - packaged this will return the exact name of the
+packages. Then you can install the package using <code>sudo aptitude install libacme-dosomething-perl</code>
+or <code>sudo yum install Acme-Dosomething</code>.
+</div>
+
+<div class="about_list">
+	<p class="about_title">ActivePerl</p>
+</div>
+<div class="blurb">
+Use ppm on the command line or with their GUI installer.
+</div>
+
+
+
+<TMPL_INCLUDE NAME="footer.tmpl">
+
