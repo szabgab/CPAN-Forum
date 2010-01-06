@@ -102,7 +102,7 @@ some reason I could not finish the process. Maybe later we'll want to enable
 our users to use their auth.perl.org identity. Maybe we can do it also with 
 PerlMonks. Right now we have our own registration and login mechanism.
 
-=head1 INSTALLATION
+=head1 INSTALLATION of a development environment
 
 =head2 Apache
 
@@ -136,46 +136,58 @@ That way, I have a totally separate virtual host just for this application.
 In a real setting probably you'll have something like cpanforum.com 
 pointed to your server.
 
+
+=head2 PostgreSQL
+
+  $ sudo -u postgres psql postgres
+  postgres=# CREATE ROLE xyz LOGIN;
+  postgres=# CREATE DATABASE abc OWNER = xyz;
+  
+  $ sudo vi /etc/postgresql/8.4/main/pg_hba.conf
+  
+Add:   local all xyz trust
+
+  $ sudo  /etc/init.d/postgresql-8.4 restart
+ 
+ Now this should work:
+ 
+   $ psql -U xyz abc
+
+
 =head2 Install the perl code
+
+=head2 test the code
 
     perl Build.PL       - and make sure the prerequisites are installed
     ./Build
     ./Build test
-    ./Build install dir=/path/to/install
-    cd /path/to/install
 
     chmod a+x www/cgi/index.pl  (needed only if you work out of the repository)
-    chmod a+x db/forum.db       (or whatever you need to make sure the database is writable by the web server.
 
-Finally, manually edit the www/cgi/index.pl file and set the sha-bang to the 
-correct one
+Finally, manually edit the www/cgi/index.pl file and set the sh-bang to the correct one
 
 
 =head2 Setup the database
 
-In the directory where you installed the modules create a file called CONFIG 
-(see t/CONFIG for an example). Having the following fields:
+    perl bin/setup.pl 
+        --username testadmin              The user name of the administrator used on the web interface
+        --email 'test\@perl.org.il'       The E-mail of the administrator.
+        --password pw_of_testadmin        The password of the administrator.
+        --from 'testforum\@perl.org.il'   The Email address to be used as the from address in the messages sent by the system.
 
-    username=        The user name of the administrator.
-    email=           The E-mail of the administrator.
-    password=        The password of the administrator.
-    from=            The Email address to be used as the from address in the 
-                     messages sent by the system.
+        --dbname $ENV{CPAN_FORUM_DB} 
+        --dbuser $ENV{CPAN_FORUM_USER}
 
 You will be able to change all these values later from the web interface but 
 we need to have the first values.
 
-Run:
-
-    perl bin/setup.pl --config CONFIG --dir db
-
-(you can now delete the CONFIG file)
-
-Run:
-
-    perl bin/populate.pl
     
-(this will fetch a file from www.cpan.org and might take a few minutes to run)
+    perl bin/populate.pl 
+        --source t/02packages.details.txt 
+        --dbname $ENV{CPAN_FORUM_DB} 
+        --dbuser $ENV{CPAN_FORUM_USER}
+
+This will fetch a file from www.cpan.org and might take a few minutes to run.
 
 =head1 PATH
 
