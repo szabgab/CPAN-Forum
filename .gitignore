@@ -3,4 +3,5 @@ _build/
 db/
 CONFIG
 blib/
+cover_db/
 
