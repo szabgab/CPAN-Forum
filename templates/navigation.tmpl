@@ -20,10 +20,13 @@
     </TMPL_IF>
     | <a href="/tags/">tags</a>
 ]
+
+<TMPL_UNLESS dev_server>
 <div class="perlads">
 <script type="text/javascript"  src="http://adserver.szabgab.com/ads/direct_link_selflink.js?cnt=2"></script>
 </div>
 <div class="perlads">
+</TMPL_UNLESS>
 
 <a href="http://padre.perlide.org/">Download Padre, the Perl IDE</a>
 | <a href="http://m5hosting.com/"> Recommended web hosting by M5 hosting</a>
@@ -31,8 +34,7 @@
 <!-- &nick=<TMPL_VAR mibbit> -->
 </div>
 
-<TMPL_IF dev_server>
-<TMPL_ELSE>
+<TMPL_UNLESS dev_server>
 <!-- Google AdSense starts -->
 <script type="text/javascript"><!--
 google_ad_client = "pub-7760157643054954";
@@ -46,6 +48,6 @@ google_ad_height = 60;
 src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
 </script>
 <!-- Google AdSense ends -->
-</TMPL_IF>
+</TMPL_UNLESS>
 
 </div>

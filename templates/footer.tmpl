@@ -24,8 +24,7 @@ servers of <a href="http://m5hosting.com/">M5 hosting</a>.<br />
 See also <a href="http://perltraining.org/">World Wide Perl Training</a>
 </div>
 
-<TMPL_IF dev_server>
-<TMPL_ELSE>
+<TMPL_UNLESS dev_server>
 <!-- Google Analytics -->
 <script type="text/javascript">
 var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
@@ -37,7 +36,7 @@ var pageTracker = _gat._getTracker("UA-12199211-5");
 pageTracker._trackPageview();
 } catch(err) {}</script>
 <!-- Google end -->
-</TMPL_IF>
+</TMPL_UNLESS>
 
 </body>
 </html>
