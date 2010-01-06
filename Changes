@@ -1,3 +1,9 @@
+v0.15 2010.02.06
+   Add  (username) write: to the messages sent out
+   Add some unit tests
+   Fix the style sheet so threads can be seen on Safari as well.
+   Make some of the pages XHTML compatible again.
+
 
 v0.14 2010.01.03
    Add simple HTML generation.

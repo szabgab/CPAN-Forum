@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use 5.008;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 use base 'CGI::Application';
 use CGI ();
