@@ -29,7 +29,7 @@ My Tags: <TMPL_LOOP mytags><a href="/tags/name/<TMPL_VAR name>"><TMPL_VAR name><
 <input type="hidden" name="what" value="tags" />
 <input type="hidden" name="group_id" value="<TMPL_VAR group_id>" />
 <input name="new_tags" value="<TMPL_LOOP mytags><TMPL_VAR name><TMPL_UNLESS __last__>,</TMPL_UNLESS> </TMPL_LOOP>" />
-<input type="submit" value="Update my tags" />
+<input type="submit" name="update_button" value="Update my tags" />
 </form>
 </p>
 </TMPL_IF>
