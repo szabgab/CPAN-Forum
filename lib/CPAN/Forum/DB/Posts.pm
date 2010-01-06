@@ -190,9 +190,12 @@ sub list_posts_by {
 
 sub add_post {
     my ($self, $data, $parent_post, $parent) = @_;
-    $self->add('posts', $data);
+
     my $dbh = CPAN::Forum::DBI::db_Main();
-    my $post_id = $dbh->func('last_insert_rowid');
+
+    # Get next post ID
+    my $post_id = $dbh->selectrow_array("SELECT nextval('posts_id_seq')");
+    $self->add('posts', { %$data, id => $post_id} );
 
     my $sql = "UPDATE posts SET thread=?";
     my @values = (

@@ -443,8 +443,7 @@ sub cgiapp_init {
     my $self = shift;
     $self->param('start_time', time);
     
-    my $db_connect = $self->param("DB_CONNECT");
-    CPAN::Forum::DBI->myinit($db_connect);
+    CPAN::Forum::DBI->myinit();
     my $dbh = CPAN::Forum::DBI::db_Main();
     $STATUS_FILE  = $self->param("ROOT") . "/db/status";
     CGI::Session->name($cookiename);
@@ -802,7 +801,7 @@ sub build_listing {
             thread_count => $thread_count-1,
             #date         => POSIX::strftime("%e/%b", localtime $post->{date}),
             #date         => scalar localtime $post->{date},
-            date         => _ellapsed($post->{date}),
+            date         => $post->{date}, #_ellapsed($post->{date}),
             postername   => $post->{username},
             };
     }
@@ -1291,7 +1290,6 @@ sub process_post {
             gid     => ($parent_post ? $parent_post->{gid} : $q->param("new_group_id")),
             subject => $q->param("new_subject"),
             text    => $new_text,
-            date    => time,
     );
     my $post_id = eval { CPAN::Forum::DB::Posts->add_post(\%data, $parent_post, $parent); }; #SQL
     if ($@) {
@@ -1317,7 +1315,6 @@ sub _post_date {
 sub _post {
     my ($self, $post) = @_;
     $self->log->debug(Data::Dumper->Dump([$post], ['post']));
-
     my %post = (
         postername  => $post->{username},
         date        => _post_date($post->{date}),

@@ -1,6 +1,7 @@
 package CPAN::Forum::DBI;
 use strict;
 use warnings;
+
 use Carp qw();
 use Data::Dumper ();
 
@@ -8,10 +9,14 @@ use DBI;
 my $dbh;
 
 sub myinit {
-    my $class = shift;
-    my $db_connect = shift;
+    my ($class) = @_;
+
+    Carp::croak('myinit now gets only one parameter and that is the class name') if @_ != 1;
+    Carp::croak('CPAN_FORUM_DB needs to be configured') if not $ENV{CPAN_FORUM_DB};
+    Carp::croak('CPAN_FORUM_USER needs to be configured') if not $ENV{CPAN_FORUM_USER};
+
     if (not $dbh) {
-        $dbh = DBI->connect($db_connect, '', '', 
+        $dbh = DBI->connect("dbi:Pg:dbname=$ENV{CPAN_FORUM_DB}", $ENV{CPAN_FORUM_USER}, '',
                     {
                         RaiseError       => 1,
                         PrintError       => 1,
@@ -34,27 +39,16 @@ $group_types{$group_types[$_]} = $_ for (0..$#group_types);
 
 # Initialize the database
 sub init_db {
-    my ($class, $schema_file, $dbfile) = @_;
+    my ($class) = @_;
 
-    die "No database file supplied" if not $dbfile;
+    Carp::croak('init_db now gets only one parameter and that is the class name') if @_ != 1;
+    Carp::croak('CPAN_FORUM_DB needs to be configured') if not $ENV{CPAN_FORUM_DB};
+    Carp::croak('CPAN_FORUM_USER needs to be configured') if not $ENV{CPAN_FORUM_USER};
 
-    my $sql;
-    my $dbh = $class->db_Main;
-    open my $data, "<", $schema_file or die "Coult no open '$schema_file'  $!\n";
-    $sql = join('', <$data>);
+    # TODO check result, hide irrelevant output?
+#    system qq(psql $ENV{CPAN_FORUM_DB} -c "GRANT ALL PRIVILEGES ON DATABASE $ENV{CPAN_FORUM_DB} TO $ENV{CPAN_FORUM_USER}" );
+    system qq(psql -q -U $ENV{CPAN_FORUM_USER} $ENV{CPAN_FORUM_DB} < schema/schema.sql);
 
-    for my $statement (split /;/, $sql) {
-        if ($dbh->{Driver}{Name} =~ /SQLite/) {
-            $statement =~ s/auto_increment//g;
-            $statement =~ s/,?FOREIGN .*$//mg;
-            $statement =~ s/TYPE=INNODB//g;
-        }
-        $statement =~ s/\#.*$//mg;    # strip # comments
-        $statement =~ s/--.*$//mg;    # strip -- comments
-        next unless $statement =~ /\S/;
-        eval {$dbh->do($statement)};
-        die "$@: $statement" if $@;
-    }
     return 1;
 }
 

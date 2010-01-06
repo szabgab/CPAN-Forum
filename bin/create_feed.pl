@@ -20,8 +20,7 @@ usage() if $opts{help};
 usage() if not $opts{dbdir} or not $opts{out};
 
 
-my $dbfile       = "$opts{dbdir}/forum.db";
-CPAN::Forum::DBI->myinit("dbi:SQLite:$dbfile");
+CPAN::Forum::DBI->myinit();
 
 posts_count_csv();
 tags();

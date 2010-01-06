@@ -4,9 +4,8 @@ use warnings;
 
 use Test::Most;
 
-
-plan skip_all => 'Need CPAN_FORUM_DB_FILE' 
-	if not $ENV{CPAN_FORUM_DB_FILE};
+plan skip_all => 'Need CPAN_FORUM_TEST_DB and CPAN_FORUM_TEST_USER and CPAN_FORUM_LOGFILE' 
+	if not $ENV{CPAN_FORUM_TEST_DB} or not $ENV{CPAN_FORUM_TEST_USER} or not $ENV{CPAN_FORUM_LOGFILE};
 
 my $tests;
 plan tests => $tests;

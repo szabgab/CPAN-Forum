@@ -19,7 +19,7 @@ my $app = CPAN::Forum->new(
 	TMPL_PATH => "$root/templates",
 	PARAMS => {
 		ROOT       => $root,
-		DB_CONNECT => "dbi:SQLite:$ENV{CPAN_FORUM_DB_FILE}",
+#		DB_CONNECT => "dbi:SQLite:$ENV{CPAN_FORUM_DB_FILE}",
 		#REQUEST    => ($ENV{SCRIPT_NAME} || '') . ($ENV{PATH_INFO} || ''),
 	},
 );

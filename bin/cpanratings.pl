@@ -21,9 +21,8 @@ use CPAN::Forum::DB::Groups;
 my $csv    = Text::CSV_XS->new();
 my $file   = "$dir/cpan_ratings.csv";
 my $cnt    = 1;
-my $dbfile = "$dir/forum.db";
 
-CPAN::Forum::DBI->myinit($dbfile);
+CPAN::Forum::DBI->myinit();
 
 
 open my $fh, "<", $file or die "Could not open '$file'\n";

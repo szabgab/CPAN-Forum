@@ -17,11 +17,10 @@ use lib "lib";
 use CPAN::Forum::INC;
 
 my $dir          = "$Bin/../db";
-my $dbfile       = "$dir/forum.db";
 
 my %opts;
 
-CPAN::Forum::DBI->myinit($dbfile);
+CPAN::Forum::DBI->myinit();
 
 GetOptions(\%opts, "sendmail", "file=s");
 

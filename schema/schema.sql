@@ -1,5 +1,41 @@
+DROP TABLE IF EXISTS users CASCADE;
+DROP TABLE IF EXISTS usergroups CASCADE;
+DROP TABLE IF EXISTS user_in_group CASCADE;
+DROP TABLE IF EXISTS configure CASCADE;
+DROP TABLE IF EXISTS groups CASCADE;
+DROP TABLE IF EXISTS grouprelations CASCADE;
+DROP TABLE IF EXISTS posts CASCADE;
+DROP TABLE IF EXISTS authors CASCADE;
+DROP TABLE IF EXISTS subscriptions CASCADE;
+DROP TABLE IF EXISTS subscriptions_all CASCADE;
+DROP TABLE IF EXISTS subscriptions_pauseid CASCADE;
+DROP TABLE IF EXISTS tags CASCADE;
+DROP TABLE IF EXISTS tag_cloud CASCADE;
+
+DROP SEQUENCE IF EXISTS groups_id_seq;
+DROP SEQUENCE IF EXISTS posts_id_seq;
+DROP SEQUENCE IF EXISTS users_id_seq;
+DROP SEQUENCE IF EXISTS usergroups_id_seq;
+DROP SEQUENCE IF EXISTS authors_id_seq;
+DROP SEQUENCE IF EXISTS subscriptions_id_seq;
+DROP SEQUENCE IF EXISTS subscriptions_all_id_seq;
+DROP SEQUENCE IF EXISTS subscriptions_pauseid_id_seq;
+DROP SEQUENCE IF EXISTS tags_id_seq;
+
+CREATE SEQUENCE users_id_seq;
+CREATE SEQUENCE groups_id_seq;
+CREATE SEQUENCE usergroups_id_seq;
+CREATE SEQUENCE posts_id_seq;
+CREATE SEQUENCE authors_id_seq;
+CREATE SEQUENCE subscriptions_id_seq;
+CREATE SEQUENCE subscriptions_all_id_seq;
+CREATE SEQUENCE subscriptions_pauseid_id_seq;
+CREATE SEQUENCE tags_id_seq;
+
+
+
 CREATE TABLE users (
-			id               INTEGER PRIMARY KEY auto_increment,
+			id               INTEGER PRIMARY KEY DEFAULT nextval('users_id_seq'::regclass),
 			username         VARCHAR(255) UNIQUE,
 			password         VARCHAR(255),
 			email            VARCHAR(255) UNIQUE,
@@ -12,13 +48,13 @@ CREATE TABLE users (
 -- locaton
 -- user_localtime
 -- scratch_pad
-
 );
 
 CREATE TABLE usergroups (
-			id               INTEGER PRIMARY KEY auto_increment,
+			id               INTEGER PRIMARY KEY DEFAULT nextval('usergroups_id_seq'::regclass),
 			name             VARCHAR(255) UNIQUE
 );
+
 
 CREATE TABLE user_in_group (
 			uid               INTEGER,
@@ -30,17 +66,13 @@ CREATE TABLE configure (
 			value             VARCHAR(255)
 );
 
-
---CREATE TABLE grouptypes (
---			id               INTEGER PRIMARY KEY auto_increment,
---			name             VARCHAR(255) NOT NULL
---);
--- grouptypes can be   Global/Distribution/Field
-
-
+CREATE TABLE authors (
+			id               INTEGER PRIMARY KEY DEFAULT nextval('authors_id_seq'::regclass),
+			pauseid          VARCHAR(100) UNIQUE NOT NULL
+);
 
 CREATE TABLE groups (
-			id               INTEGER PRIMARY KEY auto_increment,
+			id               INTEGER PRIMARY KEY DEFAULT nextval('groups_id_seq'::regclass),
 			name             VARCHAR(255) UNIQUE NOT NULL,
 			status           INTEGER,
 			gtype            INTEGER NOT NULL,
@@ -50,7 +82,6 @@ CREATE TABLE groups (
 			review_count     INTEGER
 			,FOREIGN KEY (pauseid)  REFERENCES authors(id)
 );
-
 
 
 CREATE TABLE grouprelations (
@@ -67,9 +98,8 @@ CREATE TABLE grouprelations (
 -- Distributions will have Fields as parent one child can have several parents
 -- Modules (if added) will have Distributions as parents
 
-
 CREATE TABLE posts (
-			id               INTEGER PRIMARY KEY auto_increment,
+			id               INTEGER PRIMARY KEY DEFAULT nextval('posts_id_seq'::regclass),
 			gid              INTEGER NOT NULL,
 			uid              INTEGER NOT NULL,
 			parent           INTEGER,
@@ -77,20 +107,15 @@ CREATE TABLE posts (
 			hidden           BOOLEAN,
 			subject          VARCHAR(255) NOT NULL,
 			text             VARCHAR(100000) NOT NULL,
-			date             TIMESTAMP
+			date             TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 			,FOREIGN KEY (gid) REFERENCES groups(id)
 			,FOREIGN KEY (uid) REFERENCES users(id)
 			,FOREIGN KEY (parent) REFERENCES posts(id)
 );
 
-CREATE TABLE authors (
-			id               INTEGER PRIMARY KEY auto_increment,
-			pauseid          VARCHAR(100) UNIQUE NOT NULL
-);
-
 
 CREATE TABLE subscriptions (
-			id               INTEGER PRIMARY KEY auto_increment,
+			id               INTEGER PRIMARY KEY DEFAULT nextval('subscriptions_id_seq'::regclass),
 			uid              INTEGER NOT NULL,
 			gid              INTEGER NOT NULL,
 			allposts         BOOLEAN,
@@ -102,7 +127,7 @@ CREATE TABLE subscriptions (
 );
 
 CREATE TABLE subscriptions_all (
-			id               INTEGER PRIMARY KEY auto_increment,
+			id               INTEGER PRIMARY KEY DEFAULT nextval('subscriptions_all_id_seq'::regclass),
 			uid              INTEGER NOT NULL,
 			allposts         BOOLEAN,
 			starters         BOOLEAN,
@@ -112,7 +137,7 @@ CREATE TABLE subscriptions_all (
 );
 
 CREATE TABLE subscriptions_pauseid (
-			id               INTEGER PRIMARY KEY auto_increment,
+			id               INTEGER PRIMARY KEY DEFAULT nextval('subscriptions_pauseid_id_seq'::regclass),
 			uid              INTEGER NOT NULL,
 			pauseid          INTEGER NOT NULL,
 			allposts         BOOLEAN,
@@ -131,7 +156,7 @@ CREATE INDEX posts_uid ON posts (uid);
 ---- add tagcloud
 --- TODO unique tag_id, group_id pair
 CREATE TABLE tags (
-			id               INTEGER PRIMARY KEY,
+			id               INTEGER PRIMARY KEY DEFAULT nextval('tags_id_seq'::regclass),
 			name             VARCHAR(100) UNIQUE NOT NULL
 );
 CREATE UNIQUE INDEX tags_name ON tags (name);

@@ -27,13 +27,26 @@ my %opts = (
     cpan => 'http://www.cpan.org',
 );
 
-GetOptions(\%opts, "sendmail", "source=s", "dbfile=s", "fetch", "help", "cpan") 
-    or usage();
+GetOptions(\%opts, 
+    "sendmail", 
+    "source=s", 
+    "fetch", 
+    "help", 
+    "cpan",
+    'dbname=s', 
+    'dbuser=s',
+) or usage();
 usage() if $opts{help};
-usage() if not $opts{dbfile};
 
+$opts{dbname} ||= $ENV{CPAN_FORUM_DB};
+$opts{dbuser} ||= $ENV{CPAN_FORUM_USER};
 
-CPAN::Forum::DBI->myinit("dbi:SQLite:$opts{dbfile}");
+usage() if not $opts{dbname} or not $opts{dbuser};
+
+$ENV{CPAN_FORUM_DB}   = $opts{dbname};
+$ENV{CPAN_FORUM_USER} = $opts{dbuser};
+
+CPAN::Forum::DBI->myinit();
 
 
 my $csv          = Text::CSV_XS->new();
@@ -186,11 +199,14 @@ if ($opts{sendmail}) {
 sub usage {
     print <<"END_USAGE";
 $0
-    --sendmail      to send report to Gabor
     --source FILE   path to the 02packages.details.txt
-    --dbfile PATH   path to the database file
+    --dbname NAME
+    --dbuser NAME
+
+    --sendmail      to send report to Gabor
     --fetch
     --cpan URL      (default http://www.cpan.org ) 
+
     --help          this help
 
 If you have a local mirror:

@@ -3,12 +3,12 @@ use warnings;
 
 use Test::Most;
 
-plan skip_all => 'Need CPAN_FORUM_DB_FILE and CPAN_FORUM_TEST_URL' 
-	if not $ENV{CPAN_FORUM_DB_FILE} or not $ENV{CPAN_FORUM_TEST_URL};
+plan skip_all => 'Need CPAN_FORUM_TEST_DB and CPAN_FORUM_TEST_USER and CPAN_FORUM_LOGFILE' 
+	if not $ENV{CPAN_FORUM_TEST_DB} or not $ENV{CPAN_FORUM_TEST_USER} or not $ENV{CPAN_FORUM_LOGFILE};
 
 plan tests => 36;
 
-bail_on_fail;
+#bail_on_fail;
 
 use t::lib::CPAN::Forum::Test;
 my @users = @t::lib::CPAN::Forum::Test::users;
@@ -17,7 +17,7 @@ my $w = t::lib::CPAN::Forum::Test::get_mech();
 
 {
     t::lib::CPAN::Forum::Test::setup_database();
-    ok(-e $ENV{CPAN_FORUM_DB_FILE});
+    #ok(-e $ENV{CPAN_FORUM_DB_FILE});
 }
 
 {

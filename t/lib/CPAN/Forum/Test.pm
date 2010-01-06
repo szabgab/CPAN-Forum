@@ -19,26 +19,26 @@ our @users = (
 );
 
 sub setup_database {
-    my $dbdir = dirname($ENV{CPAN_FORUM_DB_FILE});
-    mkpath($dbdir);
+    $ENV{CPAN_FORUM_DB}   = $ENV{CPAN_FORUM_TEST_DB};
+    $ENV{CPAN_FORUM_USER} = $ENV{CPAN_FORUM_TEST_USER};
 
-    system "$^X bin/setup.pl    --config t/CONFIG                 --dbfile $ENV{CPAN_FORUM_DB_FILE}";
-    system "$^X bin/populate.pl --source t/02packages.details.txt --dbfile $ENV{CPAN_FORUM_DB_FILE}";
-
-
+    # TODO capture STDERR and show if there was an error
+    my $out = qx{$^X bin/setup.pl    --email 'test\@perl.org.il' --username testadmin --password pw_of_testadmin --from 'testforum\@perl.org.il' --dbname $ENV{CPAN_FORUM_DB} --dbuser $ENV{CPAN_FORUM_USER} 2>&1};
+    if ($out =~ /ERROR/) {
+        die $out;
+    }
+    system "$^X bin/populate.pl --source t/02packages.details.txt ";
 
     return;
 }
 
 sub init_db {
     require CPAN::Forum::DBI;
-    CPAN::Forum::DBI->myinit(db_connect());
-}
+    $ENV{CPAN_FORUM_DB}   = $ENV{CPAN_FORUM_TEST_DB};
+    $ENV{CPAN_FORUM_USER} = $ENV{CPAN_FORUM_TEST_USER};
 
-sub db_connect {
-    return "dbi:SQLite:$ENV{CPAN_FORUM_DB_FILE}";
+    CPAN::Forum::DBI->myinit();
 }
-
 
 sub register_user {
     my ($id) = @_;

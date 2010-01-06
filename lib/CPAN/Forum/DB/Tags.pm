@@ -18,7 +18,7 @@ sub get_tags_of {
     if (not defined $uid) {
         return $self->get_tags_of_module($group_id);
     }
-    my $sql = "SELECT tags.name name
+    my $sql = "SELECT tags.name AS name
                              FROM tag_cloud, tags
                              WHERE tag_cloud.tag_id=tags.id AND tag_cloud.uid=? AND tag_cloud.group_id=?";
     return $self->_fetch_arrayref_of_hashes($sql, $uid, $group_id);
@@ -27,7 +27,7 @@ sub get_tags_of {
 sub get_tags_of_module {
     my ($self, $group_id) = @_;
     #my $dbh = CPAN::Forum::DBI::db_Main();
-    my $sql = "SELECT tags.name name, COUNT(tags.name) cnt 
+    my $sql = "SELECT tags.name AS name, COUNT(tags.name) AS cnt 
                              FROM tag_cloud, tags
                              WHERE tag_cloud.tag_id=tags.id AND tag_cloud.group_id=?
                              GROUP BY name";

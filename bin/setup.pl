@@ -13,50 +13,60 @@ use lib dirname(dirname(abs_path($0))) . '/lib';
 use CPAN::Forum::INC;
 
 my %opts;
-GetOptions(\%opts, "config=s", "dbfile=s") or die;
-die "$0 --config CONFIG --dbfile DB_FILE\n" 
-    if not $opts{config} or not $opts{dbfile};
+GetOptions(\%opts, 
+	'dbname=s', 
+	'dbuser=s',
 
-my $dir = dirname($opts{dbfile});
+	'username=s',
+	'email=s',
+	'password=s',
+	'from=s',
+) or usage();
 
-my %opt;
-open my $opt, $opts{config} or die "You need to create a CONFIG file. See README.\n";
-while (<$opt>) {
-	chomp ;
-	my ($k, $v) = split /=/;
-	$opt{$k} = $v;
-}
-close $opt;
+$opts{dbname} ||= $ENV{CPAN_FORUM_DB};
+$opts{dbuser} ||= $ENV{CPAN_FORUM_USER};
 
-if (
-	not $opt{username} or 
-	not $opt{password} or 
-	not $opt{email}
-	) {
-	print <<END;
-Please provide the following values for the administrator:
+usage() if not $opts{dbname} or not $opts{dbuser};
 
-$0 --username USERNAME  --email EMAIL --password PASSWORD
-END
+usage() if not $opts{username} 
+	or not $opts{password} 
+	or not $opts{email} 
+	or not $opts{from};
 
-}
+$ENV{CPAN_FORUM_DB}   = $opts{dbname};
+$ENV{CPAN_FORUM_USER} = $opts{dbuser};
 
-mkpath($dir);
-unlink $opts{dbfile};
-CPAN::Forum::DBI->myinit("dbi:SQLite:$opts{dbfile}");
-CPAN::Forum::DBI->init_db("schema/schema.sql", $opts{dbfile});
-print "Turning database directory and database word writable, for now\n";
-chmod 0777, $dir;
-chmod 0777, $opts{dbfile};
+CPAN::Forum::DBI->myinit();
+CPAN::Forum::DBI->init_db();
 
 
-my $from = delete $opt{from};
+my $from = delete $opts{from};
 CPAN::Forum::DB::Configure->set_field_value('from', $from);
 
-CPAN::Forum::DB::Users->add_user({id => 1, update_on_new_user => 1, %opt});
-CPAN::Forum::DB::Users->update(1, password => $opt{password});
+CPAN::Forum::DB::Users->add_user({id => 1, update_on_new_user => 1, %opts});
+CPAN::Forum::DB::Users->update(1, password => $opts{password});
 
 CPAN::Forum::DB::Users->add_usergroup({id => 1, name => "admin"});
 CPAN::Forum::DB::Users->add_user_to_group(uid => 1, gid => 1);
 
 
+sub usage {
+
+	print <<"USAGE";
+
+Usage: $0
+      --dbname DB_NAME   or set the environment variable CPAN_FORUM_DB
+      --dbuser DB_USER   or set the environment variable CPAN_FORUM_USER
+
+
+      Admin user of CPAN::Forum
+      --username USERNAME       
+      --email EMAIL
+      --password PASSWORD
+      
+      --from EMAIL         When sending e-mail what should be the From: fields
+
+USAGE
+
+	exit;
+}
