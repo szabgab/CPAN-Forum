@@ -349,7 +349,18 @@ BEGIN {
 	$w_user->follow_link_ok({ text => 'all the tags' });
 	$w_user->follow_link_ok({ text => 'two words' });
 	$w_user->content_unlike( qr{Something went wrong here} );
-	BEGIN { $tests += 8  + 1+@update_tags*2   + 4; }
+	$w_user->follow_link_ok({ text => 'Acme-Bleach' });
+	
+	$w_user->follow_link_ok({ text => 'one_word' });
+	$w_user->back;
+	$w_user->follow_link_ok({ text => 'two words' });
+
+	$w_guest->get_ok("$url/dist/Acme-Bleach");
+	$w_guest->follow_link_ok({ text => 'one_word' });
+	$w_guest->back;
+	$w_guest->follow_link_ok({ text => 'two words' });
+	
+	BEGIN { $tests += 8  + 1+@update_tags*2   + 10; }
 }
 
 
