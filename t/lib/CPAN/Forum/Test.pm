@@ -121,7 +121,7 @@ sub CPAN::Forum::_test_my_sendmail {
 }
 
 sub build_fake_cpan {
-    my $dir = tempdir( CLEANUP => 0 );
+    my $dir = tempdir( CLEANUP => 1 );
     mkdir $dir;
     my $cpan = CPAN::Faker->new({
 	source => "$ROOT/testfiles/fakepan_src_1",
