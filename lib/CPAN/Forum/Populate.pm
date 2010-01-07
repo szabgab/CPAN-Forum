@@ -70,6 +70,7 @@ sub mirror_cpan {
 
 	debug("Get CPAN");
 	my $cpan = $self->cpan;
+	#die $cpan;
 	my $cpan_dir = $self->cpan_dir;
 	my $verbose = 0;
 	my $force   = 1;

@@ -231,7 +231,7 @@ my @post_submit_input_fields;
 BEGIN { 
 	@post_preview_input_fields = (
         ['rm',               'hidden',    'HTML::Form::TextInput',   'process_post'],
-        ['new_group_id',     'hidden',    'HTML::Form::TextInput',   '3'],   # really can we know this number for sure?
+        ['new_group_id',     'hidden',    'HTML::Form::TextInput',   '2'],   # really can we know this number for sure?
         ['new_parent',       'hidden',    'HTML::Form::TextInput',   ''],
         ['new_subject',      'text',      'HTML::Form::TextInput',   ''],
         ['new_text',         'textarea',  'HTML::Form::TextInput',   ''],
@@ -240,7 +240,7 @@ BEGIN {
     );
 	@post_submit_input_fields = (
         ['rm',               'hidden',    'HTML::Form::TextInput',   'process_post'],
-        ['new_group_id',     'hidden',    'HTML::Form::TextInput',   '3'],   # really can we know this number for sure?
+        ['new_group_id',     'hidden',    'HTML::Form::TextInput',   '2'],   # really can we know this number for sure?
         ['new_parent',       'hidden',    'HTML::Form::TextInput',   ''],
         ['new_subject',      'text',      'HTML::Form::TextInput',   'A new subject'],
         ['new_text',         'textarea',  'HTML::Form::TextInput',   "This is supposed to be a posting"],
@@ -303,7 +303,7 @@ BEGIN {
 	@update_tags = (
 #        ['rm',               'hidden',    'HTML::Form::TextInput',   'process_post'],  #  where is the run mode?
         ['what',     'hidden',    'HTML::Form::TextInput',   'tags'],
-        ['group_id',       'hidden',    'HTML::Form::TextInput',   '3'],    # really can we know this number for sure?
+        ['group_id',       'hidden',    'HTML::Form::TextInput',   '2'],    # really can we know this number for sure?
         ['new_tags',      'text',      'HTML::Form::TextInput',   ''],
         ['update_button',   'submit',    'HTML::Form::SubmitInput', 'Update my tags'],
     );

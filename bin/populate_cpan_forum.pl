@@ -5,8 +5,9 @@ use warnings;
 
 use File::Basename qw(dirname);
 use Getopt::Long   qw(GetOptions);
+use Cwd            qw(abs_path);
 BEGIN {
-	unshift @INC, dirname(dirname($0)) . '/lib';
+	unshift @INC, dirname(dirname(abs_path($0))) . '/lib';
 }
 use CPAN::Forum::Populate;
 
@@ -20,6 +21,7 @@ GetOptions(\%opt,
 	'html',
 	'yaml',
 	'ppi',
+	'cpan=s',
 ) or usage();
 usage() if $opt{help};
 
@@ -46,6 +48,7 @@ Usage: $0
       --html               # the --process will build the HTML files
       --yaml               # the --process will update the database with mete data (yaml file and others)
       --ppi                # the --process will use PPI to deep analyse the packages
+      --cpan               # URL of the CPAN server to mirror from
 
 
       --help         this help

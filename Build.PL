@@ -45,6 +45,7 @@ my $builder = Module::Build->new(
         'XML::RSS::SimpleGen'                   => 0,  # for, well RSS generation
     },
     build_requires => {
+        'CPAN::Faker'                           => '0.004',
 #       'HTML::Lint'                            => 1.26,
         'Storable'                              => 0,
 #       'Test::HTML::Lint'                      => 1.26,

@@ -7,6 +7,7 @@ use File::Basename qw(dirname);
 use File::Copy     qw(copy);
 use File::Path     qw(mkpath);
 use File::Temp     qw(tempdir);
+use CPAN::Faker;
 
 
 my $ROOT = dirname(dirname(dirname(dirname(dirname(abs_path(__FILE__))))));
@@ -38,7 +39,10 @@ sub setup_database {
     if ($out =~ /ERROR/) {
         die $out;
     }
-    system "$^X bin/populate.pl --source t/02packages.details.txt ";
+    
+    my $dir = build_fake_cpan();
+    system "$^X bin/populate.pl --cpan file://$dir --fetch";
+    #system "$^X bin/populate.pl --source t/02packages.details.txt ";
 
     return;
 }
@@ -115,6 +119,18 @@ sub CPAN::Forum::_test_my_sendmail {
     @m{@fields} = @mail{@fields};
     push @CPAN::Forum::messages, \%m;
     return;
+}
+
+sub build_fake_cpan {
+    my $dir = tempdir( CLEANUP => 0 );
+    mkdir $dir;
+    my $cpan = CPAN::Faker->new({
+	source => "$ROOT/testfiles/fakepan_src_1",
+	dest   => $dir,
+    });
+    $cpan->make_cpan;
+
+    return $dir;
 }
 
 1;

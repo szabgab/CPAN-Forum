@@ -10,13 +10,14 @@ use Text::CSV_XS;
 use Mail::Sendmail qw(sendmail);
 use Parse::CPAN::Packages;
 use LWP::Simple;
+use File::Temp     qw(tempdir);
 
-my $dir;
+my $root;
 BEGIN {
-	$dir = dirname(dirname(abs_path($0)));
+	$root = dirname(dirname(abs_path($0)));
 	
 }
-use lib "$dir/lib";
+use lib "$root/lib";
 
 use CPAN::Forum::DBI;
 use CPAN::Forum::DB::Groups;
@@ -27,12 +28,14 @@ my %opts = (
     cpan => 'http://www.cpan.org',
 );
 
+my $tempdir = tempdir( CLEANUP => 0);
+
 GetOptions(\%opts, 
     "sendmail", 
     "source=s", 
     "fetch", 
     "help", 
-    "cpan",
+    "cpan=s",
     'dbname=s', 
     'dbuser=s',
 ) or usage();
@@ -56,15 +59,17 @@ print "This operation can take a couple of minutes\n";
 
 if (not $opts{source}) {
     my $file = "02packages.details.txt";
-    #$opts{source} = "$opts{dir}/$file"; #!!!
+    $opts{source} = "$tempdir/$file";
 }
 
 if ($opts{fetch}) {
     unlink $opts{source} if -e $opts{source};
     # must have downloaded and un-gzip-ed
     # ~/mirror/cpan/modules/02packages.details.txt.gz 
-    print "Fecthing  $opts{source} from CPAN\n";
-    getstore("$opts{cpan}/modules/02packages.details.txt.gz", "$opts{source}.gz");
+    my $remote = "$opts{cpan}/modules/02packages.details.txt.gz";
+    my $local  = "$opts{source}.gz";
+    print "Fecthing  $remote to $local  from CPAN\n";
+    getstore($remote, $local);
     print "Unzipping $opts{source}\n";
     system("gunzip $opts{source}.gz");
 }

@@ -1,4 +1,8 @@
 
+merge the populate script 
+ - create several very partial CPAN mirrors in the testfiles/ directory 
+   and process those with the new populate script one after the other
+
 - Test if the flood_control_time_limit works?
 - Make sure the time shows up correctly
 
@@ -14,13 +18,16 @@
     9) mypan
  
 
-
   * Switch application to use PostgreSQL
   * Make the data restrictions stricter in the schema (UNIQUE, NOT NULL)
+
+==========================
+
+
   * Switch application to use mod_perl on the live site
 
 
-  * Generate HTML files, merge the populate script 
+  * Generate HTML files, 
     * generate html (description tag should be the text taken from =NAME secion of each module and that of the main module of the package itself
     * the documentation of each module will be a static page (maybe later enhanced with javascript)
     * the main page of the package will be static for now but later it might be a dynamic page (or static with Javascript enhancement?)
