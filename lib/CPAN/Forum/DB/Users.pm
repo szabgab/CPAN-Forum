@@ -1,11 +1,13 @@
 package CPAN::Forum::DB::Users;
 use strict;
 use warnings;
-use Carp;
-use base 'CPAN::Forum::DBI';
- 
+use 5.008;
 
+use Carp;
+use Digest::SHA    qw(sha1_base64);
 use List::MoreUtils qw(none);
+
+use base 'CPAN::Forum::DBI';
 
 sub add_user {
     my ($self, $args) = @_;
@@ -14,12 +16,16 @@ sub add_user {
 	Carp::croak("No $field") if not $args->{$field};
     }
     my $dbh = CPAN::Forum::DBI::db_Main();
-    $dbh->do("INSERT INTO users (username, email, password) VALUES (?, ?, ?)",
+    my $pw = _generate_pw(7);
+    $dbh->do("INSERT INTO users (username, email, sha1) VALUES (?, ?, ?)",
               undef,
-              lc($args->{username}), lc($args->{email}), _generate_pw(7));
+              lc($args->{username}), lc($args->{email}), sha1_base64($pw));
 
-    my $sql = "SELECT id, username, password, email FROM users WHERE username=?";
-    return $self->_fetch_single_hashref($sql, lc $args->{username});
+    my $sql = "SELECT id, username, email FROM users WHERE username=?";
+
+    my $user = $self->_fetch_single_hashref($sql, lc $args->{username});
+    $user->{password} = $pw;
+    return $user;
 }
 
 sub add_usergroup {
@@ -30,7 +36,7 @@ sub add_usergroup {
               undef,
               lc($args->{id}), lc($args->{name}));
 
-#    my $sql = "SELECT id, username, password, email FROM users WHERE username=?";
+#    my $sql = "SELECT id, username, email FROM users WHERE username=?";
 #    return $self->_fetch_single_hashref($sql, lc $args->{username});
     return;
 }
@@ -50,7 +56,7 @@ sub info_by {
     Carp::croak("Invalid field '$field'") if none {$field eq $_} @FIELDS;
     Carp::croak("No value supplied") if not $value;
 
-    my $sql = "SELECT id, email, password, fname, lname, username, fname || ' ' || lname fullname
+    my $sql = "SELECT id, email, fname, lname, username, fname || ' ' || lname fullname
                 FROM users
                 WHERE $field=?";
     return $self->_fetch_single_hashref($sql, $value);
@@ -63,10 +69,9 @@ sub info_by_credentials {
 
     my $sql = "SELECT id, email, fname, lname, username
                 FROM users
-                WHERE username=? AND password=?";
-    return $self->_fetch_single_hashref($sql, $username, $password);
+                WHERE username=? AND sha1=?";
+    return $self->_fetch_single_hashref($sql, $username, sha1_base64($password));
 }
-
 
 sub dump_users {
     my ($self) = @_;
@@ -76,9 +81,10 @@ sub dump_users {
 
 sub update {
     my ($self, $id, %args) = @_;
-    my @valid_fields = qw(fname lname password email);
+    my @valid_fields = qw(fname lname sha1 email); #TODO no password field any more!
     my @fields;
     my @values;
+#	Carp::confess('here') if exists $args{sha1};
 
     foreach my $f (@valid_fields) {
         if (exists $args{$f}) {

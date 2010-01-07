@@ -12,7 +12,7 @@ plan skip_all => 'Need CPAN_FORUM_TEST_DB and CPAN_FORUM_TEST_USER and CPAN_FORU
 my $tests;
 plan tests => $tests;
 
-#bail_on_fail;
+bail_on_fail;
 
 use t::lib::CPAN::Forum::Test;
 my @users = @t::lib::CPAN::Forum::Test::users;
@@ -29,18 +29,6 @@ my $w_guest = t::lib::CPAN::Forum::Test::get_mech();
 
 my $url     = $ENV{CPAN_FORUM_TEST_URL};
 $url =~ s{/+$}{};
-
-my %config = read_config();
-sub read_config {
-    my %c;
-    open my $in, '<', "t/CONFIG" or die;
-    while (my $line = <$in>) {
-        chomp $line;
-        my ($k, $v) = split /=/, $line;
-        $c{$k} = $v;
-    }
-    return %c;
-}
 
 #{
 #    my @session_files = glob "/tmp/cgisess_*";
@@ -81,31 +69,31 @@ sub read_config {
     diag("Try to login with username but without password");
     $w_admin->submit_form(
         fields => {
-            nickname => $config{username},
+            nickname => $t::lib::CPAN::Forum::Test::admin{username},
         },
     );
     $w_admin->content_like(qr{Need both nickname and password.});
-    $w_admin->content_like(qr{$config{username}});
+    $w_admin->content_like(qr{$t::lib::CPAN::Forum::Test::admin{username}});
 
     diag("Try to login with correct username but with bad password");
     $w_admin->submit_form(
         fields => {
-            nickname => $config{username},
+            nickname => $t::lib::CPAN::Forum::Test::admin{username},
             password => 'bad_assword',
         },
     );
     $w_admin->content_like(qr{Login failed.});
-    $w_admin->content_like(qr{$config{username}});
+    $w_admin->content_like(qr{$t::lib::CPAN::Forum::Test::admin{username}});
     $w_admin->content_unlike(qr{bad_password});
 
-	diag("Try to login with admin username and admin password");
+    diag("Try to login with admin username and admin password");
     $w_admin->submit_form(
         fields => {
-            nickname => $config{username},
-            password => $config{password},
+            nickname => $t::lib::CPAN::Forum::Test::admin{username},
+            password => $t::lib::CPAN::Forum::Test::admin{password},
         },
     );
-    $w_admin->content_like(qr{You are logged in as.*$config{username}});
+    $w_admin->content_like(qr{You are logged in as.*$t::lib::CPAN::Forum::Test::admin{username}});
     BEGIN { $tests += 14; }
 }
 
@@ -115,10 +103,10 @@ sub read_config {
 #    BEGIN { $tests += 1; }
 #}
 
-
+my $user;
 {
-	diag("Login as a regular user");
-    my $user = t::lib::CPAN::Forum::Test::register_user(0);
+    diag("Login as a regular user");
+    $user = t::lib::CPAN::Forum::Test::register_user(0);
     #explain $user;
     $w_user->get_ok($url);
     $w_user->content_like(qr{CPAN Forum});
@@ -141,8 +129,6 @@ sub read_config {
 # the next can be probably removed or if we could check here that no e-mail is sent after
 # posting
 {
-    my $user
-        = CPAN::Forum::DB::Users->info_by( username => $users[0]{username} );
     #explain $user;
     $w_guest->get_ok($url);
     $w_guest->content_like(qr{CPAN Forum});
@@ -152,6 +138,7 @@ sub read_config {
 
     # TODO check if this is the login form
 
+    $w_guest->content_like( qr{In order to post on this site} );
     # next call causes the warning when running with -w
     $w_guest->submit_form(
         fields => {
@@ -165,7 +152,7 @@ sub read_config {
     $w_guest->content_like(qr{Distribution: Acme-Bleach});
     $w_guest->follow_link_ok({ text => 'logout' });
 
-    BEGIN { $tests += 7; }
+    BEGIN { $tests += 8; }
 }
 
 {

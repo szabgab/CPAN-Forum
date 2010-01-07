@@ -3,6 +3,7 @@ use strict;
 use warnings;
 
 use List::MoreUtils qw(none);
+use Digest::MD5     qw(md5_base64);
 
 =head2 login
 

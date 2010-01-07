@@ -1,9 +1,7 @@
 
-- TODO: Make sure the passwords are long enough and encrypted in the database!
 - Test if the flood_control_time_limit works?
 - Make sure the time shows up correctly
 
-Jan 4
   * Write tests for existing system to cover the important aspects of the system
     1) registration, email verification
     2) login/logout
@@ -16,12 +14,12 @@ Jan 4
     9) mypan
  
 
-Jan 5
+
   * Switch application to use PostgreSQL
   * Make the data restrictions stricter in the schema (UNIQUE, NOT NULL)
   * Switch application to use mod_perl on the live site
 
-Jan 6
+
   * Generate HTML files, merge the populate script 
     * generate html (description tag should be the text taken from =NAME secion of each module and that of the main module of the package itself
     * the documentation of each module will be a static page (maybe later enhanced with javascript)
@@ -31,10 +29,8 @@ Jan 6
       * package name
       * module name
 
-Jan 7
   * Process META.yml
 
-Jan 10
   * Enable users to connect their CPAN::Forum id with their PAUSE id:
     Let logged in user type in their PAUSEid
     send an e-mail with code to PAUSEID@cpan.org and save the same id in
@@ -52,7 +48,6 @@ Jan 10
     existing ways of getting help for the module.
 
 
-Jan 11
   * Allow people to mark modules like/not like
 
 -------------------------------

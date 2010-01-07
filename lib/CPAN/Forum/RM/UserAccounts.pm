@@ -1,6 +1,10 @@
 package CPAN::Forum::RM::UserAccounts;
+
 use strict;
 use warnings;
+use 5.008;
+
+use Digest::SHA    qw(sha1_base64); 
 
 sub selfconfig {
     my ($self, $errs) = @_;
@@ -42,7 +46,7 @@ sub change_password {
     }
     
     CPAN::Forum::DB::Users->update($self->session->param('uid'), # SQL
-                    password => $q->param('password'),
+                    sha1 => sha1_base64($q->param('password')),
                 );
 
     return $self->selfconfig({done => 1});

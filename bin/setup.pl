@@ -7,6 +7,7 @@ use Cwd            qw(abs_path cwd);
 use File::Basename qw(dirname);
 use File::Path     qw(mkpath);
 use Getopt::Long   qw(GetOptions);
+use Digest::SHA    qw(sha1_base64);
 
 use lib dirname(dirname(abs_path($0))) . '/lib';
 
@@ -44,7 +45,7 @@ my $from = delete $opts{from};
 CPAN::Forum::DB::Configure->set_field_value('from', $from);
 
 CPAN::Forum::DB::Users->add_user({id => 1, update_on_new_user => 1, %opts});
-CPAN::Forum::DB::Users->update(1, password => $opts{password});
+CPAN::Forum::DB::Users->update(1, sha1 => sha1_base64($opts{password}));
 
 CPAN::Forum::DB::Users->add_usergroup({id => 1, name => "admin"});
 CPAN::Forum::DB::Users->add_user_to_group(uid => 1, gid => 1);

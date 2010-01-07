@@ -36,11 +36,11 @@ CREATE SEQUENCE tags_id_seq;
 
 CREATE TABLE users (
 			id               INTEGER PRIMARY KEY DEFAULT nextval('users_id_seq'::regclass),
-			username         VARCHAR(255) UNIQUE,
-			password         VARCHAR(255),
-			email            VARCHAR(255) UNIQUE,
-			fname            VARCHAR(255),
-			lname            VARCHAR(255),
+			username         VARCHAR(25) UNIQUE NOT NULL,
+			sha1             CHAR(27)    NOT NULL,
+			email            VARCHAR(100) UNIQUE NOT NULL,
+			fname            VARCHAR(100),
+			lname            VARCHAR(100),
 			update_on_new_user VARCHAR(1),
 			status           INTEGER
 -- registration_date
@@ -52,18 +52,18 @@ CREATE TABLE users (
 
 CREATE TABLE usergroups (
 			id               INTEGER PRIMARY KEY DEFAULT nextval('usergroups_id_seq'::regclass),
-			name             VARCHAR(255) UNIQUE
+			name             VARCHAR(255) UNIQUE NOT NULL
 );
 
 
 CREATE TABLE user_in_group (
-			uid               INTEGER,
-			gid               INTEGER
+			uid               INTEGER NOT NULL,
+			gid               INTEGER NOT NULL
 );
 
 CREATE TABLE configure (
-			field             VARCHAR(255),
-			value             VARCHAR(255)
+			field             VARCHAR(255) NOT NULL,
+			value             VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE authors (
@@ -77,18 +77,18 @@ CREATE TABLE groups (
 			status           INTEGER,
 			gtype            INTEGER NOT NULL,
 			version          VARCHAR(100),
-			pauseid          INTEGER,
+			pauseid          INTEGER NOT NULL,
 			rating           VARCHAR(10),	
-			review_count     INTEGER
-			,FOREIGN KEY (pauseid)  REFERENCES authors(id)
+			review_count     INTEGER NOT NULL DEFAULT 0,
+			FOREIGN KEY (pauseid)  REFERENCES authors(id)
 );
 
 
 CREATE TABLE grouprelations (
 			parent            INTEGER NOT NULL,
-			child            INTEGER NOT NULL
-			,FOREIGN KEY (parent) REFERENCES groups(id)
-			,FOREIGN KEY (child) REFERENCES groups(id)
+			child             INTEGER NOT NULL,
+			FOREIGN KEY (parent) REFERENCES groups(id),
+			FOREIGN KEY (child) REFERENCES groups(id)
 );
 
 -- grouprelations defined which group belongs to which other group, 
@@ -107,10 +107,10 @@ CREATE TABLE posts (
 			hidden           BOOLEAN,
 			subject          VARCHAR(255) NOT NULL,
 			text             VARCHAR(100000) NOT NULL,
-			date             TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
-			,FOREIGN KEY (gid) REFERENCES groups(id)
-			,FOREIGN KEY (uid) REFERENCES users(id)
-			,FOREIGN KEY (parent) REFERENCES posts(id)
+			date             TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+			FOREIGN KEY (gid) REFERENCES groups(id),
+			FOREIGN KEY (uid) REFERENCES users(id),
+			FOREIGN KEY (parent) REFERENCES posts(id)
 );
 
 
@@ -121,9 +121,9 @@ CREATE TABLE subscriptions (
 			allposts         BOOLEAN,
 			starters         BOOLEAN,
 			followups        BOOLEAN,
-			announcements    BOOLEAN
-			,FOREIGN KEY (gid) REFERENCES groups(id)
-			,FOREIGN KEY (uid) REFERENCES users(id)
+			announcements    BOOLEAN,
+			FOREIGN KEY (gid) REFERENCES groups(id),
+			FOREIGN KEY (uid) REFERENCES users(id)
 );
 
 CREATE TABLE subscriptions_all (
@@ -132,8 +132,8 @@ CREATE TABLE subscriptions_all (
 			allposts         BOOLEAN,
 			starters         BOOLEAN,
 			followups        BOOLEAN,
-			announcements    BOOLEAN
-			,FOREIGN KEY (uid) REFERENCES users(id)
+			announcements    BOOLEAN,
+			FOREIGN KEY (uid) REFERENCES users(id)
 );
 
 CREATE TABLE subscriptions_pauseid (
@@ -143,9 +143,9 @@ CREATE TABLE subscriptions_pauseid (
 			allposts         BOOLEAN,
 			starters         BOOLEAN,
 			followups        BOOLEAN,
-			announcements    BOOLEAN
-			,FOREIGN KEY (pauseid) REFERENCES authors(id)
-			,FOREIGN KEY (uid) REFERENCES users(id)
+			announcements    BOOLEAN,
+			FOREIGN KEY (pauseid) REFERENCES authors(id),
+			FOREIGN KEY (uid) REFERENCES users(id)
 );
 
 CREATE UNIQUE INDEX groups_name ON groups (name);
@@ -163,11 +163,11 @@ CREATE UNIQUE INDEX tags_name ON tags (name);
 CREATE TABLE tag_cloud (
 			uid              INTEGER,
 			tag_id           INTEGER,
-            group_id         INTEGER,
-            stamp            TEXT
-			,FOREIGN KEY (uid) REFERENCES users(id)
-			,FOREIGN KEY (tag_id) REFERENCES tags(id)
-			,FOREIGN KEY (group_id) REFERENCES groups(id)
+			group_id         INTEGER,
+			stamp            TEXT,
+			FOREIGN KEY (uid) REFERENCES users(id),
+			FOREIGN KEY (tag_id) REFERENCES tags(id),
+			FOREIGN KEY (group_id) REFERENCES groups(id)
 );
 CREATE INDEX tags_cloud_uid ON tag_cloud (uid);
 CREATE INDEX tags_cloud_tag_id ON tag_cloud (tag_id);

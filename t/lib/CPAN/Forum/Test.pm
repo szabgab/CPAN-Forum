@@ -11,6 +11,13 @@ use File::Temp     qw(tempdir);
 
 my $ROOT = dirname(dirname(dirname(dirname(dirname(abs_path(__FILE__))))));
 
+our %admin = (
+        username => 'testadmin',
+        email    => 'test@perl.org.il',
+        password => 'pw_of_testadmin',
+        from     => 'testforum@perl.org.il',
+    );
+
 our @users = (
     {
         username => 'abcder',
@@ -23,7 +30,7 @@ sub setup_database {
     $ENV{CPAN_FORUM_USER} = $ENV{CPAN_FORUM_TEST_USER};
 
     # TODO capture STDERR and show if there was an error
-    my $out = qx{$^X bin/setup.pl    --email 'test\@perl.org.il' --username testadmin --password pw_of_testadmin --from 'testforum\@perl.org.il' 2>&1};
+    my $out = qx{$^X bin/setup.pl    --email $admin{email} --username $admin{username} --password $admin{password} --from $admin{from} 2>&1};
     if ($out =~ /ERROR/) {
         die $out;
     }
@@ -37,7 +44,11 @@ sub init_db {
     $ENV{CPAN_FORUM_DB}   = $ENV{CPAN_FORUM_TEST_DB};
     $ENV{CPAN_FORUM_USER} = $ENV{CPAN_FORUM_TEST_USER};
 
-    CPAN::Forum::DBI->myinit();
+    return CPAN::Forum::DBI->myinit();
+}
+
+sub get_dbh {
+    return init_db();
 }
 
 sub register_user {

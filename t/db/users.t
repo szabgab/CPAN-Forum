@@ -42,12 +42,12 @@ t::lib::CPAN::Forum::Test::init_db();
     });
     is($user->{username}, $users[0]{username});
     is($user->{email}, $users[0]{email});
-    is(length($user->{password}), 7);
+#    is(length($user->{password}), 7);
 
     my $db_users = CPAN::Forum::DB::Users->retrieve_all;
     is(@$db_users, 2);
     is(CPAN::Forum::DB::Users->count_all(), 2);
-    BEGIN { $tests += 5; }
+    BEGIN { $tests += 4; }
 }
 
 
