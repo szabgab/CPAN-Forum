@@ -4,12 +4,19 @@ use Moose;
 
 use CPAN::Mini        ();
 use File::Basename    qw(basename dirname);
+use File::Copy        qw(copy);
 use File::Find::Rule  ();
 use File::HomeDir     ();
 use File::Path        qw(rmtree mkpath);
 use File::Temp        qw(tempdir);
+use Parse::CPAN::Packages;
+
 
 use CPAN::Forum::Pod;
+
+use CPAN::Forum::DBI;
+use CPAN::Forum::DB::Groups;
+use CPAN::Forum::DB::Authors;
 
 =head1 NAME
 
@@ -52,6 +59,7 @@ has 'dist'        => (is => 'rw');
 has 'version'     => (is => 'rw');
 has 'source_path' => (is => 'rw');
 has 'html_path'   => (is => 'rw');
+has 'distinfo'    => (is => 'rw');
 
 =pod
 
@@ -131,12 +139,57 @@ sub mirror_cpan {
 sub process_files {
 	my ($self) = @_;
 	return if not $self->process;
-	
-	die '--process all   not yet implemented' if $self->process eq 'all';
-	die '--process new   not yet implemented' if $self->process eq 'new';
+
+	CPAN::Forum::DBI->myinit();
+
+	if ($self->process eq 'all') {
+		my $cpan_dir = $self->cpan_dir;
+		my $tmp   = tempdir( CLEANUP => 1 );
+		my $src   = "$cpan_dir/modules/02packages.details.txt.gz";
+		my $copy  = "$tmp/02packages.details.txt.gz";
+		my $txt   = "$tmp/02packages.details.txt";
+		copy $src, $copy;
+		system("gunzip $copy");
+
+		my $p = Parse::CPAN::Packages->new($txt);
+		
+		my $cnt;
+		foreach my $d ($p->latest_distributions) {
+		    $cnt++;
+
+		    # skip scripts
+		    if (not $d->prefix or $d->prefix =~ m{^\w/\w\w/\w+/scripts/}) {
+			warn "no prefix line $cnt\n";
+			next;
+		    }
+
+		    my $name        = $d->dist;
+		    if (not $name) {
+			warn "No name: line: $cnt prefix:" . $d->prefix . "\n";
+			next;
+		    }
+		    
+		    # for now skip names that start with lower case
+		    #next LINE if $name =~ /^[a-z]/;
+
+		    $self->file($d->prefix);
+		    $self->distinfo($d);
+		    $self->process_file();
+		}
+	} elsif ($self->process eq 'new') {
+		die '--process new   not yet implemented';
+	} else {
+		$self->file($self->process);
+		$self->process_file();
+	}
+
+	return;
+}
 
 
-	$self->file($self->process);
+sub process_file {
+	my ($self) = @_;
+
 	$self->unzip_file;
 	$self->generate_html;
 	$self->update_meta_data;
@@ -240,11 +293,75 @@ sub generate_html {
 	return;
 }
 
-
+# TODO: find a better name  --meta is not good because Moose does not like it
+# --yaml is not good because it is not only yaml
+# maybe --db ??
 sub update_meta_data {
 	my ($self) = @_;
 	return if not $self->meta;
-	return;
+
+	my $d = $self->distinfo;
+	my $name = $d->dist;
+	my $pauseid = ($d->cpanid()  || "");
+	my $p;
+	if ($pauseid) {
+	    eval {
+		    $p = CPAN::Forum::DB::Authors->find_or_create($pauseid);
+	    };
+	    if ($@) {
+		warn "$name\n";
+		warn $@;
+		return;
+	    }
+        }
+	if (not $p) {
+		warn "No PAUSEID?" . $d->prefix . "\n";
+		return;
+	}
+
+
+	    my %new = (
+		version => ($d->version() || ""),
+		pauseid => $p->{id},
+	    );
+	    my ($g) = CPAN::Forum::DB::Groups->get_data_by_name($name);
+	    if (%$g) {
+		my $changed;
+		foreach my $field (qw(version pauseid)) {
+		    #print "$name\n";
+		    #print "NEW: $new{$field}\n";
+		    #print "OLD: " . $g->$field, "\n";
+		    #<STDIN>;
+		    if (not defined $g->{$field} or $g->{$field} ne $new{$field}) {
+			#print "change\n";
+			#$message{$field} .= sprintf "The %s of %s has changed from %s to %s\n",
+			#		$field, $name, ($g->{$field} || ""), $new{$field};
+			$g->{$field} = $new{$field};
+			$changed++;
+		    }
+		}
+
+		if ($changed) {
+			CPAN::Forum::DB::Groups->update_data_by_name($name, $g);
+		}
+		return;
+	    }
+
+	    #$message{new} .= sprintf "Creating %s   %s\n", $name, $new{version}, $pauseid;
+
+	    eval {
+		my $g = CPAN::Forum::DB::Groups->add(
+		    name    => $name,
+		    gtype   => $CPAN::Forum::DBI::group_types{Distribution}, 
+		    version => $new{version},
+		    pauseid => $new{pauseid},
+		);
+	    };
+	    if ($@) {
+		warn "$name\n";
+		warn $@;
+	    }
+	    return;
 }
 
 sub process_ppi {

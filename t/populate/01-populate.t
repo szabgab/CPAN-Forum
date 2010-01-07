@@ -18,6 +18,9 @@ plan tests => $tests;
 
 bail_on_fail;
 
+$ENV{CPAN_FORUM_DB} = $ENV{CPAN_FORUM_TEST_DB};
+$ENV{CPAN_FORUM_USER} = $ENV{CPAN_FORUM_TEST_USER};
+
 use t::lib::CPAN::Forum::Test;
 
 use CPAN::Forum::Populate;
@@ -26,23 +29,40 @@ my $url = $ENV{CPAN_FORUM_TEST_URL};
 
 #my $root = dirname(dirname(dirname(abs_path($0))));
 #diag("Root $root\n");
+my $dir = tempdir( CLEANUP => 1 );
 
+#mkdir $ENV{CPAN_FORUM_TEST_DIR};
 
-mkdir $ENV{CPAN_FORUM_TEST_DIR};
+t::lib::CPAN::Forum::Test::setup_database();
 
+my $cpan_dir = t::lib::CPAN::Forum::Test::build_fake_cpan();
 
-my $dir = t::lib::CPAN::Forum::Test::build_fake_cpan();
+# TODO test mirror alone? - probably no need
+# 
   
 {
 	my %opt = (
-		dir    => $ENV{CPAN_FORUM_TEST_DIR},
-		cpan   => "file://$dir",
-		mirror => 'mini',
+		dir     => $dir, #$ENV{CPAN_FORUM_TEST_DIR},
+		cpan    => "file://$cpan_dir",
+
+		mirror  => 'mini',
+		process => 'all',
+		yaml    => 1,
 	);
 
 	my $p = CPAN::Forum::Populate->new(\%opt);
 	$p->run;
 }
 
-ok(1);
-BEGIN { $tests += 1; }
+my $dbh = t::lib::CPAN::Forum::Test::get_dbh();
+{
+	my $user_cnt = $dbh->selectrow_array("SELECT COUNT(*) FROM users");
+	is($user_cnt, 1, 'users count');
+	my $group_cnt = $dbh->selectrow_array("SELECT COUNT(*) FROM groups");
+	is($group_cnt, 2, 'two groups');
+	my $groups = $dbh->selectall_arrayref("SELECT name FROM groups ORDER BY name");
+	is_deeply($groups, [['ABI'], ['Acme-Bleach']]);
+	BEGIN { $tests += 3; }
+}
+
+

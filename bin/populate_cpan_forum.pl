@@ -40,7 +40,7 @@ Usage: $0
 			                  # mino = using Mini::CPAN (1.4 Gb)
                                           # list of Package::Names per line to mirror
    
-      --proces [all|new|path/to/file]     # which packages to process (need other flags to tell what to do)
+      --process [all|new|path/to/file]    # which packages to process (need other flags to tell what to do)
                                           # all = rebuilding information about every package
                                           # new = only those that were added recently
                                           # list of Package::Names per line
