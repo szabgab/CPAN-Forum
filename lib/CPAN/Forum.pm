@@ -182,8 +182,7 @@ You will be able to change all these values later from the web interface but
 we need to have the first values.
 
     
-    perl bin/populate.pl 
-        --source t/02packages.details.txt 
+    perl bin/populate_cpan_forum.pl 
         --dbname $ENV{CPAN_FORUM_DB} 
         --dbuser $ENV{CPAN_FORUM_USER}
 

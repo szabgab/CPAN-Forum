@@ -41,8 +41,7 @@ sub setup_database {
     }
     
     my $dir = build_fake_cpan();
-    system "$^X bin/populate.pl --cpan file://$dir --fetch";
-    #system "$^X bin/populate.pl --source t/02packages.details.txt ";
+    system "$^X bin/populate_cpan_forum.pl --cpan file://$dir --mirror mini --process all --yaml";
 
     return;
 }
