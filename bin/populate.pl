@@ -175,12 +175,12 @@ my %mail = (
     Subject  => 'CPAN Version Update',
     Message  => $message{version},
 );
-if ($opts{sendmail}) {
-    sendmail(%mail);
-} else {
-    open my $fh, ">", "$dir/cpan_version_update";
-    print $fh $message{version};
-}
+#if ($opts{sendmail}) {
+#    sendmail(%mail);
+#} else {
+#    open my $fh, ">", "$dir/cpan_version_update";
+#    print $fh $message{version};
+#}
 
 %mail = (
     To       => 'gabor@pti.co.il',
@@ -188,12 +188,12 @@ if ($opts{sendmail}) {
     Subject  => 'New CPAN Distros',
     Message  => $message{new},
 );
-if ($opts{sendmail}) {
-    sendmail(%mail);
-} else {
-    open my $fh, ">", "$dir/cpan_new_distros";
-    print $fh $message{new};
-}
+#if ($opts{sendmail}) {
+#    sendmail(%mail);
+#} else {
+#    open my $fh, ">", "$dir/cpan_new_distros";
+#    print $fh $message{new};
+#}
 
 
 sub usage {
