@@ -337,8 +337,19 @@ BEGIN {
 
 	my ($search_form, $tags_form) = $w_user->forms;
 	check_form($tags_form, \@update_tags);
-	
-	BEGIN { $tests += 8  + 1+@update_tags*2; }
+
+	$w_user->submit_form(
+		form_number => 2,
+		button => 'update_button',
+	    fields => {
+		new_tags   => 'one_word, two words',
+            },
+        );
+        $w_user->content_like( qr{Tags on.*Acme-Bleach.*were updated}s );
+	$w_user->follow_link_ok({ text => 'all the tags' });
+	$w_user->follow_link_ok({ text => 'two words' });
+	$w_user->content_unlike( qr{Something went wrong here} );
+	BEGIN { $tests += 8  + 1+@update_tags*2   + 4; }
 }
 
 

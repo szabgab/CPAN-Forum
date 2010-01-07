@@ -64,7 +64,7 @@ sub _list_modules_with_tag {
 
     my $referer = $ENV{HTTP_REFERER} || '';
     $referer =~ s{^(https?://[^/]+).*}{$1};
-    $t->param(referer => "$referer/dist");
+    #$t->param(referer => "$referer/dist");
     return $t->output; 
 }
 
