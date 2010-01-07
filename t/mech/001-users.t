@@ -9,14 +9,12 @@ plan skip_all => 'Need CPAN_FORUM_TEST_DB and CPAN_FORUM_TEST_USER and CPAN_FORU
 plan tests => 5;
 bail_on_fail;
 
-
 use t::lib::CPAN::Forum::Test;
 
 my $w = t::lib::CPAN::Forum::Test::get_mech();
 
 {
     t::lib::CPAN::Forum::Test::setup_database();
-    #ok(-e $ENV{CPAN_FORUM_DB_FILE});
 }
 
 {

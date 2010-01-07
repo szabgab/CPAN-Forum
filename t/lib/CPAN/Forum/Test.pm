@@ -23,6 +23,10 @@ our @users = (
         username => 'abcder',
         email    => 't@cpanforum.com',
     },
+    {
+        username => 'zorgmaster',
+        email    => 'z@cpanforum.com',
+    },
 );
 
 sub setup_database {
