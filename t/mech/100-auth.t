@@ -424,21 +424,6 @@ foreach my $i (0..2) {
 #}
 
 
-=pod
-sqlite> select * from groups;
-1|ABI||3|0.01|1||
-2|CGI-Application-ValidateRM||3|1.12|2||
-3|Acme-Bleach||3|1.12|3||
-4|CGI-Application||3|3.22|2||
-5|CGI-Application-Session||3|0.03|4||
-sqlite> select * from authors;
-1|MALAY
-2|MARKSTOS
-3|DCONWAY
-4|CEESHEK
-=cut
-
-
 sub check_form {
     my ($form, $input_fields_ref, $diag) = @_;
     foreach my $i (@$input_fields_ref) {

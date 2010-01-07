@@ -52,7 +52,6 @@
 
 -------------------------------
   * Setup bug and request tracking (or shall we use RT for this?)
-  * Switch to use Git and Github  DONE
 
   * Index and display perldoc
   * Index and display perldoc in French and Italian
