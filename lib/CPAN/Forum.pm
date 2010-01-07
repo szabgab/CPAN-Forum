@@ -1775,10 +1775,7 @@ Perl of course.
 =head1 DEVELOPMENT
 
 Subversion repository is at 
-L<http://svn.pti.co.il/svn/cpan-forum/trunk/>
-
-There is a mailing list to see the commits to the repository:
-L<http://perl.org.il/mailman/listinfo/cpan-forum-commit>
+L<http://github.com/szabgab/CPAN-Forum/blob/master/TODO>
 
 Discussion of this module will take place on
 L<http://cpanforum.com/dist/CPAN-Forum>
