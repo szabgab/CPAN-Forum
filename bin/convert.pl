@@ -14,12 +14,12 @@ GetOptions(\%opt,
 	'dbname=s',
 	'dbuser=s',
 );
-system "$^X bin/setup.pl --username demo --email email --password demo --from from";
 # --dbfile forum.db --dbname $CPAN_FORUM_TEST_NAME --dbuser $CPAN_FORUM_TEST_USER
 
 $ENV{CPAN_FORUM_USER} = $opt{dbuser};
 $ENV{CPAN_FORUM_DB}   = $opt{dbname};
 
+system "$^X bin/setup.pl --username demo --email email --password demo --from from";
 my $src = DBI->connect("dbi:SQLite:dbname=$opt{dbfile}");
 
 CPAN::Forum::DBI->myinit();
