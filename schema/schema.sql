@@ -3,7 +3,7 @@ DROP TABLE IF EXISTS usergroups CASCADE;
 DROP TABLE IF EXISTS user_in_group CASCADE;
 DROP TABLE IF EXISTS configure CASCADE;
 DROP TABLE IF EXISTS groups CASCADE;
-DROP TABLE IF EXISTS grouprelations CASCADE;
+--DROP TABLE IF EXISTS grouprelations CASCADE;
 DROP TABLE IF EXISTS posts CASCADE;
 DROP TABLE IF EXISTS authors CASCADE;
 DROP TABLE IF EXISTS subscriptions CASCADE;
@@ -47,7 +47,7 @@ CREATE TABLE users (
 			update_on_new_user VARCHAR(1),
 			pauseid            INTEGER,
 --			status             INTEGER,
-			registration_date  TIMESTAMP DEFAULT NOW(),
+			registration_date  TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
 			last_seen          TIMESTAMP,
 			FOREIGN KEY (pauseid) REFERENCES authors(id)
 );
@@ -66,7 +66,7 @@ CREATE TABLE user_in_group (
 );
 
 CREATE TABLE configure (
-			field             VARCHAR(255) NOT NULL,
+			field             VARCHAR(255) UNIQUE NOT NULL,
 			value             VARCHAR(255) NOT NULL
 );
 
@@ -77,19 +77,19 @@ CREATE TABLE groups (
 			status           INTEGER,
 			gtype            INTEGER NOT NULL,
 			version          VARCHAR(100),
-			pauseid          INTEGER NOT NULL,
+			pauseid          INTEGER, -- should be NOT NULL but there are entries in the database with null, TODO create a hash of the correct values before!
 			rating           VARCHAR(10),	
 			review_count     INTEGER NOT NULL DEFAULT 0,
 			FOREIGN KEY (pauseid)  REFERENCES authors(id)
 );
+-- TODO check again all the fields including the status fields, are they really NULL ?
 
-
-CREATE TABLE grouprelations (
-			parent            INTEGER NOT NULL,
-			child             INTEGER NOT NULL,
-			FOREIGN KEY (parent) REFERENCES groups(id),
-			FOREIGN KEY (child) REFERENCES groups(id)
-);
+--CREATE TABLE grouprelations (
+--			parent            INTEGER NOT NULL,
+--			child             INTEGER NOT NULL,
+--			FOREIGN KEY (parent) REFERENCES groups(id),
+--			FOREIGN KEY (child) REFERENCES groups(id)
+--);
 
 -- grouprelations defined which group belongs to which other group, 
 -- In the application level we'll have to implement the restriction so 
@@ -106,7 +106,7 @@ CREATE TABLE posts (
 			thread           INTEGER,
 			hidden           BOOLEAN,
 			subject          VARCHAR(255) NOT NULL,
-			text             VARCHAR(100000) NOT NULL,
+			text             TEXT,
 			date             TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
 			FOREIGN KEY (gid) REFERENCES groups(id),
 			FOREIGN KEY (uid) REFERENCES users(id),

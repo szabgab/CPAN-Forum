@@ -43,6 +43,10 @@ CPAN::Forum::DBI->init_db();
 
 my $from = delete $opts{from};
 CPAN::Forum::DB::Configure->set_field_value('from', $from);
+CPAN::Forum::DB::Configure->set_field_value('rss_size', 20);
+CPAN::Forum::DB::Configure->set_field_value('per_page', 25);
+CPAN::Forum::DB::Configure->set_field_value('flood_control_time_limit', 10);
+CPAN::Forum::DB::Configure->set_field_value('disable_email_notification', undef);
 
 CPAN::Forum::DB::Users->add_user({id => 1, update_on_new_user => 1, %opts});
 CPAN::Forum::DB::Users->update(1, sha1 => sha1_base64($opts{password}));
