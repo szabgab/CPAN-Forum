@@ -32,22 +32,24 @@ CREATE SEQUENCE subscriptions_all_id_seq;
 CREATE SEQUENCE subscriptions_pauseid_id_seq;
 CREATE SEQUENCE tags_id_seq;
 
-
+CREATE TABLE authors (
+			id               INTEGER PRIMARY KEY DEFAULT nextval('authors_id_seq'::regclass),
+			pauseid          VARCHAR(100) UNIQUE NOT NULL
+);
 
 CREATE TABLE users (
-			id               INTEGER PRIMARY KEY DEFAULT nextval('users_id_seq'::regclass),
-			username         VARCHAR(25) UNIQUE NOT NULL,
-			sha1             CHAR(27)    NOT NULL,
-			email            VARCHAR(100) UNIQUE NOT NULL,
-			fname            VARCHAR(100),
-			lname            VARCHAR(100),
+			id                 INTEGER PRIMARY KEY DEFAULT nextval('users_id_seq'::regclass),
+			username           VARCHAR(25) UNIQUE NOT NULL,
+			sha1               CHAR(27)    NOT NULL,
+			email              VARCHAR(100) UNIQUE NOT NULL,
+			fname              VARCHAR(100),
+			lname              VARCHAR(100),
 			update_on_new_user VARCHAR(1),
-			status           INTEGER
--- registration_date
--- last_seen
--- locaton
--- user_localtime
--- scratch_pad
+			pauseid            INTEGER,
+--			status             INTEGER,
+			registration_date  TIMESTAMP DEFAULT NOW(),
+			last_seen          TIMESTAMP,
+			FOREIGN KEY (pauseid) REFERENCES authors(id)
 );
 
 CREATE TABLE usergroups (
@@ -58,7 +60,9 @@ CREATE TABLE usergroups (
 
 CREATE TABLE user_in_group (
 			uid               INTEGER NOT NULL,
-			gid               INTEGER NOT NULL
+			gid               INTEGER NOT NULL,
+			FOREIGN KEY (uid)  REFERENCES users(id),
+			FOREIGN KEY (gid)  REFERENCES usergroups(id)
 );
 
 CREATE TABLE configure (
@@ -66,10 +70,6 @@ CREATE TABLE configure (
 			value             VARCHAR(255) NOT NULL
 );
 
-CREATE TABLE authors (
-			id               INTEGER PRIMARY KEY DEFAULT nextval('authors_id_seq'::regclass),
-			pauseid          VARCHAR(100) UNIQUE NOT NULL
-);
 
 CREATE TABLE groups (
 			id               INTEGER PRIMARY KEY DEFAULT nextval('groups_id_seq'::regclass),
