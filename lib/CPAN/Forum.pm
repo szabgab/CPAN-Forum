@@ -1618,51 +1618,6 @@ sub _my_sendmail {
     }
 }
 
-=head2 process_missing_dist
-
-A very CPAN related piece of code.
-Given a name of a distribution (with dashes), 
-check if the given distribution is on search.cpan.org 
-and try to add it to our database.
-
-Return true on success.
-
-=cut
-sub process_missing_dist {
-    my ($self, $dist_name) = @_;
-    $self->log->debug("Fetch info regarding $dist_name from search.cpan.org");
-
-    return if not $self->_approved_client();
-
-    my $download_url = $self->_check_on_search_cpan_org($dist_name);
-    return if not $download_url;
-
-    my ($version, $pauseid) = $self->_check_dist_info($download_url, $dist_name);
-
-    my $author = CPAN::Forum::DB::Authors->get_author_by_pauseid($pauseid); # SQL
-    if (not $author) {
-        $author = eval { CPAN::Forum::DB::Authors->add( pauseid => $pauseid ) }; # SQL
-    }
-    if (not $author) {
-        $self->log->debug("Could not find or add author: '$pauseid'");
-        return;
-    }
-
-    my $group = eval { CPAN::Forum::DB::Groups->add(   # SQL
-        name    => $dist_name,
-        gtype   => $CPAN::Forum::DBI::group_types{Distribution}, 
-        version => $version,
-        pauseid => $author->{id},
-    ); };
-    if ($group) {
-        $self->log->notice("Distribution $dist_name added");
-        return $group;
-    }
-    else {
-        $self->log->debug("Could not add distribution $dist_name: $@");
-        return;
-    }
-}
 
 sub m {
     my ($self) = @_;
@@ -1725,36 +1680,6 @@ sub _approved_client {
     return 1;
 }
 
-
-sub _check_on_search_cpan_org {
-    my ($self, $dist_name) = @_;
-
-    # Fetch page from search.cpan.org and do a sanity check
-    my $w = WWW::Mechanize->new;
-    my $url = "http://search.cpan.org/dist/$dist_name/";
-    $self->log->debug("URL: '$url'");
-    $w->get($url);
-    #$self->log->debug($w->content);
-    if (not $w->success) {
-        $self->log->debug("Could not fetch $url");
-        return;
-    }
-    my $discuss_link = $w->find_link( text_regex => qr{Discussion.*Forum} );
-    if (not $discuss_link) {
-        $self->log->debug("Could not find link to Discussion Forum");
-        return;
-    }
-    $self->log->debug("Url to discussion list: " . $discuss_link->url);
-
-    my $download_link = $w->find_link( text_regex => qr{Download} );
-    if (not $download_link) {
-        $self->log->debug("Could not find link to Download");
-        return;
-    }
-    my $download_url = $download_link->url;
-    $self->log->debug("Download url: $download_url");
-    return $download_url;
-}
 
 sub version {
     return $VERSION;

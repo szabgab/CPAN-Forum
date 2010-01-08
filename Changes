@@ -2,6 +2,7 @@
    Switch over to use PostgreSQL
    Rename the password field to sha1 and use SHA1
    Start using CPAN::Faker for testing.
+   Remove process_missing_dist as we don't want to look at search.cpan.org any more.
 
 v0.15 2010.02.06
    Add  (username) write: to the messages sent out
