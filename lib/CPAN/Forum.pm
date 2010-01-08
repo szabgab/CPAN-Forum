@@ -1664,23 +1664,6 @@ sub _check_dist_info {
 }
 
 
-sub _approved_client {
-    my ($self) = @_;
-
-    # Check if client is approved
-    my %IPS = (
-        '66.249.66.3'  => 1,   # GoogleBot
-        '65.55.213.74' => 1,   # msnbot
-#        '127.0.0.1'    => 1,   # localhost for testing
-    );
-    if (not $ENV{REMOTE_ADDR} or not $IPS{ $ENV{REMOTE_ADDR} }) {
-        $self->log->debug("Client $ENV{REMOTE_ADDR} is not in the approved list");
-        return;
-    }
-    return 1;
-}
-
-
 sub version {
     return $VERSION;
 }
