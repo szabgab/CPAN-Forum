@@ -23,6 +23,9 @@ merge the populate script
 
 ==========================
 
+collect the packaes from downstream distriutions ORDB::DebianModules
+See http://szabgab.com/distributions/ for an old project
+
 
   * Switch application to use mod_perl on the live site
 

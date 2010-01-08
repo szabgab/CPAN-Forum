@@ -184,8 +184,8 @@ sub _generate_rss {
     if ($it and @$it) {
         if ($type and $type eq 'tags') {
             foreach my $post (@$it) {
-                my $title = sprintf "%s on %s at %s", $post->{tag}, $post->{dist},
-                        POSIX::strftime("%Y%m%d %H:%S", localtime($post->{stamp}));
+                my $title = sprintf "%s on %s at %s", $post->{tag}, $post->{dist}, $post->{stamp};
+                        #POSIX::strftime("%Y%m%d %H:%S", localtime($post->{stamp}));
                 my $uri = URI->new("$url/tags/name/" . $post->{tag});
                 $rss->item($uri->as_string, $title);
             }
@@ -207,6 +207,8 @@ sub _generate_rss {
     return $rss->as_string();
 }
 
+
+# URL: Both /rss/...  and /atom/.... are serverd by this
 sub get_feed {
     my ($self, $limit) = @_;
 
@@ -214,12 +216,15 @@ sub get_feed {
 
     return [] if not @params;
 
+    # URL: /rss/dist/CPAN-Forum
+    # URL: /atom/dist/CPAN-Forum
     if ($params[0] eq 'dist') {
         my $dist = $params[1] || '';
         $self->log->debug("rss of dist: '$dist'");
         return CPAN::Forum::DB::Posts->search_post_by_groupname($dist, $limit); # SQL
     }
 
+    # URL: /rss/author/SZABGAB  ( /rss/author/szabgab also works )
     if ($params[0] eq 'author') {
         my $pauseid = uc($params[1]) || '';
         if ($pauseid) {
@@ -228,14 +233,17 @@ sub get_feed {
         }
     }
 
+    # URL /rss/all     - latest posts
     if ($params[0] eq 'all') {
         return CPAN::Forum::DB::Posts->retrieve_latest($limit); # SQL
     }
 
+    # URL /rss/threads - latest threads (questions)
     if ($params[0] eq 'threads') {
         return CPAN::Forum::DB::Posts->search_latest_threads($limit); # SQL
     }
 
+    # URL /rss/tags  - latest tags with timestamp
     if ($params[0] eq 'tags') {
         return CPAN::Forum::DB::Tags->retrieve_latest($limit); # SQL
     }

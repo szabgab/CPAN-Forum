@@ -49,7 +49,7 @@ convert('authors', [qw(id pauseid)]);
 
 	}
 }
-# 12 sec up till here
+# 12 sec on notebook
 
 #convert(qw(usergroups id name));    # set in the setup.pl script
 convert('user_in_group', [qw(uid gid)] );
@@ -58,12 +58,22 @@ convert('groups', [qw(id name gtype version pauseid rating review_count)], sub {
 	my $d = shift;
 	$d->[-1] ||= 0;
 	}); # TODO check the schema, set pauseid to not null??
-# 35 sec
+# 35 sec on notebook
 convert('posts', [qw(id gid uid parent thread hidden subject text date)], sub {
 	my $d = shift;
 	$d->[-1] = gmtime($d->[-1]);
 	});
-# 51 sec
+# 51 sec on notebook vs 23 sec on desktop
+
+convert('subscriptions', [qw(id uid gid allposts starters followups announcements)]);
+convert('subscriptions_all', [qw(id uid allposts starters followups announcements)]);
+convert('subscriptions_pauseid', [qw(id uid pauseid allposts starters followups announcements)]);
+convert('tags', [qw(id name)]);
+convert('tag_cloud', [qw(uid tag_id group_id stamp)], sub {
+	my $d = shift;
+	$d->[-1] = gmtime($d->[-1]);
+	});
+
 
 
 sub convert {
@@ -94,8 +104,3 @@ sub convert {
 	}
 }
 
-
-#my $groups = $src->selectall_arrayref("SELECT * FROM groups");
-#print scalar @$groups;
-#foreach my $g (@$groups) {
-#}

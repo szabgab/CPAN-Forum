@@ -164,7 +164,7 @@ CREATE TABLE tag_cloud (
 			uid              INTEGER,
 			tag_id           INTEGER,
 			group_id         INTEGER,
-			stamp            TEXT,
+			stamp            TIMESTAMP DEFAULT NOW(),
 			FOREIGN KEY (uid) REFERENCES users(id),
 			FOREIGN KEY (tag_id) REFERENCES tags(id),
 			FOREIGN KEY (group_id) REFERENCES groups(id)
