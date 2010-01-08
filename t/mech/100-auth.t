@@ -137,7 +137,6 @@ my $user;
     $w_guest->follow_link_ok({ text => 'new post' });
 
     # TODO check if this is the login form
-
     $w_guest->content_like( qr{In order to post on this site} );
     # next call causes the warning when running with -w
     $w_guest->submit_form(
@@ -252,6 +251,25 @@ BEGIN {
 
 }
 
+{
+    $w_guest->get_ok("$url/rss/all");
+    $w_guest->content_like(qr{<title>No posts yet</title>});
+    $w_guest->get_ok("$url/atom/all");
+    $w_guest->content_like(qr{<title>No posts yet</title>});
+    
+    $w_guest->get_ok("$url/rss/threads");
+    $w_guest->content_like(qr{<title>No posts yet</title>});
+    $w_guest->get_ok("$url/atom/threads");
+    $w_guest->content_like(qr{<title>No posts yet</title>});
+
+    $w_guest->get_ok("$url/rss/tags");
+    $w_guest->content_like(qr{<title>No posts yet</title>});
+    $w_guest->get_ok("$url/atom/tags");
+    $w_guest->content_like(qr{<title>No posts yet</title>});
+
+    #explain $w_guest->content;
+    BEGIN { $tests += 3*4 }
+}
 
 {
     diag "Submit a post";
@@ -296,6 +314,40 @@ BEGIN {
     
     BEGIN { $tests += 12 + 1+@post_preview_input_fields*2  + 1+@post_submit_input_fields*2}
 }
+
+{
+    $w_guest->get_ok("$url/rss/all");
+    $w_guest->content_unlike(qr{<title>No posts yet</title>});
+    $w_guest->content_like(qr{<title>\[Acme-Bleach\] A new subject</title>});
+    $w_guest->content_like(qr{<link>$url.*/posts/1</link>});
+
+    $w_guest->get_ok("$url/atom/all");
+    $w_guest->content_unlike(qr{<title>No posts yet</title>});
+    $w_guest->content_like(qr{<title>\[Acme-Bleach\] A new subject</title>});
+    $w_guest->content_like(qr{<link href="$url.*/posts/1"/>});
+
+# TODO, should not these link to the thread instead?
+    $w_guest->get_ok("$url/rss/threads");
+#    diag $w_guest->content;
+    $w_guest->content_unlike(qr{<title>No posts yet</title>});
+    $w_guest->content_like(qr{<title>\[Acme-Bleach\] A new subject</title>});
+    $w_guest->content_like(qr{<link>$url.*/posts/1</link>});
+
+    $w_guest->get_ok("$url/atom/threads");
+    $w_guest->content_unlike(qr{<title>No posts yet</title>});
+    $w_guest->content_like(qr{<title>\[Acme-Bleach\] A new subject</title>});
+    $w_guest->content_like(qr{<link href="$url.*/posts/1"/>});
+
+#
+#    $w_guest->get_ok("$url/rss/tags");
+#    $w_guest->content_like(qr{<title>No posts yet</title>});
+#    $w_guest->get_ok("$url/atom/tags");
+#    $w_guest->content_like(qr{<title>No posts yet</title>});
+
+    BEGIN { $tests += 4*4 }
+}
+
+
 
 
 my @update_tags;
