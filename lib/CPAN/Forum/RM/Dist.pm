@@ -37,13 +37,10 @@ sub dist {
     my $gr = CPAN::Forum::DB::Groups->info_by(name => $group_name); # SQL
     if (not $gr) {
         $self->log->warning("Invalid group '$group_name'");
-        $gr = $self->process_missing_dist($group_name);
-        if (not $gr) {
-            return $self->internal_error(
-                "",
-                "no_such_group",
-            );
-        }
+        return $self->internal_error(
+             "",
+             "no_such_group",
+        );
     }
     my $gid = $gr->{id};
     if ($gid =~ /^(\d+)$/) {
