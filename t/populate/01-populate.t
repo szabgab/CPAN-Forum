@@ -7,11 +7,8 @@ use File::Temp     qw(tempdir);
 
 use Test::Most;
 
-plan skip_all => 'Need CPAN_FORUM_TEST_DB and CPAN_FORUM_TEST_USER and CPAN_FORUM_LOGFILE CPAN_FORUM_TEST_DIR' 
-	if not $ENV{CPAN_FORUM_TEST_DB} or not $ENV{CPAN_FORUM_TEST_USER} or not $ENV{CPAN_FORUM_LOGFILE} or not $ENV{CPAN_FORUM_TEST_DIR};
-
-# CPAN_FORUM_TEST_DIR is that we are going to use as a place to create our cpan mirror
-# and build the html file
+plan skip_all => 'Need CPAN_FORUM_TEST_DB and CPAN_FORUM_TEST_USER and CPAN_FORUM_LOGFILE' 
+	if not $ENV{CPAN_FORUM_TEST_DB} or not $ENV{CPAN_FORUM_TEST_USER} or not $ENV{CPAN_FORUM_LOGFILE};
 
 my $tests;
 plan tests => $tests;
@@ -31,8 +28,6 @@ my $url = $ENV{CPAN_FORUM_TEST_URL};
 #diag("Root $root\n");
 my $dir = tempdir( CLEANUP => 1 );
 
-#mkdir $ENV{CPAN_FORUM_TEST_DIR};
-
 t::lib::CPAN::Forum::Test::setup_database();
 
 my $cpan_dir = t::lib::CPAN::Forum::Test::build_fake_cpan();
@@ -42,7 +37,7 @@ my $cpan_dir = t::lib::CPAN::Forum::Test::build_fake_cpan();
   
 {
 	my %opt = (
-		dir     => $dir, #$ENV{CPAN_FORUM_TEST_DIR},
+		dir     => $dir,
 		cpan    => "file://$cpan_dir",
 
 		mirror  => 'mini',
