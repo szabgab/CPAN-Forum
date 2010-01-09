@@ -104,70 +104,83 @@ PerlMonks. Right now we have our own registration and login mechanism.
 
 =head1 INSTALLATION of a development environment
 
-=head2 Apache
-
-This is the configuration of my Apache server on my notebook
-
-    AddHandler cgi-script .pl
-
-    <VirtualHost 127.0.0.1>
-        ServerName cpan.local
-        DocumentRoot                /home/gabor/work/gabor/public/dev/CPAN/www/
-        ScriptAliasMatch ^/(.*/.*)  /home/gabor/work/gabor/public/dev/CPAN/www/cgi/index.pl/$1
-        DirectoryIndex              cgi/index.pl
-    </VirtualHost>
-
-
-    <Directory "/home/gabor/work/dev/CPAN">
-        Options Indexes FollowSymLinks ExecCGI
-        AllowOverride None
-        Order allow,deny
-        Allow from 127.0.0.1
-    </Directory>
-
 =head2 hosts
 
 For local installations in /etc/hosts I added:
 
-    127.0.0.1         cpan.local
+    127.0.0.1         test.cpanforum.local
 
-That way, I have a totally separate virtual host just for this application.
-
-In a real setting probably you'll have something like cpanforum.com 
-pointed to your server.
-
+That way, I can have a totally separate virtual host just for this application.
 
 =head2 PostgreSQL
 
   $ sudo -u postgres psql postgres
-  postgres=# CREATE ROLE xyz LOGIN;
-  postgres=# CREATE DATABASE abc OWNER = xyz;
+  postgres=# CREATE ROLE forum_test_user LOGIN;
+  postgres=# CREATE DATABASE cpanforum_test OWNER = forum_test_user;
   
   $ sudo vi /etc/postgresql/8.4/main/pg_hba.conf
   
-Add:   local all xyz trust
+Add:   local all forum_test_user trust
 
   $ sudo  /etc/init.d/postgresql-8.4 restart
  
  Now this should work:
  
-   $ psql -U xyz abc
+   $ psql -U forum_test_user cpanforum_test
 
+=head2 Apache
+
+This is the configuration of my Apache server on my development machine. 
+(Actually I have several of these and one of them is using mod_perl2.
+
+  <VirtualHost *:80>
+    ServerName   test.cpanforum.local
+	
+    SETENV CPAN_FORUM_LOGFILE /tmp/cpanforum_test.log
+    SETENV CPAN_FORUM_DB cpanforum_test
+    SETENV CPAN_FORUM_USER forum_test_user
+
+    SETENV CPAN_FORUM_NOMAIL 1
+    SETENV CPAN_FORUM_DEV 1
+
+    DocumentRoot /home/gabor/work/cpan-forum/www
+    Alias            /img       /home/gabor/work/cpan-forum/www/img
+    Alias /pod  /home/gabor/.cpanforum/dist
+    AliasMatch ^/dist/(.+/.+) /home/gabor/.cpanforum/dist/$1
+    
+    ScriptAliasMatch ^/(\w*)$  /home/gabor/work/cpan-forum/www/cgi/index.pl/$1
+    ScriptAliasMatch ^/(.*/.*)  /home/gabor/work/cpan-forum/www/cgi/index.pl/$1
+    DirectoryIndex              cgi/index.pl
+  </VirtualHost>
+
+
+=head2 Environment variables
+
+in ~/.bashrc I have the following:
+
+   export CPAN_FORUM_LOGFILE=/tmp/cpanforum_gabor.log
+   export CPAN_FORUM_TEST_URL=http://test.cpanforum.local/
+   export CPAN_FORUM_TEST_DB=cpanforum_test
+   export CPAN_FORUM_TEST_USER=forum_test_user
 
 =head2 Install the perl code
 
 =head2 test the code
 
     perl Build.PL       - and make sure the prerequisites are installed
+                          some of the can be installed using    sudo aptitude ...
+                          for others I configured local::lib, installed them locally
+                          and configured the Apache server to look at that by adding the following
+                          to the configuration file of Apache:
+              SETENV PERL5LIB /home/gabor/perl5/lib/perl5:/home/gabor/perl5/lib/perl5/x86_64-linux-gnu-thread-multi
+
     ./Build
     ./Build test
 
-    chmod a+x www/cgi/index.pl  (needed only if you work out of the repository)
-
-Finally, manually edit the www/cgi/index.pl file and set the sh-bang to the correct one
+    chmod a+x www/cgi/index.pl
 
 
-=head2 Setup the database
+=head2 Setup and populate the database
 
     perl bin/setup.pl 
         --username testadmin              The user name of the administrator used on the web interface
@@ -193,11 +206,6 @@ This will fetch a file from www.cpan.org and might take a few minutes to run.
 The path to the root of the unzipped distribution is 
 determined automatically by the cgi script or the mod_perl
 handle. Path to lib/ and templates/ can be derived from it.
-
-=head2 CPAN_FORUM_DB_FILE
-
-Path to the SQLite file  /path/to/db/forum.db
-
 
 =head2 CPAN_FORUM_LOGFILE
 
