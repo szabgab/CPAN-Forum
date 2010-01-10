@@ -3,6 +3,7 @@ package CPAN::Forum::Populate;
 use Moose;
 
 use CPAN::Mini        ();
+use Cwd               ();
 use File::Basename    qw(basename dirname);
 use File::Copy        qw(copy);
 use File::Find::Rule  ();
@@ -60,6 +61,7 @@ has 'version'     => (is => 'rw');
 has 'source_path' => (is => 'rw');
 has 'html_path'   => (is => 'rw');
 has 'distinfo'    => (is => 'rw');
+has 'cwd'         => (is => 'rw');
 
 =pod
 
@@ -391,6 +393,7 @@ sub run {
 	$self->setup;
 	$self->mirror_cpan;
 	$self->process_files;
+	chdir $self->cwd;
 
 	return;
 }
@@ -398,6 +401,7 @@ sub run {
 sub setup {
 	my ($self) = @_;
 
+	$self->cwd(Cwd::cwd());
 	if (not $self->dir) {
 		my $home    = File::HomeDir->my_home;
 		$self->dir("$home/.cpanforum");
