@@ -27,7 +27,7 @@ my $src = DBI->connect("dbi:SQLite:dbname=$opt{dbfile}");
 CPAN::Forum::DBI->myinit();
 my $to = CPAN::Forum::DBI::db_Main();
 
-convert('authors', [qw(id pauseid)]);
+convert('authors', 'authors_id_seq', [qw(id pauseid)]);
 
 
 {
@@ -48,30 +48,30 @@ convert('authors', [qw(id pauseid)]);
 			print "row @$d\n";
 			die $@;
 		}
-
 	}
+	$to->do("SELECT setval('users_id_seq', (SELECT MAX(ID) FROM users))");
 }
 # 12 sec on notebook
 
-convert('usergroups', [qw(id name)]);    # set in the setup.pl script
-convert('user_in_group', [qw(uid gid)] );
-convert('configure', [qw(field value)] ); # set in the setup.pl script
-convert('groups', [qw(id name gtype version pauseid rating review_count)], sub {
+convert('usergroups',    'usergroups_id_seq', [qw(id name)]);    # set in the setup.pl script
+convert('user_in_group', undef, [qw(uid gid)] );
+convert('configure',     undef, [qw(field value)] ); # set in the setup.pl script
+convert('groups',        'groups_id_seq', [qw(id name gtype version pauseid rating review_count)], sub {
 	my $d = shift;
 	$d->[-1] ||= 0;
 	}); # TODO check the schema, set pauseid to not null??
 # 35 sec on notebook
-convert('posts', [qw(id gid uid parent thread hidden subject text date)], sub {
+convert('posts',        'posts_id_seq', [qw(id gid uid parent thread hidden subject text date)], sub {
 	my $d = shift;
 	$d->[-1] = gmtime($d->[-1]);
 	});
 # 51 sec on notebook vs 23 sec on desktop
 
-convert('subscriptions', [qw(id uid gid allposts starters followups announcements)]);
-convert('subscriptions_all', [qw(id uid allposts starters followups announcements)]);
-convert('subscriptions_pauseid', [qw(id uid pauseid allposts starters followups announcements)]);
-convert('tags', [qw(id name)]);
-convert('tag_cloud', [qw(uid tag_id group_id stamp)], sub {
+convert('subscriptions',          'subscriptions_id_seq',     [qw(id uid gid allposts starters followups announcements)]);
+convert('subscriptions_all',      'subscriptions_all_id_seq', [qw(id uid allposts starters followups announcements)]);
+convert('subscriptions_pauseid',  'subscriptions_pauseid_id_seq', [qw(id uid pauseid allposts starters followups announcements)]);
+convert('tags',                   'tags_id_seq', [qw(id name)]);
+convert('tag_cloud',              undef, [qw(uid tag_id group_id stamp)], sub {
 	my $d = shift;
 	$d->[-1] = gmtime($d->[-1]);
 	});
@@ -79,7 +79,7 @@ convert('tag_cloud', [qw(uid tag_id group_id stamp)], sub {
 
 
 sub convert {
-	my ($table, $columns, $sub) = @_;
+	my ($table, $sequence, $columns, $sub) = @_;
 	my $cols = join ", ", @$columns;
 	my $placeholders = join ", ", ("?") x scalar(@$columns);
 	my $select = "SELECT $cols FROM $table";
@@ -104,5 +104,9 @@ sub convert {
 			die $@;
 		}
 	}
+	if ($sequence) {
+		$to->do("SELECT setval('$sequence', (SELECT MAX(ID) FROM $table))");
+	}
+	return;
 }
 

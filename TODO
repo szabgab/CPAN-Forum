@@ -12,6 +12,8 @@ merge the populate script
 - Test if the flood_control_time_limit works?
 - Make sure the time shows up correctly
 
+Make sure posting a new message is fast! (maybe move e-mail sending to an async cron job)
+
   * Write tests for existing system to cover the important aspects of the system
     1) registration, email verification
     2) login/logout
