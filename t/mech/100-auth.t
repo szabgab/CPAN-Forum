@@ -294,7 +294,8 @@ BEGIN {
         },
     );
     #diag $w_user->content;
-    $w_user->content_like( qr{Posted on.*by.*$users[0]{username}}s );
+    my $year = 1900 + (localtime())[5];
+    $w_user->content_like( qr{  Posted  \s+ on .* $year .* by .* $users[0]{username}  }sx );
     $w_user->content_like(qr{<b>Preview</b>});
     my ($serch_form2, $post_form2) = $w_user->forms;
     check_form($post_form2, \@post_submit_input_fields);

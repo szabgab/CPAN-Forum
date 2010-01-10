@@ -193,9 +193,11 @@ sub add_post {
 
     my $dbh = CPAN::Forum::DBI::db_Main();
 
-    # Get next post ID
-    my $post_id = $dbh->selectrow_array("SELECT nextval('posts_id_seq')");
-    $self->add('posts', { %$data, id => $post_id} );
+    # Use transaction in order to make sure currval returns the value after the insers 
+    $dbh->begin_work;
+    $self->add('posts', $data );
+    my $post_id = $dbh->selectrow_array("SELECT currval('posts_id_seq')");
+    $dbh->commit;
 
     my $sql = "UPDATE posts SET thread=?";
     my @values = (

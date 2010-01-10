@@ -132,10 +132,11 @@ diag('register user');
     diag "Password: $pw";
     like($pw, qr{\w{5}}, 'password send');
     my $dbh = t::lib::CPAN::Forum::Test::get_dbh();
-    my $sha1_in_db = $dbh->selectrow_array("SELECT sha1 FROM users WHERE username=?", undef, $users[0]{username});
+    my ($uid, $sha1_in_db) = $dbh->selectrow_array("SELECT id, sha1 FROM users WHERE username=?", undef, $users[0]{username});
+    is($uid, 2, 'uid is 2');
     isnt($sha1_in_db, $pw, 'the sent password is not the same as the one in the database as the latter is hashed');
    
-    BEGIN { $tests += 5; }
+    BEGIN { $tests += 6; }
 }
 
 # TODO: Make sure the passwords can be long enough (up to 20 characters?)
@@ -143,21 +144,6 @@ diag('register user');
 # diag('TODO try to register the same username or the same e-mail twice')
 # TODO check for case in username and email and make sure they wont collide!
 
-{
-    # diag('register with 25 long username');
-    $w25->get_ok("$url/register/");
-    @CPAN::Forum::messages = ();
-    $w25->submit_form(
-        fields => {
-            nickname => $users[0]{username}, 
-            email    => $users[0]{email},
-        },
-    );
-    $w1->content_like(qr{Registration Page});
-    $w1->content_like(qr{Thank you for registering});
-    
-    BEGIN { $tests += 3; }
-}
 
 diag('try to register the same user again and see it fails');
 {
@@ -175,6 +161,40 @@ diag('try to register the same user again and see it fails');
     # TODO: disable these when testing with real web server
     is_deeply(\@CPAN::Forum::messages, [], 'no e-mails sent');
     BEGIN { $tests += 3; }
+}
+
+
+diag('register with 25 long username');
+{
+    $w25->get_ok("$url/register/");
+    @CPAN::Forum::messages = ();
+    diag "$users[2]{username} $users[2]{email}";
+    $w25->submit_form(
+        fields => {
+            nickname => $users[2]{username},
+            email    => $users[2]{email},
+        },
+    );
+    #diag $w25->content;
+    $w25->content_like(qr{Registration Page});
+    $w25->content_like(qr{Thank you for registering});
+
+    #explain \@CPAN::Forum::messages;
+
+    # TODO: disable these when testing with real web server
+    is(scalar(@CPAN::Forum::messages), 2, 'two mails sent');
+    my ($pw) = $CPAN::Forum::messages[0]{Message} =~ qr/your password is: (\w+)/;
+    diag "Password: $pw";
+    like($pw, qr{\w{5}}, 'password send');
+    my $dbh = t::lib::CPAN::Forum::Test::get_dbh();
+    my ($uid, $sha1_in_db) = $dbh->selectrow_array("SELECT id, sha1 FROM users WHERE username=?", undef, $users[2]{username});
+TODO: {
+    local $TODO = 'Maybe we should first check for duplicates and only after that insert to avoid increasing the sequence';
+    is($uid, 3, 'uid is 3');
+}
+    isnt($sha1_in_db, $pw, 'the sent password is not the same as the one in the database as the latter is hashed');
+
+    BEGIN { $tests += 7; }
 }
 
 # TODO try to login with the given password with the same browser,
