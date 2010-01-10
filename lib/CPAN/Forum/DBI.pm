@@ -12,11 +12,11 @@ sub myinit {
     my ($class) = @_;
 
     Carp::croak('myinit now gets only one parameter and that is the class name') if @_ != 1;
-    Carp::croak('CPAN_FORUM_DB needs to be configured') if not $ENV{CPAN_FORUM_DB};
+    Carp::croak('CPAN_FORUM_DB needs to be configured')   if not $ENV{CPAN_FORUM_DB};
     Carp::croak('CPAN_FORUM_USER needs to be configured') if not $ENV{CPAN_FORUM_USER};
 
     if (not $dbh) {
-        $dbh = DBI->connect("dbi:Pg:dbname=$ENV{CPAN_FORUM_DB}", $ENV{CPAN_FORUM_USER}, '',
+        $dbh = DBI->connect("dbi:Pg:dbname=$ENV{CPAN_FORUM_DB}", $ENV{CPAN_FORUM_USER}, $ENV{CPAN_FORUM_PW},
                     {
                         RaiseError       => 1,
                         PrintError       => 1,

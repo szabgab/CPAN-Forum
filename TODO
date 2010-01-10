@@ -1,4 +1,13 @@
 
+
+Make sure we can use utf-8 in the database (even if it is not yet allowed from the GUI of the Forum)
+
+move the session id in the database:
+   sid
+   uid
+   issued
+   last_seen
+
 merge the populate script 
  - create several very partial CPAN mirrors in the testfiles/ directory 
    and process those with the new populate script one after the other

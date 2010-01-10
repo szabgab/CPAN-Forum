@@ -33,6 +33,7 @@ our @users = (
 sub setup_database {
     $ENV{CPAN_FORUM_DB}   = $ENV{CPAN_FORUM_TEST_DB};
     $ENV{CPAN_FORUM_USER} = $ENV{CPAN_FORUM_TEST_USER};
+    #$ENV{CPAN_FORUM_PW}   = $ENV{CPAN_FORUM_TEST_PW};
 
     # TODO capture STDERR and show if there was an error
     my $out = qx{$^X bin/setup.pl    --email $admin{email} --username $admin{username} --password $admin{password} --from $admin{from} 2>&1};

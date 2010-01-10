@@ -13,13 +13,15 @@ GetOptions(\%opt,
 	'dbfile=s',
 	'dbname=s',
 	'dbuser=s',
+	'dbpw=s',
 );
 # --dbfile forum.db --dbname $CPAN_FORUM_TEST_NAME --dbuser $CPAN_FORUM_TEST_USER
 
 $ENV{CPAN_FORUM_USER} = $opt{dbuser};
 $ENV{CPAN_FORUM_DB}   = $opt{dbname};
+$ENV{CPAN_FORUM_PW}   = $opt{dbpw};
 
-system "$^X bin/setup.pl --username demo --email email --password demo --from from";
+system "$^X bin/setup.pl --empty";
 my $src = DBI->connect("dbi:SQLite:dbname=$opt{dbfile}");
 
 CPAN::Forum::DBI->myinit();
@@ -35,7 +37,7 @@ convert('authors', [qw(id pauseid)]);
 	print "Users: " . scalar(@$users) . "\n";
 	foreach my $d (@$users) {
 		my $pw = sha1_base64(pop @$d);
-		next if $d->[0] == 1;   # skip the admin user as it is already in the database
+		#next if $d->[0] == 1;   # skip the admin user as it is already in the database
 
 		#print "@$d\n";
 		#exit if $main::i++ > 10;
@@ -51,9 +53,9 @@ convert('authors', [qw(id pauseid)]);
 }
 # 12 sec on notebook
 
-#convert(qw(usergroups id name));    # set in the setup.pl script
+convert('usergroups', [qw(id name)]);    # set in the setup.pl script
 convert('user_in_group', [qw(uid gid)] );
-#convert(qw(configure field value)); # set in the setup.pl script
+convert('configure', [qw(field value)] ); # set in the setup.pl script
 convert('groups', [qw(id name gtype version pauseid rating review_count)], sub {
 	my $d = shift;
 	$d->[-1] ||= 0;
