@@ -1279,11 +1279,11 @@ sub process_post {
 					. $last_post->{date}
 					. " now: "
 					. time() );
-			if ( $last_post->{date} > time() - $self->config("flood_control_time_limit") ) {
-				push @errors, "flood_control";
-			} elsif ( $last_post->{text} eq $new_text ) {
+			if ( $last_post->{text} eq $new_text ) {
 				push @errors, "duplicate_post";
-			}
+			} elsif (CPAN::Forum::DB::Posts->post_within_limit( $self->session->param('uid'), $self->config("flood_control_time_limit") ) ) {
+				push @errors, "flood_control";
+			} 
 		}
 	}
 

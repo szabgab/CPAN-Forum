@@ -29,7 +29,14 @@ sub posts_in_thread {
 	$self->_fetch_arrayref_of_hashes( $sql, $thread );
 }
 
+# check if the user with given UID has recent posting (within the flod control limit)
+sub post_within_limit {
+	my ($self, $uid, $secs) = @_;
 
+	die if $secs !~ /^\d+$/;
+	my $sql = "SELECT COUNT(*) FROM posts WHERE uid=? AND date > NOW() - interval '$secs secs'";
+	return $self->_fetch_single_value( $sql, $uid );
+}
 
 sub _get_latest_pid_by_uid {
 	my ( $self, $uid ) = @_;

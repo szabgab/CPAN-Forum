@@ -10,7 +10,6 @@ merge the populate script
    and process those with the new populate script one after the other
 
 - Test if the flood_control_time_limit works?
-- Make sure the time shows up correctly
 
 Make sure posting a new message is fast! (maybe move e-mail sending to an async cron job)
 
