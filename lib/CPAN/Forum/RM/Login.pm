@@ -3,26 +3,27 @@ use strict;
 use warnings;
 
 use List::MoreUtils qw(none);
-use Digest::MD5     qw(md5_base64);
+use Digest::MD5 qw(md5_base64);
 
 =head2 login
 
 Show the login form and possibly some error messages.
 
 =cut
+
 sub login {
-    my ($self, $errs) = @_;
-    my $q = $self->query;
+	my ( $self, $errs ) = @_;
+	my $q = $self->query;
 
-    $self->log->debug("Sending cookie using sid:  " . $self->session->id());
-    $self->session_cookie();
-    my $t = $self->load_tmpl(
-            "login.tmpl",
-            associate => $q,
-    );
+	$self->log->debug( "Sending cookie using sid:  " . $self->session->id() );
+	$self->session_cookie();
+	my $t = $self->load_tmpl(
+		"login.tmpl",
+		associate => $q,
+	);
 
-    $t->param($errs) if $errs;
-    return $t->output;
+	$t->param($errs) if $errs;
+	return $t->output;
 }
 
 =head2 login_process
@@ -36,53 +37,54 @@ sub login {
 =cut
 
 sub login_process {
-    my $self = shift;
-    my $q = $self->query;
+	my $self = shift;
+	my $q    = $self->query;
 
-    if (not $q->param('nickname') or not $q->param('password')) {
-        return $self->login({no_login_data => 1});
-    }
+	if ( not $q->param('nickname') or not $q->param('password') ) {
+		return $self->login( { no_login_data => 1 } );
+	}
 
 
-    my $user = CPAN::Forum::DB::Users->info_by_credentials($q->param('nickname'), $q->param('password')); # SQL
-    if (not $user) {
-        $self->log->debug("No user found");
-        return $self->login({bad_login => 1});
-    }
-    $self->log->debug("Username: " . $user->{username});
+	my $user = CPAN::Forum::DB::Users->info_by_credentials( $q->param('nickname'), $q->param('password') ); # SQL
+	if ( not $user ) {
+		$self->log->debug("No user found");
+		return $self->login( { bad_login => 1 } );
+	}
+	$self->log->debug( "Username: " . $user->{username} );
 
-    my $session = $self->session;
-    $session->param(admin     => 0); # make sure it is clean
+	my $session = $self->session;
+	$session->param( admin => 0 ); # make sure it is clean
 
-    $session->param(loggedin  => 1);
-    $session->param(username  => $user->{username});
-    $session->param(uid       => $user->{id});
-    $session->param(fname     => $user->{fname});
-    $session->param(lname     => $user->{lname});
-    $session->param(email     => $user->{email});
-    if (CPAN::Forum::DB::Users->is_admin($user->{id})) { # SQL
-        $session->param(admin     => 1);
-    }
+	$session->param( loggedin => 1 );
+	$session->param( username => $user->{username} );
+	$session->param( uid      => $user->{id} );
+	$session->param( fname    => $user->{fname} );
+	$session->param( lname    => $user->{lname} );
+	$session->param( email    => $user->{email} );
+	if ( CPAN::Forum::DB::Users->is_admin( $user->{id} ) ) { # SQL
+		$session->param( admin => 1 );
+	}
 
-    my $request = $session->param("request") || "home";
-    $self->log->debug("Request redirection: '$request'");
-    my $response;
-    eval {
-        if ($request eq 'new_post') {
-            my $request_group = $session->param("request_group") || '';
-            $self->query->param("path_parameters" => [$request_group]);
-        }
-        $response = $self->$request();
-    };
-    if ($@) {
-        $self->log->error($@);
-        die $@; # TODO: send error page?
-    }
-    $session->param("request" => "");
-    $session->param("request_group" => "");
-    $session->flush();
-    $self->log->debug("Session flushed after login " . $session->param('loggedin'));
-    return $response;
+	my $request = $session->param("request") || "home";
+	$self->log->debug("Request redirection: '$request'");
+	my $response;
+	eval {
+		if ( $request eq 'new_post' )
+		{
+			my $request_group = $session->param("request_group") || '';
+			$self->query->param( "path_parameters" => [$request_group] );
+		}
+		$response = $self->$request();
+	};
+	if ($@) {
+		$self->log->error($@);
+		die $@; # TODO: send error page?
+	}
+	$session->param( "request"       => "" );
+	$session->param( "request_group" => "" );
+	$session->flush();
+	$self->log->debug( "Session flushed after login " . $session->param('loggedin') );
+	return $response;
 }
 
 
@@ -93,21 +95,21 @@ Set the session to be logged out and remove personal information from the Sessio
 =cut
 
 sub logout {
-    my $self = shift;
-    
-    my $session = $self->session;
-    my $username = $session->param('username');
-    $session->param(loggedin => 0);
-    $session->param(username => '');
-    $session->param(uid       => '');
-    $session->param(fname     => ''); 
-    $session->param(lname     => '');
-    $session->param(email     => '');
-    $session->param(admin     => '');
-    $session->flush();
-    $self->log->debug("logged out '$username'");
+	my $self = shift;
 
-    $self->home;
+	my $session  = $self->session;
+	my $username = $session->param('username');
+	$session->param( loggedin => 0 );
+	$session->param( username => '' );
+	$session->param( uid      => '' );
+	$session->param( fname    => '' );
+	$session->param( lname    => '' );
+	$session->param( email    => '' );
+	$session->param( admin    => '' );
+	$session->flush();
+	$self->log->debug("logged out '$username'");
+
+	$self->home;
 }
 
 =head2 pwreminder
@@ -115,18 +117,19 @@ sub logout {
 Show form to ask for password reminder e-mail
 
 =cut
+
 sub pwreminder {
-    my ($self, $errs) = @_;
-    my $q = $self->query;
+	my ( $self, $errs ) = @_;
+	my $q = $self->query;
 
-    my $t = $self->load_tmpl(
-            "pwreminder.tmpl",
-            associate => $q,
-    );
+	my $t = $self->load_tmpl(
+		"pwreminder.tmpl",
+		associate => $q,
+	);
 
-    $t->param($errs) if $errs;
-    $t->param($q->param('field') => 1) if $q->param('field') and $q->param('field') =~ /^username|email$/;
-    return $t->output;
+	$t->param($errs) if $errs;
+	$t->param( $q->param('field') => 1 ) if $q->param('field') and $q->param('field') =~ /^username|email$/;
+	return $t->output;
 }
 
 
@@ -137,22 +140,22 @@ Process the request to get a reminder about the password.
 =cut
 
 sub pwreminder_process {
-    my ($self) = @_;
-    my $q = $self->query;
-    my $field = $q->param('field');
-    my @FIELDS = qw(username email);
-    if (not $field or not $q->param('value') or none {$field eq $_} @FIELDS) {
-        return $self->pwreminder({"no_data" => 1});
-    }
+	my ($self) = @_;
+	my $q      = $self->query;
+	my $field  = $q->param('field');
+	my @FIELDS = qw(username email);
+	if ( not $field or not $q->param('value') or none { $field eq $_ } @FIELDS ) {
+		return $self->pwreminder( { "no_data" => 1 } );
+	}
 
-    my $user = CPAN::Forum::DB::Users->info_by($field => $q->param('value')); # SQL
-    return $self->pwreminder({"no_data" => 1}) if not $user;
+	my $user = CPAN::Forum::DB::Users->info_by( $field => $q->param('value') ); # SQL
+	return $self->pwreminder( { "no_data" => 1 } ) if not $user;
 
-    # TODO: put this text in a template
-    my $password = $user->{password};
-    my $username = $user->{username};
-    my $subject = "CPAN::Forum password reminder";
-    my $message = <<MSG;
+	# TODO: put this text in a template
+	my $password = $user->{password};
+	my $username = $user->{username};
+	my $subject  = "CPAN::Forum password reminder";
+	my $message  = <<MSG;
 
 Your nickname is $username
 Your secret key to CPAN::Forum is: $password
@@ -163,18 +166,18 @@ http://$ENV{HTTP_HOST}/
 
 MSG
 
-    my $FROM = $self->config("from");
-    $self->log->debug("FROM field set to be $FROM");
+	my $FROM = $self->config("from");
+	$self->log->debug("FROM field set to be $FROM");
 
-    my %mail = (
-        To       => $user->{email},
-        From     => $FROM,
-        Subject  => $subject,
-        Message  => $message,
-    );
-    $self->_my_sendmail(%mail);
+	my %mail = (
+		To      => $user->{email},
+		From    => $FROM,
+		Subject => $subject,
+		Message => $message,
+	);
+	$self->_my_sendmail(%mail);
 
-    return $self->pwreminder({"done" => 1});
+	return $self->pwreminder( { "done" => 1 } );
 }
 
 

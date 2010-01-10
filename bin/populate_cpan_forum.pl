@@ -4,16 +4,18 @@ use strict;
 use warnings;
 
 use File::Basename qw(dirname);
-use Getopt::Long   qw(GetOptions);
-use Cwd            qw(abs_path);
+use Getopt::Long qw(GetOptions);
+use Cwd qw(abs_path);
+
 BEGIN {
-	unshift @INC, dirname(dirname(abs_path($0))) . '/lib';
+	unshift @INC, dirname( dirname( abs_path($0) ) ) . '/lib';
 }
 use CPAN::Forum::Populate;
 
 usage() if not @ARGV;
 my %opt;
-GetOptions(\%opt, 
+GetOptions(
+	\%opt,
 	'help',
 	'dir=s',
 	'mirror=s',
@@ -26,7 +28,7 @@ GetOptions(\%opt,
 usage() if $opt{help};
 
 
-my $p = CPAN::Forum::Populate->new(\%opt);
+my $p = CPAN::Forum::Populate->new( \%opt );
 $p->run;
 
 

@@ -14,11 +14,11 @@ Create the markup grammar
 =cut
 
 sub new {
-    my ($class) = @_;
+	my ($class) = @_;
 
-    my $self = bless {}, $class;
-    
-    $self->{grammar} = q {
+	my $self = bless {}, $class;
+
+	$self->{grammar} = q {
     entry      : chunk(s) eodata                  { $item[1] }
     chunk      : marked_html | marked_code        { $item[1] }
 
@@ -67,9 +67,9 @@ sub new {
     eodata     : m{^\Z}
     };
 
-    $Parse::RecDescent::skip = '';
+	$Parse::RecDescent::skip = '';
 
-    return $self;
+	return $self;
 }
 
 
@@ -86,12 +86,13 @@ set the current value of the separator string
 =cut
 
 sub get_nextmark {
-    return $NEXTMARK;
+	return $NEXTMARK;
 }
+
 sub set_nextmark {
-    die 'This internal functiom needs 2 paramters' if @_ != 2;
-    $NEXTMARK = pop @_;
-    return $NEXTMARK;
+	die 'This internal functiom needs 2 paramters' if @_ != 2;
+	$NEXTMARK = pop @_;
+	return $NEXTMARK;
 }
 
 =head2 split_rows
@@ -103,26 +104,26 @@ Makes sure every line is max N characters long in it
 =cut
 
 sub split_rows {
-    my ($text, $N) = @_;
-    $N ||= 100;
-    my $NEXTMARK = __PACKAGE__->get_nextmark();
+	my ( $text, $N ) = @_;
+	$N ||= 100;
+	my $NEXTMARK = __PACKAGE__->get_nextmark();
 
-    my @text = split /\n/, $text;
-    my @new;
-    while (@text) {
-        my $row = shift @text;
-        if (length $row <= $N) {
-            push @new, CGI::escapeHTML($row);
-            next;
-        }
-        push @new, CGI::escapeHTML(substr($row, 0, $N-1, ""));
-        while (length $row > $N) {
-            push @new,  $NEXTMARK . CGI::escapeHTML(substr($row, 0, $N-2, ""));
-        }
-        push @new, $NEXTMARK . CGI::escapeHTML($row);
-        
-    }
-    return join "\n", @new;
+	my @text = split /\n/, $text;
+	my @new;
+	while (@text) {
+		my $row = shift @text;
+		if ( length $row <= $N ) {
+			push @new, CGI::escapeHTML($row);
+			next;
+		}
+		push @new, CGI::escapeHTML( substr( $row, 0, $N - 1, "" ) );
+		while ( length $row > $N ) {
+			push @new, $NEXTMARK . CGI::escapeHTML( substr( $row, 0, $N - 2, "" ) );
+		}
+		push @new, $NEXTMARK . CGI::escapeHTML($row);
+
+	}
+	return join "\n", @new;
 }
 
 =head2 parser
@@ -132,11 +133,11 @@ Run the Parse::RecDescent parser
 =cut
 
 sub parser {
-    my ($self) = @_;
-    if (not $parser) {
-        $parser = Parse::RecDescent->new($self->{grammar});
-    }
-    return $parser;
+	my ($self) = @_;
+	if ( not $parser ) {
+		$parser = Parse::RecDescent->new( $self->{grammar} );
+	}
+	return $parser;
 }
 
 =head2 posting_process
@@ -147,16 +148,16 @@ and returns the parsed text
 =cut
 
 sub posting_process {
-    my ($self, $text) = @_;
+	my ( $self, $text ) = @_;
 
-    my $parser = $self->parser;
-    if (not $parser) {
-        warn "Bad Grammar\n";
-        return;
-    }
-    my $out = $parser->entry($text);
-    return if not defined $out;
-    return join("",@$out);
+	my $parser = $self->parser;
+	if ( not $parser ) {
+		warn "Bad Grammar\n";
+		return;
+	}
+	my $out = $parser->entry($text);
+	return if not defined $out;
+	return join( "", @$out );
 }
 
 

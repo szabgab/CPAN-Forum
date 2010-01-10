@@ -9,8 +9,8 @@ use Getopt::Long;
 my $url;
 my $verbose;
 GetOptions(
-        "urls=s" => \$url, 
-        "verbose" => \$verbose,
+	"urls=s"  => \$url,
+	"verbose" => \$verbose,
 ) or usage();
 usage() if not $url;
 
@@ -27,16 +27,16 @@ CPAN::Forum::Test::init_db();
 
 $mech->get("$base_url/$url");
 if ($verbose) {
-    print $mech->content;
+	print $mech->content;
 }
 
 sub usage {
-    print <<"END_USAGE";
+	print <<"END_USAGE";
 Usage: $0
         --url   URL    (e.g. therads/1130)
         --verbose
 END_USAGE
 
-    exit;
+	exit;
 }
 

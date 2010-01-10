@@ -12,69 +12,70 @@ message within this group
 =cut
 
 sub dist {
-    my ($self) = @_;
-    my $q = $self->query;
+	my ($self) = @_;
+	my $q = $self->query;
 
-    my $group_name = ${$self->query->param("path_parameters")}[0] || '';
-    if ($group_name =~ /^([\w-]+)$/) {
-        $group_name = $1;
-    } else {
-        return $self->internal_error(
-            "Probably bad regex when checking group name for '$group_name'",
-            );
-    }
-    $self->log->debug("show dist: '$group_name'");
+	my $group_name = ${ $self->query->param("path_parameters") }[0] || '';
+	if ( $group_name =~ /^([\w-]+)$/ ) {
+		$group_name = $1;
+	} else {
+		return $self->internal_error(
+			"Probably bad regex when checking group name for '$group_name'",
+		);
+	}
+	$self->log->debug("show dist: '$group_name'");
 
-    my $t = $self->load_tmpl("groups.tmpl",
-        loop_context_vars => 1,
-        global_vars => 1,
-    );
-    $t->param(hide_group => 1);
-                
-    $t->param(group => $group_name);
-    $t->param(title => "CPAN Forum - $group_name");
+	my $t = $self->load_tmpl(
+		"groups.tmpl",
+		loop_context_vars => 1,
+		global_vars       => 1,
+	);
+	$t->param( hide_group => 1 );
 
-    my $gr = CPAN::Forum::DB::Groups->info_by(name => $group_name); # SQL
-    if (not $gr) {
-        $self->log->warning("Invalid group '$group_name'");
-        return $self->internal_error(
-             "",
-             "no_such_group",
-        );
-    }
-    my $gid = $gr->{id};
-    if ($gid =~ /^(\d+)$/) {
-        $gid = $1;
-    } else {
-        return $self->internal_error(
-            "Invalid gid received '$gid'",
-            );
-    }
+	$t->param( group => $group_name );
+	$t->param( title => "CPAN Forum - $group_name" );
 
-    $self->set_ratings($t, $group_name);
-    my $page = $q->param('page') || 1;
-    $self->_search_results($t, {where => {gid => $gid}, page => $page});
-    $self->_subscriptions($t, $gr);
+	my $gr = CPAN::Forum::DB::Groups->info_by( name => $group_name ); # SQL
+	if ( not $gr ) {
+		$self->log->warning("Invalid group '$group_name'");
+		return $self->internal_error(
+			"",
+			"no_such_group",
+		);
+	}
+	my $gid = $gr->{id};
+	if ( $gid =~ /^(\d+)$/ ) {
+		$gid = $1;
+	} else {
+		return $self->internal_error(
+			"Invalid gid received '$gid'",
+		);
+	}
 
-    # TODO: is is not clear to me how can here anything be undef, but I got
-    # several exceptions on eith $gr or $gr->pauseid being undef:
-    if ($gr and  $gr->{pauseid_name}) {
-        $t->param(pauseid_name => $gr->{pauseid_name});
-    }
+	$self->set_ratings( $t, $group_name );
+	my $page = $q->param('page') || 1;
+	$self->_search_results( $t, { where => { gid => $gid }, page => $page } );
+	$self->_subscriptions( $t, $gr );
 
-    my $frequent_tags = CPAN::Forum::DB::Tags->get_tags_of_module($gid); # SQL
-    $t->param(frequent_tags      => $frequent_tags);
+	# TODO: is is not clear to me how can here anything be undef, but I got
+	# several exceptions on eith $gr or $gr->pauseid being undef:
+	if ( $gr and $gr->{pauseid_name} ) {
+		$t->param( pauseid_name => $gr->{pauseid_name} );
+	}
+
+	my $frequent_tags = CPAN::Forum::DB::Tags->get_tags_of_module($gid); # SQL
+	$t->param( frequent_tags => $frequent_tags );
 
 
-    my $uid = $self->session->param('uid');
-    if ($uid) {
-        my $mytags = CPAN::Forum::DB::Tags->get_tags_of($gid, $uid); # SQL
-        $t->param(mytags      => $mytags);
-        $t->param(show_tags => 1);
-    }
-    $t->param(group_id => $gid);
+	my $uid = $self->session->param('uid');
+	if ($uid) {
+		my $mytags = CPAN::Forum::DB::Tags->get_tags_of( $gid, $uid );   # SQL
+		$t->param( mytags    => $mytags );
+		$t->param( show_tags => 1 );
+	}
+	$t->param( group_id => $gid );
 
-    return $t->output;
+	return $t->output;
 }
 
 1;

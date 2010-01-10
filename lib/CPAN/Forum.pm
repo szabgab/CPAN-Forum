@@ -13,20 +13,20 @@ use CPAN::DistnameInfo;
 use Data::Dumper qw();
 use List::MoreUtils qw(any);
 use Mail::Sendmail qw(sendmail);
-use POSIX        qw();
+use POSIX qw();
 use WWW::Mechanize;
 
 use CPAN::Forum::INC;
 use CPAN::Forum::DBI;
 
-my $cookiename  = "cpanforum";
-my $SUBJECT = qr{[\w .:~!@#\$%^&*\()+?><,'";=-]+};
+my $cookiename = "cpanforum";
+my $SUBJECT    = qr{[\w .:~!@#\$%^&*\()+?><,'";=-]+};
 my $STATUS_FILE;
 
 my %errors = (
-    "ERR no_less_sign"              => "No < sign in text",
-    "ERR line_too_long"             => "Line too long",
-    "ERR open_code_without_closing" => "open <code> tag without closing tag",
+	"ERR no_less_sign"              => "No < sign in text",
+	"ERR line_too_long"             => "Line too long",
+	"ERR open_code_without_closing" => "open <code> tag without closing tag",
 );
 
 =head1 NAME
@@ -459,55 +459,55 @@ Registered users
 =cut
 
 sub cgiapp_init {
-    my $self = shift;
-    $self->param('start_time', time);
-    
-    CPAN::Forum::DBI->myinit();
-    my $dbh = CPAN::Forum::DBI::db_Main();
-    $STATUS_FILE  = $self->param("ROOT") . "/db/status";
-    CGI::Session->name($cookiename);
+	my $self = shift;
+	$self->param( 'start_time', time );
+
+	CPAN::Forum::DBI->myinit();
+	my $dbh = CPAN::Forum::DBI::db_Main();
+	$STATUS_FILE = $self->param("ROOT") . "/db/status";
+	CGI::Session->name($cookiename);
 }
 
 # overriding the run method, to momentarily install warnings handler
 # can we use other way then a global $logger? -shmuel
 our $logger;
+
 sub run {
-    my ($self) = @_;
-    local $logger = $self->log;
-    local $SIG{__WARN__} = sub { $self->log->warning($_[0]) };
-    $self->SUPER::run();
+	my ($self) = @_;
+	local $logger = $self->log;
+	local $SIG{__WARN__} = sub { $self->log->warning( $_[0] ) };
+	$self->SUPER::run();
 }
 
 sub _logger {
-    my ($self, %h) = @_;
-    my ($package, $filename, $line, $sub) = caller(6);
-    my $root = $self->param("ROOT");
-    my $q = $self->query;
-    $filename =~ s/^$root//;
-    return sprintf "[%s] - %s - [%s] [%s] [%s] [%s(%s)] %s\n",
-            POSIX::strftime("%Y-%m-%d %H:%M:%S", localtime), 
-            $h{level}, 
-            ($ENV{REMOTE_ADDR} || ''),
-            ($ENV{HTTP_REFERER} || ''),
-            $q->script_name . $q->path_info, #($self->param('REQUEST')),
-            $filename, $line,
-            $h{message};
-            # keys of the hash: level, message, name
+	my ( $self, %h ) = @_;
+	my ( $package, $filename, $line, $sub ) = caller(6);
+	my $root = $self->param("ROOT");
+	my $q    = $self->query;
+	$filename =~ s/^$root//;
+	return sprintf "[%s] - %s - [%s] [%s] [%s] [%s(%s)] %s\n",
+		POSIX::strftime( "%Y-%m-%d %H:%M:%S", localtime ),
+		$h{level},
+		( $ENV{REMOTE_ADDR} || '' ),
+		( $ENV{HTTP_REFERER} || '' ), $q->script_name . $q->path_info, #($self->param('REQUEST')),
+		$filename, $line, $h{message};
+
+	# keys of the hash: level, message, name
 }
 
 sub _set_log_level {
-    my ($self) = @_;
+	my ($self) = @_;
 
-    if (open my $fh, '<', $self->param("ROOT") . "/db/log_level") {
-        chomp (my $str = <$fh>);
-        $str =~ s/^\s*|\s*$//g;
-        if (Log::Dispatch->level_is_valid($str)) {
-            return $str;
-        } else {
-            warn "Invalid log level '$str'\n";
-        }
-    }
-    return 'notice'; 
+	if ( open my $fh, '<', $self->param("ROOT") . "/db/log_level" ) {
+		chomp( my $str = <$fh> );
+		$str =~ s/^\s*|\s*$//g;
+		if ( Log::Dispatch->level_is_valid($str) ) {
+			return $str;
+		} else {
+			warn "Invalid log level '$str'\n";
+		}
+	}
+	return 'notice';
 }
 
 =head2 config
@@ -517,61 +517,61 @@ Given a filed name returns the configuration value from the database
 =cut
 
 sub config {
-    my ($self, $field) = @_;
-    
-    CPAN::Forum::DB::Configure->param($field); # SQL
+	my ( $self, $field ) = @_;
+
+	CPAN::Forum::DB::Configure->param($field); # SQL
 }
 
 # modes that can be accessed without a valid session
 my @free_modes = qw(
-    home 
-    pwreminder pwreminder_process 
-    login login_process 
-    register register_process 
-    logout 
-    about faq stats
-    posts threads dist users author privacy_policy
-    search all 
-    site_is_closed
-    help
-    rss
-    atom
-    tags
-    m
+	home
+	pwreminder pwreminder_process
+	login login_process
+	register register_process
+	logout
+	about faq stats
+	posts threads dist users author privacy_policy
+	search all
+	site_is_closed
+	help
+	rss
+	atom
+	tags
+	m
 );
 my @restricted_modes = qw(
-    new_post process_post
-    mypan 
-    admin
-    admin_process
-    admin_edit_user
-    admin_edit_user_process
-    add_new_group
-    response_form 
-    module_search
-    selfconfig change_password change_info update_subscription
-    update
-); 
-            
+	new_post process_post
+	mypan
+	admin
+	admin_process
+	admin_edit_user
+	admin_edit_user_process
+	add_new_group
+	response_form
+	module_search
+	selfconfig change_password change_info update_subscription
+	update
+);
+
 my @urls = qw(
-    logout 
-    help
-    new_post pwreminder 
-    login register 
-    posts about stats
-    threads dist users author
-    response_form 
-    faq 
-    admin
-    admin_edit_user
-    mypan selfconfig privacy_policy
-    search all 
-    rss
-    atom
-    update
-    tags
-    m
-); 
+	logout
+	help
+	new_post pwreminder
+	login register
+	posts about stats
+	threads dist users author
+	response_form
+	faq
+	admin
+	admin_edit_user
+	mypan selfconfig privacy_policy
+	search all
+	rss
+	atom
+	update
+	tags
+	m
+);
 
 use base 'CPAN::Forum::RM::Author';
 use base 'CPAN::Forum::RM::Dist';
@@ -593,43 +593,43 @@ Standard CGI::Application method
 =cut
 
 sub setup {
-    my $self = shift;
+	my $self = shift;
 
-    my $log       = $ENV{CPAN_FORUM_LOGFILE};
-    my $log_level = $self->_set_log_level();
+	my $log       = $ENV{CPAN_FORUM_LOGFILE};
+	my $log_level = $self->_set_log_level();
 
-    $self->log_config(
-        LOG_DISPATCH_MODULES => [
-        {
-            module            => 'Log::Dispatch::File',
-            name              => 'messages',
-            filename          => $log,
-            min_level         => $log_level,
-            mode              => 'append',
-            callbacks         => sub { $self->_logger(@_)},
-            close_after_write => 1,
-        },
-        ],
-        APPEND_NEWLINE => 1,
-    );
+	$self->log_config(
+		LOG_DISPATCH_MODULES => [
+			{   module            => 'Log::Dispatch::File',
+				name              => 'messages',
+				filename          => $log,
+				min_level         => $log_level,
+				mode              => 'append',
+				callbacks         => sub { $self->_logger(@_) },
+				close_after_write => 1,
+			},
+		],
+		APPEND_NEWLINE => 1,
+	);
 
-    $self->log->debug("--- START ---");
-    
-    $self->session_config(
-        #CGI_SESSION_OPTIONS => [ "driver:File", $self->query, {Directory => "/tmp"}],
-        #CGI_SESSION_OPTIONS => [ "driver:SQLite", $self->query, {Handle => $dbh}],
-        COOKIE_PARAMS       => {
-                -expires => '+14d',
-                -path    => '/',
-        },
-        SEND_COOKIE         => 0,
+	$self->log->debug("--- START ---");
 
-    );
+	$self->session_config(
 
-    $self->start_mode("home");
-    $self->run_modes([@free_modes, @restricted_modes]);
-    $self->run_modes(AUTOLOAD => "autoload");
-    $self->error_mode('error');
+		#CGI_SESSION_OPTIONS => [ "driver:File", $self->query, {Directory => "/tmp"}],
+		#CGI_SESSION_OPTIONS => [ "driver:SQLite", $self->query, {Handle => $dbh}],
+		COOKIE_PARAMS => {
+			-expires => '+14d',
+			-path    => '/',
+		},
+		SEND_COOKIE => 0,
+
+	);
+
+	$self->start_mode("home");
+	$self->run_modes( [ @free_modes, @restricted_modes ] );
+	$self->run_modes( AUTOLOAD => "autoload" );
+	$self->error_mode('error');
 }
 
 =head2 cgiapp_prerun
@@ -640,79 +640,82 @@ Maybe we should move his code to the mode_param method ?
 =cut
 
 sub cgiapp_prerun {
-    my $self = shift;
+	my $self = shift;
 
-    $self->header_props(
-        -charset => "utf-8",
-        -type    => 'text/html',
-    );
+	$self->header_props(
+		-charset => "utf-8",
+		-type    => 'text/html',
+	);
 
-    my $status = $self->status();
-    $self->log->debug("Status:  $status"); 
-    if ($status ne "open" and not $self->session->param("admin")) {
-        $self->log->debug('site_is_closed');
-        $self->prerun_mode('site_is_closed');
-        return; 
-    }
+	my $status = $self->status();
+	$self->log->debug("Status:  $status");
+	if ( $status ne "open" and not $self->session->param("admin") ) {
+		$self->log->debug('site_is_closed');
+		$self->prerun_mode('site_is_closed');
+		return;
+	}
 
-    my $rm = $self->_set_run_mode();
+	my $rm = $self->_set_run_mode();
 
-    $self->log->debug("Current runmode:  $rm");
-    $self->log->debug("Current user:  " . ($self->session->param("username") || ""));
-    $self->log->debug("Current sid:  " . ($self->session->id() || ""));
-    $self->log->debug("Cookie received: "  . ($self->query->cookie($cookiename) || "") );
+	$self->log->debug("Current runmode:  $rm");
+	$self->log->debug( "Current user:  " .   ( $self->session->param("username") || "" ) );
+	$self->log->debug( "Current sid:  " .    ( $self->session->id()              || "" ) );
+	$self->log->debug( "Cookie received: " . ( $self->query->cookie($cookiename) || "" ) );
 
-    if (any {$rm eq $_} @free_modes) {
-        $self->log->debug('Free mode');
-        return;
-    }
+	if ( any { $rm eq $_ } @free_modes ) {
+		$self->log->debug('Free mode');
+		return;
+	}
 
-    # Redirect to login, if necessary
-    if (not  $self->session->param('loggedin') ) {
-        $self->log->debug("Showing login");
-        $self->session->param(request => $rm);
-        if ($rm eq 'new_post') {
-            my $group = ${$self->query->param("path_parameters")}[0];
-            $self->session->param(request_group => $group);
-        }
-        $self->prerun_mode('login');
-        return;
-    }
-    $self->log->debug("cgiapp_prerun ends");
+	# Redirect to login, if necessary
+	if ( not $self->session->param('loggedin') ) {
+		$self->log->debug("Showing login");
+		$self->session->param( request => $rm );
+		if ( $rm eq 'new_post' ) {
+			my $group = ${ $self->query->param("path_parameters") }[0];
+			$self->session->param( request_group => $group );
+		}
+		$self->prerun_mode('login');
+		return;
+	}
+	$self->log->debug("cgiapp_prerun ends");
 }
 
 sub _set_run_mode {
-    my ($self) = @_;
+	my ($self) = @_;
 
-    $self->query->param(path_parameters => []);
+	$self->query->param( path_parameters => [] );
 
-    my $rm = $self->get_current_runmode();
-    return $rm if $rm and $rm ne 'home'; # alredy has run-mode
-    $rm = 'home'; # set to default ???
+	my $rm = $self->get_current_runmode();
+	return $rm if $rm and $rm ne 'home'; # alredy has run-mode
+	$rm = 'home';                        # set to default ???
 
-    my $q = $self->query;
+	my $q = $self->query;
 
-    # override rm based on REQUEST
-    my $request = $q->script_name . $q->path_info; # $self->param('REQUEST');
-    if ($request =~ m{^/+
+	# override rm based on REQUEST
+	my $request = $q->script_name . $q->path_info; # $self->param('REQUEST');
+	if ($request =~ m{^/+
                     ([^/]+)        # first word till after the first /
                     (?:/+(.*))?     # the rest, after the (optional) second /
-                    }x) {
-        my $newrm = $1;
-        my $params = $2 || "";
-        if (any {$newrm eq $_} @urls) {
-            my @params = split /\//, $params;
-            $self->query->param(path_parameters => @params ? \@params : []);
-            $rm = $newrm;
-        } elsif ($request eq "/cgi/index.pl") {
-            # this should be ok here
-            #$self->log->error("Invalid request: $request}");
-        } else {
-            $self->log->error("Invalid request: $request");
-        }
-    }
-    $self->prerun_mode($rm);
-    return $rm;
+                    }x
+		)
+	{
+		my $newrm = $1;
+		my $params = $2 || "";
+		if ( any { $newrm eq $_ } @urls ) {
+			my @params = split /\//, $params;
+			$self->query->param( path_parameters => @params ? \@params : [] );
+			$rm = $newrm;
+		} elsif ( $request eq "/cgi/index.pl" ) {
+
+			# this should be ok here
+			#$self->log->error("Invalid request: $request}");
+		} else {
+			$self->log->error("Invalid request: $request");
+		}
+	}
+	$self->prerun_mode($rm);
+	return $rm;
 }
 
 =head2 autoload
@@ -723,10 +726,10 @@ rm=something
 =cut
 
 sub autoload {
-    my $self = shift;
-    my $rm = $self->get_current_runmode();
-    $self->log->debug("autoload called run-mode='$rm' ARGV='@ARGV'");
-    $self->internal_error();
+	my $self = shift;
+	my $rm   = $self->get_current_runmode();
+	$self->log->debug("autoload called run-mode='$rm' ARGV='@ARGV'");
+	$self->internal_error();
 }
 
 
@@ -737,8 +740,9 @@ Currently aliased to C<all()>;
 
 
 =cut
+
 sub home {
-    all(@_);
+	all(@_);
 }
 
 
@@ -749,18 +753,19 @@ List the most recent posts.
 =cut
 
 sub all {
-    my $self = shift;
-    my $q = $self->query;
-    
-    $self->log->debug("all");
-    my $t = $self->load_tmpl("home.tmpl",
-        loop_context_vars => 1,
-    );
-    
-    my $page = $q->param('page') || 1;
-    $self->_search_results($t, {where => {}, page => $page});
-    $self->log->debug("home to output");
-    $t->output;
+	my $self = shift;
+	my $q    = $self->query;
+
+	$self->log->debug("all");
+	my $t = $self->load_tmpl(
+		"home.tmpl",
+		loop_context_vars => 1,
+	);
+
+	my $page = $q->param('page') || 1;
+	$self->_search_results( $t, { where => {}, page => $page } );
+	$self->log->debug("home to output");
+	$t->output;
 }
 
 =head2 recent_thread
@@ -771,14 +776,15 @@ Not yet working.
 =cut
 
 sub recent_threads {
-    my ($self) = @_;
-    my $q = $self->query;
+	my ($self) = @_;
+	my $q = $self->query;
 
-    $self->log->debug("recent_threads");
-    my $t = $self->load_tmpl("home.tmpl",
-        loop_context_vars => 1,
-    );
-    $t->output; 
+	$self->log->debug("recent_threads");
+	my $t = $self->load_tmpl(
+		"home.tmpl",
+		loop_context_vars => 1,
+	);
+	$t->output;
 }
 
 
@@ -791,68 +797,70 @@ display the given posts.
 =cut
 
 sub build_listing {
-    my ($self, $it) = @_;
-    
-    my @resp;
+	my ( $self, $it ) = @_;
 
-    # eliminate undefs and duplicates (TODO: I don't know why are there such values)
-    my %seen;
-    foreach my $p (@$it) {
-        next if not defined $p->{thread};
-        $seen{$p->{thread}}++;
-    }
-    my @threads = keys %seen;
+	my @resp;
 
-    my $threads = CPAN::Forum::DB::Posts->count_threads(@threads); #SQL
-    
-    foreach my $post (@$it) {
-        #$self->log->debug(Data::Dumper->Dump([$post], ['post']));
-        #$self->log->debug("id=" . $post->id);
-#warn "called for each post";
-        my $thread = $post->{thread};
-        my $thread_count = ($thread and $threads->{$thread}) ? $threads->{$thread}{cnt} : 0;
-        push @resp, {
-            subject      => _subject_escape($post->{subject}),
-            id           => $post->{id},
-            group        => $post->{group_name},
-            thread       => ($thread_count > 1 ? 1 : 0),
-            thread_id    => $post->{thread},
-            thread_count => $thread_count-1,
-            #date         => POSIX::strftime("%e/%b", localtime $post->{date}),
-            #date         => scalar localtime $post->{date},
-            date         => $post->{date}, #_ellapsed($post->{date}),
-            postername   => $post->{username},
-            };
-    }
-    return \@resp;
+	# eliminate undefs and duplicates (TODO: I don't know why are there such values)
+	my %seen;
+	foreach my $p (@$it) {
+		next if not defined $p->{thread};
+		$seen{ $p->{thread} }++;
+	}
+	my @threads = keys %seen;
+
+	my $threads = CPAN::Forum::DB::Posts->count_threads(@threads); #SQL
+
+	foreach my $post (@$it) {
+
+		#$self->log->debug(Data::Dumper->Dump([$post], ['post']));
+		#$self->log->debug("id=" . $post->id);
+		#warn "called for each post";
+		my $thread = $post->{thread};
+		my $thread_count = ( $thread and $threads->{$thread} ) ? $threads->{$thread}{cnt} : 0;
+		push @resp, {
+			subject      => _subject_escape( $post->{subject} ),
+			id           => $post->{id},
+			group        => $post->{group_name},
+			thread       => ( $thread_count > 1 ? 1 : 0 ),
+			thread_id    => $post->{thread},
+			thread_count => $thread_count - 1,
+
+			#date         => POSIX::strftime("%e/%b", localtime $post->{date}),
+			#date         => scalar localtime $post->{date},
+			date       => $post->{date},    #_ellapsed($post->{date}),
+			postername => $post->{username},
+		};
+	}
+	return \@resp;
 }
 
 sub _ellapsed {
-    my ($t) = @_;
-    my $now = time;
-    my $diff = $now-$t;
-    return  'now' if not $diff;
+	my ($t)  = @_;
+	my $now  = time;
+	my $diff = $now - $t;
+	return 'now' if not $diff;
 
-    my $sec = $diff % 60;
-    $diff = ($diff -$sec) / 60;
-    return  sprintf(" %s sec ago", $sec) if not $diff;
+	my $sec = $diff % 60;
+	$diff = ( $diff - $sec ) / 60;
+	return sprintf( " %s sec ago", $sec ) if not $diff;
 
-    my $min = $diff % 60;
-    $diff = ($diff-$min)/60;
-    return  sprintf("%s min ago", $min) if not $diff;  
+	my $min = $diff % 60;
+	$diff = ( $diff - $min ) / 60;
+	return sprintf( "%s min ago", $min ) if not $diff;
 
-    my $hours = $diff % 24;
-    $diff = ($diff - $hours) / 24;
-    return  sprintf("%s hours ago", $hours ) if not $diff;  
+	my $hours = $diff % 24;
+	$diff = ( $diff - $hours ) / 24;
+	return sprintf( "%s hours ago", $hours ) if not $diff;
 
-    return  sprintf("%s days ago", $diff );  
+	return sprintf( "%s days ago", $diff );
 }
 
 
 sub error {
-    my ($self) = @_;
-    $self->log->critical($@) if $@;
-    $self->internal_error();
+	my ($self) = @_;
+	$self->log->critical($@) if $@;
+	$self->internal_error();
 }
 
 =head2 internal_error
@@ -866,14 +874,14 @@ See C<notes()> for simple notes.
 =cut
 
 sub internal_error {
-    my ($self, $msg, $tag) = @_;
-    if ($msg) {
-        $self->log->warning($msg);
-    }
-    my $t = $self->load_tmpl("internal_error.tmpl");
-    $t->param($tag => 1) if $tag;
-    $t->param(generic => 1) if not $tag;
-    $t->output;
+	my ( $self, $msg, $tag ) = @_;
+	if ($msg) {
+		$self->log->warning($msg);
+	}
+	my $t = $self->load_tmpl("internal_error.tmpl");
+	$t->param( $tag    => 1 ) if $tag;
+	$t->param( generic => 1 ) if not $tag;
+	$t->output;
 }
 
 =head2 notes
@@ -881,12 +889,13 @@ sub internal_error {
 Print short notification messages to the user.
 
 =cut
+
 sub notes {
-    my ($self, $msg, %params) = @_;
-    my $t = $self->load_tmpl("notes.tmpl");
-    $t->param($msg => 1);
-    $t->param(%params);
-    $t->output;
+	my ( $self, $msg, %params ) = @_;
+	my $t = $self->load_tmpl("notes.tmpl");
+	$t->param( $msg => 1 );
+	$t->param(%params);
+	$t->output;
 }
 
 
@@ -897,18 +906,20 @@ Semi standard CGI::Application method to replace the way we load the templates.
 =cut
 
 sub load_tmpl {
-    my $self = shift;
-    $self->log->debug("load_tmpl: @_");
-    my $t = $self->SUPER::load_tmpl(@_
-#             die_on_bad_params => -e ($self->param("ROOT") . "/die_on_bad_param") ? 1 : 0
-    );
-    $self->log->debug("template loaded");
-    $t->param("loggedin" => $self->session->param("loggedin") || "");
-    $t->param("username" => $self->session->param("username") || "anonymous");
-    $t->param("test_site_warning" => -e $self->param("ROOT") . "/config_test_site");
-    $t->param("admin" => $self->session->param('admin'));
-    $t->param("dev_server" => ($ENV{CPAN_FORUM_DEV} ? 1 : 0));
-    return $t;
+	my $self = shift;
+	$self->log->debug("load_tmpl: @_");
+	my $t = $self->SUPER::load_tmpl(
+		@_
+
+			#             die_on_bad_params => -e ($self->param("ROOT") . "/die_on_bad_param") ? 1 : 0
+	);
+	$self->log->debug("template loaded");
+	$t->param( "loggedin" => $self->session->param("loggedin") || "" );
+	$t->param( "username" => $self->session->param("username") || "anonymous" );
+	$t->param( "test_site_warning" => -e $self->param("ROOT") . "/config_test_site" );
+	$t->param( "admin"             => $self->session->param('admin') );
+	$t->param( "dev_server"        => ( $ENV{CPAN_FORUM_DEV} ? 1 : 0 ) );
+	return $t;
 }
 
 
@@ -919,16 +930,16 @@ Show the registration page and possibly some error messages.
 =cut
 
 sub register {
-    my ($self, $errs) = @_;
-    my $q = $self->query;
+	my ( $self, $errs ) = @_;
+	my $q = $self->query;
 
-    my $t = $self->load_tmpl(
-            "register.tmpl",
-            associate => $q,
-    );
+	my $t = $self->load_tmpl(
+		"register.tmpl",
+		associate => $q,
+	);
 
-    $t->param($errs) if $errs;
-    return $t->output;
+	$t->param($errs) if $errs;
+	return $t->output;
 }
 
 
@@ -939,45 +950,47 @@ Process the registration form.
 =cut
 
 sub register_process {
-    my ($self) = @_;
-    my $q = $self->query;
+	my ($self) = @_;
+	my $q = $self->query;
 
-    if (not $q->param('nickname') or not $q->param('email')) {
-        return $self->register({"no_register_data" => 1});
-    }
-    
-    # TODO arbitrary nickname constraint, allow other nicknames ?
-    if ($q->param('nickname') !~ /^[a-z0-9]{1,25}$/) {
-        return $self->register({"bad_nickname" => 1});
-    }
+	if ( not $q->param('nickname') or not $q->param('email') ) {
+		return $self->register( { "no_register_data" => 1 } );
+	}
 
-    # TODO fix the e-mail checking and the error message
-    if ($q->param('email') !~ /^[a-z0-9_+@.-]+$/) {  
-        return $self->register({"bad_email" => 1});
-    }
-   
-    my $user = eval {
-        CPAN::Forum::DB::Users->add_user({    # SQL
-                username => $q->param('nickname'),
-                email    => $q->param('email'),
-            });
-    };
-    if ($@) {
-        return $self->register({"nickname_exists" => 1});
-    }
+	# TODO arbitrary nickname constraint, allow other nicknames ?
+	if ( $q->param('nickname') !~ /^[a-z0-9]{1,25}$/ ) {
+		return $self->register( { "bad_nickname" => 1 } );
+	}
 
-    $self->send_password($user);
-    $self->notify_admin($user);
-    return $self->register({"done" => 1});
+	# TODO fix the e-mail checking and the error message
+	if ( $q->param('email') !~ /^[a-z0-9_+@.-]+$/ ) {
+		return $self->register( { "bad_email" => 1 } );
+	}
+
+	my $user = eval {
+		CPAN::Forum::DB::Users->add_user(
+			{ # SQL
+				username => $q->param('nickname'),
+				email    => $q->param('email'),
+			}
+		);
+	};
+	if ($@) {
+		return $self->register( { "nickname_exists" => 1 } );
+	}
+
+	$self->send_password($user);
+	$self->notify_admin($user);
+	return $self->register( { "done" => 1 } );
 }
 
 sub send_password {
-    my ($self, $user) = @_;
+	my ( $self, $user ) = @_;
 
-    # TODO: put this text in a template
-    my $password = $user->{password};
-    my $subject = "CPAN::Forum registration";
-    my $message = <<MSG;
+	# TODO: put this text in a template
+	my $password = $user->{password};
+	my $subject  = "CPAN::Forum registration";
+	my $message  = <<MSG;
 
 Thank you for registering on the CPAN::Forum at
 http://$ENV{HTTP_HOST}/
@@ -987,16 +1000,16 @@ your password is: $password
 
 MSG
 
-    my $FROM = $self->config("from");
-    $self->log->debug("FROM field set to be $FROM");
+	my $FROM = $self->config("from");
+	$self->log->debug("FROM field set to be $FROM");
 
-    my %mail = (
-        To       => $user->{email},
-        From     => $FROM,
-        Subject  => $subject,
-        Message  => $message,
-    );
-    $self->_my_sendmail(%mail);
+	my %mail = (
+		To      => $user->{email},
+		From    => $FROM,
+		Subject => $subject,
+		Message => $message,
+	);
+	$self->_my_sendmail(%mail);
 }
 
 =head2 _group_selector
@@ -1008,24 +1021,24 @@ redirection.
 =cut
 
 sub _group_selector {
-    my ($self, $group_name, $group_id) = @_;
-    my $q = $self->query;
-    my %group_labels;
-    my @group_ids;
-    
-    if ($group_id) {
-        if (ref $group_id eq "ARRAY") {
-            @group_ids = @$group_id;
-            @group_labels{@$group_id} = @$group_name;
-        } else {
-            @group_ids = ($group_id);
-            $group_labels{$group_id} = $group_name;
-        }
-    }
+	my ( $self, $group_name, $group_id ) = @_;
+	my $q = $self->query;
+	my %group_labels;
+	my @group_ids;
 
-    @group_ids = sort {$group_labels{$a} cmp $group_labels{$b}}  @group_ids;
-    
-    return $q->popup_menu(-name => "new_group", -values => \@group_ids, -labels => \%group_labels);
+	if ($group_id) {
+		if ( ref $group_id eq "ARRAY" ) {
+			@group_ids = @$group_id;
+			@group_labels{@$group_id} = @$group_name;
+		} else {
+			@group_ids = ($group_id);
+			$group_labels{$group_id} = $group_name;
+		}
+	}
+
+	@group_ids = sort { $group_labels{$a} cmp $group_labels{$b} } @group_ids;
+
+	return $q->popup_menu( -name => "new_group", -values => \@group_ids, -labels => \%group_labels );
 }
 
 
@@ -1036,7 +1049,7 @@ Showing the new post page. (Alias of C<posts()>)
 =cut
 
 sub new_post {
-    posts(@_);
+	posts(@_);
 }
 
 =head2 response_form
@@ -1046,7 +1059,7 @@ Showing the response form. (Alias of C<posts()>)
 =cut
 
 sub response_form {
-    posts(@_);
+	posts(@_);
 }
 
 
@@ -1057,159 +1070,163 @@ Show a post, the editor and a preview - whichever is needed.
 =cut
 
 sub posts {
-    my ($self, $errors) = @_;
-    my $q = $self->query;
+	my ( $self, $errors ) = @_;
+	my $q = $self->query;
 
-    my $t = $self->load_tmpl(
-            "posts.tmpl",
-            associate => $q,
-    );
-    $t->param($_=>1) foreach @$errors;
+	my $t = $self->load_tmpl(
+		"posts.tmpl",
+		associate => $q,
+	);
+	$t->param( $_ => 1 ) foreach @$errors;
 
-    my $rm = $self->get_current_runmode();
-    $self->log->debug("posts rm=$rm");
-    my $request = $self->session->param('request');
-    if ($request) {
-        $rm = $request;
-        $self->log->debug("posts request reset rm=$rm");
-    }
+	my $rm = $self->get_current_runmode();
+	$self->log->debug("posts rm=$rm");
+	my $request = $self->session->param('request');
+	if ($request) {
+		$rm = $request;
+		$self->log->debug("posts request reset rm=$rm");
+	}
 
-    my $new_group = "";
-    my $new_group_id = "";
-    
-    if ($rm eq "new_post") {
-        $new_group = ${$self->query->param("path_parameters")}[0] || "";
-        $new_group_id = $q->param('new_group') if $q->param('new_group');
-        $self->log->debug("A: new_group: '$new_group' and id: '$new_group_id'");
-        
-        if ($new_group) {
-            if ($new_group =~ /^([\w-]+)$/) {
-                $new_group = $1;
-                my ($gr) = CPAN::Forum::DB::Groups->info_by(name => $new_group); # SQL
-                if ($gr) {
-                    $new_group_id = $gr->{id};
-                } else {
-                    return $self->internal_error(
-                        "Group '$new_group' was not in database",
-                        );
-                }
-            } else {
-                return $self->internal_error(
-                    "Bad regex for '$new_group' ?",
-                    );
-            }
-        } elsif ($new_group_id) {
-            my ($gr) = CPAN::Forum::DB::Groups->info_by(id => $new_group_id); # SQL
-            if ($gr) {
-                $new_group = $gr->{name};
-            } else {
-                return $self->internal_error(
-                    "Group '$new_group_id' was not in database",
-                );
-            }
-        } elsif ($q->param('q')) {
-            # process search later  
-        } else {
-            # TODO should be called whent the module_search is ready
-            return $self->module_search_form();
-        }
-        $self->log->debug("B: new_group: '$new_group' and id: '$new_group_id'");
-    }
-    if ($rm eq "process_post") {
-        $new_group_id = $q->param("new_group_id");
-        if (not $new_group_id) {
-            return $self->internal_error(
-                "Missing new_group_id.",
-                );
-        }
+	my $new_group    = "";
+	my $new_group_id = "";
 
-        if ($new_group_id =~ /^(\d+)$/) {
-            $new_group_id = $1;
-            my ($grp) = CPAN::Forum::DB::Groups->info_by(id => $new_group_id); # SQL
-            if ($grp) {
-                $new_group = $grp->{name};
-            } else {
-                return $self->internal_error(
-                    "Bad value for new_group (id) '$new_group_id' ?",
-                    );
-            } 
-        } else {
-            return $self->internal_error(
-                "Bad value for new_group (id) '$new_group_id' ?",
-                );
-        }
-    }
-    $self->log->debug("C: new_group: '$new_group' and id: '$new_group_id'");
+	if ( $rm eq "new_post" ) {
+		$new_group = ${ $self->query->param("path_parameters") }[0] || "";
+		$new_group_id = $q->param('new_group') if $q->param('new_group');
+		$self->log->debug("A: new_group: '$new_group' and id: '$new_group_id'");
 
-    my $title = ""; # of the page
-    my $editor = 0;
-    $t->param(editor    => 1) if grep {$rm eq $_} (qw(process_post new_post response_form));
+		if ($new_group) {
+			if ( $new_group =~ /^([\w-]+)$/ ) {
+				$new_group = $1;
+				my ($gr) = CPAN::Forum::DB::Groups->info_by( name => $new_group ); # SQL
+				if ($gr) {
+					$new_group_id = $gr->{id};
+				} else {
+					return $self->internal_error(
+						"Group '$new_group' was not in database",
+					);
+				}
+			} else {
+				return $self->internal_error(
+					"Bad regex for '$new_group' ?",
+				);
+			}
+		} elsif ($new_group_id) {
+			my ($gr) = CPAN::Forum::DB::Groups->info_by( id => $new_group_id ); # SQL
+			if ($gr) {
+				$new_group = $gr->{name};
+			} else {
+				return $self->internal_error(
+					"Group '$new_group_id' was not in database",
+				);
+			}
+		} elsif ( $q->param('q') ) {
 
-    
-    my $id = $q->param("id");  # there was an id 
-    if ($rm eq "response_form" or $rm eq "posts") {
-        $id = ${$self->query->param("path_parameters")}[0] if ${$self->query->param("path_parameters")}[0];
-    }
-    $id ||= $q->param("new_parent");
-    if ($id) { # Show post
-        my $post = CPAN::Forum::DB::Posts->get_post($id); # SQL
-        if (not $post) {
-            return $self->internal_error(
-                "in request",
-                );
-        }
-        my $thread_count = CPAN::Forum::DB::Posts->count_thread($post->{thread}); # SQL
-        if ($thread_count > 1) {
-            $t->param(thread_id    => $post->{thread});
-            $t->param(thread_count => $thread_count);
-        }
-        $post->{responses} = CPAN::Forum::DB::Posts->list_posts_by(parent => $post->{id}); # SQL
-        my %post = %{$self->_post($post)};
-        $t->param(%post);
-        
-#       (my $dashgroup = $post->gid) =~ s/::/-/g;
-#       $t->param(dashgroup    => $dashgroup);
-        my $new_subject = $post->{subject};
-        if ($new_subject !~ /^\s*re:\s*/i) {
-            $new_subject = "Re: $new_subject";
-        }
-        
-        $t->param(new_subject  => _subject_escape($new_subject));
-        $t->param(title        => _subject_escape($post->{subject}));
-        $t->param(post         => 1);
-        
-        my $group = CPAN::Forum::DB::Groups->info_by(id => $post->{gid}); # SQL
-        $new_group        = $group->{name};
-        $new_group_id     = $group->{id};     
-    }
-    $self->log->debug("D: new_group: '$new_group' and id: '$new_group_id'");
-    #$t->param("group_selector" => $self->_group_selector($new_group, $new_group_id));
-    $t->param(new_group    => $new_group);
-    $t->param(new_group_id => $new_group_id);
-    $t->param(new_text     => CGI::escapeHTML($q->param("new_text")));
-    
-    # for previewing purposes:
-    # This is funky, in order to use the same template for regular show of a message and for
-    # the preview facility we create a loop around this code for the preview page (with hopefully
-    # only one iteration in it) The following hash is in preparation of this internal loop.
-    if (not @$errors or $$errors[0] eq "preview") {
-        my %preview;
-        $preview{subject}    = _subject_escape($q->param("new_subject")) || "";
-        $preview{text}       = $self->_text_escape($q->param("new_text"))    || "";
-        $preview{parentid}   = $q->param("new_parent")  || "";
-#       $preview{thread_id}  = $q->param("new_text")    || "";
-        $preview{postername} = $self->session->param("username");
-        $preview{date}       = _post_date(time);
-        $preview{id}         = "TBD";
+			# process search later
+		} else {
 
-        $t->param(preview_loop => [\%preview]);
-    }
+			# TODO should be called whent the module_search is ready
+			return $self->module_search_form();
+		}
+		$self->log->debug("B: new_group: '$new_group' and id: '$new_group_id'");
+	}
+	if ( $rm eq "process_post" ) {
+		$new_group_id = $q->param("new_group_id");
+		if ( not $new_group_id ) {
+			return $self->internal_error(
+				"Missing new_group_id.",
+			);
+		}
 
-    #$t->param(new_subject => _subject_escape($q->param("new_subject")));
-    $t->param(group       => $new_group) if $new_group;
+		if ( $new_group_id =~ /^(\d+)$/ ) {
+			$new_group_id = $1;
+			my ($grp) = CPAN::Forum::DB::Groups->info_by( id => $new_group_id ); # SQL
+			if ($grp) {
+				$new_group = $grp->{name};
+			} else {
+				return $self->internal_error(
+					"Bad value for new_group (id) '$new_group_id' ?",
+				);
+			}
+		} else {
+			return $self->internal_error(
+				"Bad value for new_group (id) '$new_group_id' ?",
+			);
+		}
+	}
+	$self->log->debug("C: new_group: '$new_group' and id: '$new_group_id'");
 
-    $self->set_ratings($t, $new_group) if $new_group;
-    return $t->output;
+	my $title  = ""; # of the page
+	my $editor = 0;
+	$t->param( editor => 1 ) if grep { $rm eq $_ } (qw(process_post new_post response_form));
+
+
+	my $id = $q->param("id"); # there was an id
+	if ( $rm eq "response_form" or $rm eq "posts" ) {
+		$id = ${ $self->query->param("path_parameters") }[0] if ${ $self->query->param("path_parameters") }[0];
+	}
+	$id ||= $q->param("new_parent");
+	if ($id) {                # Show post
+		my $post = CPAN::Forum::DB::Posts->get_post($id); # SQL
+		if ( not $post ) {
+			return $self->internal_error(
+				"in request",
+			);
+		}
+		my $thread_count = CPAN::Forum::DB::Posts->count_thread( $post->{thread} ); # SQL
+		if ( $thread_count > 1 ) {
+			$t->param( thread_id    => $post->{thread} );
+			$t->param( thread_count => $thread_count );
+		}
+		$post->{responses} = CPAN::Forum::DB::Posts->list_posts_by( parent => $post->{id} ); # SQL
+		my %post = %{ $self->_post($post) };
+		$t->param(%post);
+
+		#       (my $dashgroup = $post->gid) =~ s/::/-/g;
+		#       $t->param(dashgroup    => $dashgroup);
+		my $new_subject = $post->{subject};
+		if ( $new_subject !~ /^\s*re:\s*/i ) {
+			$new_subject = "Re: $new_subject";
+		}
+
+		$t->param( new_subject => _subject_escape($new_subject) );
+		$t->param( title       => _subject_escape( $post->{subject} ) );
+		$t->param( post        => 1 );
+
+		my $group = CPAN::Forum::DB::Groups->info_by( id => $post->{gid} ); # SQL
+		$new_group    = $group->{name};
+		$new_group_id = $group->{id};
+	}
+	$self->log->debug("D: new_group: '$new_group' and id: '$new_group_id'");
+
+	#$t->param("group_selector" => $self->_group_selector($new_group, $new_group_id));
+	$t->param( new_group    => $new_group );
+	$t->param( new_group_id => $new_group_id );
+	$t->param( new_text     => CGI::escapeHTML( $q->param("new_text") ) );
+
+	# for previewing purposes:
+	# This is funky, in order to use the same template for regular show of a message and for
+	# the preview facility we create a loop around this code for the preview page (with hopefully
+	# only one iteration in it) The following hash is in preparation of this internal loop.
+	if ( not @$errors or $$errors[0] eq "preview" ) {
+		my %preview;
+		$preview{subject}  = _subject_escape( $q->param("new_subject") )  || "";
+		$preview{text}     = $self->_text_escape( $q->param("new_text") ) || "";
+		$preview{parentid} = $q->param("new_parent")                      || "";
+
+		#       $preview{thread_id}  = $q->param("new_text")    || "";
+		$preview{postername} = $self->session->param("username");
+		$preview{date}       = _post_date(time);
+		$preview{id}         = "TBD";
+
+		$t->param( preview_loop => [ \%preview ] );
+	}
+
+	#$t->param(new_subject => _subject_escape($q->param("new_subject")));
+	$t->param( group => $new_group ) if $new_group;
+
+	$self->set_ratings( $t, $new_group ) if $new_group;
+	return $t->output;
 }
 
 
@@ -1222,153 +1239,155 @@ give an error message preferably by filling out the form again.
 =cut
 
 sub process_post {
-    my $self = shift;
-    my $q = $self->query;
-    my @errors;
-    my $parent = $q->param("new_parent");
-    
-    my $parent_post;
-    if ($parent) { # assume response
-        $parent_post = CPAN::Forum::DB::Posts->get_post($parent); # SQL
-        push @errors, "bad_thing"  if not $parent_post;
-    } else {       # assume new post
-        if ($q->param("new_group_id")) {
-            push @errors, "bad_group"  if not CPAN::Forum::DB::Groups->info_by(id => $q->param("new_group_id")); # SQL
-        } else {
-            push @errors, "no_group";
-        }
-    }
-    
-    my $new_subject = $q->param("new_subject");
-    my $new_text = $q->param("new_text"); 
-    
-    push @errors, "no_subject" if not $new_subject;
-    push @errors, "invalid_subject" if $new_subject and $new_subject !~ m{^$SUBJECT$};
-    
-    push @errors, "no_text"    if not $new_text;
-    push @errors, "subject_too_long" if $new_subject and length($new_subject) > 80;
+	my $self = shift;
+	my $q    = $self->query;
+	my @errors;
+	my $parent = $q->param("new_parent");
 
-    $self->log->debug("username: " . 
-                $self->session->param("username") . 
-                " uid: " .  
-                $self->session->param("uid"));
-                
-    my $preview_button = $q->param("preview_button");
-    my $submit_button = $q->param("submit_button");
-    if (not @errors and $submit_button) {
-        my $last_post = CPAN::Forum::DB::Posts->get_latest_post_by_uid($self->session->param('uid')); # SQL
-        # TODO, maybe also check if the post is the same as the last post to avoid duplicates
-        if ($last_post) {
-            $self->log->debug("username: " . 
-                $self->session->param("username") . 
-                " last post: " . $last_post->{date} . " now: " . time());
-            if ($last_post->{date} > time() - $self->config("flood_control_time_limit")) {
-                push @errors, "flood_control";
-            } elsif ($last_post->{text} eq $new_text) {
-                push @errors, "duplicate_post";
-            }
-        }
-    }
-    
-    return $self->posts(\@errors) if @errors;
-    
+	my $parent_post;
+	if ($parent) { # assume response
+		$parent_post = CPAN::Forum::DB::Posts->get_post($parent); # SQL
+		push @errors, "bad_thing" if not $parent_post;
+	} else {                                                      # assume new post
+		if ( $q->param("new_group_id") ) {
+			push @errors, "bad_group" if not CPAN::Forum::DB::Groups->info_by( id => $q->param("new_group_id") ); # SQL
+		} else {
+			push @errors, "no_group";
+		}
+	}
 
-    # There will be two buttons, one for Submit and one for Preview.
-    # We will save the message only if the Submit button was pressed.
-    # When the editor first displayed and every time if an error was caught this button will be hidden.
+	my $new_subject = $q->param("new_subject");
+	my $new_text    = $q->param("new_text");
 
-    my $markup = CPAN::Forum::Markup->new();
-    my $result = $markup->posting_process($new_text) ;
-    if (not defined $result) {
-        $self->log->debug("--- BAD TEXT STARTS ---");
-        $self->log->debug($new_text);
-        $self->log->debug("--- BAD TEXT ENDS ---");
-        push @errors, "text_format";
-        return $self->posts(\@errors);
-    }
+	push @errors, "no_subject" if not $new_subject;
+	push @errors, "invalid_subject" if $new_subject and $new_subject !~ m{^$SUBJECT$};
+
+	push @errors, "no_text" if not $new_text;
+	push @errors, "subject_too_long" if $new_subject and length($new_subject) > 80;
+
+	$self->log->debug( "username: " . $self->session->param("username") . " uid: " . $self->session->param("uid") );
+
+	my $preview_button = $q->param("preview_button");
+	my $submit_button  = $q->param("submit_button");
+	if ( not @errors and $submit_button ) {
+		my $last_post = CPAN::Forum::DB::Posts->get_latest_post_by_uid( $self->session->param('uid') ); # SQL
+		  # TODO, maybe also check if the post is the same as the last post to avoid duplicates
+		if ($last_post) {
+			$self->log->debug( "username: "
+					. $self->session->param("username")
+					. " last post: "
+					. $last_post->{date}
+					. " now: "
+					. time() );
+			if ( $last_post->{date} > time() - $self->config("flood_control_time_limit") ) {
+				push @errors, "flood_control";
+			} elsif ( $last_post->{text} eq $new_text ) {
+				push @errors, "duplicate_post";
+			}
+		}
+	}
+
+	return $self->posts( \@errors ) if @errors;
 
 
-    if ($preview_button) {
-        return $self->posts(["preview"]);
-    }
-    if (not $submit_button) {
-        return $self->internal_error(
-            "Someone sent in a form without the Preview or Submit button",
-            );
-    }
+	# There will be two buttons, one for Submit and one for Preview.
+	# We will save the message only if the Submit button was pressed.
+	# When the editor first displayed and every time if an error was caught this button will be hidden.
 
-    my $username = $self->session->param("username");
-    my $user = CPAN::Forum::DB::Users->info_by( username => $username ); # SQL
-    if (not $user) {
-        return $self->internal_error("Unknown username: '$username'");
-    }
+	my $markup = CPAN::Forum::Markup->new();
+	my $result = $markup->posting_process($new_text);
+	if ( not defined $result ) {
+		$self->log->debug("--- BAD TEXT STARTS ---");
+		$self->log->debug($new_text);
+		$self->log->debug("--- BAD TEXT ENDS ---");
+		push @errors, "text_format";
+		return $self->posts( \@errors );
+	}
 
-    
-    my %data = (
-            uid     => $user->{id},
-            gid     => ($parent_post ? $parent_post->{gid} : $q->param("new_group_id")),
-            subject => $q->param("new_subject"),
-            text    => $new_text,
-    );
-    my $post_id = eval { CPAN::Forum::DB::Posts->add_post(\%data, $parent_post, $parent); }; #SQL
-    if ($@) {
-        #push @errors, "subject_too_long" if $@ =~ /subject_too_long/;
-        if (not @errors) {
-            return $self->internal_error(
-                "UNKNOWN_ERROR: $@",
-            );
-        }
-        return $self->posts(\@errors);
-    }
-    
-    $self->notify($post_id);
 
-    $self->home;
+	if ($preview_button) {
+		return $self->posts( ["preview"] );
+	}
+	if ( not $submit_button ) {
+		return $self->internal_error(
+			"Someone sent in a form without the Preview or Submit button",
+		);
+	}
+
+	my $username = $self->session->param("username");
+	my $user = CPAN::Forum::DB::Users->info_by( username => $username ); # SQL
+	if ( not $user ) {
+		return $self->internal_error("Unknown username: '$username'");
+	}
+
+
+	my %data = (
+		uid     => $user->{id},
+		gid     => ( $parent_post ? $parent_post->{gid} : $q->param("new_group_id") ),
+		subject => $q->param("new_subject"),
+		text    => $new_text,
+	);
+	my $post_id = eval { CPAN::Forum::DB::Posts->add_post( \%data, $parent_post, $parent ); }; #SQL
+	if ($@) {
+
+		#push @errors, "subject_too_long" if $@ =~ /subject_too_long/;
+		if ( not @errors ) {
+			return $self->internal_error(
+				"UNKNOWN_ERROR: $@",
+			);
+		}
+		return $self->posts( \@errors );
+	}
+
+	$self->notify($post_id);
+
+	$self->home;
 }
 
 
 sub _post_date {
-    return scalar localtime $_[0];
+	return scalar localtime $_[0];
 }
 
 sub _post {
-    my ($self, $post) = @_;
-    $self->log->debug(Data::Dumper->Dump([$post], ['post']));
-    my %post = (
-        postername  => $post->{username},
-        date        => _post_date($post->{date}),
-        parentid    => $post->{parent},
-        responses   => $post->{responses},
-        text        => $self->_text_escape($post->{text}),
-        id          => $post->{id},
-        subject     => _subject_escape($post->{subject}),
-    );
+	my ( $self, $post ) = @_;
+	$self->log->debug( Data::Dumper->Dump( [$post], ['post'] ) );
+	my %post = (
+		postername => $post->{username},
+		date       => _post_date( $post->{date} ),
+		parentid   => $post->{parent},
+		responses  => $post->{responses},
+		text       => $self->_text_escape( $post->{text} ),
+		id         => $post->{id},
+		subject    => _subject_escape( $post->{subject} ),
+	);
 
-    return \%post;
+	return \%post;
 }
 
 sub _subject_escape {
-    my ($subject) = @_;
-    return CGI::escapeHTML($subject);
+	my ($subject) = @_;
+	return CGI::escapeHTML($subject);
 }
 
 # TODO: this is not correct, the Internal error should be raised all the way up, not as the
 # text field...
 sub _text_escape {
-    my ($self, $text) = @_;
+	my ( $self, $text ) = @_;
 
-    return "" if not $text;
-    my $markup = CPAN::Forum::Markup->new();
-    my $html = $markup->posting_process($text);
-    if (not defined $html) {
-        $self->log->warning("Error displaying already accepted text: '$text'");
-        return "Internal Error";
-    }
-    return $html;
-    #$text =~ s{<}{&lt;}g;
-    #$text =~ s{\b(http://.*?)(\s|$)}{<a href="$1">$1</a>$2}g; # urls
-    #$text =~ s{mailto:(.*?)(\s|$)}{<a href="mailto:$1">$1</a>$2}g; # e-mail addresses
-    #return $text;
+	return "" if not $text;
+	my $markup = CPAN::Forum::Markup->new();
+	my $html   = $markup->posting_process($text);
+	if ( not defined $html ) {
+		$self->log->warning("Error displaying already accepted text: '$text'");
+		return "Internal Error";
+	}
+	return $html;
+
+	#$text =~ s{<}{&lt;}g;
+	#$text =~ s{\b(http://.*?)(\s|$)}{<a href="$1">$1</a>$2}g; # urls
+	#$text =~ s{mailto:(.*?)(\s|$)}{<a href="mailto:$1">$1</a>$2}g; # e-mail addresses
+	#return $text;
 }
 
 
@@ -1381,299 +1400,311 @@ Show all the posts of a single thread.
 =cut
 
 sub threads {
-    my $self = shift;
+	my $self = shift;
 
-    my $q = $self->query;
-    my $t = $self->load_tmpl(
-            "threads.tmpl",
-            loop_context_vars => 1,
-    );
-    
-    my $id = $q->param("id");
-    $id = ${$self->query->param("path_parameters")}[0] if ${$self->query->param("path_parameters")}[0];
+	my $q = $self->query;
+	my $t = $self->load_tmpl(
+		"threads.tmpl",
+		loop_context_vars => 1,
+	);
 
-    my $posts = CPAN::Forum::DB::Posts->posts_in_thread($id); # SQL
-    if (not @$posts) {
-        return $self->internal_error(
-            "in request",
-            );
-    }
-    $self->log->debug(Data::Dumper->Dump([$posts], ['posts']));
- 
-    # fill in the responses
-    foreach my $p (@$posts) {
-        $p->{responses} = [];
-        foreach my $response (@$posts) {
-            if ($response->{parent} and $response->{parent} eq $p->{id}) {
-                push @{ $p->{responses} }, {id => $response->{id} };
-            }
-        }
-    }
+	my $id = $q->param("id");
+	$id = ${ $self->query->param("path_parameters") }[0] if ${ $self->query->param("path_parameters") }[0];
 
-    my @posts_html;
-    foreach my $p (@$posts) {
-        push @posts_html, $self->_post($p);
-    }
-    $t->param(posts => \@posts_html);
-    
-#   (my $dashgroup = $posts[0]->gid) =~ s/::/-/g;
-    $t->param(group => $posts->[0]->{group_name});
-#   $t->param(dashgroup => $dashgroup);
-    $t->param(title => _subject_escape($posts->[0]->{subject}));
+	my $posts = CPAN::Forum::DB::Posts->posts_in_thread($id); # SQL
+	if ( not @$posts ) {
+		return $self->internal_error(
+			"in request",
+		);
+	}
+	$self->log->debug( Data::Dumper->Dump( [$posts], ['posts'] ) );
 
-    $self->set_ratings($t, $posts->[0]->{group_name});
+	# fill in the responses
+	foreach my $p (@$posts) {
+		$p->{responses} = [];
+		foreach my $response (@$posts) {
+			if ( $response->{parent} and $response->{parent} eq $p->{id} ) {
+				push @{ $p->{responses} }, { id => $response->{id} };
+			}
+		}
+	}
 
-    return $t->output;
+	my @posts_html;
+	foreach my $p (@$posts) {
+		push @posts_html, $self->_post($p);
+	}
+	$t->param( posts => \@posts_html );
+
+	#   (my $dashgroup = $posts[0]->gid) =~ s/::/-/g;
+	$t->param( group => $posts->[0]->{group_name} );
+
+	#   $t->param(dashgroup => $dashgroup);
+	$t->param( title => _subject_escape( $posts->[0]->{subject} ) );
+
+	$self->set_ratings( $t, $posts->[0]->{group_name} );
+
+	return $t->output;
 }
 
 sub get_rating {
-    my ($self, $dist) = @_;
-    require Text::CSV_XS;
-    my $csv    = Text::CSV_XS->new();
-    open my $fh, '<', '../../db/cpan_ratings.csv' or return;
-    while (my $line = <$fh>) {
-        next if $line !~ /^"$dist"/;
-        last if not $csv->parse($line);
-        return $csv->fields();
-            
-    }
-    return;
+	my ( $self, $dist ) = @_;
+	require Text::CSV_XS;
+	my $csv = Text::CSV_XS->new();
+	open my $fh, '<', '../../db/cpan_ratings.csv' or return;
+	while ( my $line = <$fh> ) {
+		next if $line !~ /^"$dist"/;
+		last if not $csv->parse($line);
+		return $csv->fields();
+
+	}
+	return;
 }
 
 sub set_ratings {
-    my ($self, $t, $group) = @_;
+	my ( $self, $t, $group ) = @_;
 
-    my ($distribution, $rating, $review_count) = $self->get_rating($group);
-    if (not $rating) {
-        $rating = "0.0";
-        $review_count = 0;
-    }
-    if ($rating) {
-        my $roundrating = sprintf "%1.1f", int($rating*2)/2;
-        $t->param(rating       => $rating);
-        $t->param(roundrating  => $roundrating);
-        $t->param(review_count => $review_count);
-    }
+	my ( $distribution, $rating, $review_count ) = $self->get_rating($group);
+	if ( not $rating ) {
+		$rating       = "0.0";
+		$review_count = 0;
+	}
+	if ($rating) {
+		my $roundrating = sprintf "%1.1f", int( $rating * 2 ) / 2;
+		$t->param( rating       => $rating );
+		$t->param( roundrating  => $roundrating );
+		$t->param( review_count => $review_count );
+	}
 }
 
 sub _subscriptions {
-    my ($self, $t, $group) = @_;
+	my ( $self, $t, $group ) = @_;
 
-    my $users = CPAN::Forum::DB::Subscriptions->get_subscriptions('allposts', $group->{id}, $group->{pauseid}); # SQL
-    my @usernames = map {{ username => $_->{username} }} @$users;
-    #$self->log->debug(Data::Dumper->Dump([\@users], ['users']));
-    $t->param(users => \@usernames);
+	my $users = CPAN::Forum::DB::Subscriptions->get_subscriptions( 'allposts', $group->{id}, $group->{pauseid} ); # SQL
+	my @usernames = map { { username => $_->{username} } } @$users;
+
+	#$self->log->debug(Data::Dumper->Dump([\@users], ['users']));
+	$t->param( users => \@usernames );
 }
 
 sub add_new_group {
-    my ($self) = @_;
-    if (not $self->session->param("admin")) {
-        return $self->internal_error("", "restricted_area");
-    }
-    my $q = $self->query;
-    my $group_name = $q->param("group");
-    # TODO pausid is currently free text on the form
-    # but it has been disabled for now
-    # we will have to provide the full list of PAUSEID on the form
-    # or check the id from the string
-    my $pauseid    = $q->param("pauseid");
-    if ($group_name !~ /^[\w-]+$/) {
-        return $self->notes("invalid_group_name");
-    }
+	my ($self) = @_;
+	if ( not $self->session->param("admin") ) {
+		return $self->internal_error( "", "restricted_area" );
+	}
+	my $q          = $self->query;
+	my $group_name = $q->param("group");
 
-    $self->log->debug("Adding group with name: '$group_name'");
-    my $group = eval {
-            CPAN::Forum::DB::Groups->add(   # SQL
-                name  => $group_name,
-                gtype => 3,
-                );
-            };
-    if ($@) {
-        $self->log->debug("Failed to add group with name: '$group_name'");
-        return $self->internal_error("", "failed_to_add_group");
-    }
+	# TODO pausid is currently free text on the form
+	# but it has been disabled for now
+	# we will have to provide the full list of PAUSEID on the form
+	# or check the id from the string
+	my $pauseid = $q->param("pauseid");
+	if ( $group_name !~ /^[\w-]+$/ ) {
+		return $self->notes("invalid_group_name");
+	}
 
-    my $t = $self->load_tmpl("admin.tmpl");
-    $t->param(updated => 1);
-    $t->output;
+	$self->log->debug("Adding group with name: '$group_name'");
+	my $group = eval {
+		CPAN::Forum::DB::Groups->add( # SQL
+			name  => $group_name,
+			gtype => 3,
+		);
+	};
+	if ($@) {
+		$self->log->debug("Failed to add group with name: '$group_name'");
+		return $self->internal_error( "", "failed_to_add_group" );
+	}
+
+	my $t = $self->load_tmpl("admin.tmpl");
+	$t->param( updated => 1 );
+	$t->output;
 }
 
 sub fetch_subscriptions {
-    my ($self, $mail, $post) = @_;
+	my ( $self, $mail, $post ) = @_;
 
-    my %to; # keys are e-mail addresses that have already received an e-mail
+	my %to; # keys are e-mail addresses that have already received an e-mail
 
-    $self->log->debug("Processing messages for allposts");
-    my $users = CPAN::Forum::DB::Subscriptions->get_subscriptions('allposts', $post->{gid}, $post->{pauseid}); # SQL
-    $self->_sendmail($users, $mail, \%to);
+	$self->log->debug("Processing messages for allposts");
+	my $users = CPAN::Forum::DB::Subscriptions->get_subscriptions( 'allposts', $post->{gid}, $post->{pauseid} ); # SQL
+	$self->_sendmail( $users, $mail, \%to );
 
-    if ($post->{thread} == $post->{id}) { 
-        $self->log->debug("Processing messages for thread starter");
-        my $users = CPAN::Forum::DB::Subscriptions->get_subscriptions('starters', $post->{gid}, $post->{pauseid}); # SQL
-        $self->_sendmail($users, $mail, \%to);
-    } else {
-        $self->log->debug("Processing messages for followups, users who posted in this thread");
+	if ( $post->{thread} == $post->{id} ) {
+		$self->log->debug("Processing messages for thread starter");
+		my $users =
+			CPAN::Forum::DB::Subscriptions->get_subscriptions( 'starters', $post->{gid}, $post->{pauseid} );     # SQL
+		$self->_sendmail( $users, $mail, \%to );
+	} else {
+		$self->log->debug("Processing messages for followups, users who posted in this thread");
 
-        my $uids = CPAN::Forum::DB::Posts->list_uids_who_posted_in_thread($post->{thread}); #SQL
-        $self->log->debug(Data::Dumper->Dump([$uids], ['uids']));
-        my %uids = map {{ $_ => 1 }} @$uids;
- 
-        my $users = CPAN::Forum::DB::Subscriptions->get_subscriptions('followups', $post->{gid}, $post->{pauseid}); # SQL
-        my @users_who_posted = grep { !$uids{ $_->{id} } } @$users;
-        $self->_sendmail(\@users_who_posted, $mail, \%to);
-    }
- 
-    $self->log->debug("Number of e-mails sent: ", scalar keys %to);
+		my $uids = CPAN::Forum::DB::Posts->list_uids_who_posted_in_thread( $post->{thread} );                    #SQL
+		$self->log->debug( Data::Dumper->Dump( [$uids], ['uids'] ) );
+		my %uids = map {
+			{ $_ => 1 }
+		} @$uids;
+
+		my $users =
+			CPAN::Forum::DB::Subscriptions->get_subscriptions( 'followups', $post->{gid}, $post->{pauseid} );    # SQL
+		my @users_who_posted = grep { !$uids{ $_->{id} } } @$users;
+		$self->_sendmail( \@users_who_posted, $mail, \%to );
+	}
+
+	$self->log->debug( "Number of e-mails sent: ", scalar keys %to );
 }
 
 sub _sendmail {
-    my ($self, $users, $mail, $to) = @_;
+	my ( $self, $users, $mail, $to ) = @_;
 
-    foreach my $user (@$users) {
-        #$self->log->debug(Data::Dumper->Dump([$mail], ['mail']));
-        my $email = $user->{email};
-        $mail->{To} = $email;
-        $self->log->debug("Sending to $email id was found");
-        next if $to->{$email}++; #TODO: stop using hardcoded reference to position!!!!!
-        $self->log->debug("Sending to $email first time sending");
-        $self->_my_sendmail(%$mail);
-        $self->log->debug("Sent to $email");
-    }
+	foreach my $user (@$users) {
+
+		#$self->log->debug(Data::Dumper->Dump([$mail], ['mail']));
+		my $email = $user->{email};
+		$mail->{To} = $email;
+		$self->log->debug("Sending to $email id was found");
+		next if $to->{$email}++; #TODO: stop using hardcoded reference to position!!!!!
+		$self->log->debug("Sending to $email first time sending");
+		$self->_my_sendmail(%$mail);
+		$self->log->debug("Sent to $email");
+	}
 }
 
 sub status {
-    my ($self, $value) = @_;
-    if ($value) {
-        if ($value eq "open") {
-            if (-e $STATUS_FILE) {
-                unlink $STATUS_FILE;
-                # TODO check if the file does not exist any more after this action?
-            }
-            return "open";
-        }
+	my ( $self, $value ) = @_;
+	if ($value) {
+		if ( $value eq "open" ) {
+			if ( -e $STATUS_FILE ) {
+				unlink $STATUS_FILE;
 
-        open my $fh, ">", $STATUS_FILE;
-        if (not $fh) {
-            $self->log->warning("Could not open status file '$STATUS_FILE' $!");
-            return;
-        }
-        print $fh $value;
-        return $value;
-    } else {
-        return "open" if not -e $STATUS_FILE;
-        open my $fh, "<", $STATUS_FILE;
-        my $value = <$fh>;
-        chomp $value;
-        return $value;
-    }
+				# TODO check if the file does not exist any more after this action?
+			}
+			return "open";
+		}
+
+		open my $fh, ">", $STATUS_FILE;
+		if ( not $fh ) {
+			$self->log->warning("Could not open status file '$STATUS_FILE' $!");
+			return;
+		}
+		print $fh $value;
+		return $value;
+	} else {
+		return "open" if not -e $STATUS_FILE;
+		open my $fh, "<", $STATUS_FILE;
+		my $value = <$fh>;
+		chomp $value;
+		return $value;
+	}
 }
 
 sub privacy_policy {
-    $_[0]->load_tmpl("privacy_policy.tmpl")->output;
+	$_[0]->load_tmpl("privacy_policy.tmpl")->output;
 }
 
 
 
 sub help {
-    $_[0]->load_tmpl("help.tmpl")->output;
+	$_[0]->load_tmpl("help.tmpl")->output;
 }
 
 sub site_is_closed {
-    $_[0]->load_tmpl("site_is_closed.tmpl")->output;
+	$_[0]->load_tmpl("site_is_closed.tmpl")->output;
 }
 
 sub cgiapp_postrun {
-    my $self = shift;
-    my $output_ref = shift;
+	my $self       = shift;
+	my $output_ref = shift;
 
-    my $rm = $self->get_current_runmode();
-    if (not  $self->session->param('loggedin')  and $rm ne "login") {
-        $self->log->debug("not logged in, deleting session");
-        $self->session->delete();
-    }
-    # flush added as the Test::WWW::Mechanize::CGI did not work well without
-    # it after we started to use file based session objects
-    $self->session->flush();
+	my $rm = $self->get_current_runmode();
+	if ( not $self->session->param('loggedin') and $rm ne "login" ) {
+		$self->log->debug("not logged in, deleting session");
+		$self->session->delete();
+	}
 
-    my $ellapsed_time = time() - $self->param('start_time');
-    # first let's try to resolve the really big problems
-    if ($ellapsed_time > 3) {
-        my $rm = $self->get_current_runmode();
-        $self->log->warning("Long request. Ellapsed time: $ellapsed_time on run-mode: $rm"); 
-    }
+	# flush added as the Test::WWW::Mechanize::CGI did not work well without
+	# it after we started to use file based session objects
+	$self->session->flush();
+
+	my $ellapsed_time = time() - $self->param('start_time');
+
+	# first let's try to resolve the really big problems
+	if ( $ellapsed_time > 3 ) {
+		my $rm = $self->get_current_runmode();
+		$self->log->warning("Long request. Ellapsed time: $ellapsed_time on run-mode: $rm");
+	}
 }
 
 sub teardown {
-    my ($self) = @_;
-    $self->log->debug("teardown called");
+	my ($self) = @_;
+	$self->log->debug("teardown called");
 }
 
 sub _my_sendmail {
-    my ($self, %args) = @_;
-    #$self->log->debug(Data::Dumper->Dump([\%args], ['_my_sendmail']));
-    #$self->log->debug("_my_sendmail to '$args{To}'");
+	my ( $self, %args ) = @_;
 
-    return if $ENV{CPAN_FORUM_NO_MAIL};
-    # for testing
-    return if $self->config("disable_email_notification");
+	#$self->log->debug(Data::Dumper->Dump([\%args], ['_my_sendmail']));
+	#$self->log->debug("_my_sendmail to '$args{To}'");
 
-    if (defined &_test_my_sendmail) {
-        $self->_test_my_sendmail(@_);
-        return;
-    }
-    else {
-        return sendmail(%args);
-    }
+	return if $ENV{CPAN_FORUM_NO_MAIL};
+
+	# for testing
+	return if $self->config("disable_email_notification");
+
+	if ( defined &_test_my_sendmail ) {
+		$self->_test_my_sendmail(@_);
+		return;
+	} else {
+		return sendmail(%args);
+	}
 }
 
 
 sub m {
-    my ($self) = @_;
-    my $path = ${$self->query->param("path_parameters")}[0] || '';
-    my $value = ${$self->query->param("path_parameters")}[1] || '';
+	my ($self) = @_;
+	my $path  = ${ $self->query->param("path_parameters") }[0] || '';
+	my $value = ${ $self->query->param("path_parameters") }[1] || '';
 
 
-    my $tags = '';
-    if ($path eq "list_tags") {
-        my $gr = CPAN::Forum::DB::Groups->info_by(name => $value); # SQL
-        if ($gr) {
-            my $gid = $gr->{id};
-            my $modules = CPAN::Forum::DB::Tags->get_tags_of_module($gid); # SQL
-            #use Data::Dumper;
-            #print STDERR Dumper $modules;
-            $tags = join ",", map {"$_->{name}:$_->{cnt}"} @$modules;
-        }
-    }
+	my $tags = '';
+	if ( $path eq "list_tags" ) {
+		my $gr = CPAN::Forum::DB::Groups->info_by( name => $value ); # SQL
+		if ($gr) {
+			my $gid     = $gr->{id};
+			my $modules = CPAN::Forum::DB::Tags->get_tags_of_module($gid); # SQL
+			                                                               #use Data::Dumper;
+			                                                               #print STDERR Dumper $modules;
+			$tags = join ",", map {"$_->{name}:$_->{cnt}"} @$modules;
+		}
+	}
 
-    return <<"END_JAVASCRIPT";
+	return <<"END_JAVASCRIPT";
 var cpan_forum_tags = "$tags";
 END_JAVASCRIPT
 
 }
 
 sub _check_dist_info {
-    my ($self, $download_url, $dist_name) = @_;
-    my $d = CPAN::DistnameInfo->new($download_url);
-    if (not $d) {
-        $self->log->debug("Could not parse download URL");
-        return;
-    }
-    if ($dist_name ne $d->dist) {
-        $self->log->debug("Distname '$dist_name' is different from '" . $d->dist . "'");
-        return; # this was not here!!
-    }
+	my ( $self, $download_url, $dist_name ) = @_;
+	my $d = CPAN::DistnameInfo->new($download_url);
+	if ( not $d ) {
+		$self->log->debug("Could not parse download URL");
+		return;
+	}
+	if ( $dist_name ne $d->dist ) {
+		$self->log->debug( "Distname '$dist_name' is different from '" . $d->dist . "'" );
+		return; # this was not here!!
+	}
 
-    my $pauseid = $d->cpanid;
-    if (not $pauseid) {
-         $self->log->debug("Could not get PAUSEID from download_url");
-         return;
-    }
-    return ($d->version, $pauseid);
+	my $pauseid = $d->cpanid;
+	if ( not $pauseid ) {
+		$self->log->debug("Could not get PAUSEID from download_url");
+		return;
+	}
+	return ( $d->version, $pauseid );
 }
 
 
 sub version {
-    return $VERSION;
+	return $VERSION;
 }
 
 
