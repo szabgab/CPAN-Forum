@@ -1,8 +1,5 @@
 
-
-Make sure we can use utf-8 in the database (even if it is not yet allowed from the GUI of the Forum)
-
-move the session id in the database:
+move the session id into the database:
    sid
    uid
    issued
@@ -31,6 +28,8 @@ merge the populate script
   * Make the data restrictions stricter in the schema (UNIQUE, NOT NULL)
 
 ==========================
+
+* We can already use utf-8 in the database - allow the use of any language in the GUU as well.
 
 collect the packaes from downstream distriutions ORDB::DebianModules
 See http://szabgab.com/distributions/ for an old project

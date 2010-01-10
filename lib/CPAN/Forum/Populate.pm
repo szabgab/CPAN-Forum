@@ -190,10 +190,15 @@ sub process_files {
 sub process_file {
 	my ($self) = @_;
 
-	$self->unzip_file;
-	$self->generate_html;
-	$self->update_meta_data;
-	$self->process_ppi;
+	eval {
+		$self->unzip_file;
+		$self->generate_html;
+		$self->update_meta_data;
+		$self->process_ppi;
+	};
+	if ($@) {
+		warn $@;
+	}
 
 	return;
 }
@@ -209,8 +214,8 @@ sub unzip_file {
 	# file look like this:
 	# R/RJ/RJBS/CPAN-Mini-0.576.tar.gz
 	# A/AA/AADLER/Games-LogicPuzzle-0.20.zip
-	if ($file !~ m{^(\w)/(\1\w)/(\2\w+)/([\w-]+)-([\d.]+)\.(tar\.gz|zip)$}) {
-		die "File '$file' is not a recognized format";
+	if ($file !~ m{^(\w)/(\1\w)/(\2\w+)/([\w-]+)-([\d.]+)\.(tar\.gz|tgz|zip)$}) {
+		die "CPAN::FORUM: File '$file' is not a recognized format\n";
 	}
 	my $pauseid  = $3;
 	my $package  = $4;
@@ -236,12 +241,16 @@ sub unzip_file {
 	chdir $target_parent_dir or die;
 	my $cpan_dir = $self->cpan_dir;
 	# TODO unzip within a temp directory in case the zipped file does not have a main directory in it?
-	if (substr($file, -7) eq '.tar.gz') {
-		_system("tar xzf $cpan_dir/authors/id/$file");
+	my $full_path = "$cpan_dir/authors/id/$file";
+	if (not -e $full_path) {
+		die "CPAN::FORUM: file '$full_path' does not exist\n";
+	}
+	if (substr($file, -7) eq '.tar.gz' or substr($file, -4) eq '.tgz') {
+		_system("tar xzf $full_path");
 	} elsif (substr($file, -4) eq '.zip') {
-		_system("unzip $cpan_dir/authors/id/$file");
+		_system("unzip $full_path");
 	} else {
-		warn "unrecognized file '$file'";
+		die "CPAN::FORUM: unrecognized file '$file'\n";
 	}
 
 	return;
@@ -414,7 +423,7 @@ sub _system {
 }
 
 sub debug {
-	print "@_\n";
+	warn "@_\n";
 }
 
 =head1
