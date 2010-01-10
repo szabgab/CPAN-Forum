@@ -22,6 +22,8 @@ my $w_admin = t::lib::CPAN::Forum::Test::get_mech();
 my $w_user  = t::lib::CPAN::Forum::Test::get_mech();
 my $w_guest = t::lib::CPAN::Forum::Test::get_mech();
 
+my $year = 1900 + ( localtime() )[5];
+
 {
 	t::lib::CPAN::Forum::Test::setup_database();
 
@@ -240,6 +242,16 @@ foreach my $i ( 0 .. 2 ) {
 	BEGIN { $tests += 3 * ( 4 + 1 + @input_fields * 2 ) }
 }
 
+my @posts;
+BEGIN {
+	@posts = (
+		{
+			subject => 'A new subject',
+			text    => "This is supposed to be a posting",
+		},
+	);
+}
+
 my @post_preview_input_fields;
 my @post_submit_input_fields;
 
@@ -257,8 +269,8 @@ BEGIN {
 		[ 'rm',           'hidden', 'HTML::Form::TextInput', 'process_post' ],
 		[ 'new_group_id', 'hidden', 'HTML::Form::TextInput', '2' ],           # really can we know this number for sure?
 		[ 'new_parent',   'hidden', 'HTML::Form::TextInput', '' ],
-		[ 'new_subject',    'text',     'HTML::Form::TextInput',   'A new subject' ],
-		[ 'new_text',       'textarea', 'HTML::Form::TextInput',   "This is supposed to be a posting" ],
+		[ 'new_subject',    'text',     'HTML::Form::TextInput',   $posts[0]{subject} ],
+		[ 'new_text',       'textarea', 'HTML::Form::TextInput',   $posts[0]{text} ],
 		[ 'preview_button', 'submit',   'HTML::Form::SubmitInput', 'Preview' ],
 		[ 'preview_button', 'submit', 'HTML::Form::SubmitInput', 'Preview' ], # there are two preview buttons
 		[ 'submit_button',  'submit', 'HTML::Form::SubmitInput', 'Submit' ],
@@ -287,6 +299,7 @@ BEGIN {
 	BEGIN { $tests += 3 * 4 }
 }
 
+
 {
 	diag "Submit a post";
 	is_deeply( \@CPAN::Forum::messages, [], 'no messages were sent so far' );
@@ -306,13 +319,12 @@ BEGIN {
 		form_number => 2,
 		button      => 'preview_button',
 		fields      => {
-			new_subject => 'A new subject',
-			new_text    => "This is supposed to be a posting",
+			new_subject => $posts[0]{subject},
+			new_text    => $posts[0]{text},
 		},
 	);
 
 	#diag $w_user->content;
-	my $year = 1900 + ( localtime() )[5];
 	$w_user->content_like(qr{  Posted  \s+ on .* $year .* by .* $users[0]{username}  }sx);
 	$w_user->content_like(qr{<b>Preview</b>});
 	my ( $serch_form2, $post_form2 ) = $w_user->forms;
@@ -337,14 +349,30 @@ BEGIN {
 }
 
 {
+	diag('Check new post on the front page and on its own');
+	$w_guest->get_ok($url);
+	$w_guest->content_like(qr{Acme-Bleach});
+	$w_guest->content_like(qr{$posts[0]{subject}});
+	$w_guest->content_like(qr{$year});
+	
+	$w_guest->follow_link_ok( { text => $posts[0]{subject} } );
+	$w_guest->content_like(qr{Acme-Bleach});
+	$w_guest->content_like(qr{$posts[0]{subject}});
+	$w_guest->content_like(qr{  Posted  \s+ on .* $year .* by .* $users[0]{username}  }sx);
+	
+	BEGIN { $tests += 4+4 }
+}
+
+{
+	diag('Check new post in the rss and atom feeds');
 	$w_guest->get_ok("$url/rss/all");
 	$w_guest->content_unlike(qr{<title>No posts yet</title>});
-	$w_guest->content_like(qr{<title>\[Acme-Bleach\] A new subject</title>});
+	$w_guest->content_like(qr{<title>\[Acme-Bleach\] $posts[0]{subject}</title>});
 	$w_guest->content_like(qr{<link>$url.*/posts/1</link>});
 
 	$w_guest->get_ok("$url/atom/all");
 	$w_guest->content_unlike(qr{<title>No posts yet</title>});
-	$w_guest->content_like(qr{<title>\[Acme-Bleach\] A new subject</title>});
+	$w_guest->content_like(qr{<title>\[Acme-Bleach\] $posts[0]{subject}</title>});
 	$w_guest->content_like(qr{<link href="$url.*/posts/1"/>});
 
 	# TODO, should not these link to the thread instead?
@@ -352,12 +380,12 @@ BEGIN {
 
 	#    diag $w_guest->content;
 	$w_guest->content_unlike(qr{<title>No posts yet</title>});
-	$w_guest->content_like(qr{<title>\[Acme-Bleach\] A new subject</title>});
+	$w_guest->content_like(qr{<title>\[Acme-Bleach\] $posts[0]{subject}</title>});
 	$w_guest->content_like(qr{<link>$url.*/posts/1</link>});
 
 	$w_guest->get_ok("$url/atom/threads");
 	$w_guest->content_unlike(qr{<title>No posts yet</title>});
-	$w_guest->content_like(qr{<title>\[Acme-Bleach\] A new subject</title>});
+	$w_guest->content_like(qr{<title>\[Acme-Bleach\] $posts[0]{subject}</title>});
 	$w_guest->content_like(qr{<link href="$url.*/posts/1"/>});
 
 	#

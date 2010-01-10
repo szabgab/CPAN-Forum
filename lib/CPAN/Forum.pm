@@ -1354,7 +1354,7 @@ sub _post {
 	$self->log->debug( Data::Dumper->Dump( [$post], ['post'] ) );
 	my %post = (
 		postername => $post->{username},
-		date       => _post_date( $post->{date} ),
+		date       => $post->{date},
 		parentid   => $post->{parent},
 		responses  => $post->{responses},
 		text       => $self->_text_escape( $post->{text} ),
