@@ -2,10 +2,11 @@ package CPAN::Forum::Populate;
 
 use Moose;
 
+use autodie;
 use CPAN::Mini ();
 use Cwd        ();
 use File::Basename qw(basename dirname);
-use File::Copy qw(copy);
+use File::Copy qw(copy move);
 use File::Find::Rule ();
 use File::HomeDir    ();
 use File::Path qw(rmtree mkpath);
@@ -58,10 +59,12 @@ has 'all_modules' => ( is => 'rw' );
 has 'file'        => ( is => 'rw' );
 has 'dist'        => ( is => 'rw' );
 has 'version'     => ( is => 'rw' );
+has 'vversion'    => ( is => 'rw' );
 has 'source_path' => ( is => 'rw' );
 has 'html_path'   => ( is => 'rw' );
 has 'distinfo'    => ( is => 'rw' );
 has 'cwd'         => ( is => 'rw' );
+has 'localcpan'   => ( is => 'rw' );
 
 =pod
 
@@ -83,7 +86,7 @@ sub mirror_cpan {
 	my $cpan = $self->cpan;
 
 	#die $cpan;
-	my $cpan_dir = $self->cpan_dir;
+	my $cpan_dir = $self->localcpan;
 	my $verbose  = 0;
 	my $force    = 1;
 
@@ -91,7 +94,7 @@ sub mirror_cpan {
 	if ( $self->mirror ne 'mini' ) {
 
 		# comment out so won't delete mirror accidentally
-		open my $fh, '<', $self->mirror or die "Could not open " . $self->mirror . " $!";
+		open my $fh, '<', $self->mirror;
 		my @modules = <$fh>; # TODO check formatting
 		chomp @modules;
 		close $fh;
@@ -149,13 +152,13 @@ sub process_files {
 	CPAN::Forum::DBI->myinit();
 
 	if ( $self->process eq 'all' ) {
-		my $cpan_dir = $self->cpan_dir;
+		my $cpan_dir = $self->localcpan;
 		my $tmp      = tempdir( CLEANUP => 1 );
 		my $src      = "$cpan_dir/modules/02packages.details.txt.gz";
 		my $copy     = "$tmp/02packages.details.txt.gz";
 		my $txt      = "$tmp/02packages.details.txt";
-		copy $src, $copy;
-		system("gunzip $copy");
+		copy $src, $copy or die ("Could not copy '$src' to '$copy'");
+		system("gunzip $copy") and die;
 
 		my $p = Parse::CPAN::Packages->new($txt);
 
@@ -165,13 +168,13 @@ sub process_files {
 
 			# skip scripts
 			if ( not $d->prefix or $d->prefix =~ m{^\w/\w\w/\w+/scripts/} ) {
-				warn "no prefix line $cnt\n";
+				error("no prefix line $cnt");
 				next;
 			}
 
 			my $name = $d->dist;
 			if ( not $name ) {
-				warn "No name: line: $cnt prefix:" . $d->prefix . "\n";
+				error("No name: line: $cnt prefix:" . $d->prefix);
 				next;
 			}
 
@@ -181,6 +184,8 @@ sub process_files {
 			$self->file( $d->prefix );
 			$self->distinfo($d);
 			$self->process_file();
+			debug("Done");
+#<STDIN>;
 		}
 	} elsif ( $self->process eq 'new' ) {
 		die '--process new   not yet implemented';
@@ -203,7 +208,7 @@ sub process_file {
 		$self->process_ppi;
 	};
 	if ($@) {
-		warn $@;
+		error($@);
 	}
 
 	return;
@@ -218,48 +223,76 @@ sub unzip_file {
 
 	my $file = $self->file;
 
+	info("Processing $file");
 	# file look like this:
 	# R/RJ/RJBS/CPAN-Mini-0.576.tar.gz
 	# A/AA/AADLER/Games-LogicPuzzle-0.20.zip
-	if ( $file !~ m{^(\w)/(\1\w)/(\2\w+)/([\w-]+)-([\d.]+)\.(tar\.gz|tgz|zip)$} ) {
-		die "CPAN::FORUM: File '$file' is not a recognized format\n";
+	if ( $file !~ m{^  (\w)/   (\1\w)/    (\2\w+)/     ([\w-]+)-(v?)([\d.]+)   \.   (tar\.gz|tgz|zip|bz2)   $}x ) {
+		die "File '$file' is not a recognized format\n";
 	}
 	my $pauseid = $3;
 	my $package = $4;
-	my $version = $5;
-	debug("PAUSE '$pauseid' package  '$package' version '$version'");
+	my $version = $6;
+	my $vversion = "$5$version";
+
+	debug("PAUSE '$pauseid' package  '$package' version '$version' vversion '$vversion'");
 	my $filename = basename($file);
 	my $root     = '';
 	my $path     = dirname($file);
 	$self->dist($package);
 	$self->version($version);
+	$self->vversion($vversion);
 
-	my $target_parent_dir = "$src/$path";
+	my $target_parent_dir = "$src/$path/";
 	mkpath($target_parent_dir);
 
-	$self->source_path("$target_parent_dir/$package-$version");
+	$self->source_path("$target_parent_dir/$package-$vversion");
 	my $dir             = $self->dir;
 	my $html_parent_dir = "$dir/html/$path";
-	$self->html_path("$html_parent_dir/$package-$version");
+	$self->html_path("$html_parent_dir/$package-$vversion");
 
 	return if -e $self->source_path;
 
-	# TODO: having more control with Archive::Zip or similar module?
-	chdir $target_parent_dir or die;
-	my $cpan_dir = $self->cpan_dir;
+	my $cpan_dir = $self->localcpan;
 
-	# TODO unzip within a temp directory in case the zipped file does not have a main directory in it?
+
+
 	my $full_path = "$cpan_dir/authors/id/$file";
 	if ( not -e $full_path ) {
-		die "CPAN::FORUM: file '$full_path' does not exist\n";
+		die "File '$full_path' does not exist\n";
 	}
+
+	# TODO unzip within a temp directory in case the zipped file does not have a main directory in it?
+	# TODO: having more control with Archive::Zip or similar module?
+	my $tmp = tempdir( CLEANUP => 1 );
+
+	# prepare for the case if the file does not have subdirectory in there:
+	my $ddir = "$tmp/$package-$vversion";
+	mkdir $ddir;
+	chdir $ddir;
+
+	debug("ddir $ddir");
 	if ( substr( $file, -7 ) eq '.tar.gz' or substr( $file, -4 ) eq '.tgz' ) {
 		_system("tar xzf $full_path");
 	} elsif ( substr( $file, -4 ) eq '.zip' ) {
 		_system("unzip $full_path");
+	} elsif ( substr( $file, -4 ) eq '.bz2' ) {
+		_system("tar xjf $full_path");
 	} else {
-		die "CPAN::FORUM: unrecognized file '$file'\n";
+		die "Unrecognized file '$file'\n";
 	}
+
+	# TODO: check if there are other files, look how CPANTS checks if the file can be opened correctly
+
+	if (not -d "$package-$vversion") {
+		error("Could not find $package$vversion subdir");
+		chdir '..';
+	}
+	debug("move($package-$vversion, " . $self->source_path . ")");
+	debug(Cwd::cwd);
+	system "mv $package-$vversion " . $self->source_path;
+	#<STDIN>;
+	chdir $self->cwd;
 
 	return;
 }
@@ -292,11 +325,8 @@ sub generate_html {
 			mkpath( dirname($outfile) );
 			if ( open my $out, '>', $outfile ) {
 				print $out $html;
-			} else {
-				warn "Could not open '$outfile' for writing $!";
 			}
 		}
-
 	}
 
 	# create symbolic link
@@ -325,16 +355,14 @@ sub update_meta_data {
 	if ($pauseid) {
 		eval { $p = CPAN::Forum::DB::Authors->find_or_create($pauseid); };
 		if ($@) {
-			warn "$name\n";
-			warn $@;
+			error("Could not find or create pause id '$pauseid' for '$name'\n$@");
 			return;
 		}
 	}
 	if ( not $p ) {
-		warn "No PAUSEID?" . $d->prefix . "\n";
+		error("No PAUSEID?" . $d->prefix);
 		return;
 	}
-
 
 	my %new = (
 		version => ( $d->version() || "" ),
@@ -367,6 +395,8 @@ sub update_meta_data {
 
 	#$message{new} .= sprintf "Creating %s   %s\n", $name, $new{version}, $pauseid;
 
+	debug("Adding group '$name'");
+#	<STDIN>;
 	eval {
 		my $g = CPAN::Forum::DB::Groups->add(
 			name    => $name,
@@ -376,8 +406,7 @@ sub update_meta_data {
 		);
 	};
 	if ($@) {
-		warn "$name\n";
-		warn $@;
+		error("Could not add dist '$name'\n$@");
 	}
 	return;
 }
@@ -414,6 +443,9 @@ sub setup {
 		$self->dir("$home/.cpanforum");
 	}
 	debug( "directory: " . $self->dir );
+	if (not $self->localcpan) {
+		$self->localcpan( $_[0]->dir . '/cpan_mirror' );
+	}
 
 	# TODO allow --cpan command line flag?
 	if ( not $self->cpan ) {
@@ -423,7 +455,6 @@ sub setup {
 	return;
 }
 
-sub cpan_dir   { return $_[0]->dir . '/cpan_mirror'; }
 sub source_dir { return $_[0]->dir . '/src'; }
 
 sub _system {
@@ -434,7 +465,13 @@ sub _system {
 }
 
 sub debug {
-	warn "@_\n";
+	print "DEBUG: @_\n";
+}
+sub info {
+	print "INFO:  @_\n";
+}
+sub error {
+	print "ERROR: @_\n";
 }
 
 =head1

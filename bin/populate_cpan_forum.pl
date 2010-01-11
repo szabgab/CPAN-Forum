@@ -23,6 +23,7 @@ GetOptions(
 	'html',
 	'yaml',
 	'ppi',
+	'localcpan=s',
 	'cpan=s',
 ) or usage();
 usage() if $opt{help};
@@ -50,7 +51,8 @@ Usage: $0
       --html               # the --process will build the HTML files
       --yaml               # the --process will update the database with mete data (yaml file and others)
       --ppi                # the --process will use PPI to deep analyse the packages
-      --cpan               # URL of the CPAN server to mirror from
+      --cpan      URL      # URL of the CPAN server to mirror from
+      --localcpan PATH     # path to the local CPAN mirror (or where it should be)
 
 
       --help         this help

@@ -16,6 +16,7 @@ my $builder = Module::Build->new(
 	create_makefile_pl   => 'traditional',
 	recursive_test_files => 1,
 	requires             => {
+		'autodie'                               => '0',
 		'CGI'                                   => 0,
 		'CGI::Application'                      => 3.31,
 		'CGI::Application::Plugin::Session'     => 0,
