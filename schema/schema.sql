@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS languages CASCADE;
 DROP TABLE IF EXISTS users CASCADE;
 DROP TABLE IF EXISTS usergroups CASCADE;
 DROP TABLE IF EXISTS user_in_group CASCADE;
@@ -31,6 +32,33 @@ CREATE SEQUENCE subscriptions_id_seq;
 CREATE SEQUENCE subscriptions_all_id_seq;
 CREATE SEQUENCE subscriptions_pauseid_id_seq;
 CREATE SEQUENCE tags_id_seq;
+
+CREATE TABLE languages (
+	code     VARCHAR(10) PRIMARY KEY,
+	english  VARCHAR(50) NOT NULL, -- the name of the language in English
+	native   VARCHAR(50)           -- the name of the language in that language
+);
+INSERT INTO languages VALUES ('en', 'English', 'English');
+INSERT INTO languages VALUES ('he', 'Hebrew', 'עברית');
+INSERT INTO languages VALUES ('hu', 'Hungarian', 'Magyar');
+INSERT INTO languages VALUES ('ar', 'Arabic', 'عربي');
+INSERT INTO languages VALUES ('cz', 'Czech', 'Česky');
+INSERT INTO languages VALUES ('de', 'German', 'Deutsch');
+INSERT INTO languages VALUES ('es', 'Spanish', 'Español');
+INSERT INTO languages VALUES ('fa', 'Persian', 'پارسی (ایران)');
+INSERT INTO languages VALUES ('fr', 'French',  'Français');
+INSERT INTO languages VALUES ('it', 'Italian', 'Italiano');
+INSERT INTO languages VALUES ('ja', 'Japanese', '日本語');
+INSERT INTO languages VALUES ('ko', 'Korean', '한국어');
+INSERT INTO languages VALUES ('nl', 'Dutch', 'Nederlands');
+INSERT INTO languages VALUES ('no', 'Norwegian', 'Norsk');
+INSERT INTO languages VALUES ('pl', 'Polish', 'Polski');
+INSERT INTO languages VALUES ('pt', 'Portuguese', 'Português');
+INSERT INTO languages VALUES ('ru', 'Russian', 'Русский');
+INSERT INTO languages VALUES ('tr', 'Trukish', 'Türkçe');
+INSERT INTO languages VALUES ('zh-cn', 'Chinese (Simplified)', '中文 (简体)');
+INSERT INTO languages VALUES ('zh-tw', 'Chinese (Traditional)', '正體中文 (繁體)');
+
 
 CREATE TABLE authors (
 			id               INTEGER PRIMARY KEY DEFAULT nextval('authors_id_seq'::regclass),
