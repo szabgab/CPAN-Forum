@@ -46,3 +46,5 @@
 ^db\b
 ^live
 tmon.out
+.git
+.gitignore
