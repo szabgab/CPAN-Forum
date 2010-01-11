@@ -1,4 +1,8 @@
 
+Passsword reminder does not work - should be replaced by way to reset password
+just to see if the utf-8 worked display the list of languages
+
+
 move the session id into the database:
    sid
    uid
