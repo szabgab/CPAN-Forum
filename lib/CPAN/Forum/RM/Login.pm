@@ -45,7 +45,7 @@ sub login_process {
 	}
 
 
-	my $user = CPAN::Forum::DB::Users->info_by_credentials( $q->param('nickname'), $q->param('password') ); # SQL
+	my $user = CPAN::Forum::DB::Users->info_by_credentials( $q->param('nickname'), $q->param('password') );
 	if ( not $user ) {
 		$self->log->debug("No user found");
 		return $self->login( { bad_login => 1 } );
@@ -61,7 +61,7 @@ sub login_process {
 	$session->param( fname    => $user->{fname} );
 	$session->param( lname    => $user->{lname} );
 	$session->param( email    => $user->{email} );
-	if ( CPAN::Forum::DB::Users->is_admin( $user->{id} ) ) { # SQL
+	if ( CPAN::Forum::DB::Users->is_admin( $user->{id} ) ) {
 		$session->param( admin => 1 );
 	}
 
@@ -148,7 +148,7 @@ sub pwreminder_process {
 		return $self->pwreminder( { "no_data" => 1 } );
 	}
 
-	my $user = CPAN::Forum::DB::Users->info_by( $field => $q->param('value') ); # SQL
+	my $user = CPAN::Forum::DB::Users->info_by( $field => $q->param('value') );
 	return $self->pwreminder( { "no_data" => 1 } ) if not $user;
 
 	# TODO: put this text in a template

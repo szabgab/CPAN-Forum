@@ -35,7 +35,7 @@ sub dist {
 	$t->param( group => $group_name );
 	$t->param( title => "CPAN Forum - $group_name" );
 
-	my $gr = CPAN::Forum::DB::Groups->info_by( name => $group_name ); # SQL
+	my $gr = CPAN::Forum::DB::Groups->info_by( name => $group_name );
 	if ( not $gr ) {
 		$self->log->warning("Invalid group '$group_name'");
 		return $self->internal_error(
@@ -63,13 +63,13 @@ sub dist {
 		$t->param( pauseid_name => $gr->{pauseid_name} );
 	}
 
-	my $frequent_tags = CPAN::Forum::DB::Tags->get_tags_of_module($gid); # SQL
+	my $frequent_tags = CPAN::Forum::DB::Tags->get_tags_of_module($gid);
 	$t->param( frequent_tags => $frequent_tags );
 
 
 	my $uid = $self->session->param('uid');
 	if ($uid) {
-		my $mytags = CPAN::Forum::DB::Tags->get_tags_of( $gid, $uid );   # SQL
+		my $mytags = CPAN::Forum::DB::Tags->get_tags_of( $gid, $uid );
 		$t->param( mytags    => $mytags );
 		$t->param( show_tags => 1 );
 	}

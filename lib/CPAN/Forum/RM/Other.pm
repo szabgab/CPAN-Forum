@@ -41,17 +41,17 @@ sub stats {
 	my $self        = shift;
 	my $t           = $self->load_tmpl("stats.tmpl");
 	my $modules_cnt = 50;
-	my $groups      = CPAN::Forum::DB::Posts->stat_posts_by_group($modules_cnt); # SQL
+	my $groups      = CPAN::Forum::DB::Posts->stat_posts_by_group($modules_cnt);
 	$t->param( modules_cnt => $modules_cnt );
 	$t->param( groups      => $groups );
 
 	my $users_cnt = 50;
-	my $top_users = CPAN::Forum::DB::Posts->stat_posts_by_user($users_cnt);      # SQL
+	my $top_users = CPAN::Forum::DB::Posts->stat_posts_by_user($users_cnt);
 	$t->param( users_cnt => $users_cnt );
 	$t->param( users     => $top_users );
 
 	my $tagging_users_cnt = 20;
-	my $top_tagging_users = CPAN::Forum::DB::Tags->stat_tags_by_user($tagging_users_cnt); # SQL
+	my $top_tagging_users = CPAN::Forum::DB::Tags->stat_tags_by_user($tagging_users_cnt);
 	$t->param( tagging_users_cnt => $tagging_users_cnt );
 	$t->param( tagging_users     => $top_tagging_users );
 

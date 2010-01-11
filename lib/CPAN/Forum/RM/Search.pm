@@ -57,7 +57,7 @@ sub module_search {
 	$txt =~ s/::/-/g;
 	$txt = '%' . $txt . '%';
 
-	my $groups_hr   = CPAN::Forum::DB::Groups->groups_by_name($txt); # SQL
+	my $groups_hr   = CPAN::Forum::DB::Groups->groups_by_name($txt);
 	my @group_names = values %$groups_hr;
 	my @group_ids   = keys %$groups_hr;
 	if ( not @group_names ) {
@@ -121,9 +121,9 @@ sub _search_modules {
 
 	my $groups;
 	if ( $what eq "module" ) {
-		$groups = CPAN::Forum::DB::Groups->names_by_name($name); # SQL
+		$groups = CPAN::Forum::DB::Groups->names_by_name($name);
 	} else {
-		$groups = CPAN::Forum::DB::Groups->names_by_pauseidstr( uc $name ); # SQL
+		$groups = CPAN::Forum::DB::Groups->names_by_pauseidstr( uc $name );
 		$t->param( pauseid_name => uc $name );
 	}
 	$t->param( groups => $groups );
@@ -134,7 +134,7 @@ sub _search_modules {
 sub _search_users {
 	my ( $self, $t, $name, $what ) = @_;
 
-	my $users = CPAN::Forum::DB::Users->list_users_like( lc($name) );       # SQL
+	my $users = CPAN::Forum::DB::Users->list_users_like( lc($name) );
 	$t->param( users => $users );
 	$t->param( $what => 1 );
 	return @$users ? 1 : 0;

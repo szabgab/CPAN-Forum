@@ -20,7 +20,7 @@ sub _update_tags {
 
 	my $q        = $self->query;
 	my $group_id = $q->param('group_id');
-	my $group    = CPAN::Forum::DB::Groups->info_by( id => $group_id ); # SQL
+	my $group    = CPAN::Forum::DB::Groups->info_by( id => $group_id );
 	my $new_tags = $q->param('new_tags');
 	$self->log->debug("_update_tags in group '$group_id' tags='$new_tags'");
 	$new_tags =~ s/^\s+//;
@@ -31,17 +31,17 @@ sub _update_tags {
 	my $uid = $self->session->param('uid');
 
 	# TODO: let the client side decide which tags need to be added and removed
-	my $tags_hr = CPAN::Forum::DB::Tags->get_tags_hash_of( $group_id, $uid ); # SQL
+	my $tags_hr = CPAN::Forum::DB::Tags->get_tags_hash_of( $group_id, $uid );
 
 	foreach my $tag (@tags) {
 		if ( $tags_hr->{$tag} ) {
 			delete $tags_hr->{$tag};
 		} else {
-			CPAN::Forum::DB::Tags->attach_tag( $uid, $group_id, $tag );       # SQL
+			CPAN::Forum::DB::Tags->attach_tag( $uid, $group_id, $tag );
 		}
 	}
 	foreach my $old_tag ( keys %$tags_hr ) {
-		CPAN::Forum::DB::Tags->remove_tag( $uid, $group_id, $tags_hr->{$old_tag} ); # SQL
+		CPAN::Forum::DB::Tags->remove_tag( $uid, $group_id, $tags_hr->{$old_tag} );
 	}
 
 	return $self->notes( 'tags_updated', dist_name => $group->{name} );

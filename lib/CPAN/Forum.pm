@@ -519,7 +519,7 @@ Given a filed name returns the configuration value from the database
 sub config {
 	my ( $self, $field ) = @_;
 
-	CPAN::Forum::DB::Configure->param($field); # SQL
+	CPAN::Forum::DB::Configure->param($field);
 }
 
 # modes that can be accessed without a valid session
@@ -809,7 +809,7 @@ sub build_listing {
 	}
 	my @threads = keys %seen;
 
-	my $threads = CPAN::Forum::DB::Posts->count_threads(@threads); #SQL
+	my $threads = CPAN::Forum::DB::Posts->count_threads(@threads);
 
 	foreach my $post (@$it) {
 
@@ -969,7 +969,7 @@ sub register_process {
 
 	my $user = eval {
 		CPAN::Forum::DB::Users->add_user(
-			{ # SQL
+			{
 				username => $q->param('nickname'),
 				email    => $q->param('email'),
 			}
@@ -1098,7 +1098,7 @@ sub posts {
 		if ($new_group) {
 			if ( $new_group =~ /^([\w-]+)$/ ) {
 				$new_group = $1;
-				my ($gr) = CPAN::Forum::DB::Groups->info_by( name => $new_group ); # SQL
+				my ($gr) = CPAN::Forum::DB::Groups->info_by( name => $new_group );
 				if ($gr) {
 					$new_group_id = $gr->{id};
 				} else {
@@ -1112,7 +1112,7 @@ sub posts {
 				);
 			}
 		} elsif ($new_group_id) {
-			my ($gr) = CPAN::Forum::DB::Groups->info_by( id => $new_group_id ); # SQL
+			my ($gr) = CPAN::Forum::DB::Groups->info_by( id => $new_group_id );
 			if ($gr) {
 				$new_group = $gr->{name};
 			} else {
@@ -1140,7 +1140,7 @@ sub posts {
 
 		if ( $new_group_id =~ /^(\d+)$/ ) {
 			$new_group_id = $1;
-			my ($grp) = CPAN::Forum::DB::Groups->info_by( id => $new_group_id ); # SQL
+			my ($grp) = CPAN::Forum::DB::Groups->info_by( id => $new_group_id );
 			if ($grp) {
 				$new_group = $grp->{name};
 			} else {
@@ -1167,18 +1167,18 @@ sub posts {
 	}
 	$id ||= $q->param("new_parent");
 	if ($id) {                # Show post
-		my $post = CPAN::Forum::DB::Posts->get_post($id); # SQL
+		my $post = CPAN::Forum::DB::Posts->get_post($id);
 		if ( not $post ) {
 			return $self->internal_error(
 				"in request",
 			);
 		}
-		my $thread_count = CPAN::Forum::DB::Posts->count_thread( $post->{thread} ); # SQL
+		my $thread_count = CPAN::Forum::DB::Posts->count_thread( $post->{thread} );
 		if ( $thread_count > 1 ) {
 			$t->param( thread_id    => $post->{thread} );
 			$t->param( thread_count => $thread_count );
 		}
-		$post->{responses} = CPAN::Forum::DB::Posts->list_posts_by( parent => $post->{id} ); # SQL
+		$post->{responses} = CPAN::Forum::DB::Posts->list_posts_by( parent => $post->{id} );
 		my %post = %{ $self->_post($post) };
 		$t->param(%post);
 
@@ -1193,7 +1193,7 @@ sub posts {
 		$t->param( title       => _subject_escape( $post->{subject} ) );
 		$t->param( post        => 1 );
 
-		my $group = CPAN::Forum::DB::Groups->info_by( id => $post->{gid} ); # SQL
+		my $group = CPAN::Forum::DB::Groups->info_by( id => $post->{gid} );
 		$new_group    = $group->{name};
 		$new_group_id = $group->{id};
 	}
@@ -1246,11 +1246,11 @@ sub process_post {
 
 	my $parent_post;
 	if ($parent) { # assume response
-		$parent_post = CPAN::Forum::DB::Posts->get_post($parent); # SQL
+		$parent_post = CPAN::Forum::DB::Posts->get_post($parent);
 		push @errors, "bad_thing" if not $parent_post;
 	} else {                                                      # assume new post
 		if ( $q->param("new_group_id") ) {
-			push @errors, "bad_group" if not CPAN::Forum::DB::Groups->info_by( id => $q->param("new_group_id") ); # SQL
+			push @errors, "bad_group" if not CPAN::Forum::DB::Groups->info_by( id => $q->param("new_group_id") );
 		} else {
 			push @errors, "no_group";
 		}
@@ -1270,7 +1270,7 @@ sub process_post {
 	my $preview_button = $q->param("preview_button");
 	my $submit_button  = $q->param("submit_button");
 	if ( not @errors and $submit_button ) {
-		my $last_post = CPAN::Forum::DB::Posts->get_latest_post_by_uid( $self->session->param('uid') ); # SQL
+		my $last_post = CPAN::Forum::DB::Posts->get_latest_post_by_uid( $self->session->param('uid') );
 		  # TODO, maybe also check if the post is the same as the last post to avoid duplicates
 		if ($last_post) {
 			$self->log->debug( "username: "
@@ -1315,7 +1315,7 @@ sub process_post {
 	}
 
 	my $username = $self->session->param("username");
-	my $user = CPAN::Forum::DB::Users->info_by( username => $username ); # SQL
+	my $user = CPAN::Forum::DB::Users->info_by( username => $username );
 	if ( not $user ) {
 		return $self->internal_error("Unknown username: '$username'");
 	}
@@ -1327,7 +1327,7 @@ sub process_post {
 		subject => $q->param("new_subject"),
 		text    => $new_text,
 	);
-	my $post_id = eval { CPAN::Forum::DB::Posts->add_post( \%data, $parent_post, $parent ); }; #SQL
+	my $post_id = eval { CPAN::Forum::DB::Posts->add_post( \%data, $parent_post, $parent ); };
 	if ($@) {
 
 		#push @errors, "subject_too_long" if $@ =~ /subject_too_long/;
@@ -1411,7 +1411,7 @@ sub threads {
 	my $id = $q->param("id");
 	$id = ${ $self->query->param("path_parameters") }[0] if ${ $self->query->param("path_parameters") }[0];
 
-	my $posts = CPAN::Forum::DB::Posts->posts_in_thread($id); # SQL
+	my $posts = CPAN::Forum::DB::Posts->posts_in_thread($id);
 	if ( not @$posts ) {
 		return $self->internal_error(
 			"in request",
@@ -1479,7 +1479,7 @@ sub set_ratings {
 sub _subscriptions {
 	my ( $self, $t, $group ) = @_;
 
-	my $users = CPAN::Forum::DB::Subscriptions->get_subscriptions( 'allposts', $group->{id}, $group->{pauseid} ); # SQL
+	my $users = CPAN::Forum::DB::Subscriptions->get_subscriptions( 'allposts', $group->{id}, $group->{pauseid} );
 	my @usernames = map { { username => $_->{username} } } @$users;
 
 	#$self->log->debug(Data::Dumper->Dump([\@users], ['users']));
@@ -1505,7 +1505,7 @@ sub add_new_group {
 
 	$self->log->debug("Adding group with name: '$group_name'");
 	my $group = eval {
-		CPAN::Forum::DB::Groups->add( # SQL
+		CPAN::Forum::DB::Groups->add(
 			name  => $group_name,
 			gtype => 3,
 		);
@@ -1526,25 +1526,25 @@ sub fetch_subscriptions {
 	my %to; # keys are e-mail addresses that have already received an e-mail
 
 	$self->log->debug("Processing messages for allposts");
-	my $users = CPAN::Forum::DB::Subscriptions->get_subscriptions( 'allposts', $post->{gid}, $post->{pauseid} ); # SQL
+	my $users = CPAN::Forum::DB::Subscriptions->get_subscriptions( 'allposts', $post->{gid}, $post->{pauseid} );
 	$self->_sendmail( $users, $mail, \%to );
 
 	if ( $post->{thread} == $post->{id} ) {
 		$self->log->debug("Processing messages for thread starter");
 		my $users =
-			CPAN::Forum::DB::Subscriptions->get_subscriptions( 'starters', $post->{gid}, $post->{pauseid} );     # SQL
+			CPAN::Forum::DB::Subscriptions->get_subscriptions( 'starters', $post->{gid}, $post->{pauseid} );
 		$self->_sendmail( $users, $mail, \%to );
 	} else {
 		$self->log->debug("Processing messages for followups, users who posted in this thread");
 
-		my $uids = CPAN::Forum::DB::Posts->list_uids_who_posted_in_thread( $post->{thread} );                    #SQL
+		my $uids = CPAN::Forum::DB::Posts->list_uids_who_posted_in_thread( $post->{thread} );
 		$self->log->debug( Data::Dumper->Dump( [$uids], ['uids'] ) );
 		my %uids = map {
 			{ $_ => 1 }
 		} @$uids;
 
 		my $users =
-			CPAN::Forum::DB::Subscriptions->get_subscriptions( 'followups', $post->{gid}, $post->{pauseid} );    # SQL
+			CPAN::Forum::DB::Subscriptions->get_subscriptions( 'followups', $post->{gid}, $post->{pauseid} );
 		my @users_who_posted = grep { !$uids{ $_->{id} } } @$users;
 		$self->_sendmail( \@users_who_posted, $mail, \%to );
 	}
@@ -1666,10 +1666,10 @@ sub m {
 
 	my $tags = '';
 	if ( $path eq "list_tags" ) {
-		my $gr = CPAN::Forum::DB::Groups->info_by( name => $value ); # SQL
+		my $gr = CPAN::Forum::DB::Groups->info_by( name => $value );
 		if ($gr) {
 			my $gid     = $gr->{id};
-			my $modules = CPAN::Forum::DB::Tags->get_tags_of_module($gid); # SQL
+			my $modules = CPAN::Forum::DB::Tags->get_tags_of_module($gid);
 			                                                               #use Data::Dumper;
 			                                                               #print STDERR Dumper $modules;
 			$tags = join ",", map {"$_->{name}:$_->{cnt}"} @$modules;

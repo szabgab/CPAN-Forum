@@ -12,12 +12,12 @@ sub admin_edit_user_process {
 	my $uid   = $q->param('uid');  # TODO error checking here !
 
 	$self->log->debug("admin_edit_user_process uid: '$uid'");
-	my $person = CPAN::Forum::DB::Users->info_by( id => $uid ); # SQL
+	my $person = CPAN::Forum::DB::Users->info_by( id => $uid );
 	if ( not $person ) {
 		return $self->internal_error( "", "no_such_user" );
 	}
 	eval {
-		my $person = CPAN::Forum::DB::Users->update( $uid, email => lc $email ); #SQL
+		my $person = CPAN::Forum::DB::Users->update( $uid, email => lc $email );
 	};
 	if ( $@ =~ /column email is not unique/ ) {
 		return $self->notes("duplicate_email");
@@ -37,7 +37,7 @@ sub admin_edit_user {
 	}
 	$self->log->debug("admin_edit_user username: '$username'");
 
-	my $person = CPAN::Forum::DB::Users->info_by( username => $username ); # SQL
+	my $person = CPAN::Forum::DB::Users->info_by( username => $username );
 	if ( not $person ) {
 		return $self->internal_error( "", "no_such_user" );
 	}
@@ -68,7 +68,7 @@ sub admin_process {
 		disable_email_notification)
 		)
 	{
-		CPAN::Forum::DB::Configure->set_field_value( $field, $q->param($field) ); # SQL
+		CPAN::Forum::DB::Configure->set_field_value( $field, $q->param($field) );
 	}
 
 	$self->status( $q->param('status') );
@@ -86,7 +86,7 @@ sub admin {
 		return $self->internal_error( "", "restricted_area" );
 	}
 
-	my $data = CPAN::Forum::DB::Configure->get_all_pairs; # SQL
+	my $data = CPAN::Forum::DB::Configure->get_all_pairs;
 	$self->log->debug( Data::Dumper->Dump( [$data], ['config'] ) );
 
 	my $t = $self->load_tmpl("admin.tmpl");

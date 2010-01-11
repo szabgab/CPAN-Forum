@@ -9,7 +9,7 @@ use Digest::SHA qw(sha1_base64);
 sub selfconfig {
 	my ( $self, $errs ) = @_;
 	my $t = $self->load_tmpl("change_password.tmpl");
-	my $user = CPAN::Forum::DB::Users->info_by( id => $self->session->param('uid') ); # SQL
+	my $user = CPAN::Forum::DB::Users->info_by( id => $self->session->param('uid') );
 	$t->param( fname => $user->{fname} );
 	$t->param( lname => $user->{lname} );
 
@@ -29,7 +29,7 @@ sub change_info {
 	}
 
 	CPAN::Forum::DB::Users->update(
-		$self->session->param('uid'), # SQL
+		$self->session->param('uid'),
 		fname => $q->param('fname'),
 		lname => $q->param('lname'),
 	);
@@ -47,7 +47,7 @@ sub change_password {
 	}
 
 	CPAN::Forum::DB::Users->update(
-		$self->session->param('uid'), # SQL
+		$self->session->param('uid'),
 		sha1 => sha1_base64( $q->param('password') ),
 	);
 

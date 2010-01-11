@@ -92,7 +92,7 @@ sub update_data_by_name {
 
 }
 
-#        my $author = CPAN::Forum::DB::Authors->get_author_by_pauseid($name); # SQL
+#        my $author = CPAN::Forum::DB::Authors->get_author_by_pauseid($name);
 
 1;
 

@@ -34,7 +34,7 @@ sub mypan {
 	my $self = shift;
 
 	my $username = $self->session->param("username");
-	my $user = CPAN::Forum::DB::Users->info_by( username => $username ); # SQL
+	my $user = CPAN::Forum::DB::Users->info_by( username => $username );
 
 	if ( not $user ) {
 		return $self->internal_error(
@@ -46,14 +46,14 @@ sub mypan {
 	my ( $gids, $subscriptions );
 	if ( @params == 2 and $params[0] eq "dist" ) {
 		my $group_name = $params[1];
-		my $group = CPAN::Forum::DB::Groups->info_by( name => $group_name ); # SQL
+		my $group = CPAN::Forum::DB::Groups->info_by( name => $group_name );
 		if ( not $group ) {
 			return $self->internal_error("Accessing");
 		}
 		( $gids, $subscriptions ) = $self->_get_module_subscription( $user, $group_name, $group );
 	} elsif ( @params == 2 and $params[0] eq "author" ) {
 		my $pauseid_str = $params[1];
-		my $subs        = CPAN::Forum::DB::Authors->get_author_by_pauseid($pauseid_str); # SQL
+		my $subs        = CPAN::Forum::DB::Authors->get_author_by_pauseid($pauseid_str);
 		if ( not $subs ) {
 			return $self->internal_error("Accessing");
 		}
@@ -78,7 +78,7 @@ sub _get_all_subscriptions {
 	my ( $self, $user ) = @_;
 
 	my @subscriptions;
-	my $s = CPAN::Forum::DB::Subscriptions_all->find_one( uid => $user->{id} ); # SQL
+	my $s = CPAN::Forum::DB::Subscriptions_all->find_one( uid => $user->{id} );
 	$self->log->debug( "all subscriptions " . ( $s ? "found" : "not found" ) );
 	push @subscriptions,
 		{
@@ -90,7 +90,7 @@ sub _get_all_subscriptions {
 		};
 	my $gids = "_all";
 
-	my $it = CPAN::Forum::DB::Subscriptions_pauseid->find( uid => $user->{id} ); # SQL
+	my $it = CPAN::Forum::DB::Subscriptions_pauseid->find( uid => $user->{id} );
 	foreach my $s (@$it) {
 		$gids .= ",_" . $s->{pauseid};
 		push @subscriptions,
@@ -103,7 +103,7 @@ sub _get_all_subscriptions {
 			};
 	}
 
-	$it = CPAN::Forum::DB::Subscriptions->find( uid => $user->{id} ); # SQL
+	$it = CPAN::Forum::DB::Subscriptions->find( uid => $user->{id} );
 	foreach my $s (@$it) {
 		$gids .= ( $gids ? "," : "" ) . $s->{gid};
 		push @subscriptions,
@@ -124,7 +124,7 @@ sub _get_module_subscription {
 	my @subscriptions;
 	my $gid  = $group->{id};
 	my $gids = $group->{id};
-	my ($s) = CPAN::Forum::DB::Subscriptions->find_one( uid => $user->{id}, gid => $gid ); # SQL
+	my ($s) = CPAN::Forum::DB::Subscriptions->find_one( uid => $user->{id}, gid => $gid );
 	if ($s) {
 		push @subscriptions,
 			{
@@ -152,7 +152,7 @@ sub _get_pauseid_subscription {
 
 	my @subscriptions;
 	my $gids = "_" . $pauseid_id;
-	my ($s) = CPAN::Forum::DB::Subscriptions_pauseid->find_one( uid => $user->{id}, pauseid => $pauseid_id ); # SQL
+	my ($s) = CPAN::Forum::DB::Subscriptions_pauseid->find_one( uid => $user->{id}, pauseid => $pauseid_id );
 	if ($s) {
 		push @subscriptions,
 			{
@@ -192,7 +192,7 @@ sub update_subscription {
 	}
 
 	my $username = $self->session->param("username");
-	my $user     = CPAN::Forum::DB::Users->info_by( username => $username ); # SQL
+	my $user     = CPAN::Forum::DB::Users->info_by( username => $username );
 	my $uid      = $user->{id};
 
 	foreach my $gid (@gids) {
@@ -201,15 +201,14 @@ sub update_subscription {
 
 		if ( $gid eq "_all" ) {
 			$self->log->debug( "Subscription_all: '$uid', '$on', " . Data::Dumper->Dump( [$data], ['data'] ) );
-			CPAN::Forum::DB::Subscriptions_all->complex_update( { uid => $uid }, $on, $data ); # SQL
+			CPAN::Forum::DB::Subscriptions_all->complex_update( { uid => $uid }, $on, $data );
 		} elsif ( $gid =~ /^_(\d+)$/ ) {
 			my $pauseid = $1;
 			$self->log->debug( "Subscription_pauseid: pauseid='$pauseid', uid='$uid', on='$on', "
 					. Data::Dumper->Dump( [$data], ['data'] ) );
-			CPAN::Forum::DB::Subscriptions_pauseid->complex_update( { pauseid => $pauseid, uid => $uid }, $on, $data )
-				;                                                                              # SQL
+			CPAN::Forum::DB::Subscriptions_pauseid->complex_update( { pauseid => $pauseid, uid => $uid }, $on, $data );
 		} elsif ( $gid =~ /^(\d+)$/ ) {
-			CPAN::Forum::DB::Subscriptions->complex_update( { gid => $gid, uid => $uid }, $on, $data ); #SQL
+			CPAN::Forum::DB::Subscriptions->complex_update( { gid => $gid, uid => $uid }, $on, $data );
 		} else {
 			$self->log->error("Invalid gid: '$gid' provided in the gids entry of mypan");
 
@@ -244,9 +243,9 @@ sub update_subscription {
     # we should not let the user overwrite it using the new entry box
     if ($q->param("type") eq "pauseid") {
         my $pauseid = uc $q->param("name");
-        my $author = CPAN::Forum::DB::Authors->get_author_by_pauseid($pauseid); # SQL
+        my $author = CPAN::Forum::DB::Authors->get_author_by_pauseid($pauseid);
         if ($author) {
-            my $s = CPAN::Forum::DB::Subscriptions_pauseid->find_or_create({ # not SQL
+            my $s = CPAN::Forum::DB::Subscriptions_pauseid->find_or_create({
                 uid       => $uid,
                 pauseid   => $author->{id},
             });
@@ -258,9 +257,9 @@ sub update_subscription {
     elsif ($q->param("type") eq "distro") {
         my $name = $q->param("name");
         $name =~ s/::/-/g;  
-        my $group = CPAN::Forum::DB::Groups->info_by(name => $name); # SQL
+        my $group = CPAN::Forum::DB::Groups->info_by(name => $name);
         if ($group) {
-            my $s = CPAN::Forum::DB::Subscriptions->find_or_create({  # not SQL
+            my $s = CPAN::Forum::DB::Subscriptions->find_or_create({
                 uid       => $uid,
                 gid       => $group->{id},
             });

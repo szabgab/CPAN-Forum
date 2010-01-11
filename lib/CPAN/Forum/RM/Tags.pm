@@ -19,10 +19,10 @@ sub tags {
 	} elsif ( $path eq 'name_popup' ) {
 		return $self->_list_modules_with_tag( $value, 'popup/' );
 	} elsif ( $path eq 'user' and $value ) {
-		my $tags = CPAN::Forum::DB::Tags->get_tags_of_user($value); # SQL
+		my $tags = CPAN::Forum::DB::Tags->get_tags_of_user($value);
 		return $self->_list_tags( $tags, { user_name => $value } );
 	} else {
-		my $tags = CPAN::Forum::DB::Tags->get_all_tags();           # SQL
+		my $tags = CPAN::Forum::DB::Tags->get_all_tags();
 		return $self->_list_tags($tags);
 	}
 }
@@ -63,7 +63,7 @@ sub _list_modules_with_tag {
 		loop_context_vars => 1,
 		global_vars       => 1,
 	);
-	my $modules = CPAN::Forum::DB::Tags->get_modules_with_tag($value); # SQL
+	my $modules = CPAN::Forum::DB::Tags->get_modules_with_tag($value);
 	$t->param( tag     => $value );
 	$t->param( modules => $modules );
 
