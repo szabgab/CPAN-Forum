@@ -60,11 +60,6 @@ INSERT INTO languages VALUES ('zh-cn', 'Chinese (Simplified)', '中文 (简体)'
 INSERT INTO languages VALUES ('zh-tw', 'Chinese (Traditional)', '正體中文 (繁體)');
 
 
-CREATE TABLE authors (
-			id               INTEGER PRIMARY KEY DEFAULT nextval('authors_id_seq'::regclass),
-			pauseid          VARCHAR(100) UNIQUE NOT NULL
-);
-
 CREATE TABLE users (
 			id                 INTEGER PRIMARY KEY DEFAULT nextval('users_id_seq'::regclass),
 			username           VARCHAR(25) UNIQUE NOT NULL,
@@ -73,11 +68,16 @@ CREATE TABLE users (
 			fname              VARCHAR(100),
 			lname              VARCHAR(100),
 			update_on_new_user VARCHAR(1),
-			pauseid            INTEGER,
 --			status             INTEGER,
 			registration_date  TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-			last_seen          TIMESTAMP,
-			FOREIGN KEY (pauseid) REFERENCES authors(id)
+			last_seen          TIMESTAMP
+);
+
+CREATE TABLE authors (
+			id               INTEGER PRIMARY KEY DEFAULT nextval('authors_id_seq'::regclass),
+			pauseid          VARCHAR(100) UNIQUE NOT NULL,
+			userid           INTEGER,
+			FOREIGN KEY (userid) REFERENCES users(id)
 );
 
 CREATE TABLE usergroups (
@@ -102,11 +102,10 @@ CREATE TABLE configure (
 CREATE TABLE groups (
 			id               INTEGER PRIMARY KEY DEFAULT nextval('groups_id_seq'::regclass),
 			name             VARCHAR(255) UNIQUE NOT NULL,
-			status           INTEGER,
 			gtype            INTEGER NOT NULL,
 			version          VARCHAR(100),
 			pauseid          INTEGER, -- should be NOT NULL but there are entries in the database with null, TODO create a hash of the correct values before!
-			rating           VARCHAR(10),	
+			rating           REAL DEFAULT 0,
 			review_count     INTEGER NOT NULL DEFAULT 0,
 			FOREIGN KEY (pauseid)  REFERENCES authors(id)
 );
