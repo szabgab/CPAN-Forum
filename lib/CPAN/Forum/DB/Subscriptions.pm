@@ -25,7 +25,7 @@ sub _find {
 	my @fields = keys %args;
 	my $where  = join " AND ", map {"$_=?"} @fields;
 	my $sql    = "SELECT subscriptions.id, gid, uid, allposts, starters, followups, announcements,
-        groups.name group_name FROM subscriptions, groups WHERE groups.id=subscriptions.gid";
+        groups.name AS group_name FROM subscriptions, groups WHERE groups.id=subscriptions.gid";
 	if ($where) {
 		$sql .= " AND $where";
 	}
@@ -48,15 +48,15 @@ sub get_subscriptions {
 	# People who asked for all the posts in this group
 	# People who asked for all the posts in this PAUSEID
 
-	my $sql = "  SELECT DISTINCT username, email, users.id id
+	my $sql = "  SELECT DISTINCT username, email, users.id AS id
                    FROM users, subscriptions_all
                    WHERE (users.id=subscriptions_all.uid AND subscriptions_all.$field IS TRUE)
                UNION
-                 SELECT DISTINCT username, email, users.id id
+                 SELECT DISTINCT username, email, users.id AS id
                    FROM users, subscriptions
                    WHERE  (users.id=subscriptions.uid AND subscriptions.$field IS TRUE AND gid=?)
                UNION
-                 SELECT DISTINCT username, email, users.id id
+                 SELECT DISTINCT username, email, users.id AS id
                    FROM users, subscriptions_pauseid
                    WHERE  
                      (users.id=subscriptions_pauseid.uid 

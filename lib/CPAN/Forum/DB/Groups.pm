@@ -11,7 +11,7 @@ sub info_by {
 	my @FIELDS = qw(id name);
 	Carp::croak("Invalid field '$field'") if none { $field eq $_ } @FIELDS;
 
-	my $sql = "SELECT groups.id id, name, groups.pauseid, authors.pauseid pauseid_name
+	my $sql = "SELECT groups.id AS id, name, groups.pauseid, authors.pauseid AS pauseid_name
                FROM groups, authors
                WHERE groups.$field=? AND authors.id=groups.pauseid";
 	return $self->_fetch_single_hashref( $sql, $value );

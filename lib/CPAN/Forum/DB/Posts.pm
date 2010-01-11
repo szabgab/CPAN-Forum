@@ -4,7 +4,7 @@ use warnings;
 use Carp;
 use base 'CPAN::Forum::DBI';
 
-my $MORE_SQL = 'groups.name group_name, users.fname user_fname, users.lname user_lname, users.username user_username';
+my $MORE_SQL = 'groups.name AS group_name, users.fname AS user_fname, users.lname AS user_lname, users.username AS user_username';
 
 
 sub get_post {
@@ -14,7 +14,7 @@ sub get_post {
 	#Carp::croak("No post_id given") if not $post_id;
 
 	my $sql = "SELECT posts.id, gid, uid, parent, thread, hidden, subject, text, date,
-                groups.name group_name, groups.pauseid, username, fname, lname
+                groups.name AS group_name, groups.pauseid, username, fname, lname
                 FROM posts, groups, users
                 WHERE posts.id=? AND posts.gid=groups.id AND users.id=posts.uid";
 	return $self->_fetch_single_hashref( $sql, $post_id );
@@ -23,7 +23,7 @@ sub get_post {
 sub posts_in_thread {
 	my ( $self, $thread ) = @_;
 	my $sql = "SELECT posts.id, gid, uid, parent, thread, hidden, subject, text, date,
-                groups.name group_name, groups.pauseid, username, fname, lname
+                groups.name AS group_name, groups.pauseid, username, fname, lname
                 FROM posts, groups, users
                 WHERE posts.thread=? AND posts.gid=groups.id AND users.id=posts.uid";
 	$self->_fetch_arrayref_of_hashes( $sql, $thread );
@@ -59,7 +59,7 @@ sub retrieve_latest {
 	my ( $self, $limit ) = @_;
 
 	$limit ||= 10;
-	my $sql = "SELECT posts.id id, posts.subject, 
+	my $sql = "SELECT posts.id AS id, posts.subject, 
                 $MORE_SQL
                 FROM posts, groups, users
                 WHERE posts.gid=groups.id AND posts.uid=users.id
@@ -75,7 +75,7 @@ sub search_post_by_groupname {
 
 	return [] if not $groupname;
 	$limit ||= 10;
-	my $sql = qq{SELECT posts.id id, posts.subject,
+	my $sql = qq{SELECT posts.id AS id, posts.subject,
                         $MORE_SQL
                         FROM posts, groups, users
                         WHERE groups.name=?
@@ -139,7 +139,7 @@ sub mysearch {
 
 sub list_counted_posts {
 	my ($self) = @_;
-	my $sql = "SELECT groups.name gname, COUNT(*) cnt
+	my $sql = "SELECT groups.name AS gname, COUNT(*) cnt
                FROM posts, groups
                WHERE posts.gid=groups.id
                GROUP BY gname
@@ -150,7 +150,7 @@ sub list_counted_posts {
 # returns the number of entries in a single thread
 sub count_thread {
 	my ( $self, $thread_id ) = @_;
-	my $sql = "SELECT count(*) FROM posts WHERE thread=?";
+	my $sql = "SELECT COUNT(*) FROM posts WHERE thread=?";
 	return $self->_fetch_single_value( $sql, $thread_id );
 }
 
@@ -164,14 +164,14 @@ sub count_threads {
 
 	$CPAN::Forum::logger->debug( Data::Dumper->Dump( [ \@thread_ids ], ['thread_ids'] ) );
 	my $ids = join ",", @thread_ids;
-	my $sql = "SELECT thread, COUNT(*) cnt FROM posts WHERE thread in ($ids) GROUP BY thread";
+	my $sql = "SELECT thread, COUNT(*) AS cnt FROM posts WHERE thread in ($ids) GROUP BY thread";
 	return $self->_selectall_hashref( $sql, 'thread' );
 }
 
 sub stat_posts_by_group {
 	my ( $self, $limit ) = @_;
 	my $sql = qq{
-            SELECT COUNT(*) cnt, groups.name gname
+            SELECT COUNT(*) AS cnt, groups.name AS gname
             FROM posts,groups 
             WHERE posts.gid=groups.id
             GROUP BY gname
@@ -184,7 +184,7 @@ sub stat_posts_by_group {
 sub stat_posts_by_user {
 	my ( $self, $limit ) = @_;
 	my $sql = qq{
-            SELECT COUNT(*) cnt, users.username username 
+            SELECT COUNT(*) AS cnt, users.username AS username
             FROM posts,users
             WHERE posts.uid=users.id
             GROUP BY username

@@ -278,7 +278,7 @@ sub mypager {
 	#$CPAN::Forum::logger->debug("where='$where'");
 
 	my $fetch_sql =
-		"SELECT posts.id, subject, thread, date, username, groups.name group_name FROM posts, users, groups";
+		"SELECT posts.id, subject, thread, date, username, groups.name AS group_name FROM posts, users, groups";
 	my $count_sql    = "SELECT COUNT(*) FROM posts";
 	my @fetch_values = @values;
 
