@@ -4,4 +4,7 @@ db/
 CONFIG
 blib/
 cover_db/
-
+MANIFEST
+MANIFEST.bak
+META.yml
+CPAN-Forum-*
