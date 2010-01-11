@@ -390,4 +390,174 @@ track the path that the web-server gives (it's in one of the environment
 variables) and then to construct a /cpan-forum/login/ /cpan-forum/register/ 
 etc. path. (or use relative URLs).
 
+----------------------------------------------------------
+OTHER
+
+
+Thinking aloud:
+what if instead of Parse::RecDescend I munge the submitted text to be XML and then
+run XML parser on it ?
+
+
+===============================================================
+text<b>HTML markup</b>more text<br />and even in a new line
+<code>
+Here I can type any while (<XX>) {} code till
+</code>
+more text
+===============================================================
+
+Add 
+<post><text>
+
+replace every <code.*?> with </text><code...><![CDATA[
+replace every </code> with   ]]></code>
+
+
+
+</post>
+
+
+
+Now in addition to the </code> endtag you cant use trhe CDATA and the ]]> thingy either
+within CODE.
+
+======================================================================
+
+
+  We will start to use a partial set of the BBCode but with a few restrictions.
+  In BBCode you can use a small set of markup such as
+    [b]text[/b] to make your text bold
+    [code]Some program[/code] to mark an are to be code.
+	http://forums.gentoo.org/faq.php?mode=bbcode
+
+  Because we don't use the <> marks for our mark up we can safely know that any <>
+  or any other funny character should be taken literally and turned into the 
+  appropriate HTML entity, except the [] markup.
+
+  In order to let us further expand our markup language we do not allow the user to
+  add the [ or ] characters to his text. This would of course create problems in Perl code
+  so within [code][/code] pair you can freely use any character (well, except [/code] itself),
+  and we'll show all this characters verbatim.
+
+
+  Allowed tags:
+  [code]CODE[/code]
+    CODE here can contain any character including <>[], the only thing it cannot include is
+    the [/code] substring. No markup is possible inside. CODE will be show in as it is typed.
+  [text]TEXT[/text]
+    Just like CODE , it can contain any character except [/text] 
+    It will be shown differently from code section. (Most likely different background color and 
+    different font. Otherwise it is still show as you type.
+
+  Free text which is not enclosed in any of the above section can contain some markup using
+    [ characters. If we encounter [ characters in any other situation we don't accept the
+    submission.
+		
+    [b]BOLD[/b]                     to show text bold
+    [url=http://blabla]Title[/url]  to create a link
+    [url]http://blabla[/url]        to create a link with the link being the title
+    [email=me@you.com]Title[/email]
+    [email]me@you.com[/email]
+
+    http://www.blabla.com           magic linking
+    me@you.com                      magic linking
+
+    [[]                             to show a [ character
+    []]                             to show a ] character
+
+
+  At this point we won't allow nesting of markups.
+  Again: any other use of the [ and ] characters will be rejected.
+
+  Additional markup I am thinking of:
+    [c][/c] the same as [code][/code] but usually used inline in Free text.
+
+    [search:Distro-Name] for a link to search.CPAN 
+	      (< href="http://search.cpan.org/dist/Distro-Name">Distro-Name</a> )
+    [forum:Distro-Name] to link to the relevant forum
+	      (<a href="/dist/Module-Name">Module::Name</a>)
+		  
+    [post:id][/post] to link to another post 
+	      (<a href="/posts/id">title of that post</a> 
+		  (one such could also fetch the subject of the appropriate message and insert here)
+
+    [code:a][/code:a]
+        Code with line numbering accross all the snippets with :a in the same post.
+		(a-z) can be used to have several code snippets with their own numbering.
+
+  Now you're probably asking How do I escape all of those pesky special characters? 
+  It's easy, you don't. We do it.
+  
+  Within the [code][/code] section people should paste in regular code without any 
+  changes and our display code should show it correctly.
+  Maybe we can even add a button for each message to "show source" that will try to display
+  the enry from the database as it is really in a <textarea>box</textarea>
+
+  E-mail rewrite: How should text show up in an e-mail message ?
+    Subjects show up as they were written.
+    Text fields remain as they are
+    markup: [b]text[/b] is turned into *text*
+    [url]http://bla[/url] - the URL is left, markup removed.
+    [url=http://bla]Title[/url] - the URL is left, (Title) added in parentheses
+    Same for e-mails
+    [[] - replaced by [
+    []] - replaced by ]
+    
+    [code][/code] ?
+    [text][/text] ?
+
+
+  Comments:
+    We could use something like this for markup <cpan:code></cpan:code> and it
+	would be more standart (XML with name space) but would be harder to type.
+
+
+
+- Create a separate authentication for module authors based on PAUSE id of the users and 
+	authentication agains pause.cpan.org - for this I'll have to setup ssl on the server
+	
+	Once authenticated the module author can setup special information about the module
+	such as 
+	- a link to the main web site of the module, (sourceforge or whatever)
+	- a link to the registration form of the main mailing list, 
+	
+	- ask to cross-post messages to the mailing list
+	add a "From:" field and e-mail address that will be used to to cross-post
+	add a "To:" address where to send each post.
+	Check-box to send 1) all posts or 2) only thread leading posts.
+
+	Module autoher, if you already have a mailing list and you would like to get
+	the postings that come here to be forwarded to the mailing list too, do the 
+	following.  (Hmm, I am not really sure this is a good idea because the mailing
+	list people will just answer on the mailing list which (curently) won't go back
+	to the web server. Later, I can include a mail gateway. Hmm.)
+	
+
+
+Some requested features and suggested solutions:
+
+
+
+	
+Q:- A good, clean layout that clearly shows the different topics available
+	for discussion, with easy access to each topic.
+
+A:- We cannot list the 7000 distros on the front page (that is 270KB data) and would be unusable.
+	We can put a search box to search for module names, I am not sure that's interesting.
+	We can put up a link that will lead to a form where we list somehow all the module names
+	( a pull down menu ?, real list ?)
+
+	I expect, at least at the beginning most of the people will arrive on links from seach.cpan.org
+	directly to the /dist/Module::Name page where the discussin regardin their module takes place.
+	Maybe I should add some explanation there too ?
+	
+
+- https access for authentication ? Sounds like too tight security for such a simple site,
+  on the other hand if this our central Perl Passport then it should be secure.
+
+
+- Add some connections to other modules which depend on the current module or on which this current
+  module depends. See Module::Depends
+
 
