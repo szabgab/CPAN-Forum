@@ -9,6 +9,8 @@ use FindBin qw ($Bin);
 
 my $dir;
 
+# http://cpanratings.perl.org/csv/all_ratings.csv
+
 BEGIN {
 	$dir = dirname( dirname( abs_path($0) ) );
 
