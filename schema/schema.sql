@@ -135,10 +135,12 @@ CREATE TABLE posts (
 			hidden           BOOLEAN,
 			subject          VARCHAR(255) NOT NULL,
 			text             TEXT,
+			language         VARCHAR(10) NOT NULL DEFAULT 'en',
 			date             TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
 			FOREIGN KEY (gid) REFERENCES groups(id),
 			FOREIGN KEY (uid) REFERENCES users(id),
-			FOREIGN KEY (parent) REFERENCES posts(id)
+			FOREIGN KEY (parent) REFERENCES posts(id),
+			FOREIGN KEY (language) REFERENCES languages(code)
 );
 
 
