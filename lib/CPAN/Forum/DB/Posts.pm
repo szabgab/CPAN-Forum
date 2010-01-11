@@ -106,7 +106,7 @@ sub search_latest_threads {
 	my ( $self, $limit ) = @_;
 
 	$limit ||= 10;
-	my $sql = "SELECT A.id, A.thread, A.subject subject, A.date,
+	my $sql = "SELECT A.id, A.thread, A.subject AS subject, A.date,
             $MORE_SQL
             FROM posts A, groups, users
             WHERE 

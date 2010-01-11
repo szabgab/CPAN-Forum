@@ -25,9 +25,9 @@ sub _find {
 	my @fields = keys %args;
 	my $where = join " AND ", map {"$_=?"} @fields;
 	$where =~ s/\bpauseid\b/subscriptions_pauseid.pauseid/; # nasty workaround?
-	my $sql = "SELECT subscriptions_pauseid.pauseid pauseid, uid, 
+	my $sql = "SELECT subscriptions_pauseid.pauseid AS pauseid, uid, 
                       allposts, starters, followups, announcements,
-                      authors.pauseid pauseid_name
+                      authors.pauseid AS pauseid_name
                FROM subscriptions_pauseid, authors 
                WHERE authors.id=subscriptions_pauseid.pauseid";
 	if ($where) {

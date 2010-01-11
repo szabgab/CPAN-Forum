@@ -60,7 +60,7 @@ sub info_by {
 	Carp::croak("Invalid field '$field'") if none { $field eq $_ } @FIELDS;
 	Carp::croak("No value supplied") if not $value;
 
-	my $sql = "SELECT id, email, fname, lname, username, fname || ' ' || lname fullname
+	my $sql = "SELECT id, email, fname, lname, username, fname || ' ' || lname AS fullname
                 FROM users
                 WHERE $field=?";
 	return $self->_fetch_single_hashref( $sql, $value );
