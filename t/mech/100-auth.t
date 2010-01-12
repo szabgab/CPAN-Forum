@@ -263,6 +263,10 @@ BEGIN {
 			subject => 'title of 3rd post',
 			text    => "Content of third post",
 		},
+		{
+			subject => 'This is a reponse post',
+			text    => "Should be seen in a thred as the second message.",
+		},
 	);
 }
 
@@ -402,10 +406,27 @@ BEGIN {
 		my $t = $i+1;
 		$w_user->content_unlike(qr{Trying to submit posts too quickly});
 		$w_user->content_like( qr{messages in a total of $t} );
-
 	}
+	$w_user->follow_link_ok( { text => $posts[0]{subject} });
+	$w_user->content_like( qr{$posts[0]{text}} );
+	$w_user->follow_link_ok( { text => 'Write a response' });
+	$w_user->submit_form(
+		form_number => 2,
+		button      => 'preview_button',
+		fields      => {
+			new_subject => $posts[3]{subject},
+			new_text    => $posts[3]{text},
+		},
+	);
+	$w_user->content_like(qr{<b>Preview</b>});
+	$w_user->submit_form(
+		form_number => 2,
+		button      => 'submit_button',
+	);
 
 	#diag $w_user->content;
+
+
 	#explain \@CPAN::Forum::messages;
 	#is_deeply(\@CPAN::Forum::messages, [], 'no messages were sent so far');
 	is( scalar(@CPAN::Forum::messages), 0, '0 message sent' );
@@ -414,14 +435,15 @@ BEGIN {
 
 	my $d = CPAN::Forum::Daemon->new;
 	$d->run();
-	is( scalar(@CPAN::Forum::messages), 2, '2 message sent by daemon' );
+	is( scalar(@CPAN::Forum::messages), 3, '3 message sent by daemon' );
+	#explain @CPAN::Forum::messages;
 	#like( $CPAN::Forum::messages[0]{Message}, qr{\($users[0]{username}\) wrote:} );
 	
 	@CPAN::Forum::messages = ();
 	$d->run();
 	is( scalar(@CPAN::Forum::messages), 0, 'no more messages sent' );
 	
-	BEGIN { $tests += 7*2+ 3 };
+	BEGIN { $tests += 7*2+ 7 };
 }
 
 
@@ -456,15 +478,15 @@ BEGIN {
 	# TODO, should not these link to the thread instead?
 	$w_guest->get_ok("$url/rss/threads");
 
-	#    diag $w_guest->content;
+	#diag $w_guest->content;
 	$w_guest->content_unlike(qr{<title>No posts yet</title>});
-	$w_guest->content_like(qr{<title>\[Acme-Bleach\] $posts[0]{subject}</title>});
-	$w_guest->content_like(qr{<link>$url.*/posts/1</link>});
+	$w_guest->content_like(qr{<title>\[Acme-Bleach\] $posts[1]{subject}</title>});
+	$w_guest->content_like(qr{<link>$url.*/posts/2</link>});
 
 	$w_guest->get_ok("$url/atom/threads");
 	$w_guest->content_unlike(qr{<title>No posts yet</title>});
-	$w_guest->content_like(qr{<title>\[Acme-Bleach\] $posts[0]{subject}</title>});
-	$w_guest->content_like(qr{<link href="$url.*/posts/1"/>});
+	$w_guest->content_like(qr{<title>\[Acme-Bleach\] $posts[1]{subject}</title>});
+	$w_guest->content_like(qr{<link href="$url.*/posts/2"/>});
 
 	#
 	#    $w_guest->get_ok("$url/rss/tags");

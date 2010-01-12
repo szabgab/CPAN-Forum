@@ -1,3 +1,5 @@
+   Fix crashes noticed after releasing 0.16 in notification and lack of use statements.
+
 0.16 2010.01.11
 
    Switch over to use PostgreSQL

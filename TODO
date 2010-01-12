@@ -1,3 +1,11 @@
+- Fix the notification code
+- Fix the crash caused by accessing /posts/favicon.ico or some other bad url
+- Find out why would one access /posts/favicon.ico (unless broken client)
+- Improve the daemon so it won't crash
+- Setup daemon to be launched at boot time
+
+
+
 notification:
   add a boolean to each post called "notified"
   during the transition set it to true
