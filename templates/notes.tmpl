@@ -16,6 +16,10 @@ You can look at them here: <a href="/mypan/">subscription information</a>
 </p>
 </TMPL_IF>
 
+<TMPL_IF no_such_post>
+<p class="error">No such post.</p>
+</TMPL_IF>
+
 <TMPL_IF no_such_pauseid>
 <p class="error">No such PAUSEID.</p>
 <p>

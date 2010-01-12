@@ -446,6 +446,17 @@ BEGIN {
 	BEGIN { $tests += 7*2+ 7 };
 }
 
+{
+	diag('Check various broken URLs');
+	$w_guest->get_ok("$url/posts/100");
+	# TODO maybe the error should contain some other text?
+	$w_guest->content_unlike(qr{Something went wrong here});
+	$w_guest->content_like(qr{No such post});
+
+	#$w_guest->get_ok("$url/post/borg");
+	#diag $w_guest->content;
+	BEGIN { $tests += 3 };
+}
 
 
 {

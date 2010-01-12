@@ -1094,9 +1094,11 @@ sub posts {
 	if ($id) {                # Show post
 		my $post = CPAN::Forum::DB::Posts->get_post($id);
 		if ( not $post ) {
-			return $self->internal_error(
-				"in request",
-			);
+			$self->log->warning("User requestsd '/posts/$id' but we could not find it in the database");
+			return $self->notes('no_such_post');
+			#return $self->internal_error(
+			#	"in request",
+			#);
 		}
 		my $thread_count = CPAN::Forum::DB::Posts->count_thread( $post->{thread} );
 		if ( $thread_count > 1 ) {
