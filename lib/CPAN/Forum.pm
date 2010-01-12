@@ -10,7 +10,7 @@ use CGI ();
 use CGI::Application::Plugin::Session;
 use CGI::Application::Plugin::LogDispatch;
 use CPAN::DistnameInfo;
-use Data::Dumper qw();
+use Data::Dumper qw(Dumper);
 use List::MoreUtils qw(any);
 use Mail::Sendmail qw(sendmail);
 use POSIX qw();
@@ -756,6 +756,9 @@ sub home {
 	all(@_);
 }
 
+	# just trying if the languages show up correctly
+	#my $languages = CPAN::Forum::DB::Posts->languages();
+	#return Dumper $languages;
 
 =head2 all
 

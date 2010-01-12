@@ -232,6 +232,11 @@ sub list_uids_who_posted_in_thread {
 	return $self->_select_column( $sql, $thread );
 }
 
+sub languages {
+	my ($self) = @_;
+	my $sql = "SELECT code, english, native FROM languages ORDER BY english";
+	return $self->_fetch_arrayref_of_hashes($sql);
+}
 
 1;
 
