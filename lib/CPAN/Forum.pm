@@ -522,10 +522,11 @@ sub config {
 	CPAN::Forum::DB::Configure->param($field);
 }
 
+#	pwreminder pwreminder_process
+
 # modes that can be accessed without a valid session
 my @free_modes = qw(
 	home
-	pwreminder pwreminder_process
 	login login_process
 	register register_process
 	logout
@@ -555,10 +556,11 @@ my @restricted_modes = qw(
 	update
 );
 
+#pwreminder
 my @urls = qw(
 	logout
 	help
-	new_post pwreminder
+	new_post 
 	login register
 	posts about stats
 	threads dist users author

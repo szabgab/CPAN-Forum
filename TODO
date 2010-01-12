@@ -1,4 +1,19 @@
 
+user requests password change
+we generate a random thing and save
+   random thing as field
+   value  { rm => 'resetpw', username => $username }  (use YAML::Tiny ?)
+send the random thing by mail to the user
+when the user comes with the random string we can fetch the value and go to the 
+resetpw run mode that shows a page with two empty password fields 
+embedding the key in the page
+then if she submits the new password pair we check again if the key is there
+allow the update only if the key is there removing the key
+
+We also need a daemon that will remove keys older than 24 hours or some other configurable
+value
+
+
 move the session id into the database:
    sid
    uid
