@@ -481,6 +481,20 @@ foreach my $i ( 0 .. 2 ) {
 
 }
 
+{
+	diag('no such page');
+	$w_guest->get_ok("$url/some_other_page");
+	$w_guest->content_like(qr{No such Page});
+	BEGIN { $tests += 2 }
+}
+
+#{
+#	diag('reset password');
+#	my $w_user2  = t::lib::CPAN::Forum::Test::get_mech();
+#	$w_user2->get_ok("$url/x/set_new_password");
+#	diag($w_user2->content);
+#}
+
 
 #my $input_ref;
 #{

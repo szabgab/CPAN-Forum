@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS junk CASCADE;
 DROP TABLE IF EXISTS languages CASCADE;
 DROP TABLE IF EXISTS users CASCADE;
 DROP TABLE IF EXISTS usergroups CASCADE;
@@ -205,9 +206,6 @@ CREATE INDEX tags_cloud_group_id ON tag_cloud (group_id);
 
 CREATE TABLE junk (
 			field        CHAR(27) PRIMARY KEY,
-			stamp        TIMESTAMP DEFAUL NOW(),
+			stamp        TIMESTAMP DEFAULT NOW(),
 			value        TEXT
 );
-
-
-
