@@ -82,6 +82,8 @@ convert(
 	}
 );
 
+$to->do("UPDATE posts SET notified = TRUE");
+
 # 51 sec on notebook vs 23 sec on desktop
 
 convert( 'subscriptions',     'subscriptions_id_seq',     [qw(id uid gid allposts starters followups announcements)] );

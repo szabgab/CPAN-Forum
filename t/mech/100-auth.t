@@ -16,6 +16,8 @@ plan tests => $tests;
 
 bail_on_fail;
 
+use CPAN::Forum::Daemon;
+
 use t::lib::CPAN::Forum::Test;
 my @users   = @t::lib::CPAN::Forum::Test::users;
 my $w_admin = t::lib::CPAN::Forum::Test::get_mech();
@@ -340,12 +342,23 @@ BEGIN {
 	#diag $w_user->content;
 	#explain \@CPAN::Forum::messages;
 	#is_deeply(\@CPAN::Forum::messages, [], 'no messages were sent so far');
-	is( scalar(@CPAN::Forum::messages), 1, 'one message sent' );
+	is( scalar(@CPAN::Forum::messages), 0, '0 message sent' );
+
+
+        $ENV{CPAN_FORUM_URL} = $ENV{CPAN_FORUM_TEST_URL}; # the Notify in the daemon needs this
+	my $d = CPAN::Forum::Daemon->new;
+	$d->run();
+	is( scalar(@CPAN::Forum::messages), 1, '1 message sent by daemon' );
 	like( $CPAN::Forum::messages[0]{Message}, qr{\($users[0]{username}\) wrote:} );
+	
+	@CPAN::Forum::messages = ();
+	$d->run();
+	is( scalar(@CPAN::Forum::messages), 0, 'no more messages sent' );
+	
 
 	# TODO check the e-mail message more in details!
 
-	BEGIN { $tests += 12 + 1 + @post_preview_input_fields * 2 + 1 + @post_submit_input_fields * 2 }
+	BEGIN { $tests += 14 + 1 + @post_preview_input_fields * 2 + 1 + @post_submit_input_fields * 2 }
 }
 
 {

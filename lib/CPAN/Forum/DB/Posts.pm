@@ -238,5 +238,23 @@ sub languages {
 	return $self->_fetch_arrayref_of_hashes($sql);
 }
 
+# return list of post ids that still need notification
+sub to_notify {
+	my ($self) = @_;
+
+	my $sql = "SELECT id FROM posts WHERE notified IS FALSE";
+	return $self->_select_column( $sql );
+}
+
+sub set_notified {
+	my ($self, $post_id) = @_;
+
+	my $sql = "UPDATE posts SET notified = TRUE WHERE id=?";
+	my $dbh = CPAN::Forum::DBI::db_Main();
+	$dbh->do($sql, undef, $post_id);
+	return;
+}
+
+
 1;
 

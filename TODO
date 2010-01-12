@@ -1,3 +1,11 @@
+notification:
+  add a boolean to each post called "notified"
+  during the transition set it to true
+  when adding a new post set it to false (default?) or keep it as NULL?
+  write a daemon that checks the database for posts with "notified"  not TRUE
+  sends the notification messages and sets the bit to true.
+
+
 
 user requests password change
 we generate a random thing and save

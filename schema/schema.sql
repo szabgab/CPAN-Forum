@@ -132,6 +132,7 @@ CREATE TABLE posts (
 			uid              INTEGER NOT NULL,
 			parent           INTEGER,
 			thread           INTEGER,
+			notified         BOOLEAN DEFAULT FALSE,
 			hidden           BOOLEAN,
 			subject          VARCHAR(255) NOT NULL,
 			text             TEXT,

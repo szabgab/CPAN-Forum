@@ -100,6 +100,7 @@ sub get_mech {
         CPAN_FORUM_LOGFILE => $ENV{CPAN_FORUM_LOGFILE},
         CPAN_FORUM_DB      => $ENV{CPAN_FORUM_TEST_DB},
         CPAN_FORUM_USER    => $ENV{CPAN_FORUM_TEST_USER},
+        CPAN_FORUM_URL     => $ENV{CPAN_FORUM_TEST_URL},
     );
 
     $w->cgi(sub {
@@ -116,7 +117,8 @@ sub get_mech {
     return $w;
 };
 
-sub CPAN::Forum::_test_my_sendmail {
+
+sub CPAN::Forum::Tools::_test_my_sendmail {
     my %mail = @_;
     my @fields = qw(Message From Subject To);
     my %m;

@@ -12,12 +12,12 @@ use CGI::Application::Plugin::LogDispatch;
 use CPAN::DistnameInfo;
 use Data::Dumper qw(Dumper);
 use List::MoreUtils qw(any);
-use Mail::Sendmail qw(sendmail);
 use POSIX qw();
 use WWW::Mechanize;
 
 use CPAN::Forum::INC;
 use CPAN::Forum::DBI;
+use CPAN::Forum::Tools;
 
 my $cookiename = "cpanforum";
 my $SUBJECT    = qr{[\w .:~!@#\$%^&*\()+?><,'";=-]+};
@@ -1023,7 +1023,7 @@ MSG
 		Subject => $subject,
 		Message => $message,
 	);
-	$self->_my_sendmail(%mail);
+	CPAN::Forum::Tools::_my_sendmail(%mail);
 }
 
 =head2 _group_selector
@@ -1353,7 +1353,7 @@ sub process_post {
 		return $self->posts( \@errors );
 	}
 
-	$self->notify($post_id);
+	#$self->notify($post_id);
 
 	$self->home;
 }
@@ -1534,53 +1534,6 @@ sub add_new_group {
 	$t->output;
 }
 
-sub fetch_subscriptions {
-	my ( $self, $mail, $post ) = @_;
-
-	my %to; # keys are e-mail addresses that have already received an e-mail
-
-	$self->log->debug("Processing messages for allposts");
-	my $users = CPAN::Forum::DB::Subscriptions->get_subscriptions( 'allposts', $post->{gid}, $post->{pauseid} );
-	$self->_sendmail( $users, $mail, \%to );
-
-	if ( $post->{thread} == $post->{id} ) {
-		$self->log->debug("Processing messages for thread starter");
-		my $users =
-			CPAN::Forum::DB::Subscriptions->get_subscriptions( 'starters', $post->{gid}, $post->{pauseid} );
-		$self->_sendmail( $users, $mail, \%to );
-	} else {
-		$self->log->debug("Processing messages for followups, users who posted in this thread");
-
-		my $uids = CPAN::Forum::DB::Posts->list_uids_who_posted_in_thread( $post->{thread} );
-		$self->log->debug( Data::Dumper->Dump( [$uids], ['uids'] ) );
-		my %uids = map {
-			{ $_ => 1 }
-		} @$uids;
-
-		my $users =
-			CPAN::Forum::DB::Subscriptions->get_subscriptions( 'followups', $post->{gid}, $post->{pauseid} );
-		my @users_who_posted = grep { !$uids{ $_->{id} } } @$users;
-		$self->_sendmail( \@users_who_posted, $mail, \%to );
-	}
-
-	$self->log->debug( "Number of e-mails sent: ", scalar keys %to );
-}
-
-sub _sendmail {
-	my ( $self, $users, $mail, $to ) = @_;
-
-	foreach my $user (@$users) {
-
-		#$self->log->debug(Data::Dumper->Dump([$mail], ['mail']));
-		my $email = $user->{email};
-		$mail->{To} = $email;
-		$self->log->debug("Sending to $email id was found");
-		next if $to->{$email}++; #TODO: stop using hardcoded reference to position!!!!!
-		$self->log->debug("Sending to $email first time sending");
-		$self->_my_sendmail(%$mail);
-		$self->log->debug("Sent to $email");
-	}
-}
 
 sub status {
 	my ( $self, $value ) = @_;
@@ -1650,25 +1603,6 @@ sub cgiapp_postrun {
 sub teardown {
 	my ($self) = @_;
 	$self->log->debug("teardown called");
-}
-
-sub _my_sendmail {
-	my ( $self, %args ) = @_;
-
-	#$self->log->debug(Data::Dumper->Dump([\%args], ['_my_sendmail']));
-	#$self->log->debug("_my_sendmail to '$args{To}'");
-
-	return if $ENV{CPAN_FORUM_NO_MAIL};
-
-	# for testing
-	return if $self->config("disable_email_notification");
-
-	if ( defined &_test_my_sendmail ) {
-		$self->_test_my_sendmail(@_);
-		return;
-	} else {
-		return sendmail(%args);
-	}
 }
 
 

@@ -5,6 +5,9 @@ use warnings;
 use List::MoreUtils qw(none);
 use Digest::MD5 qw(md5_base64);
 
+use CPAN::Forum::Tools;
+
+
 =head2 login
 
 Show the login form and possibly some error messages.
@@ -175,7 +178,7 @@ MSG
 		Subject => $subject,
 		Message => $message,
 	);
-	$self->_my_sendmail(%mail);
+	CPAN::Forum::Tools::_my_sendmail(%mail);
 
 	return $self->pwreminder( { "done" => 1 } );
 }
