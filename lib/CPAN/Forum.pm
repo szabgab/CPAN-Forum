@@ -539,6 +539,7 @@ my @free_modes = qw(
 	tags
 	m
 	no_such_page
+	reset_password_form
 );
 my @restricted_modes = qw(
 	new_post process_post
@@ -572,6 +573,7 @@ my @urls = qw(
 	update
 	tags
 	m
+	reset_password_form
 );
 
 use base 'CPAN::Forum::RM::Author';
@@ -1708,7 +1710,6 @@ sub _check_dist_info {
 	}
 	return ( $d->version, $pauseid );
 }
-
 
 sub version {
 	return $VERSION;

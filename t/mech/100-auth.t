@@ -488,12 +488,14 @@ foreach my $i ( 0 .. 2 ) {
 	BEGIN { $tests += 2 }
 }
 
-#{
-#	diag('reset password');
-#	my $w_user2  = t::lib::CPAN::Forum::Test::get_mech();
-#	$w_user2->get_ok("$url/x/set_new_password");
-#	diag($w_user2->content);
-#}
+{
+	diag('reset password');
+	my $w_user2  = t::lib::CPAN::Forum::Test::get_mech();
+	$w_user2->get_ok("$url/reset_password_form");
+	$w_user2->content_like( qr{Please fill out the new password} );
+	#diag($w_user2->content);
+	BEGIN { $tests += 2 }
+}
 
 
 #my $input_ref;

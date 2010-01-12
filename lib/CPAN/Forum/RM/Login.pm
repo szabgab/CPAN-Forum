@@ -180,6 +180,13 @@ MSG
 	return $self->pwreminder( { "done" => 1 } );
 }
 
+sub reset_password_form {
+	my $self = shift;
+	my $t = $self->load_tmpl(
+		"reset_password_form.tmpl",
+	);
+	return $t->output;
+}
 
 1;
 
