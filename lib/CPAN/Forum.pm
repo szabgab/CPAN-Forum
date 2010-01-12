@@ -1092,9 +1092,13 @@ sub posts {
 	}
 	$id ||= $q->param("new_parent");
 	if ($id) {                # Show post
+		if ($id !~ /^\d+$/) {
+			$self->log->warning("User requested '/posts/$id' but that's not a numeric id");
+			return $self->notes('invalid_request');
+		}
 		my $post = CPAN::Forum::DB::Posts->get_post($id);
 		if ( not $post ) {
-			$self->log->warning("User requestsd '/posts/$id' but we could not find it in the database");
+			$self->log->warning("User requested '/posts/$id' but we could not find it in the database");
 			return $self->notes('no_such_post');
 			#return $self->internal_error(
 			#	"in request",

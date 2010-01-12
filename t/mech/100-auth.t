@@ -453,9 +453,13 @@ BEGIN {
 	$w_guest->content_unlike(qr{Something went wrong here});
 	$w_guest->content_like(qr{No such post});
 
-	#$w_guest->get_ok("$url/post/borg");
-	#diag $w_guest->content;
-	BEGIN { $tests += 3 };
+
+	$w_guest->get_ok("$url/posts/borg");
+	diag $w_guest->content;
+	$w_guest->content_unlike(qr{Something went wrong here});
+	$w_guest->content_like(qr{Invalid request});
+	
+	BEGIN { $tests += 2*3 };
 }
 
 
