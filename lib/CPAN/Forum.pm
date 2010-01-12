@@ -538,6 +538,7 @@ my @free_modes = qw(
 	atom
 	tags
 	m
+	no_such_page
 );
 my @restricted_modes = qw(
 	new_post process_post
@@ -712,6 +713,8 @@ sub _set_run_mode {
 			#$self->log->error("Invalid request: $request}");
 		} else {
 			$self->log->error("Invalid request: $request");
+			$self->prerun_mode('no_such_page');
+			return 'no_such_page';
 		}
 	}
 	$self->prerun_mode($rm);
@@ -732,6 +735,10 @@ sub autoload {
 	$self->internal_error();
 }
 
+sub no_such_page {
+	my $self = shift;
+	return $self->notes('no_such_page');
+}
 
 =head2 home
 
