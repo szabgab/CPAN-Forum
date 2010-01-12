@@ -90,7 +90,7 @@ sub search_post_by_pauseid {
 
 	return [] if not $pauseid;
 	$limit ||= 10;
-	my $sql = qq{SELECT posts.id id, posts.subject,
+	my $sql = qq{SELECT posts.id AS id, posts.subject,
                         $MORE_SQL
                         FROM posts, groups, users
                         WHERE gid IN (
