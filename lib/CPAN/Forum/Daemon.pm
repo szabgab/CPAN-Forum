@@ -19,7 +19,10 @@ sub run {
 	CPAN::Forum::DBI->myinit();
 	
 	while(1) {
-		$self->notification;
+		eval {
+			$self->notification;
+		};
+		warn $@ if $@;
 
 		last if not $self->idle;
 		sleep $self->idle;
