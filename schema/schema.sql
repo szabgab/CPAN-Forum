@@ -203,3 +203,11 @@ CREATE INDEX tags_cloud_tag_id ON tag_cloud (tag_id);
 CREATE INDEX tags_cloud_group_id ON tag_cloud (group_id);
 
 
+CREATE TABLE junk (
+			field        CHAR(27) PRIMARY KEY,
+			stamp        TIMESTAMP DEFAUL NOW(),
+			value        TEXT
+);
+
+
+
