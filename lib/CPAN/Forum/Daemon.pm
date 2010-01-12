@@ -27,11 +27,11 @@ sub run {
 
 sub notification {
 	my $self = shift;
-	my @posts = CPAN::Forum::DB::Posts->to_notify();
-	foreach my $post_id (@posts) {
-		warn "# id $post_id->[0]\n";
-		$self->notify($post_id->[0]);
-		CPAN::Forum::DB::Posts->set_notified($post_id->[0]);
+	my $posts = CPAN::Forum::DB::Posts->to_notify();
+	foreach my $post_id (@$posts) {
+#		print STDERR "# post id to be notified $post_id\n";
+		$self->notify($post_id);
+		CPAN::Forum::DB::Posts->set_notified($post_id);
 	}
 
 	return;

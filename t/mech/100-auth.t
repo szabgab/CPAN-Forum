@@ -11,8 +11,10 @@ plan skip_all => 'Need CPAN_FORUM_TEST_DB and CPAN_FORUM_TEST_USER and CPAN_FORU
 		or not $ENV{CPAN_FORUM_TEST_USER}
 		or not $ENV{CPAN_FORUM_LOGFILE};
 
+eval "use Test::NoWarnings";
+
 my $tests;
-plan tests => $tests;
+plan tests => $tests + 1;
 
 bail_on_fail;
 
@@ -25,6 +27,8 @@ my $w_user  = t::lib::CPAN::Forum::Test::get_mech();
 my $w_guest = t::lib::CPAN::Forum::Test::get_mech();
 
 my $year = 1900 + ( localtime() )[5];
+
+$ENV{CPAN_FORUM_URL} = $ENV{CPAN_FORUM_TEST_URL}; # the Notify in the daemon needs this
 
 {
 	t::lib::CPAN::Forum::Test::setup_database();
@@ -251,6 +255,14 @@ BEGIN {
 			subject => 'A new subject',
 			text    => "This is supposed to be a posting",
 		},
+		{
+			subject => 'Another title',
+			text    => "Content of second post",
+		},
+		{
+			subject => 'title of 3rd post',
+			text    => "Content of third post",
+		},
 	);
 }
 
@@ -339,13 +351,11 @@ BEGIN {
 		button      => 'submit_button',
 	);
 
-	#diag $w_user->content;
+	$w_user->content_like( qr{messages in a total of 1} );
 	#explain \@CPAN::Forum::messages;
 	#is_deeply(\@CPAN::Forum::messages, [], 'no messages were sent so far');
 	is( scalar(@CPAN::Forum::messages), 0, '0 message sent' );
 
-
-        $ENV{CPAN_FORUM_URL} = $ENV{CPAN_FORUM_TEST_URL}; # the Notify in the daemon needs this
 	my $d = CPAN::Forum::Daemon->new;
 	$d->run();
 	is( scalar(@CPAN::Forum::messages), 1, '1 message sent by daemon' );
@@ -354,12 +364,67 @@ BEGIN {
 	@CPAN::Forum::messages = ();
 	$d->run();
 	is( scalar(@CPAN::Forum::messages), 0, 'no more messages sent' );
-	
 
 	# TODO check the e-mail message more in details!
 
-	BEGIN { $tests += 14 + 1 + @post_preview_input_fields * 2 + 1 + @post_submit_input_fields * 2 }
+	BEGIN { $tests += 15 + 1 + @post_preview_input_fields * 2 + 1 + @post_submit_input_fields * 2 }
 }
+
+#{
+#	$w_user->content_like(qr{Trying to submit posts too quickly .* Please wait 10 more seconds before posting again}s);
+#}
+
+{
+	@CPAN::Forum::messages = ();
+	CPAN::Forum::DB::Configure->set_field_value( 'flood_control_time_limit', 0 );
+
+	foreach my $i (1..2) {
+		$w_user->get_ok("$url/dist/Acme-Bleach");
+		$w_user->content_like(qr{Post a message in the subforum of Acme-Bleach});
+		$w_user->follow_link_ok( { text => 'new post' } );
+
+		$w_user->submit_form(
+			form_number => 2,
+			button      => 'preview_button',
+			fields      => {
+				new_subject => $posts[$i]{subject},
+				new_text    => $posts[$i]{text},
+			},
+		);
+
+		$w_user->content_like(qr{  Posted  \s+ on .* $year .* by .* $users[0]{username}  }sx);
+		$w_user->content_like(qr{<b>Preview</b>});
+		$w_user->submit_form(
+			form_number => 2,
+			button      => 'submit_button',
+		);
+#		diag $w_user->content;
+		my $t = $i+1;
+		$w_user->content_unlike(qr{Trying to submit posts too quickly});
+		$w_user->content_like( qr{messages in a total of $t} );
+
+	}
+
+	#diag $w_user->content;
+	#explain \@CPAN::Forum::messages;
+	#is_deeply(\@CPAN::Forum::messages, [], 'no messages were sent so far');
+	is( scalar(@CPAN::Forum::messages), 0, '0 message sent' );
+	
+	# TODO check the database
+
+	my $d = CPAN::Forum::Daemon->new;
+	$d->run();
+	is( scalar(@CPAN::Forum::messages), 2, '2 message sent by daemon' );
+	#like( $CPAN::Forum::messages[0]{Message}, qr{\($users[0]{username}\) wrote:} );
+	
+	@CPAN::Forum::messages = ();
+	$d->run();
+	is( scalar(@CPAN::Forum::messages), 0, 'no more messages sent' );
+	
+	BEGIN { $tests += 7*2+ 3 };
+}
+
+
 
 {
 	diag('Check new post on the front page and on its own');

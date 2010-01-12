@@ -54,6 +54,7 @@ my $builder = Module::Build->new(
 
 		#       'Test::HTML::Lint'                      => 1.26,
 		'Test::More' => '0.86',
+		'Test::NoWarnings' => '0',
 
 		#       'Test::Warn'                            => 0,
 		'Test::WWW::Mechanize'      => 0.02,
