@@ -7,6 +7,7 @@ use XML::Atom::SimpleFeed;
 use URI;
 
 use CPAN::Forum::DB::Configure;
+use CPAN::Forum::DB::Subscriptions;
 use CPAN::Forum::Tools;
 
 =head2 notify
@@ -278,7 +279,7 @@ sub fetch_subscriptions {
 		#$self->log->debug("Processing messages for followups, users who posted in this thread");
 
 		my $uids = CPAN::Forum::DB::Posts->list_uids_who_posted_in_thread( $post->{thread} );
-		$self->log->debug( Data::Dumper->Dump( [$uids], ['uids'] ) );
+		#$self->log->debug( Data::Dumper->Dump( [$uids], ['uids'] ) );
 		my %uids = map {
 			{ $_ => 1 }
 		} @$uids;

@@ -5,6 +5,8 @@ use 5.008;
 
 use Moose;
 use CPAN::Forum::DBI;
+use CPAN::Forum::DB::Posts;
+
 
 has 'idle'  => ( is => 'ro' );
 
