@@ -1428,29 +1428,27 @@ sub teardown {
 }
 
 
-sub m {
-	my ($self) = @_;
-	my $path  = ${ $self->query->param("path_parameters") }[0] || '';
-	my $value = ${ $self->query->param("path_parameters") }[1] || '';
-
-
-	my $tags = '';
-	if ( $path eq "list_tags" ) {
-		my $gr = CPAN::Forum::DB::Groups->info_by( name => $value );
-		if ($gr) {
-			my $gid     = $gr->{id};
-			my $modules = CPAN::Forum::DB::Tags->get_tags_of_module($gid);
-			                                                               #use Data::Dumper;
-			                                                               #print STDERR Dumper $modules;
-			$tags = join ",", map {"$_->{name}:$_->{cnt}"} @$modules;
-		}
-	}
-
-	return <<"END_JAVASCRIPT";
-var cpan_forum_tags = "$tags";
-END_JAVASCRIPT
-
-}
+#sub m {
+#	my ($self) = @_;
+#	my $path  = ${ $self->query->param("path_parameters") }[0] || '';
+#	my $value = ${ $self->query->param("path_parameters") }[1] || '';
+#
+#
+#	my $tags = '';
+#	if ( $path eq "list_tags" ) {
+#		my $gr = CPAN::Forum::DB::Groups->info_by( name => $value );
+#		if ($gr) {
+#			my $gid     = $gr->{id};
+#			my $modules = CPAN::Forum::DB::Tags->get_tags_of_module($gid);
+#			$tags = join ",", map {"$_->{name}:$_->{cnt}"} @$modules;
+#		}
+#	}
+#
+#	return <<"END_JAVASCRIPT";
+#var cpan_forum_tags = "$tags";
+#END_JAVASCRIPT
+#
+#}
 
 sub version {
 	return $VERSION;
