@@ -50,6 +50,7 @@ sub init_db {
 
 	# TODO check result, hide irrelevant output?
 	#    system qq(psql $ENV{CPAN_FORUM_DB} -c "GRANT ALL PRIVILEGES ON DATABASE $ENV{CPAN_FORUM_DB} TO $ENV{CPAN_FORUM_USER}" );
+	system qq(psql -q -U $ENV{CPAN_FORUM_USER} $ENV{CPAN_FORUM_DB} < schema/drop.sql);
 	system qq(psql -q -U $ENV{CPAN_FORUM_USER} $ENV{CPAN_FORUM_DB} < schema/schema.sql);
 
 	return 1;
