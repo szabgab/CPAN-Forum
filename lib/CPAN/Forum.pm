@@ -923,9 +923,8 @@ sub load_tmpl {
 	my $self = shift;
 	$self->log->debug("load_tmpl: @_");
 	my $t = $self->SUPER::load_tmpl(
-		@_
-
-			#             die_on_bad_params => -e ($self->param("ROOT") . "/die_on_bad_param") ? 1 : 0
+		@_,
+		die_on_bad_params => $ENV{DIE_ON_BAD_PARAM} ? 1 : 0
 	);
 	$self->log->debug("template loaded");
 	$t->param( "loggedin" => $self->session->param("loggedin") || "" );
