@@ -1238,7 +1238,6 @@ sub posts {
 	#$t->param(new_subject => _subject_escape($q->param("new_subject")));
 	$t->param( group => $new_group ) if $new_group;
 
-	$self->set_ratings( $t, $new_group ) if $new_group;
 	return $t->output;
 }
 
@@ -1454,39 +1453,7 @@ sub threads {
 	#   $t->param(dashgroup => $dashgroup);
 	$t->param( title => _subject_escape( $posts->[0]->{subject} ) );
 
-	$self->set_ratings( $t, $posts->[0]->{group_name} );
-
 	return $t->output;
-}
-
-sub get_rating {
-	my ( $self, $dist ) = @_;
-	require Text::CSV_XS;
-	my $csv = Text::CSV_XS->new();
-	open my $fh, '<', '../../db/cpan_ratings.csv' or return;
-	while ( my $line = <$fh> ) {
-		next if $line !~ /^"$dist"/;
-		last if not $csv->parse($line);
-		return $csv->fields();
-
-	}
-	return;
-}
-
-sub set_ratings {
-	my ( $self, $t, $group ) = @_;
-
-	my ( $distribution, $rating, $review_count ) = $self->get_rating($group);
-	if ( not $rating ) {
-		$rating       = "0.0";
-		$review_count = 0;
-	}
-	if ($rating) {
-		my $roundrating = sprintf "%1.1f", int( $rating * 2 ) / 2;
-		$t->param( rating       => $rating );
-		$t->param( roundrating  => $roundrating );
-		$t->param( review_count => $review_count );
-	}
 }
 
 sub _subscriptions {

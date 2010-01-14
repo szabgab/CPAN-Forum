@@ -52,7 +52,7 @@ sub dist {
 		);
 	}
 
-	$self->set_ratings( $t, $group_name );
+	$self->set_ratings( $t, $gr );
 	my $page = $q->param('page') || 1;
 	$self->_search_results( $t, { where => { gid => $gid }, page => $page } );
 	$self->_subscriptions( $t, $gr );
@@ -77,6 +77,23 @@ sub dist {
 
 	return $t->output;
 }
+
+sub set_ratings {
+	my ( $self, $t, $gr ) = @_;
+
+	my ( $rating, $review_count ) = ($gr->{rating}, $gr->{review_count});
+	if ( not $rating ) {
+		$rating       = "0.0";
+		$review_count = 0;
+	}
+	if ($rating) {
+		my $roundrating = sprintf "%1.1f", int( $rating * 2 ) / 2;
+		$t->param( rating       => $rating );
+		$t->param( roundrating  => $roundrating );
+		$t->param( review_count => $review_count );
+	}
+}
+
 
 1;
 
