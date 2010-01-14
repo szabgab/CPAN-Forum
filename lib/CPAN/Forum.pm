@@ -1140,7 +1140,7 @@ sub posts {
 
 		#       $preview{thread_id}  = $q->param("new_text")    || "";
 		$preview{postername} = $self->session->param("username");
-		$preview{date}       = _post_date(time);
+		$preview{date}       = localtime;
 		$preview{id}         = "TBD";
 
 		$t->param( preview_loop => [ \%preview ] );
@@ -1268,9 +1268,6 @@ sub process_post {
 }
 
 
-sub _post_date {
-	return scalar localtime $_[0];
-}
 
 sub _post {
 	my ( $self, $post ) = @_;
