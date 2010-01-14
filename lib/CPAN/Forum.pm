@@ -1489,7 +1489,10 @@ Perl of course.
 
 =head1 DEVELOPMENT
 
-Subversion repository is at 
+We are using Github for version control:
+L<http://github.com/szabgab/CPAN-Forum/>
+
+The list of TODO items are kept in the TODO file in the repository:
 L<http://github.com/szabgab/CPAN-Forum/blob/master/TODO>
 
 Discussion of this module will take place on
@@ -1503,7 +1506,7 @@ Please report them at L<http://rt.cpan.org/>
 
 =head1 LICENSE
 
-Copyright 2004-2006, Gabor Szabo (gabor@pti.co.il)
+Copyright 2004-2010, Gabor Szabo (gabor@pti.co.il)
  
 This software is free. It is licensed under the same terms as Perl itself.
 
