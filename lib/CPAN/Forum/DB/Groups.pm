@@ -24,6 +24,19 @@ sub list_ids_by {
 	return $self->_select_column( $sql, $value );
 }
 
+sub update_rating {
+	my ($self, $data) = @_;
+	#warn Data::Dumper::Dumper $data;
+	my $sql = "UPDATE groups SET rating=?, review_count=? WHERE name = ?"; 
+	my $dbh = CPAN::Forum::DBI::db_Main();
+	$dbh->do( $sql, undef, $data->{rating}, $data->{review_count}, $data->{distribution} );
+}
+sub list_groups_with_rating {
+	my ($self) = @_;
+	my $sql = 'SELECT id, name, rating, review_count FROM groups';
+	return $self->_selectall_hashref($sql, 'name');
+}
+
 
 sub dump_groups {
 	my ($self) = @_;
