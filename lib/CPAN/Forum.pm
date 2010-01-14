@@ -1452,26 +1452,6 @@ END_JAVASCRIPT
 
 }
 
-sub _check_dist_info {
-	my ( $self, $download_url, $dist_name ) = @_;
-	my $d = CPAN::DistnameInfo->new($download_url);
-	if ( not $d ) {
-		$self->log->debug("Could not parse download URL");
-		return;
-	}
-	if ( $dist_name ne $d->dist ) {
-		$self->log->debug( "Distname '$dist_name' is different from '" . $d->dist . "'" );
-		return; # this was not here!!
-	}
-
-	my $pauseid = $d->cpanid;
-	if ( not $pauseid ) {
-		$self->log->debug("Could not get PAUSEID from download_url");
-		return;
-	}
-	return ( $d->version, $pauseid );
-}
-
 sub version {
 	return $VERSION;
 }
