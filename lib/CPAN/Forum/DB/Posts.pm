@@ -25,7 +25,8 @@ sub posts_in_thread {
 	my $sql = "SELECT posts.id, gid, uid, parent, thread, hidden, subject, text, date,
                 groups.name AS group_name, groups.pauseid, username, fname, lname
                 FROM posts, groups, users
-                WHERE posts.thread=? AND posts.gid=groups.id AND users.id=posts.uid";
+                WHERE posts.thread=? AND posts.gid=groups.id AND users.id=posts.uid
+                ORDER BY posts.id DESC";
 	$self->_fetch_arrayref_of_hashes( $sql, $thread );
 }
 
