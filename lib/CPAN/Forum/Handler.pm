@@ -17,22 +17,16 @@ use lib "$root/lib";
 
 use CPAN::Forum;
 
-
-my $app = CPAN::Forum->new(
-	TMPL_PATH => "$root/templates",
-	PARAMS    => {
-		ROOT => $root,
-
-		#		DB_CONNECT => "dbi:SQLite:$ENV{CPAN_FORUM_DB_FILE}",
-		#REQUEST    => ($ENV{SCRIPT_NAME} || '') . ($ENV{PATH_INFO} || ''),
-	},
-);
-
 sub handler {
 	my $r = shift;
 
 	#    $r->content_type('text/html');
-
+	my $app = CPAN::Forum->new(
+		TMPL_PATH => "$root/templates",
+		PARAMS    => {
+			ROOT => $root,
+		},
+	);
 	$app->run();
 	return Apache2::Const::OK;
 }
