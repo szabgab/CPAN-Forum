@@ -2,6 +2,8 @@ package CPAN::Forum::Populate;
 
 use Moose;
 
+our $VERSION = '0.16';
+
 use autodie;
 use CPAN::Mini ();
 use Cwd        ();

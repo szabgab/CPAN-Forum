@@ -16,7 +16,7 @@ my $err = File::Spec->catfile( $tmp, 'err.txt' );
 
 my @files = File::Find::Rule->relative->file->name('*.pm')->in('lib');
 
-plan( tests => 2 * @files + 1 );
+plan( tests => 4 * @files + 1 );
 
 foreach my $file (@files) {
 	my $module = $file;
@@ -24,7 +24,7 @@ foreach my $file (@files) {
 	$module =~ s/\.pm$//;
 
 	if ( $module eq 'CPAN::Forum::Handler' ) {
-		foreach ( 1 .. 2 ) {
+		foreach ( 1 .. 4 ) {
 			Test::More->builder->skip("Not testing the mod_perl2 handler");
 		}
 		next;
@@ -37,6 +37,8 @@ foreach my $file (@files) {
 	my $out_data = slurp($out);
 	is( $out_data, 'ok', "STDOUT of $file" );
 
+	require_ok($module);
+	ok( $module->VERSION, "$module: Found \$VERSION" );
 }
 
 script_compiles_ok('bin/cpan_forum_daemon.pl');

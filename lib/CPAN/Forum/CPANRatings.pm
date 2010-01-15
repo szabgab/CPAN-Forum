@@ -2,6 +2,8 @@ package CPAN::Forum::CPANRatings;
 use strict;
 use warnings;
 
+our $VERSION = '0.16';
+
 =head1 NAME
 
 CPAN::Forum::CPANRatings - fetch data from CPANRATINGS.perl.org and integrate in our database

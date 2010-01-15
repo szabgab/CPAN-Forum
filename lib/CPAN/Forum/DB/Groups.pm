@@ -1,6 +1,9 @@
 package CPAN::Forum::DB::Groups;
 use strict;
 use warnings;
+
+our $VERSION = '0.16';
+
 use Carp;
 use base 'CPAN::Forum::DBI';
 

@@ -2,6 +2,8 @@ package CPAN::Forum::RM::Subscriptions;
 use strict;
 use warnings;
 
+our $VERSION = '0.16';
+
 use CPAN::Forum::DB::Users ();
 use CPAN::Forum::DB::Groups ();
 use CPAN::Forum::DB::Authors ();

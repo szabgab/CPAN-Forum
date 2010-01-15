@@ -2,6 +2,8 @@ package CPAN::Forum::RM::Threads;
 use strict;
 use warnings;
 
+our $VERSION = '0.16';
+
 use CPAN::Forum::DB::Posts ();
 use CPAN::Forum::Tools ();
 

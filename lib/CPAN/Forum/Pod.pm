@@ -2,6 +2,8 @@ package CPAN::Forum::Pod;
 
 use Moose;
 
+our $VERSION = '0.16';
+
 extends qw(Pod::Simple::HTML);
 
 #sub _handle_element_start {

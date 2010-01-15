@@ -3,6 +3,8 @@ use strict;
 use warnings;
 use 5.008;
 
+our $VERSION = '0.16';
+
 use Carp;
 use Digest::SHA qw(sha1_base64);
 use List::MoreUtils qw(none);

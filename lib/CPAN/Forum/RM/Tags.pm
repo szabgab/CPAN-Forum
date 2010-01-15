@@ -2,6 +2,8 @@ package CPAN::Forum::RM::Tags;
 use strict;
 use warnings;
 
+our $VERSION = '0.16';
+
 use CPAN::Forum::DB::Tags ();
 
 sub tags {

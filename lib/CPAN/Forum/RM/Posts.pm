@@ -2,6 +2,7 @@ package CPAN::Forum::RM::Posts;
 use strict;
 use warnings;
 
+our $VERSION = '0.16';
 
 use CPAN::Forum::DB::Groups ();
 use CPAN::Forum::DB::Posts ();

@@ -2,10 +2,12 @@ package CPAN::Forum::DBI;
 use strict;
 use warnings;
 
+our $VERSION = '0.16';
+
 use Carp qw();
 use Data::Dumper ();
-
 use DBI;
+
 my $dbh;
 
 sub myinit {

@@ -2,6 +2,8 @@ package CPAN::Forum::INC;
 use strict;
 use warnings;
 
+our $VERSION = '0.16';
+
 use CPAN::Forum::Markup;
 use CPAN::Forum::DBI;
 

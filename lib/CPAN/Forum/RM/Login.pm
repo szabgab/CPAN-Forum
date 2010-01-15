@@ -2,6 +2,8 @@ package CPAN::Forum::RM::Login;
 use strict;
 use warnings;
 
+our $VERSION = '0.16';
+
 use List::MoreUtils qw(none);
 use Digest::MD5 qw(md5_base64);
 

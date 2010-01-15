@@ -1,8 +1,9 @@
 package CPAN::Forum::RM::UserAccounts;
-
 use strict;
 use warnings;
 use 5.008;
+
+our $VERSION = '0.16';
 
 use Digest::SHA qw(sha1_base64);
 

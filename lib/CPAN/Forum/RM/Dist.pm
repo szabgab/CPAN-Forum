@@ -2,6 +2,8 @@ package CPAN::Forum::RM::Dist;
 use strict;
 use warnings;
 
+our $VERSION = '0.16';
+
 use CPAN::Forum::DB::Groups;
 use CPAN::Forum::DB::Tags;
 
