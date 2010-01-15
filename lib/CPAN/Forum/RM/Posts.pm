@@ -186,7 +186,7 @@ sub posts {
 	# only one iteration in it) The following hash is in preparation of this internal loop.
 	if ( not @$errors or $$errors[0] eq "preview" ) {
 		my %preview;
-		$preview{subject}  = CPAN::Forum::Tools::_subject_escape( $q->param("new_subject") )  || "";
+		$preview{subject}  = CPAN::Forum::Tools::_subject_escape( $q->param("new_subject") || '' );
 		$preview{text}     = $self->_text_escape( $q->param("new_text") ) || "";
 		$preview{parentid} = $q->param("new_parent")                      || "";
 

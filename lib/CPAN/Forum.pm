@@ -544,7 +544,7 @@ my @urls = qw(
 sub cgiapp_init {
 	my $self = shift;
 
-warn "$$ cgiapp_init";
+#warn "$$ cgiapp_init";
 
 	# Warning, in mod_perl environment this seems to be called only once when the server starts!
 
@@ -573,7 +573,7 @@ Standard CGI::Application method
 sub setup {
 	my $self = shift;
 
-warn "$$ setup";
+#warn "$$ setup";
 
 	# Warning, in mod_perl environment this seems to be called only once when the server starts!
 
@@ -625,7 +625,7 @@ Maybe we should move his code to the mode_param method ?
 sub cgiapp_prerun {
 	my $self = shift;
 
-warn "cgiapp_prerun PID: $$";
+#warn "cgiapp_prerun PID: $$";
 
 	$self->param( 'start_time', time );
 
