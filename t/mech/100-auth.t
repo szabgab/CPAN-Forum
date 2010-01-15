@@ -455,7 +455,7 @@ BEGIN {
 
 
 	$w_guest->get_ok("$url/posts/borg");
-	diag $w_guest->content;
+	#diag $w_guest->content;
 	$w_guest->content_unlike(qr{Something went wrong here});
 	$w_guest->content_like(qr{Invalid request});
 	
