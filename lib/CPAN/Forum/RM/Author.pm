@@ -2,6 +2,9 @@ package CPAN::Forum::RM::Author;
 use strict;
 use warnings;
 
+use CPAN::Forum::DB::Authors ();
+use CPAN::Forum::DB::Groups ();
+
 =head2 author
 
 List posts to dists grouped by author of the dists (PAUSEID)

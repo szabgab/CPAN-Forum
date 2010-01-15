@@ -2,6 +2,10 @@ package CPAN::Forum::RM::Search;
 use strict;
 use warnings;
 
+use CPAN::Forum::DB::Posts ();
+use CPAN::Forum::DB::Groups ();
+use CPAN::Forum::DB::Users ();
+
 # currently returning the number of results but this might change
 # ->_search_results($t, {where => {}, page => $n});
 # $t is an HTML::Template to be filled

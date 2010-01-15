@@ -2,6 +2,9 @@ package CPAN::Forum::RM::Update;
 use strict;
 use warnings;
 
+use CPAN::Forum::DB::Groups ();
+use CPAN::Forum::DB::Tags ();
+
 sub update {
 	my ($self) = @_;
 

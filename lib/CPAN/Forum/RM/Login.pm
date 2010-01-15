@@ -5,8 +5,8 @@ use warnings;
 use List::MoreUtils qw(none);
 use Digest::MD5 qw(md5_base64);
 
-use CPAN::Forum::Tools;
-
+use CPAN::Forum::Tools ();
+use CPAN::Forum::DB::Users ();
 
 =head2 login
 

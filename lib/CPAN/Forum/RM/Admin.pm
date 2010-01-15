@@ -2,6 +2,9 @@ package CPAN::Forum::RM::Admin;
 use strict;
 use warnings;
 
+use CPAN::Forum::DB::Users ();
+use CPAN::Forum::DB::Configure ();
+
 sub admin_edit_user_process {
 	my ($self) = @_;
 	if ( not $self->session->param("admin") ) {

@@ -2,6 +2,8 @@ package CPAN::Forum::RM::Threads;
 use strict;
 use warnings;
 
+use CPAN::Forum::DB::Posts ();
+
 =head2 threads
 
 Show all the posts of a single thread.

@@ -6,6 +6,9 @@ use 5.008;
 
 use Digest::SHA qw(sha1_base64);
 
+use CPAN::Forum::DB::Users ();
+
+
 sub selfconfig {
 	my ( $self, $errs ) = @_;
 	my $t = $self->load_tmpl("change_password.tmpl");

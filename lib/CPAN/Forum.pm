@@ -13,11 +13,16 @@ use CPAN::DistnameInfo;
 use Data::Dumper qw(Dumper);
 use List::MoreUtils qw(any);
 use POSIX qw();
-use WWW::Mechanize;
+use WWW::Mechanize ();
 
-use CPAN::Forum::INC;
-use CPAN::Forum::DBI;
-use CPAN::Forum::Tools;
+use CPAN::Forum::DBI ();
+use CPAN::Forum::DB::Configure ();
+use CPAN::Forum::DB::Groups ();
+use CPAN::Forum::DB::Posts ();
+use CPAN::Forum::DB::Subscriptions ();
+use CPAN::Forum::DB::Users ();
+use CPAN::Forum::Tools ();
+use CPAN::Forum::Markup;
 
 my $cookiename = "cpanforum";
 my $SUBJECT    = qr{[\w .:~!@#\$%^&*\()+?><,'";=-]+};

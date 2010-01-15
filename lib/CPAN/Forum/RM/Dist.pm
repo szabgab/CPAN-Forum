@@ -2,6 +2,9 @@ package CPAN::Forum::RM::Dist;
 use strict;
 use warnings;
 
+use CPAN::Forum::DB::Groups;
+use CPAN::Forum::DB::Tags;
+
 =head2 dist
 
 List last few posts belonging to this group, provides a link to post a new 

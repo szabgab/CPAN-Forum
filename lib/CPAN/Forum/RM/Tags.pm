@@ -2,6 +2,8 @@ package CPAN::Forum::RM::Tags;
 use strict;
 use warnings;
 
+use CPAN::Forum::DB::Tags ();
+
 sub tags {
 	my ($self) = @_;
 

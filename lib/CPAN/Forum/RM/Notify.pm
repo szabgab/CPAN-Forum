@@ -6,9 +6,12 @@ use XML::RSS::SimpleGen;
 use XML::Atom::SimpleFeed;
 use URI;
 
-use CPAN::Forum::DB::Configure;
-use CPAN::Forum::DB::Subscriptions;
-use CPAN::Forum::Tools;
+use CPAN::Forum::DB::Configure ();
+use CPAN::Forum::DB::Posts ();
+use CPAN::Forum::DB::Users ();
+use CPAN::Forum::DB::Tags ();
+use CPAN::Forum::DB::Subscriptions ();
+use CPAN::Forum::Tools ();
 
 =head2 notify
 

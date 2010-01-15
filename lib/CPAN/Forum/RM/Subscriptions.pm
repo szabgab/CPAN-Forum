@@ -2,6 +2,13 @@ package CPAN::Forum::RM::Subscriptions;
 use strict;
 use warnings;
 
+use CPAN::Forum::DB::Users ();
+use CPAN::Forum::DB::Groups ();
+use CPAN::Forum::DB::Authors ();
+use CPAN::Forum::DB::Subscriptions_all ();
+use CPAN::Forum::DB::Subscriptions_pauseid ();
+use CPAN::Forum::DB::Subscriptions ();
+
 =head2 mypan
 
 Manage the notify subscription.

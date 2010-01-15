@@ -3,6 +3,10 @@ use strict;
 use warnings;
 
 
+use CPAN::Forum::DBI ();
+use CPAN::Forum::DB::Posts ();
+use CPAN::Forum::DB::Tags ();
+
 =head2 about
 
 About box with some statistics.

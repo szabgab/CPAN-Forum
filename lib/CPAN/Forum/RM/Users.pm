@@ -2,6 +2,8 @@ package CPAN::Forum::RM::Users;
 use strict;
 use warnings;
 
+use CPAN::Forum::DB::Users ();
+
 =head2 users
 
 List the posts of a particular user.
