@@ -1,7 +1,9 @@
-<TMPL_INCLUDE NAME="head.tmpl">
-<p id="pageTitle">About CPAN::Forum</p>
-
-<TMPL_INCLUDE NAME="navigation.tmpl">
+[% DEFAULT
+  title="About CPAN::Forum"
+  description="Links to modules used to build the forum"
+  pagetitle="About CPAN::Forum"
+%]
+[% INCLUDE incl/header.tt %]
 
 <div class="blurb">
 	The CPAN Forum is a web forum for discussing Perl's CPAN modules - asking questions, 
@@ -47,16 +49,16 @@
 <div class="about_list">
 	<p class="about_title">Statistics</p>
 	<ul>
-		<li>Number of distributions: <TMPL_VAR distro_cnt></li>
-		<li>Number of posts: <TMPL_VAR posts_cnt></li>
-		<li>Number of people: <TMPL_VAR users_cnt></li>
-		<li>Number of subscriptions: <TMPL_VAR subscription_cnt></li>
-		<li>Number of tags in cloud: <TMPL_VAR tag_cloud_cnt></li>
+		<li>Number of distributions: [% distro_cnt %]</li>
+		<li>Number of posts: [% posts_cnt %]</li>
+		<li>Number of people: [% users_cnt %]</li>
+		<li>Number of subscriptions: [% subscription_cnt %]</li>
+		<li>Number of tags in cloud: [% tag_cloud_cnt %]</li>
 	</ul>
 	<p class="about_p">
 		If you have technical problems please contact 
 		<a href="mailto:gabor@pti.co.il">Gabor Szabo</a>.<br />
-		Current site version: <TMPL_VAR version>
+		Current site version: [% version %]
 	</p>
 </div>
 <a name="news"></a>
@@ -100,6 +102,5 @@
     </p>
 </div>
 
-
-<TMPL_INCLUDE NAME="footer.tmpl">
+[% INCLUDE incl/footer.tt %]
 

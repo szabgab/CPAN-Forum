@@ -20,6 +20,7 @@ my $builder = Module::Build->new(
 		'CGI'                                   => 0,
 		'CGI::Application'                      => 3.31,
 		'CGI::Application::Plugin::Session'     => 0,
+		'CGI::Application::Plugin::TT'          => 0,
 		'CGI::Application::Plugin::LogDispatch' => 0,
 		'CGI::Session'                          => 4.13, # 3.95 generates some warnings on ->flush
 		'CPAN::DistnameInfo'                    => 0,

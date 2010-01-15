@@ -1,0 +1,20 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+<head>
+	<title>[% title | html %]</title>  
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="description" content="[% description %]" />
+	<link rel="stylesheet" href="/style.css" type="text/css" />
+</head> 
+
+<body>
+[% IF test_site_warning %]
+<p class="warning">Warning: this is a test site, the data here will be deleted.<br />
+For real use, please visit the <a href="http://cpanforum.com/">the live site</a>.</p>
+[% END %]
+	
+<p id="pageHeader">CPAN::Forum</p>
+
+<p id="pageTitle">[% pagetitle %]</p>
+
+[% INCLUDE incl/navigation.tt %]

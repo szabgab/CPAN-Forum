@@ -16,14 +16,16 @@ About box with some statistics.
 
 sub about {
 	my $self = shift;
-	my $t    = $self->load_tmpl("about.tmpl");
+	#my $t    = $self->load_tmpl("about.tmpl");
 
-	$t->param( distro_cnt       => CPAN::Forum::DBI->count_rows_in('groups') );
-	$t->param( posts_cnt        => CPAN::Forum::DBI->count_rows_in('posts') );
-	$t->param( users_cnt        => CPAN::Forum::DBI->count_rows_in('users') );
-	$t->param( subscription_cnt => CPAN::Forum::DBI->count_rows_in('subscriptions') );
-	$t->param( tag_cloud_cnt    => CPAN::Forum::DBI->count_rows_in('tag_cloud') );
-	$t->param( version          => $self->version );
+	my %params = (
+		distro_cnt       => CPAN::Forum::DBI->count_rows_in('groups'),
+		posts_cnt        => CPAN::Forum::DBI->count_rows_in('posts'),
+		users_cnt        => CPAN::Forum::DBI->count_rows_in('users'),
+		subscription_cnt => CPAN::Forum::DBI->count_rows_in('subscriptions'),
+		tag_cloud_cnt    => CPAN::Forum::DBI->count_rows_in('tag_cloud'),
+		version          => $self->version,
+	);
 
 	# number of posts per group name, can create some xml feed from it that can
 	# be used by search.cpan.org and Kobes to add a number of posts next to the link
@@ -32,7 +34,7 @@ sub about {
 	#count posts for a specific group:
 	#select count(*) from posts, groups where groups.id=gid and groups.name="CPAN-Forum";
 
-	$t->output;
+	return $self->tt_process('pages/about.tt', \%params);
 }
 
 =head2 stats

@@ -8,6 +8,7 @@ our $VERSION = '0.16';
 use base 'CGI::Application';
 use CGI ();
 use CGI::Application::Plugin::Session;
+use CGI::Application::Plugin::TT;
 use CGI::Application::Plugin::LogDispatch;
 use CPAN::DistnameInfo;
 use Data::Dumper qw(Dumper);
@@ -476,6 +477,14 @@ sub cgiapp_init {
 	CPAN::Forum::DBI->myinit();
 	my $dbh = CPAN::Forum::DBI::db_Main();
 	$STATUS_FILE = $self->param("ROOT") . "/db/status";
+	$self->tt_config(
+		TEMPLATE_OPTIONS => {
+			INCLUDE_PATH => $self->param("ROOT") . "/tt",
+			POST_CHOMP   => 1,
+			EVAL_PERL    => 0,                # evaluate Perl code blocks
+			ENCODING     => 'utf8',
+		});
+
 	CGI::Session->name($cookiename);
 }
 
@@ -663,6 +672,14 @@ sub cgiapp_prerun {
 	$self->header_props(
 		-charset => "utf-8",
 		-type    => 'text/html',
+	);
+	
+	$self->tt_params(
+		"loggedin" => ($self->session->param("loggedin") || "" ),
+		"username" => ($self->session->param("username") || "anonymous"),
+		"test_site_warning" => (-e $self->param("ROOT") . "/config_test_site"),
+		"admin"             => $self->session->param('admin'),
+		"dev_server"        => ( $ENV{CPAN_FORUM_DEV} ? 1 : 0 ),
 	);
 
 	my $status = $self->status();
