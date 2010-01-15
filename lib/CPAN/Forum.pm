@@ -472,7 +472,8 @@ Registered users
 
 sub cgiapp_init {
 	my $self = shift;
-	$self->param( 'start_time', time );
+
+	# Warning, in mod_perl environment this seems to be called only once when the server starts!
 
 	CPAN::Forum::DBI->myinit();
 	my $dbh = CPAN::Forum::DBI::db_Main();
@@ -669,6 +670,7 @@ Maybe we should move his code to the mode_param method ?
 sub cgiapp_prerun {
 	my $self = shift;
 
+	$self->param( 'start_time', time );
 	$self->header_props(
 		-charset => "utf-8",
 		-type    => 'text/html',
