@@ -326,6 +326,13 @@ the name of a module and the initial subscription parameters to it.
 In addition when displaying the list of all the messages to a specific module, logged in users
 will see their current subscription to this module (even if that is empty).
 
+=head2 Notification
+
+There is a boolean field on each post called "notified"
+When adding a new post we set it to false which is the default value.
+There is a daemon that checks the database for posts with "notified"  not TRUE.
+Sends the notification messages and sets the bit to true.
+
 =head2 TEMPLATES
 
 

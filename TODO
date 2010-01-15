@@ -1,53 +1,58 @@
-- Fix the notification code
-- Fix the crash caused by accessing /posts/favicon.ico or some other bad url
-- Find out why would one access /posts/favicon.ico (unless broken client)
-- Improve the daemon so it won't crash
-- Setup daemon to be launched at boot time
+* Setup daemon to be launched at boot time
 
+* User requests password change.
 
+We generate a random string and save the random string as field in the junk table.
+The value  will be { rm => 'resetpw', username => $username }  dumped using YAML::Tiny.
+We send the random thing by mail to the user attached to a url.
 
-notification:
-  add a boolean to each post called "notified"
-  during the transition set it to true
-  when adding a new post set it to false (default?) or keep it as NULL?
-  write a daemon that checks the database for posts with "notified"  not TRUE
-  sends the notification messages and sets the bit to true.
-
-
-
-user requests password change
-we generate a random thing and save
-   random thing as field
-   value  { rm => 'resetpw', username => $username }  (use YAML::Tiny ?)
-send the random thing by mail to the user
-when the user comes with the random string we can fetch the value and go to the 
+When the user comes with the random string we can fetch the value and go to the 
 resetpw run mode that shows a page with two empty password fields 
-embedding the key in the page
-then if she submits the new password pair we check again if the key is there
-allow the update only if the key is there removing the key
+with the random string in a hidden fields on the page.
 
-We also need a daemon that will remove keys older than 24 hours or some other configurable
-value
+When the user submits the new password pair we look-up the random string again 
+and check if the run mode is the one the user requested to execute. 
+(Actually this is not the same run-mode)
+If that's the one we update the password and remove the row from the junk table.
 
-Passsword reminder does not work - should be replaced by way to reset password
-just to see if the utf-8 worked display the list of languages
+We also need a daemon that will remove keys older than 24 hours or some other
+configurable value.
 
 
-move the session id into the database:
+* Write a test checking if the flood_control_time_limit works
+
+* Switch application to use mod_perl on the live site
+
+* Check the log file and see why certain distributions are still missing?
+
+
+
+==========================================
+
+* Enable users to connect their CPAN::Forum id with their PAUSE id
+
+Let logged in user type in their PAUSEid
+
+Generate random string and save it in the junk table with the value being
+{ rm => verify_pause_id, pauseid => $pauseid }
+
+Send an e-mail with code to PAUSEID@cpan.org.
+Tell the user to check their e-mail and click on the approval link.
+
+
+
+* Move the session id into the database:
    sid
    uid
    issued
    last_seen
 
-merge the populate script 
+* Test the populate script 
  - create several very partial CPAN mirrors in the testfiles/ directory 
    and process those with the new populate script one after the other
 
-- Test if the flood_control_time_limit works?
 
-Make sure posting a new message is fast! (maybe move e-mail sending to an async cron job)
-
-  * Write tests for existing system to cover the important aspects of the system
+* Write tests for existing system to cover the important aspects of the system
     1) registration, email verification
     2) login/logout
     3) posting a new message
@@ -59,18 +64,13 @@ Make sure posting a new message is fast! (maybe move e-mail sending to an async 
     9) mypan
  
 
-  * Switch application to use PostgreSQL
-  * Make the data restrictions stricter in the schema (UNIQUE, NOT NULL)
-
 ==========================
 
-* We can already use utf-8 in the database - allow the use of any language in the GUU as well.
+* We can already use utf-8 in the database - allow the use of any language in the GUI as well.
 
-collect the packaes from downstream distriutions ORDB::DebianModules
+
+* Collect the packaes from downstream distriutions ORDB::DebianModules
 See http://szabgab.com/distributions/ for an old project
-
-
-  * Switch application to use mod_perl on the live site
 
 
   * Generate HTML files, 
@@ -84,11 +84,6 @@ See http://szabgab.com/distributions/ for an old project
 
   * Process META.yml
 
-  * Enable users to connect their CPAN::Forum id with their PAUSE id:
-    Let logged in user type in their PAUSEid
-    send an e-mail with code to PAUSEID@cpan.org and save the same id in
-      the session object tell the user to check their e-mail and copy 
-      the code to the approval form or click on the approval link
   * One-time notification of module author when the first post arrives to one of
     her modules.
   * Allow module authors to setup splash-screen for 
