@@ -6,6 +6,22 @@ use 5.008;
 our $VERSION = '0.16';
 
 use base 'CGI::Application';
+
+use base 'CPAN::Forum::RM::Author';
+use base 'CPAN::Forum::RM::Dist';
+use base 'CPAN::Forum::RM::Login';
+use base 'CPAN::Forum::RM::Users';
+use base 'CPAN::Forum::RM::Admin';
+use base 'CPAN::Forum::RM::Other';
+use base 'CPAN::Forum::RM::Notify';
+use base 'CPAN::Forum::RM::Posts';
+use base 'CPAN::Forum::RM::Search';
+use base 'CPAN::Forum::RM::Subscriptions';
+use base 'CPAN::Forum::RM::Tags';
+use base 'CPAN::Forum::RM::UserAccounts';
+use base 'CPAN::Forum::RM::Update';
+use base 'CPAN::Forum::RM::Threads';
+
 use CGI ();
 use CGI::Application::Plugin::Session;
 use CGI::Application::Plugin::TT;
@@ -462,80 +478,6 @@ Registered users
 
 =cut
 
-=head2 cgiapp_init
-
- Connect to database
- Setup logging
- Setup session
-
-=cut
-
-sub cgiapp_init {
-	my $self = shift;
-
-	# Warning, in mod_perl environment this seems to be called only once when the server starts!
-
-	CPAN::Forum::DBI->myinit();
-	my $dbh = CPAN::Forum::DBI::db_Main();
-	$STATUS_FILE = $self->param("ROOT") . "/db/status";
-	$self->tt_config(
-		TEMPLATE_OPTIONS => {
-			INCLUDE_PATH => $self->param("ROOT") . "/tt",
-			POST_CHOMP   => 1,
-			EVAL_PERL    => 0,                # evaluate Perl code blocks
-			ENCODING     => 'utf8',
-		});
-
-	CGI::Session->name($cookiename);
-}
-
-# overriding the run method, to momentarily install warnings handler
-
-sub _logger {
-	my ( $self, %h ) = @_;
-	my ( $package, $filename, $line, $sub ) = caller(6);
-	my $root = $self->param("ROOT");
-	my $q    = $self->query;
-	$filename =~ s/^$root//;
-	return sprintf "[%s] - %s - [%s] [%s] [%s] [%s(%s)] %s\n",
-		POSIX::strftime( "%Y-%m-%d %H:%M:%S", localtime ),
-		$h{level},
-		( $ENV{REMOTE_ADDR} || '' ),
-		( $ENV{HTTP_REFERER} || '' ), $q->script_name . $q->path_info, #($self->param('REQUEST')),
-		$filename, $line, $h{message};
-
-	# keys of the hash: level, message, name
-}
-
-sub _set_log_level {
-	my ($self) = @_;
-
-	if ( open my $fh, '<', $self->param("ROOT") . "/db/log_level" ) {
-		chomp( my $str = <$fh> );
-		$str =~ s/^\s*|\s*$//g;
-		if ( Log::Dispatch->level_is_valid($str) ) {
-			return $str;
-		} else {
-			warn "Invalid log level '$str'\n";
-		}
-	}
-	return 'notice';
-}
-
-=head2 config
-
-Given a filed name returns the configuration value from the database
-
-=cut
-
-sub config {
-	my ( $self, $field ) = @_;
-
-	CPAN::Forum::DB::Configure->param($field);
-}
-
-#	pwreminder pwreminder_process
-
 # modes that can be accessed without a valid session
 my @free_modes = qw(
 	home
@@ -590,20 +532,37 @@ my @urls = qw(
 	reset_password_form
 );
 
-use base 'CPAN::Forum::RM::Author';
-use base 'CPAN::Forum::RM::Dist';
-use base 'CPAN::Forum::RM::Login';
-use base 'CPAN::Forum::RM::Users';
-use base 'CPAN::Forum::RM::Admin';
-use base 'CPAN::Forum::RM::Other';
-use base 'CPAN::Forum::RM::Notify';
-use base 'CPAN::Forum::RM::Posts';
-use base 'CPAN::Forum::RM::Search';
-use base 'CPAN::Forum::RM::Subscriptions';
-use base 'CPAN::Forum::RM::Tags';
-use base 'CPAN::Forum::RM::UserAccounts';
-use base 'CPAN::Forum::RM::Update';
-use base 'CPAN::Forum::RM::Threads';
+
+=head2 cgiapp_init
+
+ Connect to database
+ Setup logging
+ Setup session
+
+=cut
+
+sub cgiapp_init {
+	my $self = shift;
+
+warn "$$ cgiapp_init";
+
+	# Warning, in mod_perl environment this seems to be called only once when the server starts!
+
+	CPAN::Forum::DBI->myinit();
+	$STATUS_FILE = $self->param("ROOT") . "/db/status";
+	$self->tt_config(
+		TEMPLATE_OPTIONS => {
+			INCLUDE_PATH => $self->param("ROOT") . "/tt",
+			POST_CHOMP   => 1,
+			EVAL_PERL    => 0,                # evaluate Perl code blocks
+			ENCODING     => 'utf8',
+		});
+
+	CGI::Session->name($cookiename);
+
+	return;
+}
+
 
 =head2 setup
 
@@ -613,6 +572,10 @@ Standard CGI::Application method
 
 sub setup {
 	my $self = shift;
+
+warn "$$ setup";
+
+	# Warning, in mod_perl environment this seems to be called only once when the server starts!
 
 	my $log       = $ENV{CPAN_FORUM_LOGFILE};
 	my $log_level = $self->_set_log_level();
@@ -633,23 +596,12 @@ sub setup {
 
 	$self->log->debug("--- START ---");
 
-	$self->session_config(
-
-		#CGI_SESSION_OPTIONS => [ "driver:File", $self->query, {Directory => "/tmp"}],
-		#CGI_SESSION_OPTIONS => [ "driver:SQLite", $self->query, {Handle => $dbh}],
-		COOKIE_PARAMS => {
-			-expires => '+14d',
-			-path    => '/',
-		},
-		SEND_COOKIE => 0,
-
-	);
-
 	$self->start_mode("home");
 	$self->run_modes( [ @free_modes, @restricted_modes ] );
 	$self->run_modes( AUTOLOAD => "autoload" );
 	$self->error_mode('error');
 }
+
 
 =head2 cgiapp_prerun
 
@@ -661,7 +613,22 @@ Maybe we should move his code to the mode_param method ?
 sub cgiapp_prerun {
 	my $self = shift;
 
+warn "cgiapp_prerun PID: $$";
+
 	$self->param( 'start_time', time );
+
+	$self->session_config(
+		#CGI_SESSION_OPTIONS => [ "driver:File", $self->query, {Directory => "/tmp"}],
+		#CGI_SESSION_OPTIONS => [ "driver:SQLite", $self->query, {Handle => $dbh}],
+		COOKIE_PARAMS => {
+			-expires => '+14d',
+			-path    => '/',
+		},
+		SEND_COOKIE => 0,
+
+	);
+
+
 	$self->header_props(
 		-charset => "utf-8",
 		-type    => 'text/html',
@@ -674,6 +641,8 @@ sub cgiapp_prerun {
 		"admin"             => $self->session->param('admin'),
 		"dev_server"        => ( $ENV{CPAN_FORUM_DEV} ? 1 : 0 ),
 	);
+
+	$self->query->param( path_parameters => [] );
 
 	my $status = $self->status();
 	$self->log->debug("Status:  $status");
@@ -709,10 +678,85 @@ sub cgiapp_prerun {
 	$self->log->debug("cgiapp_prerun ends");
 }
 
-sub _set_run_mode {
+sub cgiapp_postrun {
+	my $self       = shift;
+	my $output_ref = shift;
+
+	my $rm = $self->get_current_runmode();
+	if ( not $self->session->param('loggedin') and $rm ne "login" ) {
+		$self->log->debug("not logged in, deleting session");
+		$self->session->delete();
+	}
+
+	# flush added as the Test::WWW::Mechanize::CGI did not work well without
+	# it after we started to use file based session objects
+	$self->session->flush();
+
+	my $ellapsed_time = time() - $self->param('start_time');
+
+	# first let's try to resolve the really big problems
+	if ( $ellapsed_time > 3 ) {
+		my $rm = $self->get_current_runmode();
+		$self->log->warning("Long request. Ellapsed time: $ellapsed_time on run-mode: $rm");
+	}
+
+	return;
+}
+
+#sub teardown {
+#	my ($self) = @_;
+#	$self->log->debug("teardown called");
+#}
+
+
+
+# keys of the hash: level, message, name
+sub _logger {
+	my ( $self, %h ) = @_;
+	my ( $package, $filename, $line, $sub ) = caller(6);
+	my $root = $self->param("ROOT");
+	my $q    = $self->query;
+	$filename =~ s/^$root//;
+	return sprintf "[%s] - %s - [$$] [%s] [%s] [%s] [%s(%s)] %s\n",
+		POSIX::strftime( "%Y-%m-%d %H:%M:%S", localtime ),
+		$h{level},
+		( $ENV{REMOTE_ADDR} || '' ),
+		( $ENV{HTTP_REFERER} || '' ), $q->script_name . $q->path_info, #($self->param('REQUEST')),
+		$filename, $line, $h{message};
+}
+
+sub _set_log_level {
 	my ($self) = @_;
 
-	$self->query->param( path_parameters => [] );
+	if ( open my $fh, '<', $self->param("ROOT") . "/db/log_level" ) {
+		chomp( my $str = <$fh> );
+		$str =~ s/^\s*|\s*$//g;
+		if ( Log::Dispatch->level_is_valid($str) ) {
+			return $str;
+		} else {
+			warn "Invalid log level '$str'\n";
+		}
+	}
+	return 'notice';
+}
+
+=head2 config
+
+Given a filed name returns the configuration value from the database
+
+=cut
+
+sub config {
+	my ( $self, $field ) = @_;
+
+	CPAN::Forum::DB::Configure->param($field);
+}
+
+#	pwreminder pwreminder_process
+
+
+sub _set_run_mode {
+	my ($self) = @_;
 
 	my $rm = $self->get_current_runmode();
 	return $rm if $rm and $rm ne 'home'; # alredy has run-mode
@@ -732,7 +776,7 @@ sub _set_run_mode {
 		my $params = $2 || "";
 		if ( any { $newrm eq $_ } @urls ) {
 			my @params = split /\//, $params;
-			$self->query->param( path_parameters => @params ? \@params : [] );
+			$self->query->param( path_parameters => scalar(@params) ? \@params : [] );
 			$rm = $newrm;
 		} elsif ( $request eq "/cgi/index.pl" ) {
 
@@ -1103,43 +1147,6 @@ sub status {
 	}
 }
 
-
-
-sub help {
-	$_[0]->load_tmpl("help.tmpl")->output;
-}
-
-sub site_is_closed {
-	$_[0]->load_tmpl("site_is_closed.tmpl")->output;
-}
-
-sub cgiapp_postrun {
-	my $self       = shift;
-	my $output_ref = shift;
-
-	my $rm = $self->get_current_runmode();
-	if ( not $self->session->param('loggedin') and $rm ne "login" ) {
-		$self->log->debug("not logged in, deleting session");
-		$self->session->delete();
-	}
-
-	# flush added as the Test::WWW::Mechanize::CGI did not work well without
-	# it after we started to use file based session objects
-	$self->session->flush();
-
-	my $ellapsed_time = time() - $self->param('start_time');
-
-	# first let's try to resolve the really big problems
-	if ( $ellapsed_time > 3 ) {
-		my $rm = $self->get_current_runmode();
-		$self->log->warning("Long request. Ellapsed time: $ellapsed_time on run-mode: $rm");
-	}
-}
-
-sub teardown {
-	my ($self) = @_;
-	$self->log->debug("teardown called");
-}
 
 
 #sub m {

@@ -20,6 +20,7 @@ sub dist {
 	my ($self) = @_;
 	my $q = $self->query;
 
+	warn "$$ " . $self->query->param('path_parameters');
 	my $group_name = ${ $self->query->param("path_parameters") }[0] || '';
 	if ( $group_name =~ /^([\w-]+)$/ ) {
 		$group_name = $1;
