@@ -1107,10 +1107,6 @@ sub status {
 	}
 }
 
-sub privacy_policy {
-	$_[0]->load_tmpl("privacy_policy.tmpl")->output;
-}
-
 
 
 sub help {

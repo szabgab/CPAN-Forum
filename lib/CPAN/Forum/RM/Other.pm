@@ -37,6 +37,11 @@ sub about {
 	return $self->tt_process('pages/about.tt', \%params);
 }
 
+
+sub privacy_policy {
+	return $_[0]->tt_process('pages/privacy_policy.tt');
+}
+
 =head2 stats
 
 The stats run-mode showing some statistics

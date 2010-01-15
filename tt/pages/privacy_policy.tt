@@ -1,0 +1,31 @@
+[% DEFAULT
+  title="CPAN::Forum Privacy Policy"
+  description="What information do we keep secret and what do we share."
+  pagetitle="CPAN::Forum Privacy Policy"
+%]
+[% INCLUDE incl/header.tt %]
+
+<div class="blurb">
+Privacy of our users is important, so is making the content of CPAN::Forum available
+to the public. There are several types of information available in our database.
+</div>
+<div class="about_list">
+	<p class="about_title">Your e-mail, password</p>
+	<p class="about_p">
+    The most critical for the privacy of users are e-mail and password. 
+    We won't willingly share your e-mail address and we keep the passwords hashed so even if
+    someone manages to get reach the database it won't be easy to find out the real passwords.
+    </p> 
+</div>
+
+<div class="about_list">
+	<p class="about_title">Posts and other information</p>
+	<p class="about_p">
+    Everything else (except your password and e-mail address) is publicly readable on the Forum.
+    </p>
+
+</div>
+
+
+[% INCLUDE incl/footer.tt %]
+
