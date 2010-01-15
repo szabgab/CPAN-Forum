@@ -9,3 +9,4 @@ MANIFEST.bak
 META.yml
 CPAN-Forum-*
 tmp/
+*.swp
