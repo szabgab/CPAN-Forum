@@ -1,7 +1,10 @@
-<TMPL_INCLUDE NAME="head.tmpl">
-<p id="pageTitle">Frequently Asked Questions</p>
+[% DEFAULT
+  title="CPAN::Forum - Frequently Asked Questions"
+  description="Help answering questions frequently encountered by users of the CPAN::Forum"
+  pagetitle="Frequently Asked Questions"
+%]
+[% INCLUDE incl/header.tt %]
 
-<TMPL_INCLUDE NAME="navigation.tmpl">
 <div class="faq">
  <ol>
   <li><a href="#nologin">Why can't I login?</a></li>
@@ -160,4 +163,6 @@
  </dd>
 </dl>
 </div>
-<TMPL_INCLUDE NAME="footer.tmpl">
+
+[% INCLUDE incl/footer.tt %]
+

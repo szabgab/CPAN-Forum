@@ -77,9 +77,7 @@ Show FAQ
 =cut
 
 sub faq {
-	my $self = shift;
-	my $t    = $self->load_tmpl("faq.tmpl");
-	$t->output;
+	return $_[0]->tt_process('pages/faq.tt');
 }
 
 1;
