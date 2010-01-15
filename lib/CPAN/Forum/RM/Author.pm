@@ -19,7 +19,7 @@ sub author {
 	my ($self) = @_;
 	my $q = $self->query;
 
-	my $pauseid = ${ $self->query->param("path_parameters") }[0] || '';
+	my $pauseid = ${ $self->param("path_parameters") }[0] || '';
 	$self->log->debug("show posts to modules of PAUSEID: '$pauseid'");
 
 	my $t = $self->load_tmpl(

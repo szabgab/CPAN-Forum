@@ -596,6 +596,18 @@ warn "$$ setup";
 
 	$self->log->debug("--- START ---");
 
+	$self->session_config(
+		#CGI_SESSION_OPTIONS => [ "driver:File", $self->query, {Directory => "/tmp"}],
+		#CGI_SESSION_OPTIONS => [ "driver:SQLite", $self->query, {Handle => $dbh}],
+		COOKIE_PARAMS => {
+			-expires => '+14d',
+			-path    => '/',
+		},
+		SEND_COOKIE => 0,
+
+	);
+
+
 	$self->start_mode("home");
 	$self->run_modes( [ @free_modes, @restricted_modes ] );
 	$self->run_modes( AUTOLOAD => "autoload" );
@@ -617,17 +629,6 @@ warn "cgiapp_prerun PID: $$";
 
 	$self->param( 'start_time', time );
 
-	$self->session_config(
-		#CGI_SESSION_OPTIONS => [ "driver:File", $self->query, {Directory => "/tmp"}],
-		#CGI_SESSION_OPTIONS => [ "driver:SQLite", $self->query, {Handle => $dbh}],
-		COOKIE_PARAMS => {
-			-expires => '+14d',
-			-path    => '/',
-		},
-		SEND_COOKIE => 0,
-
-	);
-
 
 	$self->header_props(
 		-charset => "utf-8",
@@ -642,7 +643,7 @@ warn "cgiapp_prerun PID: $$";
 		"dev_server"        => ( $ENV{CPAN_FORUM_DEV} ? 1 : 0 ),
 	);
 
-	$self->query->param( path_parameters => [] );
+	$self->param( path_parameters => [] );
 
 	my $status = $self->status();
 	$self->log->debug("Status:  $status");
@@ -669,7 +670,7 @@ warn "cgiapp_prerun PID: $$";
 		$self->log->debug("Showing login");
 		$self->session->param( request => $rm );
 		if ( $rm eq 'new_post' ) {
-			my $group = ${ $self->query->param("path_parameters") }[0];
+			my $group = ${ $self->param("path_parameters") }[0];
 			$self->session->param( request_group => $group );
 		}
 		$self->prerun_mode('login');
@@ -776,7 +777,7 @@ sub _set_run_mode {
 		my $params = $2 || "";
 		if ( any { $newrm eq $_ } @urls ) {
 			my @params = split /\//, $params;
-			$self->query->param( path_parameters => scalar(@params) ? \@params : [] );
+			$self->param( path_parameters => scalar(@params) ? \@params : [] );
 			$rm = $newrm;
 		} elsif ( $request eq "/cgi/index.pl" ) {
 
@@ -1151,8 +1152,8 @@ sub status {
 
 #sub m {
 #	my ($self) = @_;
-#	my $path  = ${ $self->query->param("path_parameters") }[0] || '';
-#	my $value = ${ $self->query->param("path_parameters") }[1] || '';
+#	my $path  = ${ $self->param("path_parameters") }[0] || '';
+#	my $value = ${ $self->param("path_parameters") }[1] || '';
 #
 #
 #	my $tags = '';

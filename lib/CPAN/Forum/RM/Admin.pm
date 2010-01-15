@@ -38,7 +38,7 @@ sub admin_edit_user {
 	}
 	my $q = $self->query;
 	if ( not $username ) {
-		$username = ${ $self->query->param("path_parameters") }[0] || '';
+		$username = ${ $self->param("path_parameters") }[0] || '';
 	}
 	$self->log->debug("admin_edit_user username: '$username'");
 

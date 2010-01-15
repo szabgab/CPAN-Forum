@@ -129,7 +129,7 @@ sub _feed {
 	my $url  = "http://$ENV{HTTP_HOST}";
 	my $call = "_generate_$type";
 
-	my @params = @{ $self->query->param("path_parameters") };
+	my @params = @{ $self->param("path_parameters") };
 	my $content;
 	if ( $params[0] eq 'tags' ) {
 		$content = 'tags';
@@ -226,7 +226,7 @@ sub _generate_rss {
 sub get_feed {
 	my ( $self, $limit ) = @_;
 
-	my @params = @{ $self->query->param("path_parameters") };
+	my @params = @{ $self->param("path_parameters") };
 
 	return [] if not @params;
 

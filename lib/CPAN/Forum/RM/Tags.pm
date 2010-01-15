@@ -9,12 +9,12 @@ use CPAN::Forum::DB::Tags ();
 sub tags {
 	my ($self) = @_;
 
-	my $path  = ${ $self->query->param("path_parameters") }[0] || '';
-	my $value = ${ $self->query->param("path_parameters") }[1] || '';
+	my $path  = ${ $self->param("path_parameters") }[0] || '';
+	my $value = ${ $self->param("path_parameters") }[1] || '';
 
 	# support tag tcp/ip  but not a/b/c
-	if ( ${ $self->query->param("path_parameters") }[2] ) {
-		$value .= "/" . ${ $self->query->param("path_parameters") }[2];
+	if ( ${ $self->param("path_parameters") }[2] ) {
+		$value .= "/" . ${ $self->param("path_parameters") }[2];
 	}
 
 	$self->log->debug("tags path='$path' value='$value'");

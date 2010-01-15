@@ -25,7 +25,7 @@ sub threads {
 	);
 
 	my $id = $q->param("id");
-	$id = ${ $self->query->param("path_parameters") }[0] if ${ $self->query->param("path_parameters") }[0];
+	$id = ${ $self->param("path_parameters") }[0] if ${ $self->param("path_parameters") }[0];
 
 	my $posts = CPAN::Forum::DB::Posts->posts_in_thread($id);
 	if ( not @$posts ) {

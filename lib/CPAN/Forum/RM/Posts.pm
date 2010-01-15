@@ -61,7 +61,7 @@ sub posts {
 	my $new_group_id = "";
 
 	if ( $rm eq "new_post" ) {
-		$new_group = ${ $self->query->param("path_parameters") }[0] || "";
+		$new_group = ${ $self->param("path_parameters") }[0] || "";
 		$new_group_id = $q->param('new_group') if $q->param('new_group');
 		$self->log->debug("A: new_group: '$new_group' and id: '$new_group_id'");
 
@@ -133,7 +133,7 @@ sub posts {
 
 	my $id = $q->param("id"); # there was an id
 	if ( $rm eq "response_form" or $rm eq "posts" ) {
-		$id = ${ $self->query->param("path_parameters") }[0] if ${ $self->query->param("path_parameters") }[0];
+		$id = ${ $self->param("path_parameters") }[0] if ${ $self->param("path_parameters") }[0];
 	}
 	$id ||= $q->param("new_parent");
 	if ($id) {                # Show post
