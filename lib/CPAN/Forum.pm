@@ -490,15 +490,6 @@ sub cgiapp_init {
 }
 
 # overriding the run method, to momentarily install warnings handler
-# can we use other way then a global $logger? -shmuel
-our $logger;
-
-sub run {
-	my ($self) = @_;
-	local $logger = $self->log;
-	local $SIG{__WARN__} = sub { $self->log->warning( $_[0] ) };
-	$self->SUPER::run();
-}
 
 sub _logger {
 	my ( $self, %h ) = @_;
