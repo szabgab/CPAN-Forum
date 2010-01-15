@@ -3,6 +3,7 @@ use strict;
 use warnings;
 
 use CPAN::Forum::DB::Posts ();
+use CPAN::Forum::Tools ();
 
 =head2 threads
 
@@ -52,7 +53,7 @@ sub threads {
 	$t->param( group => $posts->[0]->{group_name} );
 
 	#   $t->param(dashgroup => $dashgroup);
-	$t->param( title => _subject_escape( $posts->[0]->{subject} ) );
+	$t->param( title => CPAN::Forum::Tools::_subject_escape( $posts->[0]->{subject} ) );
 
 	return $t->output;
 }

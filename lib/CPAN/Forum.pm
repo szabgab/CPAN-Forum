@@ -22,10 +22,9 @@ use CPAN::Forum::DB::Posts ();
 use CPAN::Forum::DB::Subscriptions ();
 use CPAN::Forum::DB::Users ();
 use CPAN::Forum::Tools ();
-use CPAN::Forum::Markup;
+use CPAN::Forum::Markup ();
 
 my $cookiename = "cpanforum";
-my $SUBJECT    = qr{[\w .:~!@#\$%^&*\()+?><,'";=-]+};
 my $STATUS_FILE;
 
 my %errors = (
@@ -597,6 +596,7 @@ use base 'CPAN::Forum::RM::Users';
 use base 'CPAN::Forum::RM::Admin';
 use base 'CPAN::Forum::RM::Other';
 use base 'CPAN::Forum::RM::Notify';
+use base 'CPAN::Forum::RM::Posts';
 use base 'CPAN::Forum::RM::Search';
 use base 'CPAN::Forum::RM::Subscriptions';
 use base 'CPAN::Forum::RM::Tags';
@@ -846,7 +846,7 @@ sub build_listing {
 		my $thread = $post->{thread};
 		my $thread_count = ( $thread and $threads->{$thread} ) ? $threads->{$thread}{cnt} : 0;
 		push @resp, {
-			subject      => _subject_escape( $post->{subject} ),
+			subject      => CPAN::Forum::Tools::_subject_escape( $post->{subject} ),
 			id           => $post->{id},
 			group        => $post->{group_name},
 			thread       => ( $thread_count > 1 ? 1 : 0 ),
@@ -979,314 +979,6 @@ sub _group_selector {
 }
 
 
-=head2 new_post
-
-Showing the new post page. (Alias of C<posts()>)
-
-=cut
-
-sub new_post {
-	posts(@_);
-}
-
-=head2 response_form
-
-Showing the response form. (Alias of C<posts()>)
-
-=cut
-
-sub response_form {
-	posts(@_);
-}
-
-
-=head2 posts
-
-Show a post, the editor and a preview - whichever is needed.
-
-=cut
-
-sub posts {
-	my ( $self, $errors ) = @_;
-	my $q = $self->query;
-
-	my $t = $self->load_tmpl(
-		"posts.tmpl",
-		associate => $q,
-	);
-	$t->param( $_ => 1 ) foreach @$errors;
-
-	my $rm = $self->get_current_runmode();
-	$self->log->debug("posts rm=$rm");
-	my $request = $self->session->param('request');
-	if ($request) {
-		$rm = $request;
-		$self->log->debug("posts request reset rm=$rm");
-	}
-
-	my $new_group    = "";
-	my $new_group_id = "";
-
-	if ( $rm eq "new_post" ) {
-		$new_group = ${ $self->query->param("path_parameters") }[0] || "";
-		$new_group_id = $q->param('new_group') if $q->param('new_group');
-		$self->log->debug("A: new_group: '$new_group' and id: '$new_group_id'");
-
-		if ($new_group) {
-			if ( $new_group =~ /^([\w-]+)$/ ) {
-				$new_group = $1;
-				my ($gr) = CPAN::Forum::DB::Groups->info_by( name => $new_group );
-				if ($gr) {
-					$new_group_id = $gr->{id};
-				} else {
-					return $self->internal_error(
-						"Group '$new_group' was not in database",
-					);
-				}
-			} else {
-				return $self->internal_error(
-					"Bad regex for '$new_group' ?",
-				);
-			}
-		} elsif ($new_group_id) {
-			my ($gr) = CPAN::Forum::DB::Groups->info_by( id => $new_group_id );
-			if ($gr) {
-				$new_group = $gr->{name};
-			} else {
-				return $self->internal_error(
-					"Group '$new_group_id' was not in database",
-				);
-			}
-		} elsif ( $q->param('q') ) {
-
-			# process search later
-		} else {
-
-			# TODO should be called whent the module_search is ready
-			return $self->module_search_form();
-		}
-		$self->log->debug("B: new_group: '$new_group' and id: '$new_group_id'");
-	}
-	if ( $rm eq "process_post" ) {
-		$new_group_id = $q->param("new_group_id");
-		if ( not $new_group_id ) {
-			return $self->internal_error(
-				"Missing new_group_id.",
-			);
-		}
-
-		if ( $new_group_id =~ /^(\d+)$/ ) {
-			$new_group_id = $1;
-			my ($grp) = CPAN::Forum::DB::Groups->info_by( id => $new_group_id );
-			if ($grp) {
-				$new_group = $grp->{name};
-			} else {
-				return $self->internal_error(
-					"Bad value for new_group (id) '$new_group_id' ?",
-				);
-			}
-		} else {
-			return $self->internal_error(
-				"Bad value for new_group (id) '$new_group_id' ?",
-			);
-		}
-	}
-	$self->log->debug("C: new_group: '$new_group' and id: '$new_group_id'");
-
-	my $title  = ""; # of the page
-	my $editor = 0;
-	$t->param( editor => 1 ) if grep { $rm eq $_ } (qw(process_post new_post response_form));
-
-
-	my $id = $q->param("id"); # there was an id
-	if ( $rm eq "response_form" or $rm eq "posts" ) {
-		$id = ${ $self->query->param("path_parameters") }[0] if ${ $self->query->param("path_parameters") }[0];
-	}
-	$id ||= $q->param("new_parent");
-	if ($id) {                # Show post
-		if ($id !~ /^\d+$/) {
-			$self->log->warning("User requested '/posts/$id' but that's not a numeric id");
-			return $self->notes('invalid_request');
-		}
-		my $post = CPAN::Forum::DB::Posts->get_post($id);
-		if ( not $post ) {
-			$self->log->warning("User requested '/posts/$id' but we could not find it in the database");
-			return $self->notes('no_such_post');
-			#return $self->internal_error(
-			#	"in request",
-			#);
-		}
-		my $thread_count = CPAN::Forum::DB::Posts->count_thread( $post->{thread} );
-		if ( $thread_count > 1 ) {
-			$t->param( thread_id    => $post->{thread} );
-			$t->param( thread_count => $thread_count );
-		}
-		$post->{responses} = CPAN::Forum::DB::Posts->list_posts_by( parent => $post->{id} );
-		my %post = %{ $self->_post($post) };
-		$t->param(%post);
-
-		#       (my $dashgroup = $post->gid) =~ s/::/-/g;
-		#       $t->param(dashgroup    => $dashgroup);
-		my $new_subject = $post->{subject};
-		if ( $new_subject !~ /^\s*re:\s*/i ) {
-			$new_subject = "Re: $new_subject";
-		}
-
-		$t->param( new_subject => _subject_escape($new_subject) );
-		$t->param( title       => _subject_escape( $post->{subject} ) );
-		$t->param( post        => 1 );
-
-		my $group = CPAN::Forum::DB::Groups->info_by( id => $post->{gid} );
-		$new_group    = $group->{name};
-		$new_group_id = $group->{id};
-	}
-	$self->log->debug("D: new_group: '$new_group' and id: '$new_group_id'");
-
-	#$t->param("group_selector" => $self->_group_selector($new_group, $new_group_id));
-	$t->param( new_group    => $new_group );
-	$t->param( new_group_id => $new_group_id );
-	$t->param( new_text     => CGI::escapeHTML( $q->param("new_text") ) );
-
-	# for previewing purposes:
-	# This is funky, in order to use the same template for regular show of a message and for
-	# the preview facility we create a loop around this code for the preview page (with hopefully
-	# only one iteration in it) The following hash is in preparation of this internal loop.
-	if ( not @$errors or $$errors[0] eq "preview" ) {
-		my %preview;
-		$preview{subject}  = _subject_escape( $q->param("new_subject") )  || "";
-		$preview{text}     = $self->_text_escape( $q->param("new_text") ) || "";
-		$preview{parentid} = $q->param("new_parent")                      || "";
-
-		#       $preview{thread_id}  = $q->param("new_text")    || "";
-		$preview{postername} = $self->session->param("username");
-		$preview{date}       = localtime;
-		$preview{id}         = "TBD";
-
-		$t->param( preview_loop => [ \%preview ] );
-	}
-
-	#$t->param(new_subject => _subject_escape($q->param("new_subject")));
-	$t->param( group => $new_group ) if $new_group;
-
-	return $t->output;
-}
-
-
-=head2 process_post
-
-Process a posting, that is take the values from the CGI object, check if they
-are acceptable and try to add them to the database. If anything bad happens,
-give an error message preferably by filling out the form again.
-
-=cut
-
-sub process_post {
-	my $self = shift;
-	my $q    = $self->query;
-	my @errors;
-	my $parent = $q->param("new_parent");
-
-	my $parent_post;
-	if ($parent) { # assume response
-		$parent_post = CPAN::Forum::DB::Posts->get_post($parent);
-		push @errors, "bad_thing" if not $parent_post;
-	} else {                                                      # assume new post
-		if ( $q->param("new_group_id") ) {
-			push @errors, "bad_group" if not CPAN::Forum::DB::Groups->info_by( id => $q->param("new_group_id") );
-		} else {
-			push @errors, "no_group";
-		}
-	}
-
-	my $new_subject = $q->param("new_subject");
-	my $new_text    = $q->param("new_text");
-
-	push @errors, "no_subject" if not $new_subject;
-	push @errors, "invalid_subject" if $new_subject and $new_subject !~ m{^$SUBJECT$};
-
-	push @errors, "no_text" if not $new_text;
-	push @errors, "subject_too_long" if $new_subject and length($new_subject) > 80;
-
-	$self->log->debug( "username: " . $self->session->param("username") . " uid: " . $self->session->param("uid") );
-
-	my $preview_button = $q->param("preview_button");
-	my $submit_button  = $q->param("submit_button");
-	if ( not @errors and $submit_button ) {
-		my $last_post = CPAN::Forum::DB::Posts->get_latest_post_by_uid( $self->session->param('uid') );
-		  # TODO, maybe also check if the post is the same as the last post to avoid duplicates
-		if ($last_post) {
-			$self->log->debug( "username: "
-					. $self->session->param("username")
-					. " last post: "
-					. $last_post->{date}
-					. " now: "
-					. time() );
-			if ( $last_post->{text} eq $new_text ) {
-				push @errors, "duplicate_post";
-			} elsif (CPAN::Forum::DB::Posts->post_within_limit( $self->session->param('uid'), $self->config("flood_control_time_limit") ) ) {
-				push @errors, "flood_control";
-			} 
-		}
-	}
-
-	return $self->posts( \@errors ) if @errors;
-
-
-	# There will be two buttons, one for Submit and one for Preview.
-	# We will save the message only if the Submit button was pressed.
-	# When the editor first displayed and every time if an error was caught this button will be hidden.
-
-	my $markup = CPAN::Forum::Markup->new();
-	my $result = $markup->posting_process($new_text);
-	if ( not defined $result ) {
-		$self->log->debug("--- BAD TEXT STARTS ---");
-		$self->log->debug($new_text);
-		$self->log->debug("--- BAD TEXT ENDS ---");
-		push @errors, "text_format";
-		return $self->posts( \@errors );
-	}
-
-
-	if ($preview_button) {
-		return $self->posts( ["preview"] );
-	}
-	if ( not $submit_button ) {
-		return $self->internal_error(
-			"Someone sent in a form without the Preview or Submit button",
-		);
-	}
-
-	my $username = $self->session->param("username");
-	my $user = CPAN::Forum::DB::Users->info_by( username => $username );
-	if ( not $user ) {
-		return $self->internal_error("Unknown username: '$username'");
-	}
-
-
-	my %data = (
-		uid     => $user->{id},
-		gid     => ( $parent_post ? $parent_post->{gid} : $q->param("new_group_id") ),
-		subject => $q->param("new_subject"),
-		text    => $new_text,
-	);
-	my $post_id = eval { CPAN::Forum::DB::Posts->add_post( \%data, $parent_post, $parent ); };
-	if ($@) {
-
-		#push @errors, "subject_too_long" if $@ =~ /subject_too_long/;
-		if ( not @errors ) {
-			return $self->internal_error(
-				"UNKNOWN_ERROR: $@",
-			);
-		}
-		return $self->posts( \@errors );
-	}
-
-	#$self->notify($post_id);
-
-	$self->home;
-}
-
-
 
 sub _post {
 	my ( $self, $post ) = @_;
@@ -1298,15 +990,10 @@ sub _post {
 		responses  => $post->{responses},
 		text       => $self->_text_escape( $post->{text} ),
 		id         => $post->{id},
-		subject    => _subject_escape( $post->{subject} ),
+		subject    => CPAN::Forum::Tools::_subject_escape( $post->{subject} ),
 	);
 
 	return \%post;
-}
-
-sub _subject_escape {
-	my ($subject) = @_;
-	return CGI::escapeHTML($subject);
 }
 
 # TODO: this is not correct, the Internal error should be raised all the way up, not as the

@@ -41,4 +41,10 @@ sub _my_sendmail {
 	}
 }
 
+sub _subject_escape {
+	my ($subject) = @_;
+	return CGI::escapeHTML($subject);
+}
+
+
 1;
