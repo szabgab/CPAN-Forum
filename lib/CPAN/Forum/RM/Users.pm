@@ -48,7 +48,11 @@ sub users {
 	$t->param( title         => "Information about $username" );
 
 	my $page = $q->param('page') || 1;
-	$self->_search_results( $t, { where => { uid => $user->{id} }, page => $page } );
+	my $params = $self->_search_results( { where => { uid => $user->{id} }, page => $page } );
+	if ($params) {
+		$t->param(%$params);
+	}
+
 	$t->output;
 }
 

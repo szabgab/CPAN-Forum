@@ -59,7 +59,10 @@ sub dist {
 
 	$self->set_ratings( $t, $gr );
 	my $page = $q->param('page') || 1;
-	$self->_search_results( $t, { where => { gid => $gid }, page => $page } );
+	my $params = $self->_search_results( { where => { gid => $gid }, page => $page } );
+	if ($params) {
+		$t->param(%$params);
+	}
 	$self->_subscriptions( $t, $gr );
 
 	# TODO: is is not clear to me how can here anything be undef, but I got

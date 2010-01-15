@@ -45,7 +45,10 @@ sub author {
 	$self->log->debug("Group IDs: @$group_ids");
 	my $page = $q->param('page') || 1;
 	if (@$group_ids) {
-		$self->_search_results( $t, { where => { gid => $group_ids }, page => $page } );
+		my $params = $self->_search_results( { where => { gid => $group_ids }, page => $page } );
+		if ($params) {
+			$t->param(%$params);
+		}
 	}
 
 	#$self->_subscriptions($t, $gr);

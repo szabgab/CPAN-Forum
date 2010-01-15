@@ -807,7 +807,10 @@ sub all {
 	);
 
 	my $page = $q->param('page') || 1;
-	$self->_search_results( $t, { where => {}, page => $page } );
+	my $params = $self->_search_results( { where => {}, page => $page } );
+	if ($params) {
+		$t->param(%$params);
+	}
 	$self->log->debug("home to output");
 	$t->output;
 }

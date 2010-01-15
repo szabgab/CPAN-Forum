@@ -8,11 +8,9 @@ use CPAN::Forum::DB::Posts ();
 use CPAN::Forum::DB::Groups ();
 use CPAN::Forum::DB::Users ();
 
-# currently returning the number of results but this might change
-# ->_search_results($t, {where => {}, page => $n});
-# $t is an HTML::Template to be filled
+# ->_search_results( {where => {}, page => $n});
 sub _search_results {
-	my ( $self, $t, $params ) = @_;
+	my ( $self, $params ) = @_;
 
 	$params->{per_page} = $self->config("per_page");
 
@@ -20,19 +18,22 @@ sub _search_results {
 	my $results = $pager->{results};
 
 	#$self->log->debug(Data::Dumper->Dump([$results], ['results']));
-	my $total = $pager->{total_entries};
-	$self->log->debug("number of entries: total=$total");
-	my $data = $self->build_listing($results);
+	return if not $pager->{total_entries};
 
-	$t->param( messages      => $data );
-	$t->param( total         => $total );
-	$t->param( previous_page => $pager->{previous_page} );
-	$t->param( next_page     => $pager->{next_page} );
-	$t->param( first_entry   => $pager->{first_entry} );
-	$t->param( last_entry    => $pager->{last_entry} );
-	$t->param( first_page    => 1 ) if $pager->{current_page} != 1;
-	$t->param( last_page     => $pager->{last_page} ) if $pager->{current_page} != $pager->{last_page};
-	return $pager->{total_entries};
+	$self->log->debug("number of entries: total=$pager->{total_entries}");
+	my $data = $self->build_listing($results);
+	my %params = (
+		messages      => $data,
+		total         => $pager->{total_entries},
+		previous_page => $pager->{previous_page},
+		next_page     => $pager->{next_page},
+		first_entry   => $pager->{first_entry},
+		last_entry    => $pager->{last_entry},
+		first_page    => ($pager->{current_page} != 1 ? 1 : 0),
+		last_page     => ($pager->{current_page} != $pager->{last_page}) ? $pager->{last_page} : 0,
+	);
+
+	return \%params;
 }
 
 sub module_search_form {
@@ -161,9 +162,9 @@ sub _search_posts {
 
 		my $page = $q->param('page') || 1;
 		$t->param( $what => 1 );
-		return $self->_search_results( $t, { where => \%where, page => $page } );
+		return $self->_search_results( { where => \%where, page => $page } );
 	}
-	return 0;
+	return;
 }
 
 1;
