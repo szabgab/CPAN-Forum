@@ -1,9 +1,11 @@
-<TMPL_INCLUDE NAME="head.tmpl">
-<p id="pageTitle">Internal Error</p>
+[% DEFAULT
+  title="Internal Error"
+  description=""
+  pagetitle="Internal Error"
+%]
+[% INCLUDE incl/header.tt %]
 
-<TMPL_INCLUDE NAME="navigation.tmpl">
-
-<TMPL_IF no_such_group>
+[% IF no_such_group %]
 <p>
 We don't have such CPAN distribution in our database. Either the link that led you here
 is not correct or our database is missing this CPAN distribution. If you belive this
@@ -14,38 +16,36 @@ of the distribution and maybe how did you get here.
 If you really have time, you could also look at <a href="/about/#development">the source code</a> 
 and let us know where is the bug.
 </p>
-</TMPL_IF>
+[% END %]
 
-<TMPL_IF restricted_area>
+[% IF restricted_area %]
 Restricted area. How did you get here ?
-</TMPL_IF>
+[% END %]
 
-<TMPL_IF no_such_user>
+[% IF no_such_user %]
 No such user.
-</TMPL_IF>
+[% END %]
 
-<TMPL_IF no_such_pauseid>
+[% IF no_such_pauseid %]
 No such PAUSEID in our database.
-</TMPL_IF>
+[% END %]
 
-<TMPL_IF failed_to_add_group>
+[% IF failed_to_add_group %]
 <p>
 Failed to add group.
 </p>
-</TMPL_IF>
+[% END %]
 
-<TMPL_IF invalid_subs_type>
+[% IF invalid_subs_type %]
 <p>
 The selected subscription type is invalid. How could it happen?
 </p>
-</TMPL_IF>
+[% END %]
 
-<TMPL_IF generic>
+[% IF generic %]
 <p>
 Something went wrong here. The webmaster will be informed and will try to take action. 
 </p>
-</TMPL_IF>
+[% END %]
 
-
-<TMPL_INCLUDE NAME="footer.tmpl">
-
+[% INCLUDE incl/footer.tt %]

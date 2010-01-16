@@ -963,10 +963,9 @@ sub internal_error {
 	if ($msg) {
 		$self->log->warning($msg);
 	}
-	my $t = $self->load_tmpl("internal_error.tmpl");
-	$t->param( $tag    => 1 ) if $tag;
-	$t->param( generic => 1 ) if not $tag;
-	$t->output;
+	$tag ||= 'generic';
+	my %params = ($tag => 1);
+	return $self->tt_process('pages/internal_error.tt', \%params);
 }
 
 =head2 notes
