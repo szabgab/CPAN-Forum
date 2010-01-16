@@ -1,0 +1,13 @@
+[% DEFAULT
+  title="Site is closed"
+  description=""
+  pagetitle="Site is closed"
+%]
+[% INCLUDE incl/header.tt %]
+
+
+<p>
+Temporarily the site is closed for upgrade. Please check back in a few minutes.
+</p>
+
+[% INCLUDE incl/footer.tt %]

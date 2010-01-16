@@ -81,11 +81,11 @@ sub faq {
 }
 
 sub help {
-	$_[0]->load_tmpl("help.tmpl")->output;
+	return $_[0]->tt_process('pages/help.tt');
 }
 
 sub site_is_closed {
-	$_[0]->load_tmpl("site_is_closed.tmpl")->output;
+	return $_[0]->tt_process('pages/site_is_closed.tt');
 }
 
 
