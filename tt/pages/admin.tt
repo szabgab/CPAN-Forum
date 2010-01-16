@@ -1,0 +1,62 @@
+[% DEFAULT
+  title="Admin interface"
+  description=""
+  pagetitle="Admin interface"
+%]
+[% INCLUDE incl/header.tt %]
+
+[% INCLUDE incl/search_form.tt %]
+
+[% IF updated %]
+Data updated. <a href="/admin/">look at it again</a>
+[% ELSE %]
+
+<!--
+<hr />
+<form method="POST" action="/admin/">
+<p>
+<input type="hidden" name="rm" value="add_new_group" />
+</p>
+<table>
+<tr>
+ <td>Group name:</td><td><input name="group" value="" size="50"></td>
+ <td>PAUSEID:</td><td><input name="pauseid" value="" size="20"></td>
+</tr>
+</table>
+<p>
+<input type="submit" value="Add new group" />
+</p>
+</form>
+-->
+
+<hr />
+
+
+<form method="POST" action="/admin/">
+<p>
+<input type="hidden" name="rm" value="admin_process" />
+</p>
+<table>
+<tr><td>From address:</td><td><input name="from" value="[% from %]" size="50"></td></tr>
+<tr><td>Disable e-mail notification:</td>
+    <td><input name="disable_email_notification" type="checkbox" [% IF disable_email_notification %]CHECKED[% END %] size="50"></td></tr>
+<tr><td>Page size:</td><td><input name="per_page" value="[% per_page %]" size="5"></td></tr>
+<tr><td>RSS size:</td><td><input name="rss_size" value="[% rss_size %]" size="5"></td></tr>
+<tr><td>Status:</td><td><select name="status">
+                         <option value="open" [% IF status_open %]SELECTED[% END %]>Open</option>
+                         <option value="readonly" [% IF status_readonly %]SELECTED[% END %]>Read only</option>
+                         <option value="closed" [% IF status_closed %]SELECTED[% END %]>Closed</option>
+						 </select></td></tr>
+<tr><td>Flood control time limit:</td><td><input name="flood_control_time_limit" value="[% flood_control_time_limit %]" size="5"></td></tr>
+	
+
+</table>
+<p>
+<input type="submit" value="Update" />
+</p>
+</form>
+
+[% END %]
+
+[% INCLUDE incl/footer.tt %]
+

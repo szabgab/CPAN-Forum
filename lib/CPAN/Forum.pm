@@ -1111,9 +1111,8 @@ sub add_new_group {
 		return $self->internal_error( "", "failed_to_add_group" );
 	}
 
-	my $t = $self->load_tmpl("admin.tmpl");
-	$t->param( updated => 1 );
-	$t->output;
+	my %params = ( updated => 1 );
+	return $self->tt_process('pages/admin.tt', \%params);
 }
 
 

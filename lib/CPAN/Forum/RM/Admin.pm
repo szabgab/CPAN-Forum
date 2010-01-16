@@ -79,9 +79,8 @@ sub admin_process {
 	$self->status( $q->param('status') );
 
 
-	my $t = $self->load_tmpl("admin.tmpl");
-	$t->param( updated => 1 );
-	$t->output;
+	my %params = ( updated => 1 );
+	return $self->tt_process('pages/admin.tt', \%params);
 }
 
 
@@ -94,10 +93,11 @@ sub admin {
 	my $data = CPAN::Forum::DB::Configure->get_all_pairs;
 	$self->log->debug( Data::Dumper->Dump( [$data], ['config'] ) );
 
-	my $t = $self->load_tmpl("admin.tmpl");
-	$t->param( "status_" . $self->status() => 1 );
-	$t->param(%$data);
-	$t->output;
+	my %params = (
+		"status_" . $self->status() => 1, 
+		%$data,
+	);
+	return $self->tt_process('pages/admin.tt', \%params);
 }
 
 1;
