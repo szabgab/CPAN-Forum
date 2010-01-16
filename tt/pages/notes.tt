@@ -1,81 +1,83 @@
-<TMPL_INCLUDE NAME="head.tmpl">
-<p id="pageTitle"></p>
+[% DEFAULT
+  title=""
+  description=""
+  pagetitle=""
+%]
+[% INCLUDE incl/header.tt %]
 
-<TMPL_INCLUDE NAME="navigation.tmpl">
-
-<TMPL_IF mypanok>
+[% IF mypanok %]
 <p>
 Your subscriptions were successfully updated.
 You can look at them here: <a href="/mypan/">subscription information</a>
 </p>
-</TMPL_IF>
+[% END %]
 
-<TMPL_IF no_such_page>
+[% IF no_such_page %]
 <p class="error">No such Page.</p>
 <p>
 </p>
-</TMPL_IF>
+[% END %]
 
-<TMPL_IF no_such_post>
+[% IF no_such_post %]
 <p class="error">No such post.</p>
-</TMPL_IF>
+[% END %]
 
-<TMPL_IF invalid_request>
+[% IF invalid_request %]
 <p class="error">Invalid request.</p>
-</TMPL_IF>
+[% END %]
 
-<TMPL_IF no_such_pauseid>
+[% IF no_such_pauseid %]
 <p class="error">No such PAUSEID.</p>
 <p>
 Look at the <a href="/mypan/">subscription information</a> again.
 </p>
-</TMPL_IF>
+[% END %]
 
-<TMPL_IF no_such_group>
+[% IF no_such_group %]
 <p class="error">No such Distribution in our database.</p>
 <p>
 Look at the <a href="/mypan/">subscription information</a> again.
 </p>
-</TMPL_IF>
+[% END %]
 
-<TMPL_IF no_subs_type>
+[% IF no_subs_type %]
 <p>
 You have to select if the given thing is a distribution or a PAUSEID.
 </p>
-</TMPL_IF>
+[% END %]
 
-<TMPL_IF no_such_rss_feed>
+[% IF no_such_rss_feed %]
 <p>
 No such RSS feed.
 </p>
-</TMPL_IF>
+[% END %]
 
-<TMPL_IF no_such_atom_feed>
+[% IF no_such_atom_feed %]
 <p>
 No such Atom feed.
 </p>
-</TMPL_IF>
+[% END %]
 
-<TMPL_IF tags_updated>
+[% IF tags_updated %]
 <p>
-Tags on <a href="/dist/<TMPL_VAR dist_name>"><TMPL_VAR dist_name></a> were updated<br />
+Tags on <a href="/dist/[% dist_name %]">[% dist_name %]</a> were updated<br />
 See list of <a href="/tags/">all the tags</a><br />
 </p>
-<TMPL_INCLUDE NAME="search_form.tmpl">
-</TMPL_IF>
+[% INCLUDE incl/search_form.tt %]
+[% END %]
 
-<TMPL_IF duplicate_email>
+[% IF duplicate_email %]
 This e-mail already exists in our database. If this is really your e-mail address 
 you can retrieve your password using the <a href="/">password reminder</a>
-</TMPL_IF>
+[% END %]
 
-<TMPL_IF invalid_group_name>
+[% IF invalid_group_name %]
 <p class="error">
 Group names are restricted to Alphanumeric characters and dash (-).
 <br />
 Press back, correct the value and submit it again.
 </p>
-</TMPL_IF>
+[% END %]
 
-<TMPL_INCLUDE NAME="footer.tmpl">
+[% INCLUDE incl/footer.tt %]
 

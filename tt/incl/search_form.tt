@@ -1,0 +1,15 @@
+<form method="post" action="/search/">
+<p>
+<input type="hidden" name="rm" value="search" />
+<select name="what">
+<option value="module"  [% IF module  %] selected="selected"[% END %]>Modules by name</option>
+<option value="pauseid" [% IF pauseid %] selected="selected"[% END %]>Modules by PAUSEID</option>
+<option value="user"    [% IF user    %] selected="selected"[% END %]>Users by name</option>
+<option value="subject" [% IF subject %] selected="selected"[% END %]>Posts by text in subject</option>
+<option value="text"    [% IF text    %] selected="selected"[% END %]>Posts by text in body</option>
+</select>
+<input name="name" value="[% name %]" />
+<input type="submit" value="Search" />
+</p>
+</form>
+

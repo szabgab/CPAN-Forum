@@ -976,10 +976,8 @@ Print short notification messages to the user.
 
 sub notes {
 	my ( $self, $msg, %params ) = @_;
-	my $t = $self->load_tmpl("notes.tmpl");
-	$t->param( $msg => 1 );
-	$t->param(%params);
-	$t->output;
+	$params{$msg} = 1;
+	return $self->tt_process('pages/notes.tt', \%params);
 }
 
 
