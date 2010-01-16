@@ -201,13 +201,10 @@ sub register {
 	my ( $self, $errs ) = @_;
 	my $q = $self->query;
 
-	my $t = $self->load_tmpl(
-		"register.tmpl",
-		associate => $q,
-	);
-
-	$t->param($errs) if $errs;
-	return $t->output;
+	my %params;
+	%params = %$errs if $errs;
+	$params{$_} = $q->param($_) for qw(nickname email fname lname); # TODO associate?
+	return $self->tt_process('pages/register.tt', \%params);
 }
 
 

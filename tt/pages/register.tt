@@ -1,0 +1,42 @@
+[% DEFAULT
+  title="Registration Pag to CPAN::Forum"
+  description=""
+  pagetitle="Registration Page to CPAN::Forum"
+%]
+[% INCLUDE incl/header.tt %]
+
+[% IF done %]
+   Thank you for registering. You are going to get your password in your mailbox.<br />
+   <a href="/login/">login</a>
+[% ELSE %]
+
+<div class="error">
+[% IF bad_nickname %]Nickname must be lower case alphanumeric between 1-25 characters.<br />[% END %]
+[% IF bad_email %]Email must be a valid address writen in lower case letters<br />[% END %]
+[% IF no_register_data %]Need both nickname and password<br />[% END %]
+[% IF nickname_exists %]Nickname or e-mail already in use<br />[% END %]
+</div>
+
+In order to post on this site first you'll have to register with a valid e-mail address.<br />
+Username currently should be between 1-25 characters.
+<form method="post" action="/">
+<p>
+<input type="hidden" name="rm" value="register_process" />
+</p>
+<table>
+<tr><td>Nickname:</td><td><input name="nickname" value="[% nickname %]" /></td></tr>
+<tr><td>Email:</td><td><input name="email" value="[% email %]" /></td></tr>
+<!--
+<tr><td>First name:</td><td><input name="fname" value="[% fname %]" /></td></tr>
+<tr><td>Last name:</td><td><input name="lname" value="[% lname %]" /></td></tr>
+-->
+<tr><td></td><td><input type="submit" value="Register" /></td></tr>
+</table>
+</form>
+<!--
+To retrieve a lost password, please visit the
+<a href="pwreminder">password reminder</a>.
+-->
+[% END  %]
+
+[% INCLUDE incl/footer.tt %]
