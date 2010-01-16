@@ -1,7 +1,9 @@
-<TMPL_INCLUDE NAME="head.tmpl">
-<p id="pageTitle">Installing a Perl Module from CPAN</p>
-
-<TMPL_INCLUDE NAME="navigation.tmpl">
+[% DEFAULT
+  title="Installing a Perl Module from CPAN"
+  description=""
+  pagetitle="Installing a Perl Module from CPAN"
+%]
+[% INCLUDE incl/header.tt %]
 
 <div class="blurb">
 There are several ways to install Perl Module from CPAN. 
@@ -31,6 +33,5 @@ Use ppm on the command line or with their GUI installer.
 </div>
 
 
-
-<TMPL_INCLUDE NAME="footer.tmpl">
+[% INCLUDE incl/footer.tt %]
 
