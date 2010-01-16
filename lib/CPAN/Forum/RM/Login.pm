@@ -22,13 +22,11 @@ sub login {
 
 	$self->log->debug( "Sending cookie using sid:  " . $self->session->id() );
 	$self->session_cookie();
-	my $t = $self->load_tmpl(
-		"login.tmpl",
-		associate => $q,
-	);
 
-	$t->param($errs) if $errs;
-	return $t->output;
+	my %params;
+	%params = %$errs if $errs;
+	$params{nickname} = $q->param('nickname'); # TODO associate?
+	return $self->tt_process('pages/login.tt', \%params);
 }
 
 =head2 login_process

@@ -1,12 +1,13 @@
-<TMPL_INCLUDE NAME="head.tmpl">
-<p id="pageTitle">Login</p>
-
-<TMPL_INCLUDE NAME="navigation.tmpl">
-
+[% DEFAULT
+  title="Login to CPAN::Forum"
+  description=""
+  pagetitle="Login to CPAN::Forum"
+%]
+[% INCLUDE incl/header.tt %]
 
 <div class="error">
-<TMPL_IF no_login_data>Need both nickname and password.<br></TMPL_IF>
-<TMPL_IF bad_login>Login failed.<br></TMPL_IF>
+[% IF no_login_data %]Need both nickname and password.<br>[% END %]
+[% IF bad_login %]Login failed.<br>[% END %]
 </div>
 
 <p>
@@ -16,7 +17,7 @@ with a valid e-mail address.
 <form method="post" action="/">
 <p>
 <input type="hidden" name="rm" value="login_process" />
-Nickname: <input name="nickname" value="<TMPL_VAR nickname>" />
+Nickname: <input name="nickname" value="[% nickname %]" />
 Password: <input name="password" type="password" />
 <input type="submit" value="Login" />
 </p>
@@ -26,4 +27,4 @@ To retrieve a lost password, please visit the
 <a href="/pwreminder/">password reminder</a>.
 </p>
 
-<TMPL_INCLUDE NAME="footer.tmpl">
+[% INCLUDE incl/footer.tt %]

@@ -16,7 +16,6 @@ About box with some statistics.
 
 sub about {
 	my $self = shift;
-	#my $t    = $self->load_tmpl("about.tmpl");
 
 	my %params = (
 		distro_cnt       => CPAN::Forum::DBI->count_rows_in('groups'),

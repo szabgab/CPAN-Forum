@@ -25,6 +25,8 @@
 		<li><a href="/dist/CGI-Application">CGI::Application</a></li>
 		<li><a href="/dist/CGI-Application-Plugin-Session">CGI::Application::Plugin::Session</a></li>
 		<li><a href="/dist/CGI-Application-Plugin-LogDispatch">CGI::Application::Plugin::LogDispatch</a></li>
+		<li><a href="/dist/CGI-Application-Plugin-TT">CGI::Application::Plugin::TT</a></li>
+		<li><a href="/dist/Template">Template Toolkit</a></li>
 		<li><a href="/dist/CGI-Session">CGI::Session</a></li>
 		<li><a href="/dist/HTML-Template">HTML::Template</a></li>
 		<li><a href="/dist/autodie">autodie</a></li>
