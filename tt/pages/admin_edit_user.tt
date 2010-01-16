@@ -1,0 +1,31 @@
+[% DEFAULT
+  title="Edit user information"
+  description=""
+  pagetitle="Edit user information"
+%]
+[% INCLUDE incl/header.tt %]
+
+[% IF done %]
+<p>
+The information was updated
+<a href="/admin_edit_user/[% this_username %]">see it again</a>
+</p>
+[% ELSE %]
+<div class="error">
+[% IF bad_pw_pair %]The two passwords mustbe the same<br>[% END %]
+</div>
+
+<p>
+Username: [% this_username %]
+</p>
+<form method="post" action="/admin_edit_user_process/">
+<p>
+<input type="hidden" name="rm" value="admin_edit_user_process" />
+<input type="hidden" name="uid" value="[% uid %]" />
+E-mail: <input name="email" value="[% email %]" size="40" /><br />
+<input type="submit" value="Update user" />
+</p>
+</form>
+[% END %]
+
+[% INCLUDE incl/footer.tt %]

@@ -47,17 +47,17 @@ sub admin_edit_user {
 		return $self->internal_error( "", "no_such_user" );
 	}
 
-	my $t = $self->load_tmpl("admin_edit_user.tmpl");
-	$t->param( this_username => $username );
-	$t->param( email         => $person->{email} );
-	$t->param( uid           => $person->{id} );
+	my %params = (
+		this_username => $username,
+		email         => $person->{email},
+		uid           => $person->{id},
+	);
 
 	if ( $errors and ref($errors) eq "ARRAY" ) {
-		$t->param( $_ => 1 ) foreach @$errors;
+		$params{$_} = 1 foreach @$errors;
 	}
 
-	$t->output;
-
+	return $self->tt_process('pages/admin_edit_user.tt', \%params);
 }
 
 sub admin_process {
