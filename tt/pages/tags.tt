@@ -1,0 +1,18 @@
+[% DEFAULT
+  title="Tags"
+  description=""
+  pagetitle="Tags"
+%]
+[% INCLUDE incl/header.tt %]
+
+[% IF user_name %]
+Tags of user <a href="/user/[% user_name %]">[% user_name %]</a>
+[% END %]
+<!--Number of tags: [% tag_count %]<br />-->
+<div id="htmltagcloud">
+[% FOREACH t IN tags %]
+<span class="tagcloud[% t.total %]"><a href="/tags/name/[% t.name %]">[% t.name %]</a></span>,
+[% END %]
+</div>
+
+[% INCLUDE incl/footer.tt %]

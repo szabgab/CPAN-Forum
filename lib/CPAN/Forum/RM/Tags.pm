@@ -34,28 +34,23 @@ sub tags {
 sub _list_tags {
 	my ( $self, $tags, $params ) = @_;
 
-	my $t = $self->load_tmpl(
-		"tags.tmpl",
-		loop_context_vars => 1,
-		global_vars       => 1,
-	);
+		#loop_context_vars => 1,
+		#global_vars       => 1,
 
 	my $tag_count = 0;
 
 	# maximize tag size to 24
 	foreach my $t (@$tags) {
-
 		#$tag_count += $t->{total};
 		$t->{total} = 24 if $t->{total} > 24;
 	}
 
-	$t->param( tags => $tags );
+	my %params = (
+		tags => $tags,
+	);
 
 	#$t->param(tag_count => $tag_count);
-	if ($params) {
-		$t->param(%$params);
-	}
-	return $t->output;
+	return $self->tt_process('pages/tags.tt', \%params);
 }
 
 sub _list_modules_with_tag {
