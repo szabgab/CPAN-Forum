@@ -598,10 +598,7 @@ sub cgiapp_prerun {
 	);
 	
 	$self->tt_params(
-		"loggedin" => ($self->session->param("loggedin") || "" ),
-		"username" => ($self->session->param("username") || "anonymous"),
 		"test_site_warning" => (-e $self->param("ROOT") . "/config_test_site"),
-		"admin"             => $self->session->param('admin'),
 		"dev_server"        => ( $ENV{CPAN_FORUM_DEV} ? 1 : 0 ),
 	);
 
@@ -640,6 +637,20 @@ sub cgiapp_prerun {
 	}
 	$self->log->debug("cgiapp_prerun ends");
 }
+
+# These cannot be set during cgiapp_prerun as we might be just
+# logging in/out and we need to set this after the fact
+sub tt_pre_process {
+	my ($self, $page, $params) = @_;
+	$params ||= {};
+
+	$params->{loggedin} = $self->session->param("loggedin") || "";
+	$params->{username} = $self->session->param("username") || "anonymous";
+	$params->{admin}    = $self->session->param('admin');
+
+	return;
+}
+
 
 sub cgiapp_postrun {
 	my $self       = shift;
