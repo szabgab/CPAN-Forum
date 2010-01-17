@@ -56,6 +56,20 @@ sub _generate_pw {
 	return $pw;
 }
 
+=pod
+
+=head2 info_by
+
+  my $user = CPAN::Forum::DB::Users->info_by( username => $username );
+
+  my $user = CPAN::Forum::DB::Users->info_by( email => $email );
+
+  my $user = CPAN::Forum::DB::Users->info_by( id => $uid );
+
+  print $user->{fname}, $user->{email}
+
+=cut
+
 sub info_by {
 	my ( $self, $field, $value ) = @_;
 	my @FIELDS = qw(id username email);

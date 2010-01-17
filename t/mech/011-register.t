@@ -206,8 +206,62 @@ diag('register with 25 long username');
 
 	BEGIN { $tests += 7; }
 }
-
 # TODO try to login with the given password with the same browser,
 # and then with another browser
+
+
+
+# TODO check when submitting same code twice
+# submitting incorrect code
+# submitting e-mail and not nickname
+{
+	diag('Reset password with the lost password form');
+	@CPAN::Forum::messages = ();
+	my $w2    = t::lib::CPAN::Forum::Test::get_mech();
+	$w2->get_ok($url);
+	$w2->follow_link_ok( { text => 'login' } );
+	$w2->follow_link_ok( { text => 'reset your password here' } );
+	#diag $w2->content;
+	$w2->content_like(qr{Please fill in your username or email:});
+	$w2->submit_form(
+		form_name => 'reset_password_request',
+		fields => {
+			username => $users[0]{username},
+		},
+	);
+	$w2->content_like(qr{Email sent with code});
+	is( scalar(@CPAN::Forum::messages), 1, 'one message sent' );
+	is ($CPAN::Forum::messages[0]{To}, $users[0]{email}, 'sent to the correct e-mail address');
+	my $rm = 'reset_password_form';
+	my ($code) = $CPAN::Forum::messages[0]{Message} =~ qr{http://\S+/$rm\?code=(\S+)}x;
+	ok($code, 'has code') or explain \@CPAN::Forum::messages;
+	diag "Code: $code";
+
+	my $new_password = 'abcdef';
+	$w2->get_ok("$url/$rm");
+	$w2->submit_form(
+		form_name => 'reset_password',
+		fields => {
+			code      => $code,
+			password  => $new_password,
+			password2 => $new_password,
+		},
+	);
+	$w2->content_like(qr{Password was reset});
+
+	
+	my $w3    = t::lib::CPAN::Forum::Test::get_mech();
+	$w3->get_ok($url);
+	$w3->content_unlike(qr{You are logged in});
+	$w3->get_ok("$url/login");
+	$w3->submit_form(
+		fields => {
+			nickname => $users[0]{username},
+			password => $new_password,
+		},
+	);
+	$w3->content_like(qr{You are logged in as.*$users[0]{username}});
+	BEGIN { $tests += 7; }
+}
 
 

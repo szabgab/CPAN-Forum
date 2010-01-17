@@ -23,8 +23,7 @@ Password: <input name="password" type="password" />
 </p>
 </form>
 <p>
-To retrieve a lost password, please visit the
-<a href="/pwreminder/">password reminder</a>.
+If you have lost your password, you can <a href="/reset_password_request/">reset your password here</a>.
 </p>
 
 [% INCLUDE incl/footer.tt %]
