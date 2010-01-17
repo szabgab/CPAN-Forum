@@ -1,0 +1,69 @@
+[% DEFAULT
+  title="Personal configuration of " _ fullname _ "(" _ username _ ")"
+  description=""
+  pagetitle= title
+%]
+[% INCLUDE incl/header.tt %]
+
+
+<form method="post" action="/">
+<p>
+<input type="hidden" name="rm" value="update_subscription" />
+<input type="hidden" name="gids" value="[% gids %]" />
+</p>
+<p>
+Subscriptions
+</p>
+<div class="subscription">
+<table>
+<tr>
+  <th>Distribution or PAUSEID</th>
+  <th>All messages</th>
+  <th>Thread starters</th>
+  <th>Followups</th>
+</tr>
+<!--
+<tr>
+  <td>All</td>
+  <td><input type="checkbox" name="allposts" [% IF allposts %]CHECKED[% END %] /></td>
+  <td><input type="checkbox" name="starters" [% IF starters %]CHECKED[% END %] /></td>
+  <td><input type="checkbox" name="followups" [% IF followups %]CHECKED[% END %] /></td>
+</tr>
+-->
+[% FOR sub IN subscriptions %]
+  <tr>
+    <td>[% sub.group %]</td>
+    <td><input type="checkbox" name="allposts_[% sub.gid %]"  [% IF sub.allposts %]CHECKED[% END %] /></td>
+    <td><input type="checkbox" name="starters_[% sub.gid %]"  [% IF sub.starters %]CHECKED[% END %] /></td>
+    <td><input type="checkbox" name="followups_[% sub.gid %]" [% IF sub.followups %]CHECKED[% END %] /></td>
+  </tr>
+[% END %]
+<!--
+<tr>
+  <td><input name="name" size="20" />
+      <select name="type">
+        <option value=""></option>
+        <option value="distro">Distribution</option>
+        <option value="pauseid">PAUSEID</option>
+      </select>
+     </td>
+  <td><input type="checkbox" name="allposts__new"  [% IF allposts %]CHECKED[% END %] /></td>
+  <td><input type="checkbox" name="starters__new"  [% IF starters %]CHECKED[% END %] /></td>
+  <td><input type="checkbox" name="followups__new" [% IF followups %]CHECKED[% END %] /></td>
+</tr>
+-->
+</table>
+
+</div>
+
+<p>
+Follow ups mean new messages in a thread you alread participated in. Not necesarily response to your message
+but probably a thread you are interested in.
+</p>
+<p>
+<input name="submit" type="submit" value="Update" />
+</p>
+</form>
+
+[% INCLUDE incl/footer.tt %]
+

@@ -71,16 +71,13 @@ sub mypan {
 		( $gids, $subscriptions ) = $self->_get_all_subscriptions($user);
 	}
 
-	my $t = $self->load_tmpl(
-		"mypan.tmpl",
-		loop_context_vars => 1,
+	my %params = (
+		subscriptions => $subscriptions,
+		gids          => $gids,
+		fullname      => $user->{fullname},
+		title         => "Information about $username",
 	);
-	$t->param( subscriptions => $subscriptions );
-	$t->param( gids          => $gids );
-	$t->param( fullname      => $user->{fullname} );
-	$t->param( title         => "Information about $username" );
-
-	$t->output;
+	return $self->tt_process('pages/mypan.tt', \%params);
 }
 
 sub _get_all_subscriptions {
