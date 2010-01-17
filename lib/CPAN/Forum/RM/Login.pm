@@ -214,9 +214,28 @@ sub reset_password_form_process {
 		return $self->reset_password_form('not_matching');
 	}
 
-	# get user from code
-	# check if the runodes match
+	my $data = CPAN::Forum::DB::Junk->get_junk($code);
+	if (not $data) {
+		return $self->reset_password_form('invalid_code');
+	}
+
+	# check if the run-modes match
+	if ($data->{rm} ne 'reset_password') {
+		return $self->reset_password_form('invalid_rm');
+	};
+
+	if (not $data->{username} or not $data->{uid}) {
+		# TODO internal error?
+		return $self->reset_password_form('no_user');
+	}
+
 	# update password, remove code
+	use Digest::SHA qw(sha1_base64);
+	CPAN::Forum::DB::Users->update(
+		$data->{uid},
+		sha1 => sha1_base64( $pw1 ),
+	);
+	my $data = CPAN::Forum::DB::Junk->delete_junk($code);
 	
 	return $self->tt_process('pages/reset_password_done.tt');
 }
@@ -257,6 +276,8 @@ sub reset_password_request_process {
 	use CPAN::Forum::DB::Users;
 	my $code = CPAN::Forum::DB::Users::_generate_pw(20);
 
+	use CPAN::Forum::DB::Junk;
+	CPAN::Forum::DB::Junk->add_junk($code, { rm => 'reset_password', username => $user->{username}, uid => $user->{id} });
 
 	$self->send_password_reset_code($user, $code);
 	return $self->tt_process('pages/reset_password_request_processed.tt');

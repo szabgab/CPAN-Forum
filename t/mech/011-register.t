@@ -243,11 +243,12 @@ diag('register with 25 long username');
 		form_name => 'reset_password',
 		fields => {
 			code      => $code,
-			password  => $new_password,
+			password1 => $new_password,
 			password2 => $new_password,
 		},
 	);
-	$w2->content_like(qr{Password was reset});
+	#diag $w2->content;
+	$w2->content_like(qr{Your password was reset});
 
 	
 	my $w3    = t::lib::CPAN::Forum::Test::get_mech();
@@ -261,7 +262,7 @@ diag('register with 25 long username');
 		},
 	);
 	$w3->content_like(qr{You are logged in as.*$users[0]{username}});
-	BEGIN { $tests += 7; }
+	BEGIN { $tests += 14; }
 }
 
 
