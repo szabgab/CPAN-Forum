@@ -57,20 +57,16 @@ sub _list_modules_with_tag {
 	my ( $self, $value, $type ) = @_;
 	$type ||= '';
 
-	my $t = $self->load_tmpl(
-		"${type}modules_with_tags.tmpl",
-		loop_context_vars => 1,
-		global_vars       => 1,
-	);
 	my $modules = CPAN::Forum::DB::Tags->get_modules_with_tag($value);
-	$t->param( tag     => $value );
-	$t->param( modules => $modules );
+	my %params = (
+		tag     => $value,
+		modules => $modules,
+	);
 
-	my $referer = $ENV{HTTP_REFERER} || '';
-	$referer =~ s{^(https?://[^/]+).*}{$1};
-
-	#$t->param(referer => "$referer/dist");
-	return $t->output;
+	#my $referer = $ENV{HTTP_REFERER} || '';
+	#$referer =~ s{^(https?://[^/]+).*}{$1};
+	#$params{referer} = "$referer/dist";
+	return $self->tt_process("pages/${type}modules_with_tags.tt", \%params);
 }
 
 1;

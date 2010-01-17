@@ -1,0 +1,29 @@
+<html>
+<head>
+<script language="javascript">
+
+function show(url) {
+    window.opener.location = url;
+    window.close();
+}
+</script>
+
+</head>
+<body>
+[% IF loggedin %]You are logged in to CPAN::Forum as [% username %][% END %]
+[% IF admin %][% END %]
+[% IF test_site_warning %]
+<p class="warning">Warning: this is a test site, the data here will be deleted.</p>
+[% END %]
+
+
+
+
+<p>Modules with tag <b>[% tag %]</b></p>
+[% FOR m IN modules %]
+<a href="javascript:show('[% m.referer %]/[% m.name %]')">[% m.name %]</a> ([% m.cnt %]), 
+[% END %]
+
+
+</body>
+</html>

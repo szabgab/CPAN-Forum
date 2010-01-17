@@ -1,0 +1,12 @@
+[% DEFAULT
+  title="Modules with tag " _ tag
+  description = ""
+  pagetitle = title
+%]
+[% INCLUDE incl/header.tt %]
+
+[% FOR m IN modules %]
+<a href="/dist/[% m.name %]">[% m.name %]</a> [% m.cnt %]<br />
+[% END %]
+
+[% INCLUDE incl/footer.tt %]
