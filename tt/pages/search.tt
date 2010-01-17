@@ -1,0 +1,35 @@
+[% DEFAULT
+  title = "Search page"
+  description = ""
+  pagetitle = title
+%]
+[% INCLUDE incl/header.tt %]
+
+
+[% INCLUDE incl/search_form.tt %]
+
+[% IF pauseid_name %]
+    <p>
+    All the posts related to modules of 
+       <a href="/author/[% pauseid_name %]">[% pauseid_name %]</a>.
+    </p>
+[% END %]
+
+[% FOR g IN groups %]
+   <a href="/dist/[% g.name %]">[% g.name %]</a><br />
+[% END %]
+
+[% FOR u IN users %]
+  <a href="/users/[% u.username %]">[% u.username %]</a><br />
+[% END %]
+
+[% INCLUDE incl/listing.tt %]
+
+[% IF no_results %]
+<p class="error">
+No hits.
+</p>
+[% END %]
+
+[% INCLUDE incl/footer.tt %]
+

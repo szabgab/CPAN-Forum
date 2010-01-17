@@ -91,11 +91,6 @@ sub search {
 	if ( $name =~ /(.*)/ ) { $name = $1; }
 	$name =~ s/::/-/g if $what eq "module";
 
-	my $t = $self->load_tmpl(
-		"search.tmpl",
-		associate         => $q,
-		loop_context_vars => 1,
-	);
 	my $it;
 
 	if ( not $what and not $name ) {
@@ -106,49 +101,51 @@ sub search {
 	$self->session->param( search_what => $what );
 	$self->session->param( search_name => $name );
 
-	if ( not $what or not $name ) {
-		return $t->output;
+	my $params;
+	if ( $what and $name ) {
+		if ( $what eq "module" or $what eq "pauseid" ) {
+			$params = $self->_search_modules( $name, $what );
+		} elsif ( $what eq "user" ) {
+			$params = $self->_search_users( $name, $what );
+		} else {
+			$params = $self->_search_posts( $name, $what );
+		}
 	}
-
-	my $any_result = 0;
-	if ( $what eq "module" or $what eq "pauseid" ) {
-		$any_result = $self->_search_modules( $t, $name, $what );
-	} elsif ( $what eq "user" ) {
-		$any_result = $self->_search_users( $t, $name, $what );
-	} else {
-		$any_result = $self->_search_posts( $t, $name, $what );
-	}
-	$t->param( no_results => not $any_result );
-	$t->output;
+	return $self->tt_process('pages/search.tt', $params);
 }
 
 # $what: module or pauseid
 sub _search_modules {
-	my ( $self, $t, $name, $what ) = @_;
+	my ( $self, $name, $what ) = @_;
 
+	my %params;
 	my $groups;
 	if ( $what eq "module" ) {
 		$groups = CPAN::Forum::DB::Groups->names_by_name($name);
 	} else {
 		$groups = CPAN::Forum::DB::Groups->names_by_pauseidstr( uc $name );
-		$t->param( pauseid_name => uc $name );
+		$params{pauseid_name} = uc $name;
 	}
-	$t->param( groups => $groups );
-	$t->param( $what  => 1 );
-	return @$groups ? 1 : 0;
+	$params{groups} = $groups;
+	$params{$what} = 1;
+	$params{no_results} = @$groups ? 0 : 1;
+	return \%params;
 }
 
 sub _search_users {
-	my ( $self, $t, $name, $what ) = @_;
+	my ( $self, $name, $what ) = @_;
 
 	my $users = CPAN::Forum::DB::Users->list_users_like( lc($name) );
-	$t->param( users => $users );
-	$t->param( $what => 1 );
-	return @$users ? 1 : 0;
+	my %params = (
+		users => $users,
+		$what => 1,
+		no_results => (@$users ? 0 : 1),
+	);
+	return \%params;
 }
 
 sub _search_posts {
-	my ( $self, $t, $name, $what ) = @_;
+	my ( $self, $name, $what ) = @_;
 
 	my $q = $self->query;
 
@@ -161,10 +158,10 @@ sub _search_posts {
 		$self->log->debug( "Search 2: " . join "|", %where );
 
 		my $page = $q->param('page') || 1;
-		$t->param( $what => 1 );
-		return $self->_search_results( { where => \%where, page => $page } );
+		#$t->param( $what => 1 );
+		#$self->_search_results( { where => \%where, page => $page } );
 	}
-	return;
+	return {no_results => 1};
 }
 
 1;
