@@ -1,0 +1,27 @@
+[% IF messages %]
+<table class="posts">
+	<tr class="posts_head">
+		[% UNLESS hide_group %]<th class="col1">Module</th>[% END %]
+		<th class="col2">Title</th>
+		<th class="col3">Thread</th>
+		<th class="col4">Date</th>
+		[% UNLESS hide_username %]<th class="col5">Posted by</th>[% END %]
+	</tr>
+[% FOR m IN messages %]
+    [% odd = loop.count mod 2 %]
+	<tr class="[% IF odd %]odd[% ELSE %]even[% END %]">
+		[% UNLESS hide_group %]<td class="col1"><a href="/dist/[% m.group %]">[% m.group %]</a></td>[% END %]
+		<td class="col2"><a href="/posts/[% m.id %]">[% m.subject %]</a></td>
+		<td class="col3">[% IF m.thread %]<a href="/threads/[% m.thread_id %]">(+[% m.thread_count %])</a>[% END %]</td>
+		<td class="col4">[% m.date %]</td>
+		[% UNLESS hide_username %]<td class="col5"><a href="/users/[% m.postername %]">[% m.postername %]</a></td>[% END %]
+	</tr>
+[% END %]
+</table>
+[% IF first_page %]   <a href="?page=[% first_page %]">first page</a> | [% END %]
+[% IF previous_page %]<a href="?page=[% previous_page %]">previous page</a> | [% END %]
+[% first_entry %] - [% last_entry %] messages in a total of [% total %]
+[% IF next_page %] | <a href="?page=[% next_page %]">next page</a>[% END %]
+[% IF last_page %] | <a href="?page=[% last_page %]">last page</a>[% END %]
+
+[% END %]

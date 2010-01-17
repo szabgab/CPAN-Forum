@@ -24,14 +24,6 @@ sub users {
 		return $self->internal_error("No username");
 	}
 
-	my $t = $self->load_tmpl(
-		"users.tmpl",
-		loop_context_vars => 1,
-		global_vars       => 1,
-	);
-
-	$t->param( hide_username => 1 );
-
 	my $user = CPAN::Forum::DB::Users->info_by( username => $username );
 
 	if ( not $user ) {
@@ -43,17 +35,20 @@ sub users {
 
 	#$fullname = $username if not $fullname;
 
-	$t->param( this_username => $username );
-	$t->param( this_fullname => $fullname );
-	$t->param( title         => "Information about $username" );
+	my %params = (
+		hide_username => 1,
+		this_username => $username,
+		this_fullname => $fullname,
+		title         => "Information about $username",
+	);
 
 	my $page = $q->param('page') || 1;
-	my $params = $self->_search_results( { where => { uid => $user->{id} }, page => $page } );
-	if ($params) {
-		$t->param(%$params);
+	my $listing = $self->_search_results( { where => { uid => $user->{id} }, page => $page } );
+	if ($listing) {
+		%params = (%params, %$listing);
 	}
 
-	$t->output;
+	return $self->tt_process('pages/users.tt', \%params);
 }
 
 1;
