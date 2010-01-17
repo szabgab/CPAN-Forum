@@ -12,13 +12,14 @@ use CPAN::Forum::DB::Users ();
 
 sub selfconfig {
 	my ( $self, $errs ) = @_;
-	my $t = $self->load_tmpl("change_password.tmpl");
+	$errs ||= {};
 	my $user = CPAN::Forum::DB::Users->info_by( id => $self->session->param('uid') );
-	$t->param( fname => $user->{fname} );
-	$t->param( lname => $user->{lname} );
-
-	$t->param($errs) if $errs;
-	$t->output;
+	my %params = (
+		fname => $user->{fname},
+		lname => $user->{lname},
+		%$errs,
+	);
+	return $self->tt_process('pages/change_password.tt', \%params);
 }
 
 sub change_info {
