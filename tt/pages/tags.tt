@@ -11,7 +11,7 @@ Tags of user <a href="/user/[% user_name %]">[% user_name %]</a>
 <!--Number of tags: [% tag_count %]<br />-->
 <div id="htmltagcloud">
 [% FOREACH t IN tags %]
-<span class="tagcloud[% t.total %]"><a href="/tags/name/[% t.name %]">[% t.name %]</a></span>,
+<span class="tagcloud[% t.total %]"><a href="/tags/name/[% t.name %]">[% t.name %]</a></span>[% UNLESS loop.last %],[% END %]
 [% END %]
 </div>
 
