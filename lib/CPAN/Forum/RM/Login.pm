@@ -188,8 +188,9 @@ sub reset_password_form {
 	my $error = shift;
 
 	my $q = $self->query;
+	my $code = $q->param('code') || '';
 	my %params = (
-		code => $q->param('code'),
+		code => $code,
 	);
 	if ($error) {
 		$params{$error} = 1;
@@ -235,7 +236,7 @@ sub reset_password_form_process {
 		$data->{uid},
 		sha1 => sha1_base64( $pw1 ),
 	);
-	my $data = CPAN::Forum::DB::Junk->delete_junk($code);
+	CPAN::Forum::DB::Junk->delete_junk($code);
 	
 	return $self->tt_process('pages/reset_password_done.tt');
 }
