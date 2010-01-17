@@ -38,9 +38,8 @@ sub _search_results {
 
 sub module_search_form {
 	my ( $self, $errors ) = @_;
-	my $t = $self->load_tmpl("module_search_form.tmpl");
-	$t->param( $_ => 1 ) foreach @$errors;
-	$t->output;
+	my %params = map {$_ => 1 } @$errors;
+	return $self->tt_process('pages/module_search_form.tt', \%params);
 }
 
 sub module_search {
@@ -73,11 +72,10 @@ sub module_search {
 
 	#$self->log->debug("GROUP NAMES: @group_names");
 
-	my $t = $self->load_tmpl(
-		"module_select_form.tmpl",
+	my %params = (
+		"group_selector" => $self->_group_selector( \@group_names, \@group_ids ),
 	);
-	$t->param( "group_selector" => $self->_group_selector( \@group_names, \@group_ids ) );
-	$t->output;
+	return $self->tt_process('pages/module_select_form.tt', \%params);
 }
 
 sub search {

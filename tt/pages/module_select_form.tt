@@ -1,0 +1,22 @@
+[% DEFAULT
+  title="Select the module name to write about"
+  description=""
+  pagetitle = title
+%]
+[% INCLUDE incl/header.tt %]
+
+
+<p class="error">
+[% IF invalid_search_term %]Invalid or missing search term[% END %]
+</p>
+
+<form method="post" action="/new_post/">
+<p>
+<input type="hidden" name="rm" value="new_post" />
+[% group_selector %]
+<input type="submit" value="Select" />
+</p>
+</form>
+
+[% INCLUDE incl/footer.tt %]
+

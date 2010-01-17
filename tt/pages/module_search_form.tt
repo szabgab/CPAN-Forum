@@ -1,0 +1,25 @@
+[% DEFAULT
+  title="Search for module name"
+  description=""
+  pagetitle = title
+%]
+[% INCLUDE incl/header.tt %]
+
+<p class="error">
+[% IF invalid_search_term %]Invalid or missing search term[% END %]<br />
+[% IF no_module_found %]No module found[% END %]<br />
+</p>
+<p>
+Please search for the name of a module.
+</p>
+
+<form method="post" action="/module_search/">
+<p>
+<input type="hidden" name="rm" value="module_search" />
+<input name="q" value="[% q %]" />
+<input type="submit" value="Search" />
+</p>
+</form>
+
+[% INCLUDE incl/footer.tt %]
+
