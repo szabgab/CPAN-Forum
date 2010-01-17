@@ -1,29 +1,16 @@
-
-* User requests password change.
-
-We generate a random string and save the random string as field in the junk table.
-The value  will be { rm => 'resetpw', username => $username }  dumped using YAML::Tiny.
-We send the random thing by mail to the user attached to a url.
-
-When the user comes with the random string we can fetch the value and go to the 
-resetpw run mode that shows a page with two empty password fields 
-with the random string in a hidden fields on the page.
-
-When the user submits the new password pair we look-up the random string again 
-and check if the run mode is the one the user requested to execute. 
-(Actually this is not the same run-mode)
-If that's the one we update the password and remove the row from the junk table.
-
-We also need a daemon that will remove keys older than 24 hours or some other
-configurable value.
-
-* Switch application to use mod_perl on the live site
-
-==========================================
+* Display date in a better way (ellapsed time, or short date format)
+  Put time ellapsed since post instead of date of post, (3 min. 6 hours 3 days ago)
+  make this configurable: User can say after N days passed the date should show,
+  before that the ellapsed time
+ 
+* Add to the daemon that will remove junk keys older than 24 hours or some other
+  configurable value.
 
 * Setup daemon to be launched at boot time
 
 * Switch the whole application to use Template::Toolkit instead of HTML::Template
+
+* Record when a user last visited
 
 ==========================================
 
@@ -31,11 +18,14 @@ configurable value.
 
 * Check the log file and see why certain distributions are still missing?
 
+* Check the log of the cpanrating to see missing distributions
+
 ==========================================
 
 * Enable users to connect their CPAN::Forum id with their PAUSE id
 
-Let logged in user type in their PAUSEid
+Let logged in user type in their PAUSEid (or better yet, on the authors page 
+have a button "This is me" - if this PAUSEid is not yet associated)
 
 Generate random string and save it in the junk table with the value being
 { rm => verify_pause_id, pauseid => $pauseid }
@@ -43,6 +33,27 @@ Generate random string and save it in the junk table with the value being
 Send an e-mail with code to PAUSEID@cpan.org.
 Tell the user to check their e-mail and click on the approval link.
 
+* Allow module authors to setup splash-screen for 
+      * for all their modules or 
+      * for specific modules
+      The module specific splash-screen will win over any maintainer 
+      specific splash screen.
+    On the splash screen people will be able tell the users for example
+    that they discourage the use of CPAN::Forum and can point to other
+    existing ways of getting help for the module.
+
+* Allow the users to add 6 tags to the postings
+
+* Create rss feeds based on tags, allow people to subscribe posts that have
+   specific tags
+
+* Create discussion group that does not belong to any specific CPAN package
+  but where posts can be tagged.
+
+* Allow setting language field of the post - 
+    We can already use utf-8 in the database - allow the use of any language in the GUI as well.
+    once there is someone who will be ready to monitor the posts in those languages.
+    Allow people to subscribe to posts in specific languages only
 
 
 * Move the session id into the database:
@@ -51,6 +62,20 @@ Tell the user to check their e-mail and click on the approval link.
    issued
    last_seen
 
+
+* Allow a post to be associated with more than one group
+   Sometime we'll want to post a message in more than one group, e.g.  now I'd
+   like to know how to use CGI::Session with DBD::SQLite. I might want to post the
+   message on more than one list at the same time as this is related to more than
+   one module.  Porbably if I need to chose one I'll select CGI::Session as I am
+   trying to use that but it might be a nice feature.  Maybe I need to tell one
+   module as the main group and then have a way to associate a few more modules
+   with the posting.
+
+   Add an extra table for the additional distributions so there will be a leading 
+   distro of the thread.
+
+ 
 * Test the populate script 
  - create several very partial CPAN mirrors in the testfiles/ directory 
    and process those with the new populate script one after the other
@@ -70,14 +95,13 @@ Tell the user to check their e-mail and click on the approval link.
 
 ==========================
 
-* We can already use utf-8 in the database - allow the use of any language in the GUI as well.
 
 
-* Collect the packaes from downstream distriutions ORDB::DebianModules
-See http://szabgab.com/distributions/ for an old project
+* Collect the packages from downstream distriutions ORDB::DebianModules
+   See http://szabgab.com/distributions/ for an old project
 
 
-  * Generate HTML files, 
+* Generate HTML files, 
     * generate html (description tag should be the text taken from =NAME secion of each module and that of the main module of the package itself
     * the documentation of each module will be a static page (maybe later enhanced with javascript)
     * the main page of the package will be static for now but later it might be a dynamic page (or static with Javascript enhancement?)
@@ -86,90 +110,72 @@ See http://szabgab.com/distributions/ for an old project
       * package name
       * module name
 
-  * Process META.yml
-
-  * One-time notification of module author when the first post arrives to one of
-    her modules.
-  * Allow module authors to setup splash-screen for 
-      * for all their modules or 
-      * for specific modules
-      The module specific splash-screen will win over any maintainer 
-      specific splash screen.
-    On the splash screen people will be able tell the users for example
-    that they discourage the use of CPAN::Forum and can point to other
-    existing ways of getting help for the module.
+* Process META.yml
+  Start displaying more meta information
 
 
-  * Allow people to mark modules like/not like
+* One-time notification of module author when the first post arrives to one of
+    her modules. ( I am not sure we really need this any more )
 
--------------------------------
-  * Setup bug and request tracking (or shall we use RT for this?)
+* Allow people to mark modules like/not like
 
-  * Index and display perldoc
-  * Index and display perldoc in French and Italian
-  * Allow setting language field of the post - 
-    once there is someone who will be ready to monitor the posts in those languages.
-    Allow people to subscribe to posts in specific languages only
+==========================
 
-  * Create a user group that can delete posts, lock (or delete?) users.
+* Setup bug and request tracking (or shall we use RT for this?)
 
-  * Session information: remember logged in user, 
+* Index and display perldoc
+
+* Index and display perldoc in French and Italian
+
+* Create a user group that can delete posts, lock (or delete?) users.
+
+* Session information: remember logged in user, 
     have check-box on the main form to say user wants to be remembered
 
-  * Include the information received from cpanratings in our database:
-    For each "group" add two fields:  "ratings" and "review_count"
-
-
-  * Improve the populate.pl, look at CPANTS for ideas:
+* Improve the populate.pl, look at CPANTS for ideas:
     http://search.cpan.org/src/DOMM/Module-CPANTS-ProcessCPAN-0.62/bin/update_authors.pl
     Finish the recent.pl file and maybe replace the populate.pl by using recent.pl
     use this file to retreive list of CPAN authors and their e-mail address 
     http://www.cpan.org/authors/01mailrc.txt.gz
 
+* check all submitted fields (restrict posting size to 10.000 Kbyte ?
 
-  * Describe the schema (in Forum.pm) which fields are in use and which are not.
+==========================
 
+* Setup stand-alone server 
 
-
-
-Setup stand-alone server 
-
-Write Selenium tests that run against the web server -
-  by default it should run agains the stand-alone server 
-  but should be configurable to run agains the Apache CGI and 
-  against the mod_perl version.
+* Write Selenium tests that run against the web server -
+    by default it should run agains the stand-alone server 
+    but should be configurable to run agains the Apache CGI and 
+    against the mod_perl version.
 
 
-  Unite and clean up the code that fetches list of people who need to be
-  notified. Test both the interface to manage this and the the actually
-  retreival of addresses to be notified.
+* Unite and clean up the code that fetches list of people who need to be
+    notified. Test both the interface to manage this and the the actually
+    retreival of addresses to be notified.
 
-  We might want to add another way of subscripton: to subscribe to a specific
-  thread even if the user has not posted.
-
-
-  Missing entries: 
-    ApacheDBI
-    Net-SMS-TWSMS   missing from 02... and from CPANTS
-  they are both on search.cpan.org, now they are going to be auto-added but
-  we should still understand this issue so we can keep the version numbers
-  and the author changes up-to-date.
+* We might want to add another way of subscripton: to subscribe to a specific
+    thread even if the user has not posted.
 
 
-  Provide the alerts in rss feed as well, not only in e-mail.
-  Let people subscribe to alerts but ask to have the RSS feed only, no e-mails.
-  /rss/user/username
+* Provide the alerts in rss feed as well, not only in e-mail.
+    Let people subscribe to alerts but ask to have the RSS feed only, no e-mails.
+    /rss/user/username
+    This should be an integration of all the feeds with the alert mechanism
 
-  Check if the database (and its parent directory) is writable by the process 
-  and give appropriate error message if not.
-  BUG: If the directory of the database is not writable and logging was setup the
-   application fails.
+* BUG: If the directory of the logging directory is not writable
+     the application fails.
 
-  Logging: enable logging based on a single client IP address
+* Logging: enable logging based on a single client IP address
   
-  Include number of AnnoCPAN posts
+* Include number of AnnoCPAN posts
+
+* Check if it would be possible to get all the data from AnnoCPAN
+
+* Check if it would be possible to get all the data from CPANRATINGS to
+  include in our display
   
-  BUG:
+* BUG:
   When I try to reply and the original subject is already 50 chars long
   in offers a new subject with Re: prefix but then when I try to submit
   it won't let me.
@@ -178,13 +184,10 @@ Write Selenium tests that run against the web server -
   subject and press preview again
   it returns the same error message as it put back the word where it was earlier.
 
-  At the bottom of the pages add subscribers to specific threads
+* At the bottom of the pages add subscribers to specific threads
   and thread started in separate listsings.
   
-  Script that populates database should not lock the whole database for a long time
-  Maybe it should fetch all the data to memory and work there.
-
-  Add announcement service (check for new versions of modules and send e-mail
+* Add announcement service (check for new versions of modules and send e-mail
   to those whom are interested in announcements.
   For example I just tried to install a module but it failed its test. Checking 
   search.cpan.org I noticed the module has been updated lately and looking at
@@ -194,71 +197,68 @@ Write Selenium tests that run against the web server -
   it is hot. I can subscribe to the announcement service of this module and get
   the message.
 
-  Announcment service for new modules (modules that appear on CPAN for the first time)
-  For this I n
+* Announcment service for new modules (modules that appear on CPAN for the first time)
 
-  Register the PAUSEID where the module was last seen:
+* Register the PAUSEID where the module was last seen:
   Send out e-mail about PAUSEID changes
-  
 
-  In order to avoid accepting postings today that will break when we add more 
-  tags, we will reject any submission that is not correctly marked up.
+* Allow people to monitor if someone else uploaded a module in their name space
+  even if that module is not indexed.
 
-  Create larger discussion groups (e.g. Web development and All)
+* Check if the technique we use to remember the last request before login
+    cannot cause some security problem such as remembering the last request of
+    someone else who used the same machine recently ? 
 
-  Record the date when a user joined
-  Record when a user last visited
- 
-  Put time ellapsed since post instead of date of post, (3 min. 6 hours 3 days ago)
-  make this configurable: User can say after N days passed the date should show,
-  before that the ellapsed time
-  
-- replace the e-mail address checking by  if ($q->param('email') !~ $Email::Address::addr_spec) {
+* replace the e-mail address checking by  if ($q->param('email') !~ $Email::Address::addr_spec) {
 
-- Enable people to edit their posts 
-   - Shall we track changes ? 
+* Enable people to edit their posts 
+   - Track changes (versions of the posts)
    - Shall we display the orinal date and the last update date ?
    - Shall we display the post on its new date (order the display result by date ?)
-- Improve the markup language
 
-- Enable module authors (or some other volunteer) to configure some aspects of the 
+* Improve the markup language
+
+* Enable module authors (or some other volunteer) to configure some aspects of the 
   section of their own module
 
-- Posting a message under more than one distribution
+* Get a nice logo and favicon.ico
 
+* Removed the use of CPAN::Forum::Build - need to see what was it doing and
+   replace its functionality with something better
 
-- Get a nice logo and favicon.ico
+* Admin: hide a posting
 
-- xml version of the search results
+* Admin: delete or disable a user
 
-  Admin: hide a posting
+* Admin: disable posting to a distibution, 
 
-  Admin: delete or disable a user
+* Admin: hide a distribution and all its postings
 
-  Admin: disable posting to a distibution, 
+* Admin: change username ?
 
-  Admin: hide a distribution and all its postings
+* Admin: hide a message (or a whole thread)
 
-  Admin: change username ?
+* Admin: freeze a distro: (cannot add new message but still can see the earlier messages)
 
-  Admin: hide a message (or a whole thread) (database already has field)
-
-  Admin: freeze a distro: (cannot add new message but still can see the earlier messages)
-
-  Admin: (or even the author ?) should be able to move a message from one module to 
+* Admin: (or even the author ?) should be able to move a message from one module to 
           another module or group.
 
-- Statistics on posts, views etc.
+* Statistics on posts, views etc.
 
-- Other (human) languages (?)
+* Enable sending direct mail to a poster (?) (without disclosing e-mail address)
 
-- Enable sending direct mail to a poster (?) (without disclosing e-mail address)
+* Provide statistics on number of comments per distro 
 
-  Provide statistics on number of comments per distro to be displayed on search.cpan
+* Replace the /post/number link by /post/TITLE_OF_POST ???
 
-- Replace the /post/number link by /post/TITLE_OF_POST ???
+* make the page size (for paging) user configurable
 
-- make the page size (for paging) user configurable
+* show the release dates and version numbers of the modules
+
+==========================
+
+ 
+- xml version of the search results
 
 - Allow users to subscribe for announcement service:
   A script that will send an announcement on the new version of every module to
@@ -270,7 +270,7 @@ Write Selenium tests that run against the web server -
 
 
 PROBLEM:
-  Currently when a new browse visits the site we immediately give a cookie and
+  Currently when a new browser visits the site we immediately give a cookie and
   instert an entry in the sessions table.
   After running for about 10 days we have about 32.000 entries in the sessions table.
   It is not likely that so many people have visited the site.
@@ -287,23 +287,12 @@ PROBLEM:
   4) Add a field to the session table where I indicate the last access time
 
 
-
-- check out the remote authentication module of  David Nicol: AIS::Client
-  and its server.
-
-
 - Decide on Basic Markup language and how to extend for shortcuts opening tag
 for code:  <code[^>]*>  but right now only <code> should be accepted closing
 tag for code:  </code>
 
-- check all submitted fields (restrict posting size to 10.000 Kbyte ?
 - Improve text and explanations.
 
-- clean up documentation
-
-- add indexes to the tables ?
-
-- show the release dates and version numbers of the modules
 
 Authentication and user management process:
 - new user comes to our site we give him a cookie, when he wants to login we offer him
@@ -331,62 +320,11 @@ should use separate fields for usernames from various sources and when
 displayed we might prefix it auth:gabor, local:gabor etc.  Not nice, any better
 way ?
 
-- Fix Installation
-
-- when installing one might need to be root, in order to set the permissions 
-correctly ?
-
-- as user www fetch the module list file, unzip it in the db directory (as 
-this is the only directory we can write to) and run the populator
-
-- on a new installation, change the ownership of directories (or at least tell
-the user to do so)
-
 - Reply within a thread
 
 When replying to a post within a thread we might want to open the editor window
 in the middle of the thread, just below the post I am responding to.
 
-- make sure links that are relevant for distros don't show up on pages which
-don't belong to distros. (e.g. a link to search.cpan.org/dist/CGI is ok but a
-link to search.cpan.org/dist/General is not)
-
-- Sometime we'll want to post a message in more than one group, e.g.  now I'd
-like to know how to use CGI::Session with DBD::SQLite. I might want to post the
-message on more than one list at the same time as this is related to more than
-one module.  Porbably if I need to chose one I'll select CGI::Session as I am
-trying to use that but it might be a nice feature.  Maybe I need to tell one
-module as the main group and then have a way to associate a few more modules
-with the posting.
-
-This can be done by de-coupleing the name of the distribution from the posts table for all the distributions or we can add such an extra table for the additional distributions so there will be a leading distro of the thread.
-
-
-- Create a group for 
-- each Distribution (DONE)
-- Some bigger groups (eg. databases, testing, )
-maybe put each distribution under one or more of the groups too
-- General and other special purpose groups such as News (for the site)
-where only "administrators" can post.
-
-I am not sure if I have to keep all these things in one table and if the
-same form has to serve for creating messages in both distros and categories.
-
-- Database or plain files ?
-
-I think every information should be in the database but then we might want to
-generate static pages from the posts and discussions in order to reduce the
-need to fetch information from the database. Hmm, it sound faster but we'll
-probabl want to build the pages on the fly anyway so maybe it does not improve
-anything. We can start off by totally dynamic pages and then see if making them
-static will reduce the load on the server. First we'll have to have load on the
-server. :-) 
-
-- Check if the technique we use to remember the last request before login
-cannot cause some security problem such as remembering the last request of
-someone else who used the same machine recently ? 
-
-- xml - provided
 
 In order to prepare a downloadable version of the database we need to hide the
 personal infromation:
@@ -403,28 +341,6 @@ personal infromation:
     update posts set uid=myuid where (select users.uid myuid from users where posts.uid=users.username;
     select posts.id pid, users.id uid, users.username from posts, users where posts.uid=users.username;
 
-
-Removed the use of CPAN::Forum::Build - need to see what was it doing and
-replace its functionality with something better
-
-Allow the module author to put an announcement in front of their module forum.  
-Just some arbitrary block of HTML is fine.  
-
-Allow the author to delete their forum.  "Opt out".  ????
-
-Shlomi:
-The Forum uses cgiapp_prerun to set the mode according to the PATH_INFO instead of 
-using a mode_param code-reference. This causes a lot of warnings in the logs, 
-and doesn't really belong in cgiapp_prerun.
-
-It cannot be hosted on a URL except for its own virtual host, as it uses 
-absolute URLs. ("/login/", "/register/", etc.) A better idea would be to 
-track the path that the web-server gives (it's in one of the environment 
-variables) and then to construct a /cpan-forum/login/ /cpan-forum/register/ 
-etc. path. (or use relative URLs).
-
-----------------------------------------------------------
-OTHER
 
 
 Thinking aloud:
@@ -454,6 +370,10 @@ replace every </code> with   ]]></code>
 
 Now in addition to the </code> endtag you cant use trhe CDATA and the ]]> thingy either
 within CODE.
+
+  In order to avoid accepting postings today that will break when we add more 
+  tags, we will reject any submission that is not correctly marked up.
+
 
 ======================================================================
 
@@ -568,11 +488,6 @@ within CODE.
 	
 
 
-Some requested features and suggested solutions:
-
-
-
-	
 Q:- A good, clean layout that clearly shows the different topics available
 	for discussion, with easy access to each topic.
 
@@ -586,11 +501,10 @@ A:- We cannot list the 7000 distros on the front page (that is 270KB data) and w
 	Maybe I should add some explanation there too ?
 	
 
-- https access for authentication ? Sounds like too tight security for such a simple site,
-  on the other hand if this our central Perl Passport then it should be secure.
+* https access for authentication ? Sounds like too tight security for such a simple site
 
 
-- Add some connections to other modules which depend on the current module or on which this current
+* Add some connections to other modules which depend on the current module or on which this current
   module depends. See Module::Depends
 
 
