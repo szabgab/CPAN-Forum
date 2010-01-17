@@ -46,7 +46,7 @@ sub author {
 		}
 	}
 
-	#$self->_subscriptions($t, $gr);
+	#my $m = $self->_subscriptions($gr);
 	return $self->tt_process('pages/authors.tt', \%params);
 }
 

@@ -30,15 +30,11 @@ sub dist {
 	}
 	$self->log->debug("show dist: '$group_name'");
 
-	my $t = $self->load_tmpl(
-		"groups.tmpl",
-		loop_context_vars => 1,
-		global_vars       => 1,
+	my %params = (
+		hide_group => 1,
+		group => $group_name,
+		title => "CPAN Forum - $group_name",
 	);
-	$t->param( hide_group => 1 );
-
-	$t->param( group => $group_name );
-	$t->param( title => "CPAN Forum - $group_name" );
 
 	my $gr = CPAN::Forum::DB::Groups->info_by( name => $group_name );
 	if ( not $gr ) {
@@ -57,48 +53,53 @@ sub dist {
 		);
 	}
 
-	$self->set_ratings( $t, $gr );
+	my $more_params = $self->set_ratings( $gr );
+	%params = (%params, %$more_params);
 	my $page = $q->param('page') || 1;
-	my $params = $self->_search_results( { where => { gid => $gid }, page => $page } );
-	if ($params) {
-		$t->param(%$params);
+	my $results = $self->_search_results( { where => { gid => $gid }, page => $page } );
+	if ($results) {
+		%params = (%params, %$results);
 	}
-	$self->_subscriptions( $t, $gr );
+	my $mp = $self->_subscriptions( $gr );
+	%params = (%params, %$mp);
 
 	# TODO: is is not clear to me how can here anything be undef, but I got
 	# several exceptions on eith $gr or $gr->pauseid being undef:
 	if ( $gr and $gr->{pauseid_name} ) {
-		$t->param( pauseid_name => $gr->{pauseid_name} );
+		$params{pauseid_name} = $gr->{pauseid_name};
 	}
 
 	my $frequent_tags = CPAN::Forum::DB::Tags->get_tags_of_module($gid);
-	$t->param( frequent_tags => $frequent_tags );
+	$params{frequent_tags} = $frequent_tags;
 
 
 	my $uid = $self->session->param('uid');
 	if ($uid) {
 		my $mytags = CPAN::Forum::DB::Tags->get_tags_of( $gid, $uid );
-		$t->param( mytags    => $mytags );
-		$t->param( show_tags => 1 );
+		$params{mytags} = $mytags;
+		$params{show_tags} = 1;
 	}
-	$t->param( group_id => $gid );
+	$params{group_id} = $gid;
 
-	return $t->output;
+	return $self->tt_process('pages/dists.tt', \%params);
 }
 
 sub set_ratings {
-	my ( $self, $t, $gr ) = @_;
+	my ( $self, $gr ) = @_;
+
 
 	my ( $rating, $review_count ) = ($gr->{rating}, $gr->{review_count});
 	if ( not $rating ) {
 		$rating       = "0.0";
 		$review_count = 0;
 	}
-	if ($rating) {
-		my $roundrating = sprintf "%1.1f", int( $rating * 2 ) / 2;
-		$t->param( rating       => $rating );
-		$t->param( roundrating  => $roundrating );
-		$t->param( review_count => $review_count );
+	return {} if not $rating; # ????
+
+	my $roundrating = sprintf "%1.1f", int( $rating * 2 ) / 2;
+	return {
+		rating       => $rating,
+		roundrating  => $roundrating,
+		review_count => $review_count,
 	}
 }
 

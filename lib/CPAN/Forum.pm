@@ -1033,13 +1033,13 @@ sub _text_escape {
 
 
 sub _subscriptions {
-	my ( $self, $t, $group ) = @_;
+	my ( $self, $group ) = @_;
 
 	my $users = CPAN::Forum::DB::Subscriptions->get_subscriptions( 'allposts', $group->{id}, $group->{pauseid} );
 	my @usernames = map { { username => $_->{username} } } @$users;
 
 	#$self->log->debug(Data::Dumper->Dump([\@users], ['users']));
-	$t->param( users => \@usernames );
+	return { users => \@usernames };
 }
 
 sub add_new_group {

@@ -1,0 +1,17 @@
+<div class="links">
+    <b><a href="/dist/[% group %]">[% group %]</a></b>
+    [<a href="http://search.cpan.org/dist/[% group %]">search.cpan.org</a>]
+    [<a href="http://cpan.uwinnipeg.ca/dist/[% group %]">Kobes search</a>]
+    [<a href="http://rt.cpan.org/NoAuth/Bugs.html?Dist=[% group %]">View and report bugs</a>]
+    [<a href="http://cpanratings.perl.org/d/[% group %]">Ratings</a>
+      [% IF rating %]
+        <img src="/img/stars-[% roundrating %].png" alt="[% rating %]" /> ([% review_count %])
+      [% END %]
+    ]
+</div>
+<div class="links">
+    [<a href="http://www.annocpan.org/dist/[% group %]">AnnoCPAN</a>]
+    [<a href="http://testers.cpan.org/show/[% group %].html">CPAN Tests results</a>]
+    [<a href="http://cpants.perl.org/dist/[% group %]">CPANTS</a>]
+</div>
+
