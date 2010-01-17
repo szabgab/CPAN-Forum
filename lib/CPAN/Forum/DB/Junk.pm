@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use 5.008;
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 use Carp;
 #use Digest::SHA qw(sha1_base64);

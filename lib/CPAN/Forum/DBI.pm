@@ -2,7 +2,7 @@ package CPAN::Forum::DBI;
 use strict;
 use warnings;
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 use Carp qw();
 use Data::Dumper ();

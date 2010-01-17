@@ -2,7 +2,7 @@ package CPAN::Forum::DB::Posts;
 use strict;
 use warnings;
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 use Carp;
 use base 'CPAN::Forum::DBI';

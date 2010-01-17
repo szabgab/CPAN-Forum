@@ -2,7 +2,7 @@ package CPAN::Forum::Populate;
 
 use Moose;
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 use autodie;
 use CPAN::Mini ();

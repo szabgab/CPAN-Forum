@@ -2,7 +2,7 @@ package CPAN::Forum::Handler;
 use strict;
 use warnings;
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 use Apache2::Const-compile => qw(OK);
 use Apache2::RequestRec ();

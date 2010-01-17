@@ -1,6 +1,9 @@
+0.17 2010.01.17
+
    Fix crashes noticed after releasing 0.16 in notification and lack of use statements.
    Start moving to Template Toolkit.
    Fix the cpanratings update script and the display of the stars.
+   Add mode to reset forgotten password.
 
 0.16 2010.01.11
 
