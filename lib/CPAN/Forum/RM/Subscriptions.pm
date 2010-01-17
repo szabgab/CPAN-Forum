@@ -75,7 +75,6 @@ sub mypan {
 		subscriptions => $subscriptions,
 		gids          => $gids,
 		fullname      => $user->{fullname},
-		title         => "Information about $username",
 	);
 	return $self->tt_process('pages/mypan.tt', \%params);
 }
