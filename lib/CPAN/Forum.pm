@@ -495,6 +495,9 @@ my @free_modes = qw(
 	m
 	no_such_page
 	reset_password_form
+	reset_password_form_process
+	reset_password_request
+	reset_password_request_process
 );
 my @restricted_modes = qw(
 	new_post process_post
@@ -530,6 +533,9 @@ my @urls = qw(
 	tags
 	m
 	reset_password_form
+	reset_password_form_process
+	reset_password_request
+	reset_password_request_process
 );
 
 

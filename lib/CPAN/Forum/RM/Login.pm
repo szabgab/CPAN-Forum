@@ -185,11 +185,104 @@ MSG
 
 sub reset_password_form {
 	my $self = shift;
-	my $t = $self->load_tmpl(
-		"reset_password_form.tmpl",
+	my $error = shift;
+
+	my $q = $self->query;
+	my %params = (
+		code => $q->param('code'),
 	);
-	return $t->output;
+	if ($error) {
+		$params{$error} = 1;
+	}
+	return $self->tt_process('pages/reset_password_form.tt', \%params);
 }
+sub reset_password_form_process {
+	my $self = shift;
+	my $q = $self->query;
+
+	my $pw1 = $q->param('password1');
+	my $pw2 = $q->param('password2');
+	my $code = $q->param('code');
+
+	if (not $pw1) {
+		return $self->reset_password_form('no_password1');
+	} elsif (not $pw2) {
+		return $self->reset_password_form('no_password2');
+	} elsif (not $code) {
+		return $self->reset_password_form('no_code');
+	} elsif ($pw1 ne $pw2) {
+		return $self->reset_password_form('not_matching');
+	}
+
+	my $data = CPAN::Forum::DB::Junk->get_junk($code);
+	if (not $data) {
+		return $self->reset_password_form('invalid_code');
+	}
+
+	# check if the run-modes match
+	if ($data->{rm} ne 'reset_password') {
+		return $self->reset_password_form('invalid_rm');
+	};
+
+	if (not $data->{username} or not $data->{uid}) {
+		# TODO internal error?
+		return $self->reset_password_form('no_user');
+	}
+
+	# update password, remove code
+	use Digest::SHA qw(sha1_base64);
+	CPAN::Forum::DB::Users->update(
+		$data->{uid},
+		sha1 => sha1_base64( $pw1 ),
+	);
+	my $data = CPAN::Forum::DB::Junk->delete_junk($code);
+	
+	return $self->tt_process('pages/reset_password_done.tt');
+}
+
+sub reset_password_request {
+	my $self = shift;
+	my $error = shift;
+	my $q = $self->query;
+
+	my %params = (
+		username => $q->param('username'),
+		email    => $q->param('email'),
+	);
+	if ($error) {
+		$params{$error} = 1;
+	}
+	return $self->tt_process('pages/reset_password_request.tt', \%params);
+}
+
+sub reset_password_request_process {
+	my $self = shift;
+	my $q = $self->query;
+
+
+	my $user;
+	if ($q->param('email')) {
+  		$user = CPAN::Forum::DB::Users->info_by( email => $q->param('email') );
+	} elsif ($q->param('username')) {
+  		$user = CPAN::Forum::DB::Users->info_by( username => $q->param('username') );
+	} else {
+		return $self->reset_password_request('no_param');
+	}
+	if (not $user) {
+		return $self->reset_password_request('no_such_user');
+	}
+
+	# generate code
+	use CPAN::Forum::DB::Users;
+	my $code = CPAN::Forum::DB::Users::_generate_pw(20);
+
+	use CPAN::Forum::DB::Junk;
+	CPAN::Forum::DB::Junk->add_junk($code, { rm => 'reset_password', username => $user->{username}, uid => $user->{id} });
+
+	$self->send_password_reset_code($user, $code);
+	return $self->tt_process('pages/reset_password_request_processed.tt');
+}
+
 
 =head2 register
 
@@ -248,6 +341,29 @@ sub register_process {
 	$self->notify_admin($user);
 	return $self->register( { "done" => 1 } );
 }
+
+sub send_password_reset_code {
+	my ( $self, $user, $code ) = @_;
+
+	# TODO: put this text in a template
+	my $subject  = "CPAN::Forum password reset code";
+	my $message  = <<MSG;
+
+http://$ENV{HTTP_HOST}/reset_password_form?code=$code
+
+MSG
+
+	my $FROM = $self->config("from");
+
+	my %mail = (
+		To      => $user->{email},
+		From    => $FROM,
+		Subject => $subject,
+		Message => $message,
+	);
+	CPAN::Forum::Tools::_my_sendmail(%mail);
+}
+
 
 sub send_password {
 	my ( $self, $user ) = @_;

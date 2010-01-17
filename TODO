@@ -1,4 +1,3 @@
-* Setup daemon to be launched at boot time
 
 * User requests password change.
 
@@ -18,14 +17,19 @@ If that's the one we update the password and remove the row from the junk table.
 We also need a daemon that will remove keys older than 24 hours or some other
 configurable value.
 
+* Switch application to use mod_perl on the live site
+
+==========================================
+
+* Setup daemon to be launched at boot time
+
+* Switch the whole application to use Template::Toolkit instead of HTML::Template
+
+==========================================
 
 * Write a test checking if the flood_control_time_limit works
 
-* Switch application to use mod_perl on the live site
-
 * Check the log file and see why certain distributions are still missing?
-
-
 
 ==========================================
 
