@@ -497,7 +497,6 @@ my @urls = qw(
 	atom
 	update
 	tags
-	m
 	reset_password_form
 	reset_password_form_process
 	reset_password_request
@@ -515,10 +514,6 @@ my @urls = qw(
 
 sub cgiapp_init {
 	my $self = shift;
-
-#warn "$$ cgiapp_init";
-
-	# Warning, in mod_perl environment this seems to be called only once when the server starts!
 
 	CPAN::Forum::DBI->myinit();
 	$STATUS_FILE = $self->param("ROOT") . "/db/status";
@@ -544,10 +539,6 @@ Standard CGI::Application method
 
 sub setup {
 	my $self = shift;
-
-#warn "$$ setup";
-
-	# Warning, in mod_perl environment this seems to be called only once when the server starts!
 
 	my $log       = $ENV{CPAN_FORUM_LOGFILE};
 	my $log_level = $self->_set_log_level();
@@ -576,14 +567,14 @@ sub setup {
 			-path    => '/',
 		},
 		SEND_COOKIE => 0,
-
 	);
-
 
 	$self->start_mode("home");
 	$self->run_modes( [ @free_modes, @restricted_modes ] );
 	$self->run_modes( AUTOLOAD => "autoload" );
 	$self->error_mode('error');
+
+	return;
 }
 
 
@@ -1090,6 +1081,7 @@ sub add_new_group {
 
 sub status {
 	my ( $self, $value ) = @_;
+
 	if ($value) {
 		if ( $value eq "open" ) {
 			if ( -e $STATUS_FILE ) {
@@ -1106,39 +1098,16 @@ sub status {
 			return;
 		}
 		print $fh $value;
-		return $value;
 	} else {
 		return "open" if not -e $STATUS_FILE;
 		open my $fh, "<", $STATUS_FILE;
 		my $value = <$fh>;
 		chomp $value;
-		return $value;
 	}
+
+	return $value;
 }
 
-
-
-#sub m {
-#	my ($self) = @_;
-#	my $path  = ${ $self->param("path_parameters") }[0] || '';
-#	my $value = ${ $self->param("path_parameters") }[1] || '';
-#
-#
-#	my $tags = '';
-#	if ( $path eq "list_tags" ) {
-#		my $gr = CPAN::Forum::DB::Groups->info_by( name => $value );
-#		if ($gr) {
-#			my $gid     = $gr->{id};
-#			my $modules = CPAN::Forum::DB::Tags->get_tags_of_module($gid);
-#			$tags = join ",", map {"$_->{name}:$_->{cnt}"} @$modules;
-#		}
-#	}
-#
-#	return <<"END_JAVASCRIPT";
-#var cpan_forum_tags = "$tags";
-#END_JAVASCRIPT
-#
-#}
 
 sub version {
 	return $VERSION;
