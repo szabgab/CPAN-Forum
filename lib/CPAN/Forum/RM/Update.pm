@@ -27,7 +27,6 @@ sub _update_tags {
 	my $group_id = $q->param('group_id');
 	my $group    = CPAN::Forum::DB::Groups->info_by( id => $group_id );
 	my $new_tags = $q->param('new_tags');
-	$self->log->debug("_update_tags in group '$group_id' tags='$new_tags'");
 	$new_tags =~ s/^\s+//;
 	$new_tags =~ s/\s+$//;
 	$new_tags =~ s{<>/}{};

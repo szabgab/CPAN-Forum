@@ -20,7 +20,6 @@ sub login {
 	my ( $self, $errs ) = @_;
 	my $q = $self->query;
 
-	$self->log->debug( "Sending cookie using sid:  " . $self->session->id() );
 	$self->session_cookie();
 
 	my %params;
@@ -50,10 +49,8 @@ sub login_process {
 
 	my $user = CPAN::Forum::DB::Users->info_by_credentials( $q->param('nickname'), $q->param('password') );
 	if ( not $user ) {
-		$self->log->debug("No user found");
 		return $self->login( { bad_login => 1 } );
 	}
-	$self->log->debug( "Username: " . $user->{username} );
 
 	my $session = $self->session;
 	$session->param( admin => 0 ); # make sure it is clean
@@ -69,7 +66,6 @@ sub login_process {
 	}
 
 	my $request = $session->param("request") || "home";
-	$self->log->debug("Request redirection: '$request'");
 	my $response;
 	eval {
 		if ( $request eq 'new_post' )
@@ -86,7 +82,6 @@ sub login_process {
 	$session->param( "request"       => "" );
 	$session->param( "request_group" => "" );
 	$session->flush();
-	$self->log->debug( "Session flushed after login " . $session->param('loggedin') );
 	return $response;
 }
 
@@ -110,7 +105,6 @@ sub logout {
 	$session->param( email    => '' );
 	$session->param( admin    => '' );
 	$session->flush();
-	$self->log->debug("logged out '$username'");
 
 	$self->home;
 }
@@ -315,7 +309,6 @@ your password is: $password
 MSG
 
 	my $FROM = $self->config("from");
-	$self->log->debug("FROM field set to be $FROM");
 
 	my %mail = (
 		To      => $user->{email},

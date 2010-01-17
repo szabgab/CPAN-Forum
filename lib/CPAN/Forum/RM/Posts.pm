@@ -50,11 +50,9 @@ sub posts {
 	$t->param( $_ => 1 ) foreach @$errors;
 
 	my $rm = $self->get_current_runmode();
-	$self->log->debug("posts rm=$rm");
 	my $request = $self->session->param('request');
 	if ($request) {
 		$rm = $request;
-		$self->log->debug("posts request reset rm=$rm");
 	}
 
 	my $new_group    = "";
@@ -63,7 +61,6 @@ sub posts {
 	if ( $rm eq "new_post" ) {
 		$new_group = ${ $self->param("path_parameters") }[0] || "";
 		$new_group_id = $q->param('new_group') if $q->param('new_group');
-		$self->log->debug("A: new_group: '$new_group' and id: '$new_group_id'");
 
 		if ($new_group) {
 			if ( $new_group =~ /^([\w-]+)$/ ) {
@@ -98,7 +95,6 @@ sub posts {
 			# TODO should be called whent the module_search is ready
 			return $self->module_search_form();
 		}
-		$self->log->debug("B: new_group: '$new_group' and id: '$new_group_id'");
 	}
 	if ( $rm eq "process_post" ) {
 		$new_group_id = $q->param("new_group_id");
@@ -124,7 +120,6 @@ sub posts {
 			);
 		}
 	}
-	$self->log->debug("C: new_group: '$new_group' and id: '$new_group_id'");
 
 	my $title  = ""; # of the page
 	my $editor = 0;
@@ -173,7 +168,6 @@ sub posts {
 		$new_group    = $group->{name};
 		$new_group_id = $group->{id};
 	}
-	$self->log->debug("D: new_group: '$new_group' and id: '$new_group_id'");
 
 	#$t->param("group_selector" => $self->_group_selector($new_group, $new_group_id));
 	$t->param( new_group    => $new_group );
@@ -240,20 +234,12 @@ sub process_post {
 	push @errors, "no_text" if not $new_text;
 	push @errors, "subject_too_long" if $new_subject and length($new_subject) > 80;
 
-	$self->log->debug( "username: " . $self->session->param("username") . " uid: " . $self->session->param("uid") );
-
 	my $preview_button = $q->param("preview_button");
 	my $submit_button  = $q->param("submit_button");
 	if ( not @errors and $submit_button ) {
 		my $last_post = CPAN::Forum::DB::Posts->get_latest_post_by_uid( $self->session->param('uid') );
 		  # TODO, maybe also check if the post is the same as the last post to avoid duplicates
 		if ($last_post) {
-			$self->log->debug( "username: "
-					. $self->session->param("username")
-					. " last post: "
-					. $last_post->{date}
-					. " now: "
-					. time() );
 			if ( $last_post->{text} eq $new_text ) {
 				push @errors, "duplicate_post";
 			} elsif (CPAN::Forum::DB::Posts->post_within_limit( $self->session->param('uid'), $self->config("flood_control_time_limit") ) ) {
@@ -272,9 +258,6 @@ sub process_post {
 	my $markup = CPAN::Forum::Markup->new();
 	my $result = $markup->posting_process($new_text);
 	if ( not defined $result ) {
-		$self->log->debug("--- BAD TEXT STARTS ---");
-		$self->log->debug($new_text);
-		$self->log->debug("--- BAD TEXT ENDS ---");
 		push @errors, "text_format";
 		return $self->posts( \@errors );
 	}

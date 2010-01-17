@@ -69,8 +69,6 @@ sub retrieve_latest {
                 WHERE posts.gid=groups.id AND posts.uid=users.id
                 ORDER BY date DESC LIMIT ?";
 
-	#$self->log->debug("SQL: $sql");
-
 	return $self->_fetch_arrayref_of_hashes( $sql, $limit );
 }
 
@@ -131,7 +129,6 @@ sub mysearch {
 	my %where = %{ $params->{where} };
 
 	#%where = (1 => 1) if not %where;
-	#$CPAN::Forum::logger->debug( Data::Dumper->Dump( [ \%where ], ['where'] ) );
 
 	my $pager = $self->mypager(
 		where    => \%where,
@@ -166,7 +163,6 @@ sub count_threads {
 
 	# TODO check if they are all numbers?
 
-	#$CPAN::Forum::logger->debug( Data::Dumper->Dump( [ \@thread_ids ], ['thread_ids'] ) );
 	my $ids = join ",", @thread_ids;
 	my $sql = "SELECT thread, COUNT(*) AS cnt FROM posts WHERE thread in ($ids) GROUP BY thread";
 	return $self->_selectall_hashref( $sql, 'thread' );

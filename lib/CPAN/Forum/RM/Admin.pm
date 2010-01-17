@@ -16,7 +16,6 @@ sub admin_edit_user_process {
 	my $email = $q->param('email');
 	my $uid   = $q->param('uid');  # TODO error checking here !
 
-	$self->log->debug("admin_edit_user_process uid: '$uid'");
 	my $person = CPAN::Forum::DB::Users->info_by( id => $uid );
 	if ( not $person ) {
 		return $self->internal_error( "", "no_such_user" );
@@ -40,7 +39,6 @@ sub admin_edit_user {
 	if ( not $username ) {
 		$username = ${ $self->param("path_parameters") }[0] || '';
 	}
-	$self->log->debug("admin_edit_user username: '$username'");
 
 	my $person = CPAN::Forum::DB::Users->info_by( username => $username );
 	if ( not $person ) {
@@ -91,7 +89,6 @@ sub admin {
 	}
 
 	my $data = CPAN::Forum::DB::Configure->get_all_pairs;
-	$self->log->debug( Data::Dumper->Dump( [$data], ['config'] ) );
 
 	my %params = (
 		"status_" . $self->status() => 1, 

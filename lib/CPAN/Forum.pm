@@ -556,8 +556,6 @@ sub setup {
 		APPEND_NEWLINE => 1,
 	);
 
-	$self->log->debug("--- START ---");
-
 	$self->session_config(
 		#CGI_SESSION_OPTIONS => [ "driver:File", $self->query, {Directory => "/tmp"}],
 		#CGI_SESSION_OPTIONS => [ "driver:SQLite", $self->query, {Handle => $dbh}],
@@ -605,28 +603,19 @@ sub cgiapp_prerun {
 	$self->param( path_parameters => [] );
 
 	my $status = $self->status();
-	$self->log->debug("Status:  $status");
 	if ( $status ne "open" and not $self->session->param("admin") ) {
-		$self->log->debug('site_is_closed');
 		$self->prerun_mode('site_is_closed');
 		return;
 	}
 
 	my $rm = $self->_set_run_mode();
 
-	$self->log->debug("Current runmode:  $rm");
-	$self->log->debug( "Current user:  " .   ( $self->session->param("username") || "" ) );
-	$self->log->debug( "Current sid:  " .    ( $self->session->id()              || "" ) );
-	$self->log->debug( "Cookie received: " . ( $self->query->cookie($cookiename) || "" ) );
-
 	if ( any { $rm eq $_ } @free_modes ) {
-		$self->log->debug('Free mode');
 		return;
 	}
 
 	# Redirect to login, if necessary
 	if ( not $self->session->param('loggedin') ) {
-		$self->log->debug("Showing login");
 		$self->session->param( request => $rm );
 		if ( $rm eq 'new_post' ) {
 			my $group = ${ $self->param("path_parameters") }[0];
@@ -635,7 +624,6 @@ sub cgiapp_prerun {
 		$self->prerun_mode('login');
 		return;
 	}
-	$self->log->debug("cgiapp_prerun ends");
 }
 
 # These cannot be set during cgiapp_prerun as we might be just
@@ -658,7 +646,6 @@ sub cgiapp_postrun {
 
 	my $rm = $self->get_current_runmode();
 	if ( not $self->session->param('loggedin') and $rm ne "login" ) {
-		$self->log->debug("not logged in, deleting session");
 		$self->session->delete();
 	}
 
@@ -679,7 +666,6 @@ sub cgiapp_postrun {
 
 #sub teardown {
 #	my ($self) = @_;
-#	$self->log->debug("teardown called");
 #}
 
 
@@ -774,7 +760,6 @@ rm=something
 sub autoload {
 	my $self = shift;
 	my $rm   = $self->get_current_runmode();
-	$self->log->debug("autoload called run-mode='$rm' ARGV='@ARGV'");
 	$self->internal_error();
 }
 
@@ -809,12 +794,10 @@ sub all {
 	my $self = shift;
 	my $q    = $self->query;
 
-	$self->log->debug("all");
 
 	my $page = $q->param('page') || 1;
 	my $params = $self->_search_results( { where => {}, page => $page } );
 	$params ||= {};
-	$self->log->debug("home to output");
 	return $self->tt_process('pages/home.tt', $params);
 }
 
@@ -829,7 +812,6 @@ sub recent_threads {
 	my ($self) = @_;
 	my $q = $self->query;
 
-	$self->log->debug("recent_threads");
 	my %params;
 	return $self->tt_process('pages/home.tt', \%params);
 }
@@ -860,8 +842,6 @@ sub build_listing {
 
 	foreach my $post (@$it) {
 
-		#$self->log->debug(Data::Dumper->Dump([$post], ['post']));
-		#$self->log->debug("id=" . $post->id);
 		#warn "called for each post";
 		my $thread = $post->{thread};
 		my $thread_count = ( $thread and $threads->{$thread} ) ? $threads->{$thread}{cnt} : 0;
@@ -951,12 +931,10 @@ Semi standard CGI::Application method to replace the way we load the templates.
 
 sub load_tmpl {
 	my $self = shift;
-	$self->log->debug("load_tmpl: @_");
 	my $t = $self->SUPER::load_tmpl(
 		@_,
 		die_on_bad_params => $ENV{DIE_ON_BAD_PARAM} ? 1 : 0
 	);
-	$self->log->debug("template loaded");
 	$t->param( "loggedin" => $self->session->param("loggedin") || "" );
 	$t->param( "username" => $self->session->param("username") || "anonymous" );
 	$t->param( "test_site_warning" => -e $self->param("ROOT") . "/config_test_site" );
@@ -999,7 +977,6 @@ sub _group_selector {
 
 sub _post {
 	my ( $self, $post ) = @_;
-	$self->log->debug( Data::Dumper->Dump( [$post], ['post'] ) );
 	my %post = (
 		postername => $post->{username},
 		date       => $post->{date},
@@ -1040,7 +1017,6 @@ sub _subscriptions {
 	my $users = CPAN::Forum::DB::Subscriptions->get_subscriptions( 'allposts', $group->{id}, $group->{pauseid} );
 	my @usernames = map { { username => $_->{username} } } @$users;
 
-	#$self->log->debug(Data::Dumper->Dump([\@users], ['users']));
 	return { users => \@usernames };
 }
 
@@ -1061,7 +1037,6 @@ sub add_new_group {
 		return $self->notes("invalid_group_name");
 	}
 
-	$self->log->debug("Adding group with name: '$group_name'");
 	my $group = eval {
 		CPAN::Forum::DB::Groups->add(
 			name  => $group_name,
@@ -1069,7 +1044,6 @@ sub add_new_group {
 		);
 	};
 	if ($@) {
-		$self->log->debug("Failed to add group with name: '$group_name'");
 		return $self->internal_error( "", "failed_to_add_group" );
 	}
 

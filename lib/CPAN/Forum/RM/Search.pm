@@ -17,10 +17,8 @@ sub _search_results {
 	my $pager   = CPAN::Forum::DB::Posts->mysearch($params);
 	my $results = $pager->{results};
 
-	#$self->log->debug(Data::Dumper->Dump([$results], ['results']));
 	return if not $pager->{total_entries};
 
-	$self->log->debug("number of entries: total=$pager->{total_entries}");
 	my $data = $self->build_listing($results);
 	my %params = (
 		messages      => $data,
@@ -52,14 +50,11 @@ sub module_search {
 	# remove taint if there is
 	if ( $txt =~ /^([\w:.%-]+)$/ ) {
 		$txt = $1;
-	} else {
-		$self->log->debug("Tained search: $txt");
 	}
 
 	if ( not $txt ) {
 		return $self->module_search_form( ['invalid_search_term'] );
 	}
-	$self->log->debug("group name search term: $txt");
 	$txt =~ s/::/-/g;
 	$txt = '%' . $txt . '%';
 
@@ -69,8 +64,6 @@ sub module_search {
 	if ( not @group_names ) {
 		return $self->module_search_form( ['no_module_found'] );
 	}
-
-	#$self->log->debug("GROUP NAMES: @group_names");
 
 	my %params = (
 		"group_selector" => $self->_group_selector( \@group_names, \@group_ids ),
@@ -150,10 +143,7 @@ sub _search_posts {
 	my %where;
 	if ( $what eq "subject" ) { %where = ( subject => { 'LIKE', '%' . $name . '%' } ); }
 	if ( $what eq "text" )    { %where = ( text    => { 'LIKE', '%' . $name . '%' } ); }
-	$self->log->debug( "Search 1: " . join "|", %where );
 	if (%where) {
-
-		$self->log->debug( "Search 2: " . join "|", %where );
 
 		my $page = $q->param('page') || 1;
 		#$t->param( $what => 1 );

@@ -28,7 +28,6 @@ sub dist {
 			"Probably bad regex when checking group name for '$group_name'",
 		);
 	}
-	$self->log->debug("show dist: '$group_name'");
 
 	my %params = (
 		hide_group => 1,

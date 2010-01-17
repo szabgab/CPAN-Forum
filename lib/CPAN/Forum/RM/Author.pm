@@ -20,7 +20,6 @@ sub author {
 	my $q = $self->query;
 
 	my $pauseid = ${ $self->param("path_parameters") }[0] || '';
-	$self->log->debug("show posts to modules of PAUSEID: '$pauseid'");
 
 	my %params = (
 		pauseid => $pauseid,
@@ -37,7 +36,6 @@ sub author {
 
 	# TODO: simplify query!
 	my $group_ids = CPAN::Forum::DB::Groups->list_ids_by( pauseid => $author->{id} );
-	$self->log->debug("Group IDs: @$group_ids");
 	my $page = $q->param('page') || 1;
 	if (@$group_ids) {
 		my $results = $self->_search_results( { where => { gid => $group_ids }, page => $page } );

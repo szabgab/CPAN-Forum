@@ -49,14 +49,11 @@ sub notify {
 	my $subject = sprintf( "[%s] %s", $post->{group_name}, $post->{subject} ); # TODO _subject_escape ?
 
 	my $FROM = CPAN::Forum::DB::Configure->param("from");
-#	$self->log->debug("FROM field set to be $FROM");
 	my %mail = (
 		From    => $FROM,
 		Subject => $subject,
 		Message => $message,
 	);
-	#$self->log->debug( Data::Dumper->Dump( [ \%mail ], ['mail'] ) );
-
 
 	$self->fetch_subscriptions( \%mail, $post );
 	return;
@@ -84,7 +81,6 @@ sub notify_admin {
 		Subject => "New Forum user: " . $user->{username},
 		Message => $msg,
 	);
-	#$self->log->debug( Data::Dumper->Dump( [ \%mail ], ['mail'] ) );
 	CPAN::Forum::Tools::_my_sendmail(%mail);
 }
 
@@ -234,7 +230,6 @@ sub get_feed {
 	# URL: /atom/dist/CPAN-Forum
 	if ( $params[0] eq 'dist' ) {
 		my $dist = $params[1] || '';
-		#$self->log->debug("rss of dist: '$dist'");
 		return CPAN::Forum::DB::Posts->search_post_by_groupname( $dist, $limit );
 	}
 
@@ -242,7 +237,6 @@ sub get_feed {
 	if ( $params[0] eq 'author' ) {
 		my $pauseid = uc( $params[1] ) || '';
 		if ($pauseid) {
-			#$self->log->debug("rss of author: '$pauseid'");
 			return CPAN::Forum::DB::Posts->search_post_by_pauseid( $pauseid, $limit );
 		}
 	}
@@ -271,21 +265,16 @@ sub fetch_subscriptions {
 
 	my %to; # keys are e-mail addresses that have already received an e-mail
 
-	#$self->log->debug("Processing messages for allposts");
 	my $users = CPAN::Forum::DB::Subscriptions->get_subscriptions( 'allposts', $post->{gid}, $post->{pauseid} );
 	CPAN::Forum::Tools::_sendmail( $users, $mail, \%to );
 
 	if ( $post->{thread} == $post->{id} ) {
-		#$self->log->debug("Processing messages for thread starter");
 		my $users =
 			CPAN::Forum::DB::Subscriptions->get_subscriptions( 'starters', $post->{gid}, $post->{pauseid} );
 		CPAN::Forum::Tools::_sendmail( $users, $mail, \%to );
 	} else {
-		#$self->log->debug("Processing messages for followups, users who posted in this thread");
 
 		my $uids = CPAN::Forum::DB::Posts->list_uids_who_posted_in_thread( $post->{thread} );
-#		warn Data::Dumper::Dumper $uids;
-		#$self->log->debug( Data::Dumper->Dump( [$uids], ['uids'] ) );
 		my %uids = map { $_ => 1 } @$uids;
 
 		my $users =
@@ -293,8 +282,6 @@ sub fetch_subscriptions {
 		my @users_who_posted = grep { !$uids{ $_->{id} } } @$users;
 		CPAN::Forum::Tools::_sendmail( \@users_who_posted, $mail, \%to );
 	}
-
-	#$self->log->debug( "Number of e-mails sent: ", scalar keys %to );
 }
 
 =head2 _text2mail

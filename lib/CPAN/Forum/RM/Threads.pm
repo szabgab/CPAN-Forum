@@ -29,7 +29,6 @@ sub threads {
 			"in request",
 		);
 	}
-	$self->log->debug( Data::Dumper->Dump( [$posts], ['posts'] ) );
 
 	# fill in the responses
 	foreach my $p (@$posts) {

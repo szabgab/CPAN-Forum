@@ -17,7 +17,6 @@ sub tags {
 		$value .= "/" . ${ $self->param("path_parameters") }[2];
 	}
 
-	$self->log->debug("tags path='$path' value='$value'");
 	if ( $path eq 'name' and $value ) {
 		return $self->_list_modules_with_tag($value);
 	} elsif ( $path eq 'name_popup' ) {
