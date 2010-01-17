@@ -1,0 +1,20 @@
+[% DEFAULT
+  title=""
+  description=""
+  pagetitle = title
+  rss_href = "/rss/all"
+  rss_title = "CPAN::Fourm rss"
+%]
+[% INCLUDE incl/header.tt %]
+
+<a href="/faq/#feeds">RSS and Atom feeds</a>
+| <a href="/faq/#notify">Notification by e-mail</a>
+| <a href="/faq/#tags">Add tags to CPAN modules</a><br />
+
+[% INCLUDE incl/search_form.tt %]
+[% INCLUDE incl/listing.tt %]
+
+<p><a href="[% rss_href %]"><img src="/img/rss1.gif" alt="[% rss_title %]" /></a></p>
+
+[% INCLUDE incl/footer.tt %]
+

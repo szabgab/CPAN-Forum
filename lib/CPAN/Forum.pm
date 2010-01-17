@@ -799,18 +799,12 @@ sub all {
 	my $q    = $self->query;
 
 	$self->log->debug("all");
-	my $t = $self->load_tmpl(
-		"home.tmpl",
-		loop_context_vars => 1,
-	);
 
 	my $page = $q->param('page') || 1;
 	my $params = $self->_search_results( { where => {}, page => $page } );
-	if ($params) {
-		$t->param(%$params);
-	}
+	$params ||= {};
 	$self->log->debug("home to output");
-	$t->output;
+	return $self->tt_process('pages/home.tt', $params);
 }
 
 =head2 recent_thread
@@ -825,11 +819,8 @@ sub recent_threads {
 	my $q = $self->query;
 
 	$self->log->debug("recent_threads");
-	my $t = $self->load_tmpl(
-		"home.tmpl",
-		loop_context_vars => 1,
-	);
-	$t->output;
+	my %params;
+	return $self->tt_process('pages/home.tt', \%params);
 }
 
 
