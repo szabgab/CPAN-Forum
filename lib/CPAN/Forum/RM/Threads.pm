@@ -19,10 +19,6 @@ sub threads {
 	my $self = shift;
 
 	my $q = $self->query;
-	my $t = $self->load_tmpl(
-		"threads.tmpl",
-		loop_context_vars => 1,
-	);
 
 	my $id = $q->param("id");
 	$id = ${ $self->param("path_parameters") }[0] if ${ $self->param("path_parameters") }[0];
@@ -49,15 +45,17 @@ sub threads {
 	foreach my $p (@$posts) {
 		push @posts_html, $self->_post($p);
 	}
-	$t->param( posts => \@posts_html );
+	my %params = (
+		posts => \@posts_html,
+	);
 
-	#   (my $dashgroup = $posts[0]->gid) =~ s/::/-/g;
-	$t->param( group => $posts->[0]->{group_name} );
+	# (my $dashgroup = $posts[0]->gid) =~ s/::/-/g;
+	$params{group} = $posts->[0]->{group_name};
 
-	#   $t->param(dashgroup => $dashgroup);
-	$t->param( title => CPAN::Forum::Tools::_subject_escape( $posts->[0]->{subject} ) );
+	# $params{dashgroup} = $dashgroup;
+	$params{title} = CPAN::Forum::Tools::_subject_escape( $posts->[0]->{subject} );
 
-	return $t->output;
+	return $self->tt_process('pages/threads.tt', \%params);
 }
 
 1;

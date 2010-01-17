@@ -1,0 +1,28 @@
+<a name="[% post.id %]"></a>
+<table class="message">
+<tr class="message_row_head"><td>
+   Posted on <span class="date">[% post.date %]</span> 
+   by <span class="username"><a href="/users/[% post.postername %]">[% post.postername %]</a></span>
+  [% IF post.parentid %]
+	<span class="inresponse">in response to <a href="#[% post.parentid %]">[% post.parentid %]</a></span>
+  [% END %]
+</td></tr>
+<tr class="message_row_subject"><td>[% post.subject %]</td></tr>
+<tr class="message_row_text"><td>
+    [% post.text %]
+</td></tr>
+<tr class="message_row_foot"><td>
+[% IF post.responses %]
+	Direct Responses:
+	[% FOR resp IN post.responses %]
+	 <a href="#[% resp.id %]">[% resp.id %]</a> | 
+    [% END %]
+[% END %]
+
+[% UNLESS post.editor %]
+ <a href="/response_form/[% post.id %]">Write a response</a>
+[% END %]
+</td></tr>
+</table>
+
+

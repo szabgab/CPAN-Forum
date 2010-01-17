@@ -1,0 +1,23 @@
+[% DEFAULT
+  title="CPAN::Forum Thread"
+  description=""
+  pagetitle= title
+  rss_href  = "/rss/author/" _ pauseid
+  rss_title = "CPAN::Forum " _ pauseid _ " rss"
+%]
+[% INCLUDE incl/header.tt %]
+
+[% INCLUDE incl/search_form.tt %]
+[% INCLUDE incl/link_to_dist.tt %]
+<table class="threads">
+[% FOR post IN posts %]
+  [% odd = loop.count mod 2 %]
+  <tr class="threads_[% IF odd %]odd[% ELSE %]even[% END %]">
+  <td>
+    [% INCLUDE incl/message_in_thread.tt post %]
+  </td>
+  </tr>
+[% END %]
+</table>
+
+[% INCLUDE incl/footer.tt %]
