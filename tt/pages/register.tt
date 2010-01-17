@@ -1,7 +1,7 @@
 [% DEFAULT
-  title="Registration Pag to CPAN::Forum"
+  title="Registration Page to CPAN::Forum"
   description=""
-  pagetitle="Registration Page to CPAN::Forum"
+  pagetitle=title
 %]
 [% INCLUDE incl/header.tt %]
 
@@ -33,10 +33,10 @@ Username currently should be between 1-25 characters.
 <tr><td></td><td><input type="submit" value="Register" /></td></tr>
 </table>
 </form>
-<!--
-To retrieve a lost password, please visit the
-<a href="pwreminder">password reminder</a>.
--->
+<p>
+If you have lost your password, you can <a href="/reset_password_request/">reset your password here</a>.
+</p>
+
 [% END  %]
 
 [% INCLUDE incl/footer.tt %]

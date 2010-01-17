@@ -479,7 +479,6 @@ my @restricted_modes = qw(
 	update
 );
 
-#pwreminder
 my @urls = qw(
 	logout
 	help
@@ -715,8 +714,6 @@ sub config {
 
 	CPAN::Forum::DB::Configure->param($field);
 }
-
-#	pwreminder pwreminder_process
 
 
 sub _set_run_mode {
