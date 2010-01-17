@@ -1,0 +1,38 @@
+[% DEFAULT
+  title="CPAN::Forum " _ pauseid
+  description="Help answering questions frequently encountered by users of the CPAN::Forum"
+  pagetitle= title
+  rss_href  = "/rss/author/" _ pauseid
+  rss_title = "CPAN::Forum " _ pauseid _ " rss"
+%]
+[% INCLUDE incl/header.tt %]
+
+
+[% INCLUDE incl/search_form.tt %]
+
+<p>
+Post made to modules whose author is <b><[% pauseid %]</b>.
+</p>
+
+<p>
+If you are <a href="/register/">registered</a> on the forum you can 
+<a href="/mypan/author/[% pauseid %]">subscribe to get alerted</a> when someone posts a new 
+message to any of the modules maintained by [% pauseid %].
+<!-- <a href="/mypan/dist/[% pauseid %]">subscribe to e-mail notification
+[% group %]</a>  -->
+</p>
+
+[% INCLUDE incl/listing.tt %]
+
+<!--
+<p>
+Users currently monitoring the modules of [% pauseid %]:
+[% FOR u IN users %]
+   <a href="/users/[% u.username %]">[% u.username %]</a>, 
+[% END %]
+</p>
+-->
+
+<p><a href="[% rss_href %]"><img src="/img/rss1.gif" alt="[% rss_title %]" /></a></p>
+
+[% INCLUDE incl/footer.tt %]

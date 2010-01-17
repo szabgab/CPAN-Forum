@@ -22,14 +22,9 @@ sub author {
 	my $pauseid = ${ $self->param("path_parameters") }[0] || '';
 	$self->log->debug("show posts to modules of PAUSEID: '$pauseid'");
 
-	my $t = $self->load_tmpl(
-		"authors.tmpl",
-		loop_context_vars => 1,
-		global_vars       => 1,
+	my %params = (
+		pauseid => $pauseid,
 	);
-
-	$t->param( pauseid => $pauseid );
-	$t->param( title   => "CPAN Forum - $pauseid" );
 
 	my $author = CPAN::Forum::DB::Authors->get_author_by_pauseid($pauseid);
 	if ( not $author ) {
@@ -45,14 +40,14 @@ sub author {
 	$self->log->debug("Group IDs: @$group_ids");
 	my $page = $q->param('page') || 1;
 	if (@$group_ids) {
-		my $params = $self->_search_results( { where => { gid => $group_ids }, page => $page } );
-		if ($params) {
-			$t->param(%$params);
+		my $results = $self->_search_results( { where => { gid => $group_ids }, page => $page } );
+		if ($results) {
+			%params = (%params, %$results);
 		}
 	}
 
 	#$self->_subscriptions($t, $gr);
-	$t->output;
+	return $self->tt_process('pages/authors.tt', \%params);
 }
 
 1;
