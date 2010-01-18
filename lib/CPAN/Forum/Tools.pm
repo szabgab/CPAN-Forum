@@ -60,6 +60,21 @@ sub _text_escape {
 	#return $text;
 }
 
+sub format_post {
+	my ( $post ) = @_;
+	my %post = (
+		postername => $post->{username},
+		date       => $post->{date},
+		parentid   => $post->{parent},
+		responses  => $post->{responses},
+		text       => _text_escape( $post->{text} ),
+		id         => $post->{id},
+		subject    => _subject_escape( $post->{subject} ),
+	);
+
+	return \%post;
+}
+
 
 
 1;

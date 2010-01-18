@@ -42,7 +42,7 @@ sub threads {
 
 	my @posts_html;
 	foreach my $p (@$posts) {
-		push @posts_html, $self->_post($p);
+		push @posts_html, CPAN::Forum::Tools::format_post($p);
 	}
 	my %params = (
 		posts => \@posts_html,

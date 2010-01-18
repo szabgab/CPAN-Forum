@@ -977,21 +977,6 @@ sub _group_selector {
 
 
 
-sub _post {
-	my ( $self, $post ) = @_;
-	my %post = (
-		postername => $post->{username},
-		date       => $post->{date},
-		parentid   => $post->{parent},
-		responses  => $post->{responses},
-		text       => CPAN::Forum::Tools::_text_escape( $post->{text} ),
-		id         => $post->{id},
-		subject    => CPAN::Forum::Tools::_subject_escape( $post->{subject} ),
-	);
-
-	return \%post;
-}
-
 sub _subscriptions {
 	my ( $self, $group ) = @_;
 

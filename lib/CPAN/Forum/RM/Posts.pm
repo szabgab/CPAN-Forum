@@ -150,7 +150,7 @@ sub posts {
 			$params{thread_count} = $thread_count;
 		}
 		$post->{responses} = CPAN::Forum::DB::Posts->list_posts_by( parent => $post->{id} );
-		my %post = %{ $self->_post($post) };
+		my %post = %{ CPAN::Forum::Tools::format_post($post) };
 		%params = (%params, %post);
 
 		#       (my $dashgroup = $post->gid) =~ s/::/-/g;
