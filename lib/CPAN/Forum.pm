@@ -539,18 +539,20 @@ Standard CGI::Application method
 sub setup {
 	my $self = shift;
 
-	my $log       = $ENV{CPAN_FORUM_LOGFILE};
-	my $log_level = $self->_set_log_level();
+	#my $log       = $ENV{CPAN_FORUM_LOGFILE};
+	#my $log_level = $self->_set_log_level();
 
 	$self->log_config(
 		LOG_DISPATCH_MODULES => [
-			{   module            => 'Log::Dispatch::File',
+			{   module            => 'Log::Dispatch::Screen',
 				name              => 'messages',
-				filename          => $log,
-				min_level         => $log_level,
-				mode              => 'append',
+				stderr            => 1,
+#				filename          => $log,
+#				min_level         => $log_level,
+				min_level         => 'notice',
+#				mode              => 'append',
 				callbacks         => sub { $self->_logger(@_) },
-				close_after_write => 1,
+#				close_after_write => 1,
 			},
 		],
 		APPEND_NEWLINE => 1,

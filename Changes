@@ -1,3 +1,7 @@
+   Converting more pages to Template Toolkit
+   Removing all the log->debug calls
+   Changing the logging of warnings and errors to go to STDERR
+
 0.17 2010.01.17
 
    Fix crashes noticed after releasing 0.16 in notification and lack of use statements.
