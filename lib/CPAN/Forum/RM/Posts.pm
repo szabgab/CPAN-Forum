@@ -128,6 +128,7 @@ sub posts {
 	}
 	$id ||= $q->param("new_parent");
 	if ($id) {                # Show post
+		$params{new_parent} = $id;
 		if ($id !~ /^\d+$/) {
 			$self->log->warning("User requested '/posts/$id' but that's not a numeric id");
 			return $self->notes('invalid_request');
@@ -144,18 +145,20 @@ sub posts {
 		}
 		$post->{responses} = CPAN::Forum::DB::Posts->list_posts_by( parent => $post->{id} );
 		my $post_data = CPAN::Forum::Tools::format_post($post);
-		%params = (%params, %$post_data);
+		$params{post} = [ $post_data ];
 
 		#       (my $dashgroup = $post->gid) =~ s/::/-/g;
 		#       $params{dashgroup}    = $dashgroup;
-		my $new_subject = $post->{subject};
-		if ( $new_subject !~ /^\s*re:\s*/i ) {
-			$new_subject = "Re: $new_subject";
+		my $new_subject = $q->param('new_subject');
+		if (not $new_subject) {
+			$new_subject = $post->{subject};
+			if ( $new_subject !~ /^\s*re:\s*/i ) {
+				$new_subject = "Re: $new_subject";
+			}
 		}
 
 		$params{new_subject} = CPAN::Forum::Tools::_subject_escape($new_subject);
 		$params{title}       = CPAN::Forum::Tools::_subject_escape( $post->{subject} );
-		$params{post}        = 1;
 
 		my $group = CPAN::Forum::DB::Groups->info_by( id => $post->{gid} );
 		$new_group    = $group->{name};

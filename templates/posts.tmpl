@@ -12,7 +12,9 @@
 </TMPL_IF>
 
 <TMPL_IF post>
-	<TMPL_INCLUDE NAME="message.tmpl">
+   <TMPL_LOOP post>
+	  <TMPL_INCLUDE NAME="message.tmpl">
+   </TMPL_LOOP>
 </TMPL_IF>
 
 
