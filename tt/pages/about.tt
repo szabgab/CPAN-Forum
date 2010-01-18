@@ -28,7 +28,6 @@
 		<li><a href="/dist/CGI-Application-Plugin-TT">CGI::Application::Plugin::TT</a></li>
 		<li><a href="/dist/Template">Template Toolkit</a></li>
 		<li><a href="/dist/CGI-Session">CGI::Session</a></li>
-		<li><a href="/dist/HTML-Template">HTML::Template</a></li>
 		<li><a href="/dist/autodie">autodie</a></li>
 		<li><a href="/dist/DBI">DBI</a></li>
 		<li><a href="/dist/DBD-Pg">DBD::Pg</a> PostgreSQL</li>

@@ -34,7 +34,6 @@ my $builder = Module::Build->new(
 		'File::HomeDir'         => '0',
 		'File::Path'            => '0',
 		'File::Temp'            => '0',
-		'HTML::Template'        => 2.6,
 		'List::MoreUtils'       => 0,
 		'LWP::Simple'           => 0,      # for populate
 		'Mail::Sendmail'        => 0,
