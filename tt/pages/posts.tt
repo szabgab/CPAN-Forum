@@ -1,0 +1,36 @@
+[% DEFAULT
+  title=group _ " - " _  subject
+  description=""
+  pagetitle= title
+%]
+[% INCLUDE incl/header.tt %]
+
+[% INCLUDE incl/search_form.tt %]
+[% IF group %]
+  [% INCLUDE incl/link_to_dist.tt %]
+[% END %]
+
+[% IF admin %]
+    <a href="/?rm=hide&amp;post=[% id %]">hide this post</a>
+[% END %]
+
+[% IF post %]
+  [% INCLUDE incl/message.tt m = post %]
+[% END %]
+
+[% IF preview %]
+	<div class="preview">
+	<p>
+	<b>Preview</b><br />
+	[% IF preview %]
+       [% INCLUDE incl/message.tt m = preview %]
+	[% END %]
+	</p>
+	</div>
+[% END %]
+
+[% IF editor %]
+    [% INCLUDE incl/editor.tt %]
+[% END %]
+
+[% INCLUDE incl/footer.tt %]

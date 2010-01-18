@@ -144,8 +144,9 @@ sub posts {
 			$params{thread_count} = $thread_count;
 		}
 		$post->{responses} = CPAN::Forum::DB::Posts->list_posts_by( parent => $post->{id} );
+
 		my $post_data = CPAN::Forum::Tools::format_post($post);
-		$params{post} = [ $post_data ];
+		$params{post} = $post_data;
 
 		#       (my $dashgroup = $post->gid) =~ s/::/-/g;
 		#       $params{dashgroup}    = $dashgroup;
@@ -185,19 +186,13 @@ sub posts {
 		$preview{date}       = localtime;
 		$preview{id}         = "TBD";
 
-		$params{preview} = [ \%preview ];
+		$params{preview} = \%preview;
 	}
 
 	#$params{new_subject} = CPAN::Forum::Tools::_subject_escape($q->param("new_subject"));
 	$params{group} = $new_group if $new_group;
 
-	my $t = $self->load_tmpl(
-		"posts.tmpl",
-		associate => $q,
-	);
-	$t->param(%params);
-	return $t->output;
-#	return $self->tt_process('pages/posts.tt', \%params);
+	return $self->tt_process('pages/posts.tt', \%params);
 }
 
 

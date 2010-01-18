@@ -1,45 +1,45 @@
 
 <div class="error">
-	<TMPL_IF no_group>No distribution name provided<br /></TMPL_IF>
-	<TMPL_IF no_subject>No subject provided<br /></TMPL_IF>
-	<TMPL_IF invalid_subject>The subject contained and invalid character
-	<a href="/help/">help</a><br /></TMPL_IF>
-	<TMPL_IF no_text>No text provided<br /></TMPL_IF>
-	<TMPL_IF bad_group>Bad distribution name<br /></TMPL_IF>
-	<TMPL_IF bad_data>Bad data<br /></TMPL_IF>
-	<TMPL_IF subject_too_long>Subject must be up to 50 characters.<br /></TMPL_IF>
-	<TMPL_IF flood_control>Trying to submit posts too quickly. 
-	         Please wait 10 more seconds before posting again.</TMPL_IF>
-    <TMPL_IF duplicate_post>Identical to your last post. You might have tried to reload the page.</TMPL_IF>
-	<TMPL_IF text_format>Text format is not correct.<br />
+	[% IF no_group %]No distribution name provided<br />[% END %]
+	[% IF no_subject %]No subject provided<br />[% END %]
+	[% IF invalid_subject %]The subject contained and invalid character
+	<a href="/help/">help</a><br />[% END %]
+	[% IF no_text %]No text provided<br />[% END %]
+	[% IF bad_group %]Bad distribution name<br />[% END %]
+	[% IF bad_data %]Bad data<br />[% END %]
+	[% IF subject_too_long %]Subject must be up to 50 characters.<br />[% END %]
+	[% IF flood_control %]Trying to submit posts too quickly. 
+	         Please wait 10 more seconds before posting again.[% END %]
+    [% IF duplicate_post %]Identical to your last post. You might have tried to reload the page.[% END %]
+	[% IF text_format %]Text format is not correct.<br />
     Most likely you need to replace &lt; characters by &amp;lt;<br />
     or wrap your code snippets in &lt;code&gt;&lt;/code&gt; tags.
     <br />
     If that still does not work you can send the text to <a href="mailto:gabor@perl.org.il">szabgab</a> I might be
-    able to tell what is the problem.<br /></TMPL_IF>
+    able to tell what is the problem.<br />[% END %]
 
-	<TMPL_IF bad_thing>Bad thing<br /></TMPL_IF>
+	[% IF bad_thing %]Bad thing<br />[% END %]
 </div>
 
 <form method="post" action="/">
 <p>
 <input type="submit" name="preview_button" value="Preview" />
-<TMPL_IF preview>
+[% IF previewa %]
 	<input type="submit" name="submit_button" value="Submit" />
-</TMPL_IF>
+[% END %]
 <br />
 <input type="hidden" name="rm" value="process_post" />
-<input type="hidden" name="new_parent" value="<TMPL_VAR new_parent>" />
+<input type="hidden" name="new_parent" value="[% new_parent %]" />
 	
-<input type="hidden" name="new_group_id" value="<TMPL_VAR new_group_id>">
-Distribution: <TMPL_VAR new_group><br />
-Subject:<br /><input name="new_subject" size="100" value="<TMPL_VAR new_subject>" /><br />
-Text:<br /><textarea name="new_text" rows="15" cols="100"><TMPL_VAR new_text></textarea><br />
+<input type="hidden" name="new_group_id" value="[% new_group_id %]">
+Distribution: [% new_group %]<br />
+Subject:<br /><input name="new_subject" size="100" value="[% new_subject %]" /><br />
+Text:<br /><textarea name="new_text" rows="15" cols="100">[% new_text %]</textarea><br />
 
 <input type="submit" name="preview_button" value="Preview" />
-<TMPL_IF preview>
+[% IF preview %]
 	<input type="submit" name="submit_button" value="Submit" />
-</TMPL_IF>
+[% END %]
 </p>
 </form>
 
