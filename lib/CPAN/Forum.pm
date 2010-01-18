@@ -984,34 +984,13 @@ sub _post {
 		date       => $post->{date},
 		parentid   => $post->{parent},
 		responses  => $post->{responses},
-		text       => $self->_text_escape( $post->{text} ),
+		text       => CPAN::Forum::Tools::_text_escape( $post->{text} ),
 		id         => $post->{id},
 		subject    => CPAN::Forum::Tools::_subject_escape( $post->{subject} ),
 	);
 
 	return \%post;
 }
-
-# TODO: this is not correct, the Internal error should be raised all the way up, not as the
-# text field...
-sub _text_escape {
-	my ( $self, $text ) = @_;
-
-	return "" if not $text;
-	my $markup = CPAN::Forum::Markup->new();
-	my $html   = $markup->posting_process($text);
-	if ( not defined $html ) {
-		$self->log->warning("Error displaying already accepted text: '$text'");
-		return "Internal Error";
-	}
-	return $html;
-
-	#$text =~ s{<}{&lt;}g;
-	#$text =~ s{\b(http://.*?)(\s|$)}{<a href="$1">$1</a>$2}g; # urls
-	#$text =~ s{mailto:(.*?)(\s|$)}{<a href="mailto:$1">$1</a>$2}g; # e-mail addresses
-	#return $text;
-}
-
 
 sub _subscriptions {
 	my ( $self, $group ) = @_;

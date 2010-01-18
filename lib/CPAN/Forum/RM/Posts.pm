@@ -182,7 +182,7 @@ sub posts {
 		$params{preview} = 1;
 		my %preview;
 		$preview{subject}  = CPAN::Forum::Tools::_subject_escape( $q->param("new_subject") || '' );
-		$preview{text}     = $self->_text_escape( $q->param("new_text") ) || "";
+		$preview{text}     = CPAN::Forum::Tools::_text_escape( $q->param("new_text") || '' );
 		$preview{parentid} = $q->param("new_parent")                      || "";
 
 		#       $preview{thread_id}  = $q->param("new_text")    || "";
