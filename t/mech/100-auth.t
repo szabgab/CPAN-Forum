@@ -679,7 +679,7 @@ sub check_form {
 		}
 	}
 	my @inputs = $form->inputs;
-	is( @inputs, scalar @$input_fields_ref );
+	is( @inputs, scalar @$input_fields_ref ) or explain \@inputs;
 	if ($diag) {
 		foreach my $i (@inputs) { diag $i->name; }
 	}

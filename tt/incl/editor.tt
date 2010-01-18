@@ -24,7 +24,7 @@
 <form method="post" action="/">
 <p>
 <input type="submit" name="preview_button" value="Preview" />
-[% IF previewa %]
+[% IF preview %]
 	<input type="submit" name="submit_button" value="Submit" />
 [% END %]
 <br />

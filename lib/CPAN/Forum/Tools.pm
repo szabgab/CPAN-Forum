@@ -36,14 +36,14 @@ sub _my_sendmail {
 }
 
 sub _subject_escape {
-	my ($subject) = @_;
+	my $subject = shift || '';
 	return CGI::escapeHTML($subject);
 }
 
 # TODO: this is not correct, the Internal error should be raised all the way up, not as the
 # text field...
 sub _text_escape {
-	my ( $text ) = @_;
+	my $text = shift || '';
 
 	return "" if not $text;
 	my $markup = CPAN::Forum::Markup->new();

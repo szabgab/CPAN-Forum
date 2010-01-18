@@ -189,7 +189,7 @@ sub posts {
 		$params{preview} = \%preview;
 	}
 
-	#$params{new_subject} = CPAN::Forum::Tools::_subject_escape($q->param("new_subject"));
+	$params{new_subject} ||= CPAN::Forum::Tools::_subject_escape($q->param("new_subject"));
 	$params{group} = $new_group if $new_group;
 
 	return $self->tt_process('pages/posts.tt', \%params);
