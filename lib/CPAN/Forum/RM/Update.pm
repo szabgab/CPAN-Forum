@@ -2,7 +2,7 @@ package CPAN::Forum::RM::Update;
 use strict;
 use warnings;
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 use CPAN::Forum::DB::Groups ();
 use CPAN::Forum::DB::Tags ();

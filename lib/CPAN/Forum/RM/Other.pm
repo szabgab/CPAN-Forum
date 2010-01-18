@@ -2,7 +2,7 @@ package CPAN::Forum::RM::Other;
 use strict;
 use warnings;
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 use CPAN::Forum::DBI ();
 use CPAN::Forum::DB::Posts ();

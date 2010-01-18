@@ -1,3 +1,5 @@
+0.18 2010.01.18
+
    Converting all the pages to Template Toolkit
    Removing all the log->debug calls
    Changing the logging of warnings and errors to go to STDERR

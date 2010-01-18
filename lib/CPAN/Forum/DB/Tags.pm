@@ -2,7 +2,7 @@ package CPAN::Forum::DB::Tags;
 use strict;
 use warnings;
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 use base 'CPAN::Forum::DBI';
 use Carp qw();
