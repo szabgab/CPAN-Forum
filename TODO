@@ -1,3 +1,8 @@
+
+* add names to forms and test them
+* add tests where not logged in user tries to post something, gets login page and can go on posting
+* replace the hidden rm values by URL of the same name  /runmode/param/param/param
+
 * Display date in a better way (ellapsed time, or short date format)
   Put time ellapsed since post instead of date of post, (3 min. 6 hours 3 days ago)
   make this configurable: User can say after N days passed the date should show,
@@ -7,8 +12,6 @@
   configurable value.
 
 * Setup daemon to be launched at boot time
-
-* Switch the whole application to use Template::Toolkit instead of HTML::Template
 
 * Record when a user last visited
 
