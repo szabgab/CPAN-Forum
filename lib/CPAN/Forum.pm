@@ -888,6 +888,7 @@ sub _ellapsed {
 
 sub error {
 	my ($self) = @_;
+	print STDERR $@;
 	$self->log->critical($@) if $@;
 	$self->internal_error();
 }

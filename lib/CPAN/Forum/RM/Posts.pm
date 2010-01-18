@@ -172,7 +172,6 @@ sub posts {
 	# the preview facility we create a loop around this code for the preview page (with hopefully
 	# only one iteration in it) The following hash is in preparation of this internal loop.
 	if ( $preview ) {
-		$params{preview} = 1;
 		my %preview;
 		$preview{subject}  = CPAN::Forum::Tools::_subject_escape( $q->param("new_subject") || '' );
 		$preview{text}     = CPAN::Forum::Tools::_text_escape( $q->param("new_text") || '' );
@@ -183,7 +182,7 @@ sub posts {
 		$preview{date}       = localtime;
 		$preview{id}         = "TBD";
 
-		$params{preview_loop} = [ \%preview ];
+		$params{preview} = [ \%preview ];
 	}
 
 	#$params{new_subject} = CPAN::Forum::Tools::_subject_escape($q->param("new_subject"));
@@ -195,6 +194,7 @@ sub posts {
 	);
 	$t->param(%params);
 	return $t->output;
+#	return $self->tt_process('pages/posts.tt', \%params);
 }
 
 
