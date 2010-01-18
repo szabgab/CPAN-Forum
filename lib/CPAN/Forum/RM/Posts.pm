@@ -47,7 +47,7 @@ sub posts {
 		"posts.tmpl",
 		associate => $q,
 	);
-	$t->param( $_ => 1 ) foreach @$errors;
+	my %params = map { $_ => 1 } @$errors;
 
 	my $rm = $self->get_current_runmode();
 	my $request = $self->session->param('request');
@@ -123,7 +123,7 @@ sub posts {
 
 	my $title  = ""; # of the page
 	my $editor = 0;
-	$t->param( editor => 1 ) if grep { $rm eq $_ } (qw(process_post new_post response_form));
+	$params{editor} = 1 if grep { $rm eq $_ } (qw(process_post new_post response_form));
 
 
 	my $id = $q->param("id"); # there was an id
@@ -146,40 +146,40 @@ sub posts {
 		}
 		my $thread_count = CPAN::Forum::DB::Posts->count_thread( $post->{thread} );
 		if ( $thread_count > 1 ) {
-			$t->param( thread_id    => $post->{thread} );
-			$t->param( thread_count => $thread_count );
+			$params{thread_id}    = $post->{thread};
+			$params{thread_count} = $thread_count;
 		}
 		$post->{responses} = CPAN::Forum::DB::Posts->list_posts_by( parent => $post->{id} );
 		my %post = %{ $self->_post($post) };
-		$t->param(%post);
+		%params = (%params, %post);
 
 		#       (my $dashgroup = $post->gid) =~ s/::/-/g;
-		#       $t->param(dashgroup    => $dashgroup);
+		#       $params{dashgroup}    = $dashgroup;
 		my $new_subject = $post->{subject};
 		if ( $new_subject !~ /^\s*re:\s*/i ) {
 			$new_subject = "Re: $new_subject";
 		}
 
-		$t->param( new_subject => CPAN::Forum::Tools::_subject_escape($new_subject) );
-		$t->param( title       => CPAN::Forum::Tools::_subject_escape( $post->{subject} ) );
-		$t->param( post        => 1 );
+		$params{new_subject} = CPAN::Forum::Tools::_subject_escape($new_subject);
+		$params{title}       = CPAN::Forum::Tools::_subject_escape( $post->{subject} );
+		$params{post}        = 1;
 
 		my $group = CPAN::Forum::DB::Groups->info_by( id => $post->{gid} );
 		$new_group    = $group->{name};
 		$new_group_id = $group->{id};
 	}
 
-	#$t->param("group_selector" => $self->_group_selector($new_group, $new_group_id));
-	$t->param( new_group    => $new_group );
-	$t->param( new_group_id => $new_group_id );
-	$t->param( new_text     => CGI::escapeHTML( $q->param("new_text") ) );
+	#$params{group_selector} = $self->_group_selector($new_group, $new_group_id);
+	$params{new_group}    = $new_group;
+	$params{new_group_id} = $new_group_id;
+	$params{new_text}     = CGI::escapeHTML( $q->param("new_text") );
 
 	# for previewing purposes:
 	# This is funky, in order to use the same template for regular show of a message and for
 	# the preview facility we create a loop around this code for the preview page (with hopefully
 	# only one iteration in it) The following hash is in preparation of this internal loop.
 	if ( $preview ) {
-		$t->param( preview => 1 );
+		$params{preview} = 1;
 		my %preview;
 		$preview{subject}  = CPAN::Forum::Tools::_subject_escape( $q->param("new_subject") || '' );
 		$preview{text}     = $self->_text_escape( $q->param("new_text") ) || "";
@@ -190,11 +190,13 @@ sub posts {
 		$preview{date}       = localtime;
 		$preview{id}         = "TBD";
 
-		$t->param( preview_loop => [ \%preview ] );
+		$params{preview_loop} = [ \%preview ];
 	}
 
-	#$t->param(new_subject => CPAN::Forum::Tools::_subject_escape($q->param("new_subject")));
-	$t->param( group => $new_group ) if $new_group;
+	#$params{new_subject} = CPAN::Forum::Tools::_subject_escape($q->param("new_subject"));
+	$params{group} = $new_group if $new_group;
+
+	$t->param(%params);
 
 	return $t->output;
 }
