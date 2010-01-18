@@ -40,7 +40,7 @@ Show a post, the editor and a preview - whichever is needed.
 =cut
 
 sub posts {
-	my ( $self, $errors ) = @_;
+	my ( $self, $preview, $errors ) = @_;
 	my $q = $self->query;
 
 	my $t = $self->load_tmpl(
@@ -178,7 +178,8 @@ sub posts {
 	# This is funky, in order to use the same template for regular show of a message and for
 	# the preview facility we create a loop around this code for the preview page (with hopefully
 	# only one iteration in it) The following hash is in preparation of this internal loop.
-	if ( not @$errors or $$errors[0] eq "preview" ) {
+	if ( $preview ) {
+		$t->param( preview => 1 );
 		my %preview;
 		$preview{subject}  = CPAN::Forum::Tools::_subject_escape( $q->param("new_subject") || '' );
 		$preview{text}     = $self->_text_escape( $q->param("new_text") ) || "";
@@ -248,7 +249,7 @@ sub process_post {
 		}
 	}
 
-	return $self->posts( \@errors ) if @errors;
+	return $self->posts( undef, \@errors ) if @errors;
 
 
 	# There will be two buttons, one for Submit and one for Preview.
@@ -259,12 +260,12 @@ sub process_post {
 	my $result = $markup->posting_process($new_text);
 	if ( not defined $result ) {
 		push @errors, "text_format";
-		return $self->posts( \@errors );
+		return $self->posts( undef, \@errors );
 	}
 
 
 	if ($preview_button) {
-		return $self->posts( ["preview"] );
+		return $self->posts( "preview", [] );
 	}
 	if ( not $submit_button ) {
 		return $self->internal_error(
@@ -294,7 +295,7 @@ sub process_post {
 				"UNKNOWN_ERROR: $@",
 			);
 		}
-		return $self->posts( \@errors );
+		return $self->posts( undef, \@errors );
 	}
 
 	#$self->notify($post_id);
