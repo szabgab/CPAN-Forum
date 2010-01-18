@@ -43,10 +43,6 @@ sub posts {
 	my ( $self, $preview, $errors ) = @_;
 	my $q = $self->query;
 
-	my $t = $self->load_tmpl(
-		"posts.tmpl",
-		associate => $q,
-	);
 	my %params = map { $_ => 1 } @$errors;
 
 	my $rm = $self->get_current_runmode();
@@ -140,9 +136,6 @@ sub posts {
 		if ( not $post ) {
 			$self->log->warning("User requested '/posts/$id' but we could not find it in the database");
 			return $self->notes('no_such_post');
-			#return $self->internal_error(
-			#	"in request",
-			#);
 		}
 		my $thread_count = CPAN::Forum::DB::Posts->count_thread( $post->{thread} );
 		if ( $thread_count > 1 ) {
@@ -150,8 +143,8 @@ sub posts {
 			$params{thread_count} = $thread_count;
 		}
 		$post->{responses} = CPAN::Forum::DB::Posts->list_posts_by( parent => $post->{id} );
-		my %post = %{ CPAN::Forum::Tools::format_post($post) };
-		%params = (%params, %post);
+		my $post_data = CPAN::Forum::Tools::format_post($post);
+		%params = (%params, %$post_data);
 
 		#       (my $dashgroup = $post->gid) =~ s/::/-/g;
 		#       $params{dashgroup}    = $dashgroup;
@@ -196,8 +189,11 @@ sub posts {
 	#$params{new_subject} = CPAN::Forum::Tools::_subject_escape($q->param("new_subject"));
 	$params{group} = $new_group if $new_group;
 
+	my $t = $self->load_tmpl(
+		"posts.tmpl",
+		associate => $q,
+	);
 	$t->param(%params);
-
 	return $t->output;
 }
 
