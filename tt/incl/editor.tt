@@ -21,7 +21,7 @@
 	[% IF bad_thing %]Bad thing<br />[% END %]
 </div>
 
-<form method="post" action="/">
+<form method="post" action="/" name="editor">
 <p>
 <input type="submit" name="preview_button" value="Preview" />
 [% IF preview %]

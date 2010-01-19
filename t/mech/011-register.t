@@ -36,6 +36,7 @@ my $w25   = t::lib::CPAN::Forum::Test::get_mech();
 {
 	diag('Make sure cannot register with e-mail only, username only, too long a username');
 	$w1->submit_form(
+		form_name => 'register',
 		fields => {
 			nickname => '',
 			email    => 'some@email',
@@ -45,6 +46,7 @@ my $w25   = t::lib::CPAN::Forum::Test::get_mech();
 	$w1->content_like(qr{Need both nickname and password});
 
 	$w1->submit_form(
+		form_name => 'register',
 		fields => {
 			nickname => '',
 			email    => '',
@@ -54,6 +56,7 @@ my $w25   = t::lib::CPAN::Forum::Test::get_mech();
 	$w1->content_like(qr{Need both nickname and password});
 
 	$w1->submit_form(
+		form_name => 'register',
 		fields => {
 			nickname => 'xyz',
 			email    => '',
@@ -65,6 +68,7 @@ my $w25   = t::lib::CPAN::Forum::Test::get_mech();
 	my $too_long_name = 'xyzqwertyuiqwertyuiopqwert';
 	diag( length $too_long_name );
 	$w1->submit_form(
+		form_name => 'register',
 		fields => {
 			nickname => $too_long_name,
 			email    => 'a@com',
@@ -84,6 +88,7 @@ BEGIN {
 	diag('reject various bad usernames');
 	foreach my $username (@bad_usernames) {
 		$w1->submit_form(
+			form_name => 'register',
 			fields => {
 				nickname => $username,
 				email    => 'a@com',
@@ -104,6 +109,7 @@ BEGIN {
 	diag('reject various bad email address');
 	foreach my $email (@bad_emails) {
 		$w1->submit_form(
+			form_name => 'register',
 			fields => {
 				nickname => "abcde",
 				email    => $email,
@@ -122,6 +128,7 @@ diag('register user');
 {
 	@CPAN::Forum::messages = ();
 	$w1->submit_form(
+		form_name => 'register',
 		fields => {
 			nickname => $users[0]{username},
 			email    => $users[0]{email},
@@ -157,6 +164,7 @@ diag('try to register the same user again and see it fails');
 	@CPAN::Forum::messages = ();
 	$w1->back;
 	$w1->submit_form(
+		form_name => 'register',
 		fields => {
 			nickname => $users[0]{username},
 			email    => $users[0]{email},
@@ -177,6 +185,7 @@ diag('register with 25 long username');
 	@CPAN::Forum::messages = ();
 	diag "$users[2]{username} $users[2]{email}";
 	$w25->submit_form(
+		form_name => 'register',
 		fields => {
 			nickname => $users[2]{username},
 			email    => $users[2]{email},
@@ -256,6 +265,7 @@ diag('register with 25 long username');
 	$w3->content_unlike(qr{You are logged in});
 	$w3->get_ok("$url/login");
 	$w3->submit_form(
+		form_name => 'login',
 		fields => {
 			nickname => $users[0]{username},
 			password => $new_password,

@@ -68,7 +68,9 @@ $url =~ s{/+$}{};
 	#    is($session_files[0], "/tmp/cgisess_$cookie");
 
 	diag("Try to login without filling username or password");
-	$w_admin->submit_form();
+	$w_admin->submit_form(
+		form_name => 'login',
+	);
 	$w_admin->content_like(qr{Need both nickname and password.});
 
 	my $new_cookie = $w_admin->cookie_jar->as_string;
@@ -82,6 +84,7 @@ $url =~ s{/+$}{};
 
 	diag("Try to login with username but without password");
 	$w_admin->submit_form(
+		form_name => 'login',
 		fields => {
 			nickname => $t::lib::CPAN::Forum::Test::admin{username},
 		},
@@ -91,6 +94,7 @@ $url =~ s{/+$}{};
 
 	diag("Try to login with correct username but with bad password");
 	$w_admin->submit_form(
+		form_name => 'login',
 		fields => {
 			nickname => $t::lib::CPAN::Forum::Test::admin{username},
 			password => 'bad_assword',
@@ -102,6 +106,7 @@ $url =~ s{/+$}{};
 
 	diag("Try to login with admin username and admin password");
 	$w_admin->submit_form(
+		form_name => 'login',
 		fields => {
 			nickname => $t::lib::CPAN::Forum::Test::admin{username},
 			password => $t::lib::CPAN::Forum::Test::admin{password},
@@ -129,6 +134,7 @@ my $user;
 	$w_user->content_like(qr{Login});
 
 	$w_user->submit_form(
+		form_name => 'login',
 		fields => {
 			nickname => $user->{username},
 			password => $user->{password},
@@ -155,8 +161,8 @@ my $user;
 	# TODO check if this is the login form
 	$w_guest->content_like(qr{In order to post on this site});
 
-	# next call causes the warning when running with -w
 	$w_guest->submit_form(
+		form_name => 'login',
 		fields => {
 			nickname => $user->{username},
 			password => $user->{password},
@@ -220,7 +226,9 @@ BEGIN {
 {
 
 	# submit without any changes
-	$w_user->submit_form();
+	$w_user->submit_form(
+		form_name => 'subscriptions',
+	);
 	$w_user->content_like(qr{Your subscriptions were successfully updated.});
 	$w_user->content_like(qr{You can look at them here:});
 	$w_user->follow_link_ok( { text => 'subscription information' } );
@@ -234,7 +242,9 @@ BEGIN {
 foreach my $i ( 0 .. 2 ) {
 	my $input = $w_user->current_form->find_input( $input_fields[$i][0] );
 	$input->check;
-	$w_user->submit_form();
+	$w_user->submit_form(
+		form_name => 'subscriptions',
+	);
 	$w_user->content_like(qr{Your subscriptions were successfully updated.});
 	$w_user->content_like(qr{You can look at them here:});
 	$w_user->follow_link_ok( { text => 'subscription information' } );
@@ -334,7 +344,7 @@ BEGIN {
 
 	diag "Submit to Preview";
 	$w_user->submit_form(
-		form_number => 2,
+		form_name => 'editor',
 		button      => 'preview_button',
 		fields      => {
 			new_subject => $posts[0]{subject},

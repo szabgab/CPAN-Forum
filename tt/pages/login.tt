@@ -14,7 +14,7 @@
 In order to post on this site first you'll have to <a href="/register/">register</a>
 with a valid e-mail address.
 </p>
-<form method="post" action="/">
+<form method="post" action="/" name="login">
 <p>
 <input type="hidden" name="rm" value="login_process" />
 Nickname: <input name="nickname" value="[% nickname %]" />

@@ -6,7 +6,7 @@
 [% INCLUDE incl/header.tt %]
 
 
-<form method="post" action="/">
+<form method="post" action="/" name="subscriptions">
 <p>
 <input type="hidden" name="rm" value="update_subscription" />
 <input type="hidden" name="gids" value="[% gids %]" />

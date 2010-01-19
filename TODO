@@ -1,4 +1,7 @@
 
+The longest threads
+select count(*), thread from posts group by thread order by count desc limit 3;
+
 * add names to forms and test them
 * add tests where not logged in user tries to post something, gets login page and can go on posting
 * replace the hidden rm values by URL of the same name  /runmode/param/param/param

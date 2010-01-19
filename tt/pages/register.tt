@@ -19,7 +19,7 @@
 
 In order to post on this site first you'll have to register with a valid e-mail address.<br />
 Username currently should be between 1-25 characters.
-<form method="post" action="/">
+<form method="post" action="/" name="register">
 <p>
 <input type="hidden" name="rm" value="register_process" />
 </p>
