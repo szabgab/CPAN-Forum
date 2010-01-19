@@ -37,7 +37,7 @@ All the posts related to modules of <a href="/author/[% pauseid_name %]">[% paus
   [% END %]
   <br />
 
-  <form method="post" action="/update/">
+  <form method="post" action="/update/" name="update_tags">
   <input type="hidden" name="what" value="tags" />
   <input type="hidden" name="group_id" value="[% group_id %]" />
   <input name="new_tags" value="[% FOR tag IN mytags %][% tag.name %][% UNLESS loop.last %],[% END %] [% END %]" />

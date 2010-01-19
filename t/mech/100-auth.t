@@ -361,7 +361,7 @@ BEGIN {
 	is_deeply( \@CPAN::Forum::messages, [], 'no messages were sent so far' );
 	diag "Submit for posting";
 	$w_user->submit_form(
-		form_number => 2,
+		form_name => 'editor',
 		button      => 'submit_button',
 	);
 
@@ -398,7 +398,7 @@ BEGIN {
 		$w_user->follow_link_ok( { text => 'new post' } );
 
 		$w_user->submit_form(
-			form_number => 2,
+			form_name => 'editor',
 			button      => 'preview_button',
 			fields      => {
 				new_subject => $posts[$i]{subject},
@@ -409,7 +409,7 @@ BEGIN {
 		$w_user->content_like(qr{  Posted  \s+ on .* $year .* by .* $users[0]{username}  }sx);
 		$w_user->content_like(qr{<b>Preview</b>});
 		$w_user->submit_form(
-			form_number => 2,
+			form_name => 'editor',
 			button      => 'submit_button',
 		);
 #		diag $w_user->content;
@@ -421,7 +421,7 @@ BEGIN {
 	$w_user->content_like( qr{$posts[0]{text}} );
 	$w_user->follow_link_ok( { text => 'Write a response' });
 	$w_user->submit_form(
-		form_number => 2,
+		form_name => 'editor',
 		button      => 'preview_button',
 		fields      => {
 			new_subject => $posts[3]{subject},
@@ -430,7 +430,7 @@ BEGIN {
 	);
 	$w_user->content_like(qr{<b>Preview</b>});
 	$w_user->submit_form(
-		form_number => 2,
+		form_name => 'editor',
 		button      => 'submit_button',
 	);
 
@@ -555,7 +555,7 @@ BEGIN {
 	check_form( $tags_form, \@update_tags );
 
 	$w_user->submit_form(
-		form_number => 2,
+		form_name => 'update_tags',
 		button      => 'update_button',
 		fields      => {
 			new_tags => 'one_word, two words',
@@ -585,7 +585,9 @@ $w_user->get_ok("$url/mypan");
 foreach my $i ( 0 .. 2 ) {
 	my $input = $w_user->current_form->find_input( $input_fields[$i][0] );
 	$input->value(undef);
-	$w_user->submit_form();
+	$w_user->submit_form(
+		form_name => 'subscriptions',
+	);
 	$w_user->content_like(qr{Your subscriptions were successfully updated.});
 	$w_user->content_like(qr{You can look at them here:});
 	$w_user->follow_link_ok( { text => 'subscription information' } );
