@@ -514,6 +514,8 @@ my @urls = qw(
 sub cgiapp_init {
 	my $self = shift;
 
+	$self->param( 'start_time', time );
+
 	CPAN::Forum::DBI->myinit();
 	$STATUS_FILE = $self->param("ROOT") . "/db/status";
 	$self->tt_config(
@@ -587,11 +589,6 @@ Maybe we should move his code to the mode_param method ?
 sub cgiapp_prerun {
 	my $self = shift;
 
-#warn "cgiapp_prerun PID: $$";
-
-	$self->param( 'start_time', time );
-
-
 	$self->header_props(
 		-charset => "utf-8",
 		-type    => 'text/html',
@@ -658,7 +655,7 @@ sub cgiapp_postrun {
 	my $ellapsed_time = time() - $self->param('start_time');
 
 	# first let's try to resolve the really big problems
-	if ( $ellapsed_time > 3 ) {
+	if ( $ellapsed_time > 1 ) {
 		my $rm = $self->get_current_runmode();
 		$self->log->warning("Long request. Ellapsed time: $ellapsed_time on run-mode: $rm");
 	}
