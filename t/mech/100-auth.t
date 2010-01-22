@@ -213,7 +213,7 @@ BEGIN {
 	$w_user->follow_link_ok( { text => 'home' } );
 	$w_user->follow_link_ok( { text => 'mypan' } );
 	$w_user->content_like(qr{Personal configuration of}); # fname lname (username)
-	my ($form) = $w_user->forms;
+	my ($sf, $form) = $w_user->forms;
 	isa_ok( $form, 'HTML::Form' );
 	is( $form->method, 'POST' );
 	is( $form->action, "$url/" );
@@ -232,7 +232,7 @@ BEGIN {
 	$w_user->content_like(qr{Your subscriptions were successfully updated.});
 	$w_user->content_like(qr{You can look at them here:});
 	$w_user->follow_link_ok( { text => 'subscription information' } );
-	my ($form) = $w_user->forms;
+	my ($sf, $form) = $w_user->forms;
 	check_form( $form, \@input_fields );
 
 	BEGIN { $tests += 3 + 1 + @input_fields * 2 }
@@ -240,6 +240,7 @@ BEGIN {
 
 # set the flags of all modules
 foreach my $i ( 0 .. 2 ) {
+	$w_user->form_name('subscriptions');
 	my $input = $w_user->current_form->find_input( $input_fields[$i][0] );
 	$input->check;
 	$w_user->submit_form(
@@ -249,7 +250,7 @@ foreach my $i ( 0 .. 2 ) {
 	$w_user->content_like(qr{You can look at them here:});
 	$w_user->follow_link_ok( { text => 'subscription information' } );
 	$w_user->content_unlike(qr{Acme-Bleach});
-	my ($form) = $w_user->forms;
+	my ($sf, $form) = $w_user->forms;
 	$input_fields[$i][3] = 'on';
 	check_form( $form, \@input_fields );
 
@@ -337,7 +338,7 @@ BEGIN {
 	$w_user->content_like(qr{Distribution: Acme-Bleach});
 	$w_user->content_unlike(qr{Password:}); # not a login form
 	$w_user->content_unlike(qr{Posted on});
-	my ( $serch_form1, $post_form1 ) = $w_user->forms;
+	my ( $sf, $serch_form1, $post_form1 ) = $w_user->forms;
 
 	#$input_fields[$i][3] = undef;
 	check_form( $post_form1, \@post_preview_input_fields );
@@ -355,7 +356,7 @@ BEGIN {
 	#diag $w_user->content;
 	$w_user->content_like(qr{  Posted  \s+ on .* $year .* by .* $users[0]{username}  }sx);
 	$w_user->content_like(qr{<b>Preview</b>});
-	my ( $serch_form2, $post_form2 ) = $w_user->forms;
+	my ( $sf2, $serch_form2, $post_form2 ) = $w_user->forms;
 	check_form( $post_form2, \@post_submit_input_fields );
 
 	is_deeply( \@CPAN::Forum::messages, [], 'no messages were sent so far' );
@@ -551,7 +552,7 @@ BEGIN {
 	$w_guest->get_ok("$url/dist/Acme-Bleach");
 	$w_guest->content_unlike(qr{Update my tags});
 
-	my ( $search_form, $tags_form ) = $w_user->forms;
+	my ( $sf, $search_form, $tags_form ) = $w_user->forms;
 	check_form( $tags_form, \@update_tags );
 
 	$w_user->submit_form(
@@ -583,6 +584,7 @@ BEGIN {
 diag("Unsubscribe form all notifications");
 $w_user->get_ok("$url/mypan");
 foreach my $i ( 0 .. 2 ) {
+	$w_user->form_name('subscriptions');
 	my $input = $w_user->current_form->find_input( $input_fields[$i][0] );
 	$input->value(undef);
 	$w_user->submit_form(
@@ -592,7 +594,7 @@ foreach my $i ( 0 .. 2 ) {
 	$w_user->content_like(qr{You can look at them here:});
 	$w_user->follow_link_ok( { text => 'subscription information' } );
 	$w_user->content_unlike(qr{Acme-Bleach});
-	my ($form) = $w_user->forms;
+	my ($sf, $form) = $w_user->forms;
 	$input_fields[$i][3] = undef;
 	check_form( $form, \@input_fields );
 
@@ -674,6 +676,7 @@ foreach my $i ( 0 .. 2 ) {
 
 sub check_form {
 	my ( $form, $input_fields_ref, $diag ) = @_;
+	local $Test::Builder::Level =  $Test::Builder::Level + 1;
 	foreach my $i (@$input_fields_ref) {
 		my ( $name, $type, $obj, $value ) = @$i;
 
