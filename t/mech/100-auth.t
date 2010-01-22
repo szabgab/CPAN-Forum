@@ -112,7 +112,7 @@ $url =~ s{/+$}{};
 			password => $t::lib::CPAN::Forum::Test::admin{password},
 		},
 	);
-	$w_admin->content_like(qr{You are logged in as.*$t::lib::CPAN::Forum::Test::admin{username}});
+	$w_admin->content_like(qr{/users/$t::lib::CPAN::Forum::Test::admin{username}});
 	BEGIN { $tests += 14; }
 }
 
@@ -140,7 +140,7 @@ my $user;
 			password => $user->{password},
 		},
 	);
-	$w_user->content_like(qr{You are logged in as.*$users[0]{username}});
+	$w_user->content_like(qr{/users/$users[0]{username}});
 
 	BEGIN { $tests += 5; }
 

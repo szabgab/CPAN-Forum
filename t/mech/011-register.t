@@ -262,7 +262,7 @@ diag('register with 25 long username');
 	
 	my $w3    = t::lib::CPAN::Forum::Test::get_mech();
 	$w3->get_ok($url);
-	$w3->content_unlike(qr{You are logged in});
+	$w3->content_unlike(qr{/users/$users[0]{username}});
 	$w3->get_ok("$url/login");
 	$w3->submit_form(
 		form_name => 'login',
@@ -271,7 +271,7 @@ diag('register with 25 long username');
 			password => $new_password,
 		},
 	);
-	$w3->content_like(qr{You are logged in as.*$users[0]{username}});
+	$w3->content_like(qr{/users/$users[0]{username}});
 	BEGIN { $tests += 14; }
 }
 

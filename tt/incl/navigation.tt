@@ -1,21 +1,14 @@
 <div class="navigation">
 [
     <a href="/">home</a>
-    | <a href="/faq/">FAQ</a>
-    | <a href="/about/">about</a>
-    | <a href="/stats/">stats</a>
     | <a href="/new_post/[% group %]">new post</a>
     [% IF loggedin %]
-        | You are logged in as <a href="/users/[% username %]">[% username %]</a>
-        | <a href="/mypan/">mypan</a>
         | <a href="/tags/user/[% username %]">my tags</a>
         | <a href="/selfconfig/">selfconfig</a>
-        | <a href="/logout/">logout</a>
         [% IF admin %]
             | <a href="/admin/">admin</a>
         [% END %]
     [% ELSE %]
-        | <a href="/login/">login</a>
         | <a href="/register/">register</a>
     [% END %]
     | <a href="/tags/">tags</a>

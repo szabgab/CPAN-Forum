@@ -21,6 +21,12 @@
    <div id="toplinks">
     [% IF loggedin %]
        <a href="/users/[% username %]">[% username %]</a>
+       <span class="lsep">|</span>
+       <a href="/logout/">logout</a>
+       <span class="lsep">|</span>
+       <a href="/mypan/">mypan</a>
+    [% ELSE %]
+     <a href="/login/">login</a>
     [% END %]
     <span class="lsep">|</span>
     <a href="/faq/">FAQ</a>
