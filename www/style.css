@@ -1,7 +1,77 @@
-BODY { 
-	background: #ffffff; 
-	font-family: Arial;
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td
+{
+	margin:0;
+	padding:0;
+	border:0;
+	font-size:100%;
+	vertical-align:baseline;
+	background:transparent;
 }
+body { 
+	background: #ffffff none repeat scroll 0 0; 
+	color: #000000;
+	font-family: Arial;
+	font-size: 80%;
+	text-align:center;
+	line-height: 1;
+}
+
+a {
+	color:#0077CC;
+	cursor:pointer;
+	text-decoration:none;
+}
+a:hover {
+	text-decoration: underline;
+}
+
+a:visited {
+	color:#4A6B82;
+}
+
+.lsep {
+	color:#CCCCCC;
+	font-size:110%;
+	margin:0 2px;
+}
+
+.container {
+	margin: 0 auto;
+	text-align: left; /* what about rtl? */
+	width: 960px;
+	zoom:1;
+}
+
+#header {
+	height: 103px;
+	width: 100%;
+}
+
+#header #topbar {
+	background-color: #EEEEEE;
+	float: right;
+	height: 30px;
+	line-height: 22px;
+	max-width: 750px;
+	padding: 3px 10px 0;
+	width: auto;
+}
+
+#header #topbar #toplinks {
+	float: left;
+	margin: 0 35px 0 0;
+}
+
+#header #topbar #toplinks a {
+	font-weight: bold;
+}
+
+#header #topbar #topsearch {
+	float: left;
+}
+
+/* start old css */
+
 
 .warning {
 	color: red;

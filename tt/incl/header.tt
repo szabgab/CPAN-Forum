@@ -4,7 +4,7 @@
 	<title>[% title | html %]</title>  
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="description" content="[% description %]" />
-	<link rel="stylesheet" href="/style.css" type="text/css" />
+	<link rel="stylesheet" href="/style.css?[% version %]" type="text/css" />
 	[% IF rss_href %]
     <link href="/rss/author/[% rss_href %]" rel="alternate" type="application/rss+xml" title ="[% rss_title %]" />
     [% END %]
@@ -12,8 +12,33 @@
 
 <body>
 
-<p id="pageHeader">CPAN::Forum</p>
+<div id="notify-container">
+</div> 
 
+<div class="container">
+ <div id="header">
+  <div id="topbar">
+   <div id="toplinks">
+    [% IF loggedin %]
+       <a href="/users/[% username %]">[% username %]</a>
+    [% END %]
+    <span class="lsep">|</span>
+    <a href="/faq/">FAQ</a>
+    <span class="lsep">|</span>
+    <a href="/about/">about</a>
+    <span class="lsep">|</span>
+    <a href="/stats/">stats</a>
+   </div>
+   <div id="topsearch">
+     <form id="search" method="post" action="/search">
+       <div>
+         <input class="textbox" type="text" value="search" size="28" maxlength="80" onfocus="if (this.value=='search') this.value = ''" tabindex="1" name="q"/>
+       </div>
+     </form>
+   </div>
+  </div>
+ </div>
+<!--
 <p id="pageTitle">[% pagetitle %]</p>
-
+-->
 [% INCLUDE incl/navigation.tt %]

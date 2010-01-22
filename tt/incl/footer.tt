@@ -13,6 +13,7 @@ servers of <a href="http://m5hosting.com/">M5 hosting</a>.<br />
 See also <a href="http://perltraining.org/">World Wide Perl Training</a>
 </div>
 
+</div>
 [% UNLESS dev_server %]
 <!-- Google Analytics -->
 <script type="text/javascript">
