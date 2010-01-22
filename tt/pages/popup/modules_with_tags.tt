@@ -12,11 +12,6 @@ function show(url) {
 <body>
 [% IF loggedin %]You are logged in to CPAN::Forum as [% username %][% END %]
 [% IF admin %][% END %]
-[% IF test_site_warning %]
-<p class="warning">Warning: this is a test site, the data here will be deleted.</p>
-[% END %]
-
-
 
 
 <p>Modules with tag <b>[% tag %]</b></p>

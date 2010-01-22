@@ -11,11 +11,7 @@
 </head> 
 
 <body>
-[% IF test_site_warning %]
-<p class="warning">Warning: this is a test site, the data here will be deleted.<br />
-For real use, please visit the <a href="http://cpanforum.com/">the live site</a>.</p>
-[% END %]
-	
+
 <p id="pageHeader">CPAN::Forum</p>
 
 <p id="pageTitle">[% pagetitle %]</p>

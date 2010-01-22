@@ -593,7 +593,6 @@ sub cgiapp_prerun {
 	);
 	
 	$self->tt_params(
-		"test_site_warning" => (-e $self->param("ROOT") . "/config_test_site"),
 		"dev_server"        => ( $ENV{CPAN_FORUM_DEV} ? 1 : 0 ),
 	);
 
@@ -935,7 +934,6 @@ sub load_tmpl {
 	);
 	$t->param( "loggedin" => $self->session->param("loggedin") || "" );
 	$t->param( "username" => $self->session->param("username") || "anonymous" );
-	$t->param( "test_site_warning" => -e $self->param("ROOT") . "/config_test_site" );
 	$t->param( "admin"             => $self->session->param('admin') );
 	$t->param( "dev_server"        => ( $ENV{CPAN_FORUM_DEV} ? 1 : 0 ) );
 	return $t;
