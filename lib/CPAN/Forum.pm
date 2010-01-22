@@ -919,27 +919,6 @@ sub notes {
 	return $self->tt_process('pages/notes.tt', \%params);
 }
 
-
-=head2 load_tmpl
-
-Semi standard CGI::Application method to replace the way we load the templates.
-
-=cut
-
-sub load_tmpl {
-	my $self = shift;
-	my $t = $self->SUPER::load_tmpl(
-		@_,
-		die_on_bad_params => $ENV{DIE_ON_BAD_PARAM} ? 1 : 0
-	);
-	$t->param( "loggedin" => $self->session->param("loggedin") || "" );
-	$t->param( "username" => $self->session->param("username") || "anonymous" );
-	$t->param( "admin"             => $self->session->param('admin') );
-	$t->param( "dev_server"        => ( $ENV{CPAN_FORUM_DEV} ? 1 : 0 ) );
-	return $t;
-}
-
-
 =head2 _group_selector
 
 
