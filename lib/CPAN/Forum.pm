@@ -26,11 +26,9 @@ use CGI ();
 use CGI::Application::Plugin::Session;
 use CGI::Application::Plugin::TT;
 use CGI::Application::Plugin::LogDispatch;
-use CPAN::DistnameInfo;
 use Data::Dumper qw(Dumper);
 use List::MoreUtils qw(any);
 use POSIX qw();
-use WWW::Mechanize ();
 
 use CPAN::Forum::DBI ();
 use CPAN::Forum::DB::Configure ();
