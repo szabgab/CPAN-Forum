@@ -4,12 +4,18 @@
 %]
 [% INCLUDE incl/header.tt %]
 
-
 <!--
 First name: [% fname %]<br />
 Last name: [% lname %]<br />
 -->
-[% IF admin %]<a href="/admin_edit_user/[% this_username %]">EDIT[% END %]
+
+[% IF loggedin %]
+    | <a href="/selfconfig/">selfconfig</a>
+   [% IF admin %]
+       | <a href="/admin/">admin</a>
+	   <a href="/admin_edit_user/[% this_username %]">EDIT
+   [% END %]
+[% END %]
 
 <p>
 Tags by <a href="/tags/user/[% this_username %]">[% this_username %]</a>

@@ -1,19 +1,4 @@
 <div class="navigation">
-[
-    <a href="/">home</a>
-    | <a href="/new_post/[% group %]">new post</a>
-    [% IF loggedin %]
-        | <a href="/tags/user/[% username %]">my tags</a>
-        | <a href="/selfconfig/">selfconfig</a>
-        [% IF admin %]
-            | <a href="/admin/">admin</a>
-        [% END %]
-    [% ELSE %]
-        | <a href="/register/">register</a>
-    [% END %]
-    | <a href="/tags/">tags</a>
-]
-
 [% UNLESS dev_server %]
 <!--
 <div class="perlads">

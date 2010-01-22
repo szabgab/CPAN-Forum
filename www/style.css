@@ -70,6 +70,53 @@ a:visited {
 	float: left;
 }
 
+#header #homelink {
+	height: 61px;
+	width: 250px;
+	float: left;
+	padding:34px 0 20px 5px;
+	font-size: 30px;
+	margin-top:12px;
+}
+
+#header #topmenu {
+	width:705px;
+/*	height: 40px; */
+	float:left;
+	/* padding:34px 0 20px 5px; */
+	margin-top:12px;
+}
+
+.nav {
+	float:left;
+	font-size:125%;
+}
+.nav ul {
+	margin:0;
+}
+.nav li {
+	background:#777;
+	display:block;
+	float:left;
+	margin-right:7px;
+}
+.nav .youarehere {
+	background:#f90;
+}
+.youarehere a {
+	color:#fff;
+}
+.nav li:hover {
+	background-color:#f90;
+}
+.nav a {
+	color:#fff;
+	display:block;
+	font-weight:bold;
+	padding:6px 12px 6px 12px;
+	text-decoration:none;
+}
+
 /* start old css */
 
 .navigation  {
@@ -117,7 +164,7 @@ TABLE.message {
 	font-size: 10pt;
 }
 
-
+/*
 A       {
 	color: #003399;
 }
@@ -125,6 +172,7 @@ A       {
 A:visited {
 	color: #663399;
 }
+*/
 
 TABLE.posts { 
 	margin: 5px 0px 5px 0px;

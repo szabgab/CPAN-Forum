@@ -16,32 +16,57 @@
 </div> 
 
 <div class="container">
- <div id="header">
-  <div id="topbar">
-   <div id="toplinks">
-    [% IF loggedin %]
-       <a href="/users/[% username %]">[% username %]</a>
-       <span class="lsep">|</span>
-       <a href="/logout/">logout</a>
-       <span class="lsep">|</span>
-       <a href="/mypan/">mypan</a>
-    [% ELSE %]
-     <a href="/login/">login</a>
-    [% END %]
-    <span class="lsep">|</span>
-    <a href="/faq/">FAQ</a>
-    <span class="lsep">|</span>
-    <a href="/about/">about</a>
-    <span class="lsep">|</span>
-    <a href="/stats/">stats</a>
-   </div>
-   <div id="topsearch">
-     <form id="search" method="post" action="/search">
-       <div>
-         <input class="textbox" type="text" value="search" size="28" maxlength="80" onfocus="if (this.value=='search') this.value = ''" tabindex="1" name="q"/>
-       </div>
-     </form>
-   </div>
+  <div id="header">
+    <div id="topbar">
+      <div id="toplinks">
+        [% IF loggedin %]
+          <a href="/users/[% username %]">[% username %]</a>
+          <span class="lsep">|</span>
+          <a href="/logout/">logout</a>
+          <span class="lsep">|</span>
+          <a href="/mypan/">mypan</a>
+        [% ELSE %]
+          <a href="/login/">login</a>
+        [% END %]
+        <span class="lsep">|</span>
+        <a href="/faq/">FAQ</a>
+        <span class="lsep">|</span>
+        <a href="/about/">about</a>
+        <span class="lsep">|</span>
+        <a href="/stats/">stats</a>
+      </div>
+      <div id="topsearch">
+        <form id="search" method="post" action="/search">
+          <div>
+            <input class="textbox" type="text" value="search" size="28" maxlength="80" onfocus="if (this.value=='search') this.value = ''" tabindex="1" name="q"/>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div id="homelink">
+      <a href="/">CPAN::Forum</a>
+    </div>
+    <div id="topmenu">
+      <div class="nav">
+        <ul> <!-- home should show recently opened or recently active threads? -->
+          <li><a href="/threads/">Threads</a></li> <!-- show all the threads -->
+          <li><a href="/tags/">Tags</a></li>
+          <li><a href="/credits/">Credits</a></li> <!-- credit system, or tuits system -->
+          <li><a href="/users/">Users</a></li> <!-- list of top users -->
+          <li><a href="/unanswered">Unanswered</a></li> <!-- list of threads without a response -->
+		<!--
+          [% IF loggedin %]
+            <li><a href="/tags/user/[% username %]">My Tags</a></li>
+          [% END %]
+        -->
+        </ul>
+      </div>
+      <div class="nav" style="float: right;">
+        <ul>
+          <li><a href="/new_post/[% group %]">New Post</a></li>
+        </ul>
+      </div>
+    </div>
   </div>
- </div>
+
 [% INCLUDE incl/navigation.tt %]
