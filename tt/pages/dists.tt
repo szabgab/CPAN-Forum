@@ -1,7 +1,6 @@
 [% DEFAULT
   title = group
   description=""
-  pagetitle = title
   rss_href  = "/rss/dist/" _ group
   rss_title = "CPAN::Forum " _ group _ " rss"
 %]

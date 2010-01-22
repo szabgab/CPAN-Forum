@@ -1,7 +1,6 @@
 [% DEFAULT
   title="Recent postings by " _ this_fullname _ "(" _ this_username _ ")"
   description=""
-  pagetitle="Recent postings by " _ this_fullname _ "(" _ this_username _ ")"
 %]
 [% INCLUDE incl/header.tt %]
 

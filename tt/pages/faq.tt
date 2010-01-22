@@ -1,7 +1,6 @@
 [% DEFAULT
-  title="CPAN::Forum - Frequently Asked Questions"
+  title="Frequently Asked Questions"
   description="Help answering questions frequently encountered by users of the CPAN::Forum"
-  pagetitle="Frequently Asked Questions"
 %]
 [% INCLUDE incl/header.tt %]
 

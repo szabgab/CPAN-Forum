@@ -1,7 +1,6 @@
 [% DEFAULT
   title="CPAN::Forum " _ pauseid
   description="Help answering questions frequently encountered by users of the CPAN::Forum"
-  pagetitle= title
   rss_href  = "/rss/author/" _ pauseid
   rss_title = "CPAN::Forum " _ pauseid _ " rss"
 %]

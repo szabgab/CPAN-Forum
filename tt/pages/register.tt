@@ -1,7 +1,6 @@
 [% DEFAULT
   title="Registration Page to CPAN::Forum"
   description=""
-  pagetitle=title
 %]
 [% INCLUDE incl/header.tt %]
 

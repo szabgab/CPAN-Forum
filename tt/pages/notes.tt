@@ -1,7 +1,6 @@
 [% DEFAULT
   title=""
   description=""
-  pagetitle=""
 %]
 [% INCLUDE incl/header.tt %]
 

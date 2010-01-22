@@ -1,7 +1,6 @@
 [% DEFAULT
   title="Internal Error"
   description=""
-  pagetitle="Internal Error"
 %]
 [% INCLUDE incl/header.tt %]
 

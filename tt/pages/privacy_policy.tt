@@ -1,7 +1,6 @@
 [% DEFAULT
-  title="CPAN::Forum Privacy Policy"
+  title="Privacy Policy"
   description="What information do we keep secret and what do we share."
-  pagetitle="CPAN::Forum Privacy Policy"
 %]
 [% INCLUDE incl/header.tt %]
 

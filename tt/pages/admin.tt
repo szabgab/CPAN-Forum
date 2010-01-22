@@ -1,7 +1,6 @@
 [% DEFAULT
   title="Admin interface"
   description=""
-  pagetitle="Admin interface"
 %]
 [% INCLUDE incl/header.tt %]
 

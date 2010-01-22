@@ -72,38 +72,6 @@ a:visited {
 
 /* start old css */
 
-
-.warning {
-	color: red;
-	font-size: 20pt;
-}
-
-#pageHeader { 
-	background: #dddddd; 
-	margin-top: 10px; 
-	margin-left: 25px; 
-	margin-bottom: 0px; 
-	width: 220px; 
-	height: 37px; 
-	padding: 0px 10px 0px 10px; 
-	font-size: 30pt;
-	font-weight: bold;
-	color: #555555;
-}
-
-#pageTitle { 
-	background: white; 
-	margin-top: 0px; 
-	margin-bottom: 20px;
-	height: 18px; 
-	padding: 0px 0px 0px 20px; 
-	font-size: 12pt;
-	/*font-weight: bold;*/
-	color: #333333;
-	border: solid thin;
-	border-color: #333333;
-}
-
 .navigation  {
 	margin-top: 20px; 
 	margin-bottom: 20px; 

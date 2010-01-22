@@ -1,7 +1,6 @@
 [% DEFAULT
   title="Personal configuration of " _ fullname _ "(" _ username _ ")"
   description=""
-  pagetitle= title
 %]
 [% INCLUDE incl/header.tt %]
 

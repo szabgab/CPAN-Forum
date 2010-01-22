@@ -1,7 +1,6 @@
 [% DEFAULT
-  title="Statistics of CPAN::Forum"
+  title="Statistics"
   description=""
-  pagetitle="Statistics of CPAN::Forum"
 %]
 [% INCLUDE incl/header.tt %]
 

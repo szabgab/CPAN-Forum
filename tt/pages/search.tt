@@ -1,7 +1,6 @@
 [% DEFAULT
   title = "Search page"
   description = ""
-  pagetitle = title
 %]
 [% INCLUDE incl/header.tt %]
 

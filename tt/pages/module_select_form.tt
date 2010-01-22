@@ -1,7 +1,6 @@
 [% DEFAULT
   title="Select the module name to write about"
   description=""
-  pagetitle = title
 %]
 [% INCLUDE incl/header.tt %]
 

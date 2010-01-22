@@ -1,7 +1,6 @@
 [% DEFAULT
-  title="Login to CPAN::Forum"
+  title="Login"
   description=""
-  pagetitle="Login to CPAN::Forum"
 %]
 [% INCLUDE incl/header.tt %]
 

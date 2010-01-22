@@ -1,7 +1,6 @@
 [% DEFAULT
   title="About CPAN::Forum"
   description="Links to modules used to build the forum"
-  pagetitle="About CPAN::Forum"
 %]
 [% INCLUDE incl/header.tt %]
 

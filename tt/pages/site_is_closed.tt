@@ -1,7 +1,6 @@
 [% DEFAULT
   title="Site is closed"
   description=""
-  pagetitle="Site is closed"
 %]
 [% INCLUDE incl/header.tt %]
 

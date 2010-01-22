@@ -1,7 +1,6 @@
 [% DEFAULT
   title="CPAN::Forum Thread"
   description=""
-  pagetitle= title
   rss_href  = "/rss/author/" _ pauseid
   rss_title = "CPAN::Forum " _ pauseid _ " rss"
 %]

@@ -1,7 +1,6 @@
 [% DEFAULT
   title="Modules with tag " _ tag
   description = ""
-  pagetitle = title
 %]
 [% INCLUDE incl/header.tt %]
 

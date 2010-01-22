@@ -1,7 +1,6 @@
 [% DEFAULT
   title="Help"
   description=""
-  pagetitle="Help"
 %]
 [% INCLUDE incl/header.tt %]
 

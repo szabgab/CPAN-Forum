@@ -1,7 +1,6 @@
 [% DEFAULT
   title="Installing a Perl Module from CPAN"
   description=""
-  pagetitle="Installing a Perl Module from CPAN"
 %]
 [% INCLUDE incl/header.tt %]
 

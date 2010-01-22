@@ -1,7 +1,6 @@
 [% DEFAULT
   title=group _ " - " _  subject
   description=""
-  pagetitle= title
 %]
 [% INCLUDE incl/header.tt %]
 

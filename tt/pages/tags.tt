@@ -1,7 +1,6 @@
 [% DEFAULT
   title="Tags"
   description=""
-  pagetitle="Tags"
 %]
 [% INCLUDE incl/header.tt %]
 

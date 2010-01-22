@@ -1,7 +1,6 @@
 [% DEFAULT
   title="Edit user information"
   description=""
-  pagetitle="Edit user information"
 %]
 [% INCLUDE incl/header.tt %]
 

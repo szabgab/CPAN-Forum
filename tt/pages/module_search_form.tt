@@ -1,7 +1,6 @@
 [% DEFAULT
   title="Search for module name"
   description=""
-  pagetitle = title
 %]
 [% INCLUDE incl/header.tt %]
 
