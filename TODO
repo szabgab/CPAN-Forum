@@ -1,4 +1,19 @@
 
+* Change the design of the website
+
+* Allow the users to add 6 tags to the postings
+
+* Create discussion group that does not belong to any specific CPAN package
+  but where posts can be tagged.
+
+* Allow setting language field of the post - (maybe only for the posts without a package name ??) 
+    We can already use utf-8 in the database - allow the use of any language in the GUI as well.
+    once there is someone who will be ready to monitor the posts in those languages.
+    Allow people to subscribe to posts in specific languages only
+
+----------------------------------------
+
+
 The longest threads
 select count(*), thread from posts group by thread order by count desc limit 3;
 
@@ -48,18 +63,9 @@ Tell the user to check their e-mail and click on the approval link.
     that they discourage the use of CPAN::Forum and can point to other
     existing ways of getting help for the module.
 
-* Allow the users to add 6 tags to the postings
 
 * Create rss feeds based on tags, allow people to subscribe posts that have
    specific tags
-
-* Create discussion group that does not belong to any specific CPAN package
-  but where posts can be tagged.
-
-* Allow setting language field of the post - 
-    We can already use utf-8 in the database - allow the use of any language in the GUI as well.
-    once there is someone who will be ready to monitor the posts in those languages.
-    Allow people to subscribe to posts in specific languages only
 
 
 * Move the session id into the database:
