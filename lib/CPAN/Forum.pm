@@ -628,6 +628,7 @@ sub tt_pre_process {
 	my ($self, $page, $params) = @_;
 	$params ||= {};
 
+	$params->{version}  = time; #$VERSION;
 	$params->{loggedin} = $self->session->param("loggedin") || "";
 	$params->{username} = $self->session->param("username") || "anonymous";
 	$params->{admin}    = $self->session->param('admin');
