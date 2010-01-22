@@ -6,7 +6,6 @@
 %]
 [% INCLUDE incl/header.tt %]
 
-[% INCLUDE incl/search_form.tt %]
 [% INCLUDE incl/links.tt %]
 
 <p>

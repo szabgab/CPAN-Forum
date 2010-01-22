@@ -62,7 +62,6 @@ No such Atom feed.
 Tags on <a href="/dist/[% dist_name %]">[% dist_name %]</a> were updated<br />
 See list of <a href="/tags/">all the tags</a><br />
 </p>
-[% INCLUDE incl/search_form.tt %]
 [% END %]
 
 [% IF duplicate_email %]

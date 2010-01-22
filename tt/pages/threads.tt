@@ -6,7 +6,6 @@
 %]
 [% INCLUDE incl/header.tt %]
 
-[% INCLUDE incl/search_form.tt %]
 [% INCLUDE incl/link_to_dist.tt %]
 <table class="threads">
 [% FOR post IN posts %]

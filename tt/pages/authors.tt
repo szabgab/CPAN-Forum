@@ -6,9 +6,6 @@
 %]
 [% INCLUDE incl/header.tt %]
 
-
-[% INCLUDE incl/search_form.tt %]
-
 <p>
 Post made to modules whose author is <b><[% pauseid %]</b>.
 </p>

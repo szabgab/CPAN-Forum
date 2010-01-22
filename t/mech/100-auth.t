@@ -338,7 +338,7 @@ BEGIN {
 	$w_user->content_like(qr{Distribution: Acme-Bleach});
 	$w_user->content_unlike(qr{Password:}); # not a login form
 	$w_user->content_unlike(qr{Posted on});
-	my ( $sf, $serch_form1, $post_form1 ) = $w_user->forms;
+	my ( $sf, $post_form1 ) = $w_user->forms;
 
 	#$input_fields[$i][3] = undef;
 	check_form( $post_form1, \@post_preview_input_fields );
@@ -356,7 +356,7 @@ BEGIN {
 	#diag $w_user->content;
 	$w_user->content_like(qr{  Posted  \s+ on .* $year .* by .* $users[0]{username}  }sx);
 	$w_user->content_like(qr{<b>Preview</b>});
-	my ( $sf2, $serch_form2, $post_form2 ) = $w_user->forms;
+	my ( $sf2, $post_form2 ) = $w_user->forms;
 	check_form( $post_form2, \@post_submit_input_fields );
 
 	is_deeply( \@CPAN::Forum::messages, [], 'no messages were sent so far' );
@@ -552,7 +552,7 @@ BEGIN {
 	$w_guest->get_ok("$url/dist/Acme-Bleach");
 	$w_guest->content_unlike(qr{Update my tags});
 
-	my ( $sf, $search_form, $tags_form ) = $w_user->forms;
+	my ( $sf, $tags_form ) = $w_user->forms;
 	check_form( $tags_form, \@update_tags );
 
 	$w_user->submit_form(

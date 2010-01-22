@@ -4,7 +4,6 @@
 %]
 [% INCLUDE incl/header.tt %]
 
-[% INCLUDE incl/search_form.tt %]
 [% IF group %]
   [% INCLUDE incl/link_to_dist.tt %]
 [% END %]
