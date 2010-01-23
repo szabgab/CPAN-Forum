@@ -156,7 +156,7 @@ my $user;
 	$w_guest->content_like(qr{CPAN Forum});
 	$w_guest->get_ok("$url/dist/Acme-Bleach");
 	$w_guest->content_like(qr{subforum of Acme-Bleach});
-	$w_guest->follow_link_ok( { text => 'new post' } );
+	$w_guest->follow_link_ok( { text => 'New Post' } );
 
 	# TODO check if this is the login form
 	$w_guest->content_like(qr{In order to post on this site});
@@ -182,7 +182,7 @@ my $user;
 	$w_user->content_like(qr{CPAN Forum});
 	$w_user->get_ok("$url/dist/Acme-Bleach");
 	$w_user->content_like(qr{Acme-Bleach});
-	$w_user->follow_link_ok( { text => 'new post' } );
+	$w_user->follow_link_ok( { text => 'New Post' } );
 	$w_user->content_like(qr{Distribution: Acme-Bleach});
 
 	BEGIN { $tests += 6; }
@@ -210,7 +210,7 @@ BEGIN {
 
 {
 	diag("Subscribe to notification on All entries");
-	$w_user->follow_link_ok( { text => 'home' } );
+	$w_user->follow_link_ok( { text => 'CPAN::Forum' } );
 	$w_user->follow_link_ok( { text => 'mypan' } );
 	$w_user->content_like(qr{Personal configuration of}); # fname lname (username)
 	my ($sf, $form) = $w_user->forms;
@@ -334,7 +334,7 @@ BEGIN {
 	is_deeply( \@CPAN::Forum::messages, [], 'no messages were sent so far' );
 	$w_user->get_ok("$url/dist/Acme-Bleach");
 	$w_user->content_like(qr{Be the first one to post a message in the subforum of Acme-Bleach});
-	$w_user->follow_link_ok( { text => 'new post' } );
+	$w_user->follow_link_ok( { text => 'New Post' } );
 	$w_user->content_like(qr{Distribution: Acme-Bleach});
 	$w_user->content_unlike(qr{Password:}); # not a login form
 	$w_user->content_unlike(qr{Posted on});
@@ -396,7 +396,7 @@ BEGIN {
 	foreach my $i (1..2) {
 		$w_user->get_ok("$url/dist/Acme-Bleach");
 		$w_user->content_like(qr{Post a message in the subforum of Acme-Bleach});
-		$w_user->follow_link_ok( { text => 'new post' } );
+		$w_user->follow_link_ok( { text => 'New Post' } );
 
 		$w_user->submit_form(
 			form_name => 'editor',

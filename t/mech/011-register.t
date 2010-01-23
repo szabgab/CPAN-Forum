@@ -28,9 +28,10 @@ my $w25   = t::lib::CPAN::Forum::Test::get_mech();
 	$w1->get_ok($url);
 	$w1->content_like(qr{CPAN Forum});
 
+	$w1->follow_link_ok( { text => 'login' } );
 	$w1->follow_link_ok( { text => 'register' } );
 	$w1->content_like(qr{Registration Page}) or diag $w1->content;
-	BEGIN { $tests += 4; }
+	BEGIN { $tests += 5; }
 }
 
 {
