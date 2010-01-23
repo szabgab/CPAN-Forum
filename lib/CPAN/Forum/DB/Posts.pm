@@ -15,8 +15,8 @@ sub get_post {
 	return if not $post_id;
 
 	#Carp::croak("No post_id given") if not $post_id;
-
 	my $sql = "SELECT posts.id, gid, uid, parent, thread, hidden, subject, text, date,
+			   extract(epoch from date_trunc('seconds', NOW()-date)) AS seconds,
                 groups.name AS group_name, groups.pauseid, username, fname, lname
                 FROM posts, groups, users
                 WHERE posts.id=? AND posts.gid=groups.id AND users.id=posts.uid";

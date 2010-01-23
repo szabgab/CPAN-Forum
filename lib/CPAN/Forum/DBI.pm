@@ -270,7 +270,9 @@ sub mypager {
 	my ( $where, @values ) = $self->_prep_where( $args{where} );
 
 	my $fetch_sql =
-		"SELECT posts.id, subject, thread, date, username, groups.name AS group_name FROM posts, users, groups";
+		"SELECT posts.id, subject, thread, date, 
+			   extract(epoch from date_trunc('seconds', NOW()-date)) AS seconds,
+				username, groups.name AS group_name FROM posts, users, groups";
 	my $count_sql    = "SELECT COUNT(*) FROM posts";
 	my @fetch_values = @values;
 

@@ -838,7 +838,6 @@ sub build_listing {
 	my $threads = CPAN::Forum::DB::Posts->count_threads(@threads);
 
 	foreach my $post (@$it) {
-
 		#warn "called for each post";
 		my $thread = $post->{thread};
 		my $thread_count = ( $thread and $threads->{$thread} ) ? $threads->{$thread}{cnt} : 0;
@@ -852,6 +851,7 @@ sub build_listing {
 
 			#date         => POSIX::strftime("%e/%b", localtime $post->{date}),
 			#date         => scalar localtime $post->{date},
+			seconds    => _ellapsed($post->{seconds}),
 			date       => $post->{date},    #_ellapsed($post->{date}),
 			postername => $post->{username},
 		};
@@ -860,24 +860,22 @@ sub build_listing {
 }
 
 sub _ellapsed {
-	my ($t)  = @_;
-	my $now  = time;
-	my $diff = $now - $t;
+	my ($diff)  = @_;
 	return 'now' if not $diff;
 
 	my $sec = $diff % 60;
 	$diff = ( $diff - $sec ) / 60;
-	return sprintf( " %s sec ago", $sec ) if not $diff;
+	return sprintf( " %s s ago", $sec ) if not $diff;
 
 	my $min = $diff % 60;
 	$diff = ( $diff - $min ) / 60;
-	return sprintf( "%s min ago", $min ) if not $diff;
+	return sprintf( "%s m ago", $min ) if not $diff;
 
 	my $hours = $diff % 24;
 	$diff = ( $diff - $hours ) / 24;
-	return sprintf( "%s hours ago", $hours ) if not $diff;
+	return sprintf( "%s h ago", $hours ) if not $diff;
 
-	return sprintf( "%s days ago", $diff );
+	return sprintf( "%s d ago", $diff );
 }
 
 
