@@ -78,6 +78,9 @@ a:visited {
 	font-size: 30px;
 	margin-top:12px;
 }
+#header #homelink a {
+	text-decoration: none;
+}
 
 #header #topmenu {
 	width:705px;
@@ -86,6 +89,7 @@ a:visited {
 	/* padding:34px 0 20px 5px; */
 	margin-top:12px;
 }
+
 
 .nav {
 	float:left;
@@ -100,22 +104,56 @@ a:visited {
 	float:left;
 	margin-right:7px;
 }
+#topmenu a {
+	color: #ffffff;
+}
+
 .nav .youarehere {
 	background:#f90;
 }
 .youarehere a {
-	color:#fff;
+	color:#fffffff;
 }
 .nav li:hover {
 	background-color:#f90;
 }
 .nav a {
-	color:#fff;
+	color:#fffffff;
 	display:block;
 	font-weight:bold;
 	padding:6px 12px 6px 12px;
 	text-decoration:none;
 }
+
+#posts .post {
+	width: 600px;
+	border-bottom:1px 
+	dotted #999;
+	overflow:hidden;
+	padding:11px 0;
+	float:left;
+}
+
+#posts .post .subject {
+	color: yellow;
+	font-size:130%;
+	font-weight:bold;
+}
+
+#posts .post .group {
+	color: yellow;
+	padding:6px 12px 6px 12px;
+	font-weight:bold;
+}
+
+#posts .post .ellapsed {
+	float:right;
+}
+#posts .post .username {
+	padding:0px 12px 6px 12px;
+	float:right;
+}
+
 
 /* start old css */
 
