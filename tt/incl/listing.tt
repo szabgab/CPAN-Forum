@@ -1,5 +1,4 @@
 [% IF messages %]
-<div id="posts">
 [% FOR m IN messages %]
   <div class="post">
 		<div class="subject"><a href="/posts/[% m.id %]">[% m.subject %]</a></div>
@@ -17,6 +16,4 @@
    [% IF next_page %] | <a href="?page=[% next_page %]">next page</a>[% END %]
    [% IF last_page %] | <a href="?page=[% last_page %]">last page</a>[% END %]
   </div>
-</div>
-
 [% END %]

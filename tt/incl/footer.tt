@@ -1,19 +1,21 @@
 [% INCLUDE incl/navigation.tt %]
+<div id="footer">
+	<div id="left_footer">
+		Service launched on 2nd of February 2005.<br />
+		Comments, and other submissions on CPAN Forum are Copyright 2005-2010, their respective owners.<br />
+		Site maintainer is not responsible for content. 
+	    <a href="/privacy_policy">Privacy Policy</a>
+	</div>
+	<div id="right_footer">
+	Maintained by <a href="http://szabgab.com/">Gabor Szabo</a> and hosted on the
+	servers of <a href="http://m5hosting.com/">M5 hosting</a>.<br />
+	<a href="http://pti.co.il/"><img src="/img/pti-round-80.jpg" alt="Perl Training Israel" /></a>
+	See also <a href="http://perltraining.org/">World Wide Perl Training</a>
+	</div>
+</div>
 
-<div class="left_footer">
-	Service launched on 2nd of February 2005.<br />
-	Comments, and other submissions on CPAN Forum are Copyright 2005-2010, their respective owners.<br />
-	Site maintainer is not responsible for content. 
-    <a href="/privacy_policy">Privacy Policy</a>
-</div>
-<div class="right_footer">
-Maintained by <a href="http://szabgab.com/">Gabor Szabo</a> and hosted on the
-servers of <a href="http://m5hosting.com/">M5 hosting</a>.<br />
-<a href="http://pti.co.il/"><img src="/img/pti-round-80.jpg" alt="Perl Training Israel" /></a>
-See also <a href="http://perltraining.org/">World Wide Perl Training</a>
-</div>
+</div> <!-- container -->
 
-</div>
 [% UNLESS dev_server %]
 <!-- Google Analytics -->
 <script type="text/javascript">

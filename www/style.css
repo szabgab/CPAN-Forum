@@ -70,6 +70,13 @@ a:visited {
 	float: left;
 }
 
+#header #topbar #toplanguage {
+	float: left;
+}
+#toplanguage select {
+	width: 120px;
+}
+
 #header #homelink {
 	height: 61px;
 	width: 250px;
@@ -125,8 +132,29 @@ a:visited {
 	text-decoration:none;
 }
 
-#posts .post {
-	width: 600px;
+#content_body {
+/*	background-color: #00ff00;*/
+	margin-top:12px;
+	margin-bottom: 12px;
+/*	height: 100%; */
+/*	display: block; */
+/*	float: bottom; */
+/*	width: 100%; */
+}
+
+#left_column {
+/*	background-color: #eeeeee; */
+	width: 798px;
+	float: left;
+}
+#right_column {
+	width: 160px;
+	float: right;
+}
+
+#left_column .post {
+/*	width: 600px; */
+	width: 100%;
 	border-bottom:1px 
 	dotted #999;
 	overflow:hidden;
@@ -134,26 +162,34 @@ a:visited {
 	float:left;
 }
 
-#posts .post .subject {
+#left_column .post .subject {
 	color: yellow;
 	font-size:130%;
 	font-weight:bold;
 }
 
-#posts .post .group {
+#left_column .post .group {
 	color: yellow;
 	padding:6px 12px 6px 12px;
 	font-weight:bold;
 }
 
-#posts .post .ellapsed {
+#left_column .post .ellapsed {
 	float:right;
 }
-#posts .post .username {
+#left_column .post .username {
 	padding:0px 12px 6px 12px;
 	float:right;
 }
 
+#pager {
+	padding: 12px;
+	float: left;
+}
+#rss {
+	paddinx: 12px;
+	float: left;
+}
 
 /* start old css */
 
@@ -163,6 +199,7 @@ a:visited {
 	font-size: 10pt;
 	text-align: center; 
 	padding-bottom:1px;
+	float: bottom;
 /*	width: 780px;*/
 }
 .perlads li {
@@ -201,16 +238,6 @@ TABLE.message {
 	background: white;
 	font-size: 10pt;
 }
-
-/*
-A       {
-	color: #003399;
-}
-
-A:visited {
-	color: #663399;
-}
-*/
 
 TABLE.posts { 
 	margin: 5px 0px 5px 0px;
@@ -343,13 +370,20 @@ INPUT {
 	font-size: 9pt;
 }
 
-.left_footer {
-	font-size: 8pt;
+#footer {
+	padding-top: 12px;
+	float: left;
 }
 
-.right_footer {
+#left_footer {
 	font-size: 8pt;
-    text-align: right;
+	float: left;
+}
+
+#right_footer {
+	font-size: 8pt;
+/*	text-align: right;*/
+	float: right;
 }
 
 .error {

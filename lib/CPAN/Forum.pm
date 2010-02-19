@@ -632,6 +632,7 @@ sub tt_pre_process {
 	$params->{loggedin} = $self->session->param("loggedin") || "";
 	$params->{username} = $self->session->param("username") || "anonymous";
 	$params->{admin}    = $self->session->param('admin');
+	$params->{language_hu} = 1;
 
 	return;
 }

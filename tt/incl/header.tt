@@ -12,9 +12,6 @@
 
 <body>
 
-<div id="notify-container">
-</div> 
-
 <div class="container">
   <div id="header">
     <div id="topbar">
@@ -40,6 +37,14 @@
           <div>
             <input class="textbox" type="text" value="search" size="28" maxlength="80" onfocus="if (this.value=='search') this.value = ''" tabindex="1" name="q"/>
           </div>
+        </form>
+      </div>
+      <div id="toplanguage">
+        <form id="language" method="post" action="/language">
+        <select name="lang">
+        <option value="en" [%IF language_en %]selected="SELECTED"[% END %] >English</option>
+<!--        <option value="hu" [%IF language_hu %]selected="SELECTED"[% END %] >Magyar</option>-->
+        </select>
         </form>
       </div>
     </div>
@@ -69,3 +74,4 @@
     </div>
   </div>
 
+  
