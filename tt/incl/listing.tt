@@ -2,7 +2,7 @@
 [% FOR m IN messages %]
   <div class="post">
 		<div class="subject"><a href="/posts/[% m.id %]">[% m.subject %]</a></div>
-		[% UNLESS hide_group %]<div class="group"><a href="/dist/[% m.group %]">[% m.group %]</a></div>[% END %]
+		[% UNLESS hide_group %]<div class="post-dist-tag"><a href="/dist/[% m.group %]">[% m.group %]</a></div>[% END %]
 		<div class="ellapsed">[% m.seconds %]</div>
 <!--		<div class="date">[% m.date %]</div> -->
 		[% UNLESS hide_username %]<div class="username"><a href="/users/[% m.postername %]">[% m.postername %]</a></div>[% END %]

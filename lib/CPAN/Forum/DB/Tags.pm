@@ -93,7 +93,7 @@ sub get_all_tags {
                 FROM tags, tag_cloud 
                 WHERE tag_cloud.tag_id=tags.id
                 GROUP BY name
-                ORDER BY name ASC
+                ORDER BY total DESC
                 ";
 	return $self->_fetch_arrayref_of_hashes($sql);
 }

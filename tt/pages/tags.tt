@@ -1,17 +1,26 @@
 [% DEFAULT
-  title="Tags"
+  title="Tags - CPAN::Forum"
   description=""
 %]
 [% INCLUDE incl/header.tt %]
 
+<div id="content_body">
+<div id="left_column">
+
 [% IF user_name %]
 Tags of user <a href="/user/[% user_name %]">[% user_name %]</a>
 [% END %]
+
 <!--Number of tags: [% tag_count %]<br />-->
-<div id="htmltagcloud">
+<div id="tags">
+<ul>
 [% FOREACH t IN tags %]
-<span class="tagcloud[% t.total %]"><a href="/tags/name/[% t.name %]">[% t.name %]</a></span>[% UNLESS loop.last %],[% END %]
+<li><a href="/tags/name/[% t.name %]">[% t.name %]</a> x [% t.total %]
 [% END %]
+</ul>
+</div>
+
+</div>
 </div>
 
 [% INCLUDE incl/footer.tt %]

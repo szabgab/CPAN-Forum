@@ -54,10 +54,10 @@
     <div id="topmenu">
       <div class="nav">
         <ul> <!-- home should show recently opened or recently active threads? -->
-          <li><a href="/threads/">Threads</a></li> <!-- show all the threads -->
+<!--          <li><a href="/threads/">Threads</a></li> --><!-- show all the threads -->
           <li><a href="/tags/">Tags</a></li>
 <!--          <li><a href="/credits/">Credits</a></li> --><!-- credit system, or tuits system -->
-          <li><a href="/users/">Users</a></li> <!-- list of top users -->
+<!--          <li><a href="/users/">Users</a></li> --><!-- list of top users -->
 <!--          <li><a href="/unanswered">Unanswered</a></li> --><!-- list of threads without a response -->
 		<!--
           [% IF loggedin %]

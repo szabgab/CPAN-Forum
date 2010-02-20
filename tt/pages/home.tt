@@ -1,6 +1,6 @@
 [% DEFAULT
-  title="Discuss any issue related to Perl or specific CPAN modules"
-  description="The place where you can ask anythng about Perl and CPAN that you were afraid to ask elsewhere."
+  title="Discuss any issue related to any CPAN module or to Perl in general"
+  description="The place where you can ask anything about Perl and CPAN that you were afraid to ask elsewhere."
   rss_href = "/rss/all"
   rss_title = "CPAN::Fourm rss"
 %]
