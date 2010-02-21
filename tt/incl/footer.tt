@@ -9,8 +9,10 @@
 	<div id="right_footer">
 	Maintained by <a href="http://szabgab.com/">Gabor Szabo</a> and hosted on the
 	servers of <a href="http://m5hosting.com/">M5 hosting</a>.<br />
+<!--
 	<a href="http://pti.co.il/"><img src="/img/pti-round-80.jpg" alt="Perl Training Israel" /></a>
 	See also <a href="http://perltraining.org/">World Wide Perl Training</a>
+-->
 	</div>
 </div>
 

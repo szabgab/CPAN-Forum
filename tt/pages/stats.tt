@@ -4,50 +4,60 @@
 %]
 [% INCLUDE incl/header.tt %]
 
+<div id="content_body">
+<div id="left_column">
 
-<a name="statistics"></a>
-<table>
-<tr><td>
+  <a name="statistics"></a>
+  <table>
+  <tr><td>
 
-<div class="about_list">
-<p class="about_title">Top [% modules_cnt %] modules</p>
-<table>
-[% FOR g IN groups %]
-  <tr><td><a href="/dist/[% g.gname %]">[% g.gname %]</a></td><td>[% g.cnt %]</td></tr>
-[% END %]
-</table>
+  <div class="about_list">
+  <p class="about_title">Top [% modules_cnt %] modules</p>
+  <table>
+  [% FOR g IN groups %]
+    <tr><td><a href="/dist/[% g.gname %]">[% g.gname %]</a></td><td>[% g.cnt %]</td></tr>
+  [% END %]
+  </table>
+  </div>
+  </td>
+
+  [% IF users %]
+  <td>
+      <div class="about_list">
+      <p class="about_title">[% users_cnt %] most active users</p>
+      <table>
+      [% FOR u IN users %]
+        <tr><td><a href="/users/[% u.username %]">[% u.username %]</a></td><td>[% u.cnt %]</td></tr>
+      [% END %]
+      </table>
+      </div>
+  </td>
+  [% END %]
+
+
+  [% IF tagging_users %]
+  <td valign=top>
+      <div class="about_list">
+      <p class="about_title">Top [% tagging_users_cnt %] taggers</p>
+      <table>
+      [% FOR u IN tagging_users %]
+        <tr><td><a href="/tags/user/[% u.username %]">[% u.username %]</a></td><td>[% u.cnt %]</td></tr>
+      [% END %]
+      </table>
+      </div>
+  </td>
+  [% END %]
+
+  </tr>
+  </table>
 </div>
-</td>
 
-[% IF users %]
-<td>
-    <div class="about_list">
-    <p class="about_title">[% users_cnt %] most active users</p>
-    <table>
-    [% FOR u IN users %]
-      <tr><td><a href="/users/[% u.username %]">[% u.username %]</a></td><td>[% u.cnt %]</td></tr>
-    [% END %]
-    </table>
-    </div>
-</td>
-[% END %]
+<div id="right_column">
+  <!--
+  This place was intentionally left empty.
+  -->
+</div>
 
-
-[% IF tagging_users %]
-<td valign=top>
-    <div class="about_list">
-    <p class="about_title">Top [% tagging_users_cnt %] taggers</p>
-    <table>
-    [% FOR u IN tagging_users %]
-      <tr><td><a href="/tags/user/[% u.username %]">[% u.username %]</a></td><td>[% u.cnt %]</td></tr>
-    [% END %]
-    </table>
-    </div>
-</td>
-[% END %]
-
-</tr>
-</table>
-
+</div>
 [% INCLUDE incl/footer.tt %]
 
