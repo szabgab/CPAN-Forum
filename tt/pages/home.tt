@@ -15,9 +15,7 @@
 </div>
 
 <div id="right_column">
-<!--
-This place was intentionally left empty.
--->
+[% INCLUDE incl/right_side.tt %]
 </div>
 
 
