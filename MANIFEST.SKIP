@@ -48,3 +48,4 @@
 tmon.out
 .git
 .gitignore
+^MYMETA.yml$
