@@ -2,7 +2,7 @@ package CPAN::Forum::Pod;
 
 use Moose;
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 extends qw(Pod::Simple::HTML);
 

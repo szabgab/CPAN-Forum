@@ -1,6 +1,7 @@
-0.19
+0.19 2010.02.21
    Change most of the UI to use div elements instead of table elements
    Change the whole look of the web site
+   Fix the search tool
 
 0.18 2010.01.18
 

@@ -2,7 +2,7 @@ package CPAN::Forum::Build;
 use warnings;
 use strict;
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 use File::Copy;
 use File::Path;

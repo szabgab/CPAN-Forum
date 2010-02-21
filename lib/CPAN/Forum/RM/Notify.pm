@@ -2,7 +2,7 @@ package CPAN::Forum::RM::Notify;
 use strict;
 use warnings;
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 use XML::RSS::SimpleGen;
 use XML::Atom::SimpleFeed;
