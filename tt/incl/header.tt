@@ -31,7 +31,10 @@
         <a href="/about/">about</a>
         <span class="lsep">|</span>
         <a href="/stats/">stats</a>
+        <span class="lsep">|</span>
+        <a href="/search/">search</a>
       </div>
+<!--
       <div id="topsearch">
         <form id="search" method="post" action="/search">
           <div>
@@ -39,6 +42,7 @@
           </div>
         </form>
       </div>
+-->
       <div id="toplanguage">
         <form id="language" method="post" action="/language">
         <select name="lang">
