@@ -55,7 +55,7 @@ a:visited {
 .container {
 	margin:      0 auto;
 	text-align:  left; /* what about rtl? */
-	width:       960px;
+	width:       1020px;
 	zoom:        1;
 }
 
@@ -166,8 +166,17 @@ a:visited {
 	float: left;
 }
 #right_column {
-	width: 160px;
+	width: 220px;
 	float: right;
+}
+/*
+#right_column img {
+	float: right;
+}
+*/
+#right_column .google_ad {
+	/* background: black; */
+	margin-top: 20px;
 }
 
 #left_column .post {

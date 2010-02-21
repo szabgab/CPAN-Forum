@@ -14,10 +14,7 @@
 
 </div>
 
-<div id="right_column">
 [% INCLUDE incl/right_side.tt %]
-</div>
-
 
 </div>
 

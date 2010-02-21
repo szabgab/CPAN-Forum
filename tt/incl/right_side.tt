@@ -1,5 +1,10 @@
-[% UNLESS dev_server %]
+<div id="right_column">
+<center>
+<a href="http://bit.ly/davorg_training">
+<img src="/img/extra/learnperl_in_london_160x480.png" width="160" height="480" border="0" />
+</a>
 
+<div class="google_ad">
 <script type="text/javascript"><!--
 google_ad_client = "pub-7760157643054954";
 /* 120x240, created 2/21/10 */
@@ -11,5 +16,9 @@ google_ad_height = 240;
 <script type="text/javascript"
 src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
 </script>
+</div>
+</center>
 
+[% UNLESS dev_server %]
 [% END %]
+</div>

@@ -86,11 +86,7 @@
   <div id="rss"><a href="[% rss_href %]"><img src="/img/rss1.gif" alt="[% rss_title %]" /></a></div>
 </div>
 
-<div id="right_column">
-  <!--
-  This place was intentionally left empty.
-  -->
-</div>
+[% INCLUDE incl/right_side.tt %]
 
 </div>
 
