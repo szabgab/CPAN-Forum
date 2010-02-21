@@ -1,3 +1,7 @@
+0.19
+   Change most of the UI to use div elements instead of table elements
+   Change the whole look of the web site
+
 0.18 2010.01.18
 
    Converting all the pages to Template Toolkit

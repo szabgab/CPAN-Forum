@@ -43,14 +43,16 @@
         </form>
       </div>
 -->
+<!--
       <div id="toplanguage">
         <form id="language" method="post" action="/language">
         <select name="lang">
         <option value="en" [%IF language_en %]selected="SELECTED"[% END %] >English</option>
-<!--        <option value="hu" [%IF language_hu %]selected="SELECTED"[% END %] >Magyar</option>-->
+        <option value="hu" [%IF language_hu %]selected="SELECTED"[% END %] >Magyar</option>
         </select>
         </form>
       </div>
+-->
     </div>
     <div id="homelink">
       <a href="/">CPAN::Forum</a>

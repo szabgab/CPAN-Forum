@@ -7,15 +7,26 @@
 [% INCLUDE incl/header.tt %]
 
 [% INCLUDE incl/link_to_dist.tt %]
-<table class="threads">
-[% FOR post IN posts %]
-  [% odd = loop.count mod 2 %]
-  <tr class="threads_[% IF odd %]odd[% ELSE %]even[% END %]">
-  <td>
-    [% INCLUDE incl/message_in_thread.tt post %]
-  </td>
-  </tr>
-[% END %]
-</table>
+
+<div id="content_body">
+<div id="left_column">
+
+  <div class="threads">
+  [% FOR post IN posts %]
+    [% odd = loop.count mod 2 %]
+    <div class="threads_[% IF odd %]odd[% ELSE %]even[% END %]">
+      [% INCLUDE incl/message_in_thread.tt post %]
+    </div>
+  [% END %]
+  </div>
+</div>
+
+<div id="right_column">
+  <!--
+  This place was intentionally left empty.
+  -->
+</div>
+
+</div>
 
 [% INCLUDE incl/footer.tt %]

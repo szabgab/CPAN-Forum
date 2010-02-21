@@ -8,78 +8,92 @@
 
 [% INCLUDE incl/links.tt %]
 
-<p>
-This section of the site is for discussing the <b>[% group %]</b> CPAN distribution.
-<br />
-All the posts related to modules of <a href="/author/[% pauseid_name %]">[% pauseid_name %]</a>.
-</p>
+<div id="content_body">
+<div id="left_column">
 
-<p>
-[% IF frequent_tags %]
-  Current tags:
-    [% FOR tag IN frequent_tags %]
-      <a href="/tags/name/[% tag.name %]">[% tag.name %]</a>([% tag.cnt %])[% UNLESS loop.last %], [% END %]
-    [% END %]
-  <br />
-[% END %]
-</p>
-
-[% IF show_tags %]
   <p>
+  This section of the site is for discussing the <b>[% group %]</b> CPAN distribution.
+  <br />
+  All the posts related to modules of <a href="/author/[% pauseid_name %]">[% pauseid_name %]</a>.
+  </p>
 
-  [% IF mytags %]
-  My Tags: 
-     [% FOR tag IN mytags %]
-        <a href="/tags/name/[% tag.name %]">[% tag.name %]</a>[% UNLESS loop.last %], [% END %]
-     [% END %]
+  <p>
+  [% IF frequent_tags %]
+    Current tags:
+      [% FOR tag IN frequent_tags %]
+        <a href="/tags/name/[% tag.name %]">[% tag.name %]</a>([% tag.cnt %])[% UNLESS loop.last %], [% END %]
+      [% END %]
+    <br />
   [% END %]
-  <br />
-
-  <form method="post" action="/update/" name="update_tags">
-  <input type="hidden" name="what" value="tags" />
-  <input type="hidden" name="group_id" value="[% group_id %]" />
-  <input name="new_tags" value="[% FOR tag IN mytags %][% tag.name %][% UNLESS loop.last %],[% END %] [% END %]" />
-  <input type="submit" name="update_button" value="Update my tags" />
-  </form>
   </p>
-[% END %]
 
-[% IF messages %]
+  [% IF show_tags %]
+    <p>
+
+    [% IF mytags %]
+    My Tags: 
+       [% FOR tag IN mytags %]
+          <a href="/tags/name/[% tag.name %]">[% tag.name %]</a>[% UNLESS loop.last %], [% END %]
+       [% END %]
+    [% END %]
+    <br />
+
+    <form method="post" action="/update/" name="update_tags">
+    <input type="hidden" name="what" value="tags" />
+    <input type="hidden" name="group_id" value="[% group_id %]" />
+    <input name="new_tags" value="[% FOR tag IN mytags %][% tag.name %][% UNLESS loop.last %],[% END %] [% END %]" />
+    <input type="submit" name="update_button" value="Update my tags" />
+    </form>
+    </p>
+  [% END %]
+
+  [% IF messages %]
+    <p>
+    <center>
+    <form action="/new_post/[% group %]">
+    <input type="submit" value="Post a message in the subforum of [% group %]">
+    </form>
+    </center>
+    </p>
+  [% ELSE %]
+    <p>
+    The whole web site is new, so there are no posts in this section yet. 
+    Visit the <a href="/">main page</a> to see more action.
+    </p>
+    <p>
+    <center>
+    <form action="/new_post/[% group %]">
+    <input type="submit" value="Be the first one to post a message in the subforum of [% group %]">
+    </form>
+    </center>
+    </p>
+  [% END %]
+
   <p>
-  <center>
-  <form action="/new_post/[% group %]">
-  <input type="submit" value="Post a message in the subforum of [% group %]">
-  </form>
-  </center>
+  If you are <a href="/register/">registered</a> on the forum you can <a href="/mypan/dist/[% group %]">subscribe to e-mail notification [% group %]</a> for this specific
+  distribution and get alerted when someone posts a new message.
   </p>
-[% ELSE %]
+  
+  [% INCLUDE incl/listing.tt %]
+
   <p>
-  The whole web site is new, so there are no posts in this section yet. 
-  Visit the <a href="/">main page</a> to see more action.
+  Users currently monitoring this forum:
+  [% FOR u IN users %]
+     <a href="/users/[% u.username %]">[% u.username %]</a>, 
+  [% END %]
   </p>
-  <p>
-  <center>
-  <form action="/new_post/[% group %]">
-  <input type="submit" value="Be the first one to post a message in the subforum of [% group %]">
-  </form>
-  </center>
-  </p>
-[% END %]
 
-<p>
-If you are <a href="/register/">registered</a> on the forum you can <a href="/mypan/dist/[% group %]">subscribe to e-mail notification [% group %]</a> for this specific
-distribution and get alerted when someone posts a new message.
-</p>
-[% INCLUDE incl/listing.tt %]
+  <div id="rss"><a href="[% rss_href %]"><img src="/img/rss1.gif" alt="[% rss_title %]" /></a></div>
+</div>
 
-<p>
-Users currently monitoring this forum:
-[% FOR u IN users %]
-   <a href="/users/[% u.username %]">[% u.username %]</a>, 
-[% END %]
-</p>
+<div id="right_column">
+  <!--
+  This place was intentionally left empty.
+  -->
+</div>
 
-<p><a href="[% rss_href %]"><img src="/img/rss1.gif" alt="[% rss_title %]" /></a></p>
+</div>
+
 
 [% INCLUDE incl/footer.tt %]
 

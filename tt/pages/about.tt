@@ -7,103 +7,113 @@
 <div id="content_body">
 <div id="left_column">
 
-	<div class="blurb">
-		The CPAN Forum is a web forum for discussing Perl's CPAN modules - asking questions, 
-		making comments, helping other users, etc. This is not a forum for generic Perl 
-		questions- for those, please visit the helpful  
-		<a href="http://www.perlmonks.org/">Perl Monks</a>, the mailing lists on 
-		<a href="http://learn.perl.org/">Learn Perl</a> or find the local 
-		<a href="http://www.pm.org/">Perl Mongers</a>. There are also subject 
-		specific mailing lists, a list of them is collected at 
-		<a href="http://lists.cpan.org/">Lists CPAN</a>. For even more resources visit 
-		<a href="http://www.perl.org/">Perl.org</a>.
-	</div>
-	<a name="tools"></a>
-	<div class="about_list">
-		<p class="about_title">Tools used</p>
-		<ul>
-			<li><a href="/dist/Parse-CPAN-Packages">Parse::CPAN::Packages</a></li>
-			<li><a href="/dist/libwww-perl">LWP::Simple</a></li>
-			<li><a href="/dist/CGI-Application">CGI::Application</a></li>
-			<li><a href="/dist/CGI-Application-Plugin-Session">CGI::Application::Plugin::Session</a></li>
-			<li><a href="/dist/CGI-Application-Plugin-LogDispatch">CGI::Application::Plugin::LogDispatch</a></li>
-			<li><a href="/dist/CGI-Application-Plugin-TT">CGI::Application::Plugin::TT</a></li>
-			<li><a href="/dist/Template">Template Toolkit</a></li>
-			<li><a href="/dist/CGI-Session">CGI::Session</a></li>
-			<li><a href="/dist/autodie">autodie</a></li>
-			<li><a href="/dist/DBI">DBI</a></li>
-			<li><a href="/dist/DBD-Pg">DBD::Pg</a> PostgreSQL</li>
-			<li><a href="/dist/Moose">Moose</a></li>
-			<li><a href="/dist/Digest-SHA">Digest::SHA</a></li>
-			<li><a href="/dist/WWW-Mechanize">WWW::Mechanize</a></li>
-			<li><a href="/dist/Test-Simple">Test::More</a></li>
-			<li><a href="/dist/Test-Most">Test::Most</a></li>
-			<li><a href="/dist/Test-Script">Test::Script</a></li>
-			<li><a href="/dist/Test-NoWarnings">Test::NoWarnings</a></li>
-			<li><a href="/dist/Test-WWW-Mechanize">Test::WWW::Mechanize</a></li>
-			<li><a href="/dist/Test-WWW-Mechanize-CGI">Test::WWW::Mechanize::CGI</a></li>
-			<li><a href="/dist/XML-RSS-SimpleGen">XML::RSS::SimpleGen</a></li>
-			<li><a href="/dist/Mail-Sendmail">Mail::Sendmail</a></li>
-			<li><a href="/dist/Text-CSV_XS">Text::CSV_XS</a></li>
-			<li><a href="/dist/Parse-RecDescent">Parse::RecDescent</a></li>
-		</ul>
-	</div>
-	<a name="statistics"></a>
-	<div class="about_list">
-		<p class="about_title">Statistics</p>
-		<ul>
-			<li>Number of distributions: [% distro_cnt %]</li>
-			<li>Number of posts: [% posts_cnt %]</li>
-			<li>Number of people: [% users_cnt %]</li>
-			<li>Number of subscriptions: [% subscription_cnt %]</li>
-			<li>Number of tags in cloud: [% tag_cloud_cnt %]</li>
-		</ul>
-		<p class="about_p">
-			If you have technical problems please contact 
-			<a href="mailto:gabor@pti.co.il">Gabor Szabo</a>.<br />
-			Current site version: [% version %]
-		</p>
-	</div>
-	<a name="news"></a>
-	<div class="about_list">
-		<p class="about_title">News</p>
-		<ul>
-			<li> 2010 January 2 - Restarting development effort</li>
-			<li> 2005 February 1 - First public release</li>
-			<li> 2005 January 15 - First public beta version</li>
-			<li> 2004 June - First version (and then a long silence fell on us)</li>
-		</ul>
-	</div>
-	<a name="development"></a>
-	<div class="about_list">
-		<p class="about_title">Development</p>
-		<p>If you'd like to follow the development of this web site and the
-		   <a href="http://search.cpan.org/dist/CPAN-Forum/">CPAN::Forum</a> distribution
-		   on CPAN you should know the following things:
-		</p>
-		<ul>
-		  <li><a href="http://github.com/szabgab/CPAN-Forum">CPAN::Forum on Github</a></li>
-	      <li><a href="/dist/CPAN-Forum">Discussion</a></li>
-		</ul>
-	</div>
-	<a name="todo"></a>
-	<div class="about_list">
-		<p class="about_title">TODO</p>
-	    <p>
-		Read the TODO section in the <a href="http://github.com/szabgab/CPAN-Forum/blob/master/README">README</a> file directly from the repository.
-	    </p>
-	</div>
-	<div class="about_list">
-		<p class="about_title">Sponsorship, Development grants</p>
-	    <p>
-	    Instead of sponsoring the development and maintenance of CPAN::Forum, I  
-	    would be glad to be invited to provide Perl training in your company.
-	    <br />
-	    Basically anywhere in the world.
-	    <br />
-	    See the list of my training classes at <a href="http://www.pti.co.il/courses.html">Perl courses</a>
-	    </p>
-	</div>
+  <div class="blurb">
+	The CPAN Forum is a web forum for discussing Perl's CPAN modules - asking questions, 
+	making comments, helping other users, etc. This is not a forum for generic Perl 
+	questions- for those, please visit the helpful  
+	<a href="http://www.perlmonks.org/">Perl Monks</a>, the mailing lists on 
+	<a href="http://learn.perl.org/">Learn Perl</a> or find the local 
+	<a href="http://www.pm.org/">Perl Mongers</a>. There are also subject 
+	specific mailing lists, a list of them is collected at 
+	<a href="http://lists.cpan.org/">Lists CPAN</a>. For even more resources visit 
+	<a href="http://www.perl.org/">Perl.org</a>.
+  </div>
+  
+  <a name="tools"></a>
+  <div class="about_list">
+	<p class="about_title">Tools used</p>
+	<ul>
+		<li><a href="/dist/autodie">autodie</a></li>
+		<li><a href="/dist/CGI-Application">CGI::Application</a></li>
+		<li><a href="/dist/CGI-Application-Plugin-LogDispatch">CGI::Application::Plugin::LogDispatch</a></li>
+		<li><a href="/dist/CGI-Application-Plugin-Session">CGI::Application::Plugin::Session</a></li>
+		<li><a href="/dist/CGI-Application-Plugin-TT">CGI::Application::Plugin::TT</a></li>
+		<li><a href="/dist/CGI-Session">CGI::Session</a></li>
+		<li><a href="/dist/DBI">DBI</a></li>
+		<li><a href="/dist/DBD-Pg">DBD::Pg</a> PostgreSQL</li>
+		<li><a href="/dist/Digest-SHA">Digest::SHA</a></li>
+		<li><a href="/dist/libwww-perl">LWP::Simple</a></li>
+		<li><a href="/dist/Mail-Sendmail">Mail::Sendmail</a></li>
+		<li><a href="/dist/Moose">Moose</a></li>
+		<li><a href="/dist/Parse-CPAN-Packages">Parse::CPAN::Packages</a></li>
+		<li><a href="/dist/Parse-RecDescent">Parse::RecDescent</a></li>
+		<li><a href="/dist/Template">Template Toolkit</a></li>
+		<li><a href="/dist/Test-Simple">Test::More</a></li>
+		<li><a href="/dist/Test-Most">Test::Most</a></li>
+		<li><a href="/dist/Test-NoWarnings">Test::NoWarnings</a></li>
+		<li><a href="/dist/Test-Script">Test::Script</a></li>
+		<li><a href="/dist/Test-WWW-Mechanize">Test::WWW::Mechanize</a></li>
+		<li><a href="/dist/Test-WWW-Mechanize-CGI">Test::WWW::Mechanize::CGI</a></li>
+		<li><a href="/dist/Text-CSV_XS">Text::CSV_XS</a></li>
+		<li><a href="/dist/XML-RSS-SimpleGen">XML::RSS::SimpleGen</a></li>
+		<li><a href="/dist/WWW-Mechanize">WWW::Mechanize</a></li>
+	</ul>
+</div>
+<a name="statistics"></a>
+<div class="about_list">
+  <p class="about_title">Statistics</p>
+  <ul>
+    <li>Number of distributions: [% distro_cnt %]</li>
+    <li>Number of posts: [% posts_cnt %]</li>
+    <li>Number of people: [% users_cnt %]</li>
+    <li>Number of subscriptions: [% subscription_cnt %]</li>
+    <li>Number of tags in cloud: [% tag_cloud_cnt %]</li>
+  </ul>
+  <div class="blurb">
+    If you have technical problems please contact 
+    <a href="mailto:szabgab@gmail.com">Gabor Szabo</a>.<br />
+    Current site version: [% version %]
+  </div>
+</div>
+<a name="news"></a>
+<div class="about_list">
+	<p class="about_title">News</p>
+	<ul>
+		<li> 2010 January 18 - v0.18 uploaded</li>
+		<li> 2010 January 17 - v0.17 uploaded</li>
+		<li> 2010 January 12 - v0.16 uploaded</li>
+		<li> 2010 January 06 - v0.15 uploaded</li>
+		<li> 2010 January 03 - v0.14 uploaded</li>
+		<li> 2010 January 2 - Restarting development effort</li>
+		<li> 2005 February 1 - First public release</li>
+		<li> 2005 January 15 - First public beta version</li>
+		<li> 2004 June - First version</li>
+	</ul>
+</div>
+
+<a name="development"></a>
+<div class="about_list">
+  <p class="about_title">Development</p>
+  <div class="blurb">
+   If you'd like to follow the development of this web site and the
+   <a href="http://search.cpan.org/dist/CPAN-Forum/">CPAN::Forum</a> distribution
+   on CPAN you should know the following things:
+  </div>
+  <ul>
+    <li><a href="http://github.com/szabgab/CPAN-Forum">CPAN::Forum on Github</a></li>
+    <li><a href="/dist/CPAN-Forum">Discussion</a></li>
+  </ul>
+</div>
+
+<a name="todo"></a>
+<div class="about_list">
+  <p class="about_title">TODO</p>
+  <div class="blurb">
+	Read the TODO section in the <a href="http://github.com/szabgab/CPAN-Forum/blob/master/README">README</a> file directly from the repository.
+  </div>
+</div>
+
+<div class="about_list">
+  <p class="about_title">Sponsorship, Development grants</p>
+  <div class="blurb">
+    Instead of sponsoring the development and maintenance of CPAN::Forum, I  
+    would be glad to be invited to provide Perl training in your company.
+    <br />
+    Basically anywhere in the world.
+    <br />
+    See the list of my training classes at <a href="http://www.pti.co.il/courses.html">Perl courses</a>
+  </div>
+</div>
 </div>
 
 
