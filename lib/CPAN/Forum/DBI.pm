@@ -213,8 +213,8 @@ sub _prep_where {
 		} elsif ( 'HASH' eq ref $args->{$f} ) {
 			my @k = keys %{ $args->{$f} };
 			Carp::croak("don't know how to handle more than one keys in $f") if @k != 1;
-			if ( $k[0] eq 'LIKE' ) {
-				push @FIELDS, "$f LIKE ?";
+			if ( $k[0] eq 'LIKE' or $k[0] eq 'ILIKE') {
+				push @FIELDS, "$f $k[0] ?";
 				push @values, $args->{$f}{ $k[0] };
 			} else {
 				Carp::croak( "don't know how to handle $k[0] of field $f " . Data::Dumper->Dump( [$args], ['args'] ) );
@@ -302,10 +302,15 @@ sub mypager {
 		$fetch_sql .= " OFFSET ?";
 		push @fetch_values, $offset;
 	}
-
+#	warn $count_sql;
+#	warn Data::Dumper::Dumper \@values;
+#	warn $fetch_sql;
+#	warn Data::Dumper::Dumper \@fetch_values;
 	my $total = $self->_fetch_single_value( $count_sql, @values );
+#	warn "--- total $total\n";
 
 	my $results = $self->_fetch_arrayref_of_hashes( $fetch_sql, @fetch_values );
+#	warn Data::Dumper::Dumper $results;
 
 	my $last_page = int( $total / $limit );
 	if ( $last_page != $total / $limit ) {

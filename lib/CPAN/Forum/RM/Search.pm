@@ -102,6 +102,8 @@ sub search {
 			$params = $self->_search_posts( $name, $what );
 		}
 	}
+	$params->{name} = $name;
+	$params->{$what} = 1;
 	return $self->tt_process('pages/search.tt', $params);
 }
 
@@ -141,13 +143,13 @@ sub _search_posts {
 	my $q = $self->query;
 
 	my %where;
-	if ( $what eq "subject" ) { %where = ( subject => { 'LIKE', '%' . $name . '%' } ); }
-	if ( $what eq "text" )    { %where = ( text    => { 'LIKE', '%' . $name . '%' } ); }
+	if ( $what eq "subject" ) { %where = ( subject => { 'ILIKE', '%' . $name . '%' } ); }
+	if ( $what eq "text" )    { %where = ( text    => { 'ILIKE', '%' . $name . '%' } ); }
 	if (%where) {
 
 		my $page = $q->param('page') || 1;
 		#$t->param( $what => 1 );
-		#$self->_search_results( { where => \%where, page => $page } );
+		return $self->_search_results( { where => \%where, page => $page } );
 	}
 	return {no_results => 1};
 }

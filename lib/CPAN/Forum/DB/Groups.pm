@@ -83,7 +83,7 @@ sub add {
 sub names_by_name {
 	my ( $self, $value ) = @_;
 	$value = '%' . $value . '%';
-	my $sql = "SELECT name FROM groups WHERE name LIKE ? ORDER BY name";
+	my $sql = "SELECT name FROM groups WHERE name ILIKE ? ORDER BY name";
 	return $self->_fetch_arrayref_of_hashes( $sql, $value );
 }
 
