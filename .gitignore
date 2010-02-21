@@ -7,6 +7,7 @@ cover_db/
 MANIFEST
 MANIFEST.bak
 META.yml
+MYMETA.yml
 CPAN-Forum-*
 tmp/
 *.swp
