@@ -3,7 +3,7 @@ use 5.008;
 
 use Moose;
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use CPAN::Forum::DBI;
 use CPAN::Forum::DB::Posts;

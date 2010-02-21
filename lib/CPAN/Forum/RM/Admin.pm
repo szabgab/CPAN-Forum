@@ -2,7 +2,7 @@ package CPAN::Forum::RM::Admin;
 use strict;
 use warnings;
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use CPAN::Forum::DB::Users ();
 use CPAN::Forum::DB::Configure ();

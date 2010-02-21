@@ -4,8 +4,6 @@ See the documentation of CPAN::Forum for details on the
 
 ************  TODO *********************
 
-* Change the design of the website
-
 * Allow the users to add 6 tags to the postings
 
 * Create discussion group that does not belong to any specific CPAN package
@@ -17,7 +15,6 @@ See the documentation of CPAN::Forum for details on the
     Allow people to subscribe to posts in specific languages only
 
 ----------------------------------------
-
 
 The longest threads
 select count(*), thread from posts group by thread order by count desc limit 3;
@@ -33,8 +30,6 @@ select count(*), thread from posts group by thread order by count desc limit 3;
  
 * Add to the daemon that will remove junk keys older than 24 hours or some other
   configurable value.
-
-* Setup daemon to be launched at boot time
 
 * Record when a user last visited
 

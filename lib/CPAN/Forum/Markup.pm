@@ -2,7 +2,7 @@ package CPAN::Forum::Markup;
 use strict;
 use warnings;
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use CGI qw();
 use Parse::RecDescent;

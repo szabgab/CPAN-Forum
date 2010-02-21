@@ -2,7 +2,7 @@ package CPAN::Forum::INC;
 use strict;
 use warnings;
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use CPAN::Forum::Markup;
 use CPAN::Forum::DBI;
