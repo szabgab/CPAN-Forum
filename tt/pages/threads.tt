@@ -1,5 +1,5 @@
 [% DEFAULT
-  title="CPAN::Forum Thread"
+  title="Thread"
   description=""
   rss_href  = "/rss/author/" _ pauseid
   rss_title = "CPAN::Forum " _ pauseid _ " rss"

@@ -16,6 +16,22 @@ body {
 	line-height:  1;
 }
 
+td {
+	margin:  0;
+	padding: 0;
+}
+
+img { 
+	border: 0; 
+}
+
+form { 
+	margin: 0; 
+}
+
+input {
+	margin: 2px; 
+}
 
 a {
 	color:#0077CC;
@@ -53,7 +69,7 @@ a:visited {
 	float: right;
 	height: 30px;
 	line-height: 22px;
-	max-width: 750px;
+	max-width: 950px;
 	padding: 3px 10px 0;
 	width: auto;
 }
@@ -140,7 +156,7 @@ a:visited {
 	margin-bottom: 12px;
 /*	height: 100%; */
 /*	display: block; */
-/*	float: bottom; */
+	float: left;
 /*	width: 100%; */
 }
 
@@ -204,7 +220,7 @@ a:visited {
 	font-size: 10pt;
 	text-align: center; 
 	padding-bottom:1px;
-	float: bottom;
+	float: left;
 /*	width: 780px;*/
 }
 .perlads li {
@@ -293,11 +309,6 @@ TABLE.posts {
 }
 */
 
-TD {
-	margin:  0;
-	padding: 0;
-}
-
 
 .col1 {
 	width: 25%;
@@ -320,16 +331,19 @@ TD {
 }
 
 .faq {
-	padding: 0.2ex 0.4ex;
 }
 
 .faq DT {
-	font-size: 1.2em;
+/*	font-size: 1.2em;*/
 	font-weight: bold;
 }
 
+.faq li {
+	margin-bottom: 2px;
+}
+
 .faq DD {
-	margin-bottom: 10px;
+	margin-bottom: 20px;
 }
 
 .about_list {
@@ -354,17 +368,6 @@ TD {
 }
 
 
-IMG { 
-	border: 0; 
-}
-
-FORM { 
-	margin: 0; 
-}
-
-INPUT {
-	margin: 2px; 
-}
 
 .title {
 	font-size: 16pt;
@@ -400,7 +403,11 @@ INPUT {
 	background: #eeeeee;
 	text-align: center; 
 }
-
+.admin_links {
+	width:      100%;
+	background: #dddddd;
+	text-align: left;
+}
 
 .text {
 	background: #eeeeee;
@@ -437,14 +444,15 @@ INPUT {
 }
 */
 
-.#tags ul {
+#tags ul {
 	margin:   0;
 }
 #tags li {
 	display:      block;
 	float:        left;
 	margin-right: 7px;
-	margin-top:   2px;
+	margin-top:   12px;
+	margin-right: 10px;
 	height:       30px;
 }
 #tags a {

@@ -4,25 +4,36 @@
 %]
 [% INCLUDE incl/header.tt %]
 
-<div class="error">
-[% IF no_login_data %]Need both nickname and password.<br>[% END %]
-[% IF bad_login %]Login failed.<br>[% END %]
+<div id="content_body">
+<div id="left_column">
+
+  <div class="error">
+  [% IF no_login_data %]Need both nickname and password.<br>[% END %]
+  [% IF bad_login %]Login failed.<br>[% END %]
+  </div>
+  <p>
+  In order to post on this site first you'll have to <a href="/register/">register</a>
+  with a valid e-mail address.
+  </p>
+  <form method="post" action="/" name="login">
+  <p>
+  <input type="hidden" name="rm" value="login_process" />
+  Nickname: <input name="nickname" value="[% nickname %]" />
+  Password: <input name="password" type="password" />
+  <input type="submit" value="Login" />
+  </p>
+  </form>
+  <p>
+  If you have lost your password, you can <a href="/reset_password_request/">reset your password here</a>.
+  </p>
 </div>
 
-<p>
-In order to post on this site first you'll have to <a href="/register/">register</a>
-with a valid e-mail address.
-</p>
-<form method="post" action="/" name="login">
-<p>
-<input type="hidden" name="rm" value="login_process" />
-Nickname: <input name="nickname" value="[% nickname %]" />
-Password: <input name="password" type="password" />
-<input type="submit" value="Login" />
-</p>
-</form>
-<p>
-If you have lost your password, you can <a href="/reset_password_request/">reset your password here</a>.
-</p>
+<div id="right_column">
+  <!--
+  This place was intentionally left empty.
+  -->
+</div>
+
+</div>
 
 [% INCLUDE incl/footer.tt %]

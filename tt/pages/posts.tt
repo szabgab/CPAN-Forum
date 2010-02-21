@@ -9,26 +9,41 @@
 [% END %]
 
 [% IF admin %]
+<div class="admin_links">
     <a href="/?rm=hide&amp;post=[% id %]">hide this post</a>
+</div>
 [% END %]
 
-[% IF post %]
-  [% INCLUDE incl/message.tt m = post %]
-[% END %]
+<div id="content_body">
+<div id="left_column">
 
-[% IF preview %]
-	<div class="preview">
-	<p>
-	<b>Preview</b><br />
-	[% IF preview %]
-       [% INCLUDE incl/message.tt m = preview %]
-	[% END %]
-	</p>
-	</div>
-[% END %]
 
-[% IF editor %]
-    [% INCLUDE incl/editor.tt %]
-[% END %]
+  [% IF post %]
+    [% INCLUDE incl/message.tt m = post %]
+  [% END %]
+
+  [% IF preview %]
+          <div class="preview">
+          <p>
+          <b>Preview</b><br />
+          [% IF preview %]
+         [% INCLUDE incl/message.tt m = preview %]
+          [% END %]
+          </p>
+          </div>
+  [% END %]
+
+  [% IF editor %]
+      [% INCLUDE incl/editor.tt %]
+  [% END %]
+</div>
+
+<div id="right_column">
+  <!--
+  This place was intentionally left empty.
+  -->
+</div>
+
+</div>
 
 [% INCLUDE incl/footer.tt %]
