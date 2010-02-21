@@ -1,3 +1,527 @@
 
 See the documentation of CPAN::Forum for details on the
 "INSTALLATION of a development environment"
+
+************  TODO *********************
+
+* Change the design of the website
+
+* Allow the users to add 6 tags to the postings
+
+* Create discussion group that does not belong to any specific CPAN package
+  but where posts can be tagged.
+
+* Allow setting language field of the post - (maybe only for the posts without a package name ??) 
+    We can already use utf-8 in the database - allow the use of any language in the GUI as well.
+    once there is someone who will be ready to monitor the posts in those languages.
+    Allow people to subscribe to posts in specific languages only
+
+----------------------------------------
+
+
+The longest threads
+select count(*), thread from posts group by thread order by count desc limit 3;
+
+* add names to forms and test them
+* add tests where not logged in user tries to post something, gets login page and can go on posting
+* replace the hidden rm values by URL of the same name  /runmode/param/param/param
+
+* Display date in a better way (ellapsed time, or short date format)
+  Put time ellapsed since post instead of date of post, (3 min. 6 hours 3 days ago)
+  make this configurable: User can say after N days passed the date should show,
+  before that the ellapsed time
+ 
+* Add to the daemon that will remove junk keys older than 24 hours or some other
+  configurable value.
+
+* Setup daemon to be launched at boot time
+
+* Record when a user last visited
+
+==========================================
+
+* Write a test checking if the flood_control_time_limit works
+
+* Check the log file and see why certain distributions are still missing?
+
+* Check the log of the cpanrating to see missing distributions
+
+==========================================
+
+* Enable users to connect their CPAN::Forum id with their PAUSE id
+
+Let logged in user type in their PAUSEid (or better yet, on the authors page 
+have a button "This is me" - if this PAUSEid is not yet associated)
+
+Generate random string and save it in the junk table with the value being
+{ rm => verify_pause_id, pauseid => $pauseid }
+
+Send an e-mail with code to PAUSEID@cpan.org.
+Tell the user to check their e-mail and click on the approval link.
+
+* Allow module authors to setup splash-screen for 
+      * for all their modules or 
+      * for specific modules
+      The module specific splash-screen will win over any maintainer 
+      specific splash screen.
+    On the splash screen people will be able tell the users for example
+    that they discourage the use of CPAN::Forum and can point to other
+    existing ways of getting help for the module.
+
+
+* Create rss feeds based on tags, allow people to subscribe posts that have
+   specific tags
+
+
+* Move the session id into the database:
+   sid
+   uid
+   issued
+   last_seen
+
+
+* Allow a post to be associated with more than one group
+   Sometime we'll want to post a message in more than one group, e.g.  now I'd
+   like to know how to use CGI::Session with DBD::SQLite. I might want to post the
+   message on more than one list at the same time as this is related to more than
+   one module.  Porbably if I need to chose one I'll select CGI::Session as I am
+   trying to use that but it might be a nice feature.  Maybe I need to tell one
+   module as the main group and then have a way to associate a few more modules
+   with the posting.
+
+   Add an extra table for the additional distributions so there will be a leading 
+   distro of the thread.
+
+ 
+* Test the populate script 
+ - create several very partial CPAN mirrors in the testfiles/ directory 
+   and process those with the new populate script one after the other
+
+
+* Write tests for existing system to cover the important aspects of the system
+    1) registration, email verification
+    2) login/logout
+    3) posting a new message
+    4) answering message
+    5) viewing messages
+    6) paging when there are many messages
+    7) not being able to post a message when not logged in
+    8) rss/atom feeds
+    9) mypan
+ 
+
+==========================
+
+
+
+* Collect the packages from downstream distriutions ORDB::DebianModules
+   See http://szabgab.com/distributions/ for an old project
+
+
+* Generate HTML files, 
+    * generate html (description tag should be the text taken from =NAME secion of each module and that of the main module of the package itself
+    * the documentation of each module will be a static page (maybe later enhanced with javascript)
+    * the main page of the package will be static for now but later it might be a dynamic page (or static with Javascript enhancement?)
+    * put some data in the database (populate 
+      * author PAUSEID
+      * package name
+      * module name
+
+* Process META.yml
+  Start displaying more meta information
+
+
+* One-time notification of module author when the first post arrives to one of
+    her modules. ( I am not sure we really need this any more )
+
+* Allow people to mark modules like/not like
+
+==========================
+
+* Setup bug and request tracking (or shall we use RT for this?)
+
+* Index and display perldoc
+
+* Index and display perldoc in French and Italian
+
+* Create a user group that can delete posts, lock (or delete?) users.
+
+* Session information: remember logged in user, 
+    have check-box on the main form to say user wants to be remembered
+
+* Improve the populate.pl, look at CPANTS for ideas:
+    http://search.cpan.org/src/DOMM/Module-CPANTS-ProcessCPAN-0.62/bin/update_authors.pl
+    Finish the recent.pl file and maybe replace the populate.pl by using recent.pl
+    use this file to retreive list of CPAN authors and their e-mail address 
+    http://www.cpan.org/authors/01mailrc.txt.gz
+
+* check all submitted fields (restrict posting size to 10.000 Kbyte ?
+
+==========================
+
+* Setup stand-alone server 
+
+* Write Selenium tests that run against the web server -
+    by default it should run agains the stand-alone server 
+    but should be configurable to run agains the Apache CGI and 
+    against the mod_perl version.
+
+
+* Unite and clean up the code that fetches list of people who need to be
+    notified. Test both the interface to manage this and the the actually
+    retreival of addresses to be notified.
+
+* We might want to add another way of subscripton: to subscribe to a specific
+    thread even if the user has not posted.
+
+
+* Provide the alerts in rss feed as well, not only in e-mail.
+    Let people subscribe to alerts but ask to have the RSS feed only, no e-mails.
+    /rss/user/username
+    This should be an integration of all the feeds with the alert mechanism
+
+* BUG: If the directory of the logging directory is not writable
+     the application fails.
+
+* Logging: enable logging based on a single client IP address
+  
+* Include number of AnnoCPAN posts
+
+* Check if it would be possible to get all the data from AnnoCPAN
+
+* Check if it would be possible to get all the data from CPANRATINGS to
+  include in our display
+  
+* BUG:
+  When I try to reply and the original subject is already 50 chars long
+  in offers a new subject with Re: prefix but then when I try to submit
+  it won't let me.
+  (So far is ok, though it should 70 or 100 long)
+  But the main problem is that if I delete the last word from the
+  subject and press preview again
+  it returns the same error message as it put back the word where it was earlier.
+
+* At the bottom of the pages add subscribers to specific threads
+  and thread started in separate listsings.
+  
+* Add announcement service (check for new versions of modules and send e-mail
+  to those whom are interested in announcements.
+  For example I just tried to install a module but it failed its test. Checking 
+  search.cpan.org I noticed the module has been updated lately and looking at
+  the results of the CPAN Testers I can see I am not the only one with these problems.
+  So for now I skip the installation of this module but I'd like to get an e-mail
+  when a new version of this module is uploaded to CPAN so I can try it while
+  it is hot. I can subscribe to the announcement service of this module and get
+  the message.
+
+* Announcment service for new modules (modules that appear on CPAN for the first time)
+
+* Register the PAUSEID where the module was last seen:
+  Send out e-mail about PAUSEID changes
+
+* Allow people to monitor if someone else uploaded a module in their name space
+  even if that module is not indexed.
+
+* Check if the technique we use to remember the last request before login
+    cannot cause some security problem such as remembering the last request of
+    someone else who used the same machine recently ? 
+
+* replace the e-mail address checking by  if ($q->param('email') !~ $Email::Address::addr_spec) {
+
+* Enable people to edit their posts 
+   - Track changes (versions of the posts)
+   - Shall we display the orinal date and the last update date ?
+   - Shall we display the post on its new date (order the display result by date ?)
+
+* Improve the markup language
+
+* Enable module authors (or some other volunteer) to configure some aspects of the 
+  section of their own module
+
+* Get a nice logo and favicon.ico
+
+* Removed the use of CPAN::Forum::Build - need to see what was it doing and
+   replace its functionality with something better
+
+* Admin: hide a posting
+
+* Admin: delete or disable a user
+
+* Admin: disable posting to a distibution, 
+
+* Admin: hide a distribution and all its postings
+
+* Admin: change username ?
+
+* Admin: hide a message (or a whole thread)
+
+* Admin: freeze a distro: (cannot add new message but still can see the earlier messages)
+
+* Admin: (or even the author ?) should be able to move a message from one module to 
+          another module or group.
+
+* Statistics on posts, views etc.
+
+* Enable sending direct mail to a poster (?) (without disclosing e-mail address)
+
+* Provide statistics on number of comments per distro 
+
+* Replace the /post/number link by /post/TITLE_OF_POST ???
+
+* make the page size (for paging) user configurable
+
+* show the release dates and version numbers of the modules
+
+==========================
+
+ 
+- xml version of the search results
+
+- Allow users to subscribe for announcement service:
+  A script that will send an announcement on the new version of every module to
+  those who asked for this information.
+
+- JavaScript that lets users to set all the modules in /mypan to the same value
+  (either All message or thread starter or Followup or nothing)
+
+
+
+PROBLEM:
+  Currently when a new browser visits the site we immediately give a cookie and
+  instert an entry in the sessions table.
+  After running for about 10 days we have about 32.000 entries in the sessions table.
+  It is not likely that so many people have visited the site.
+  I think the crawlers of Google and co. never return the cookie that I give them and
+  thus every hit they generate will create a new cookie and a new entry in the sessions
+  table. Besides, I never clean up the sessions table.
+
+  So let's see what can we do
+  1) Add an index to that table to speed up the access time (this I should do in any case)
+  2) If I recognize a crawler (e.g. googlebot) don't give a session ID to it.
+  3) Run cleanup routine that will delete old sessions:
+     As right now the session time is only kept within the a_session field this will be a slow
+	 process but should be done anyway
+  4) Add a field to the session table where I indicate the last access time
+
+
+- Decide on Basic Markup language and how to extend for shortcuts opening tag
+for code:  <code[^>]*>  but right now only <code> should be accepted closing
+tag for code:  </code>
+
+- Improve text and explanations.
+
+
+Authentication and user management process:
+- new user comes to our site we give him a cookie, when he wants to login we offer him
+--  login using the auth.perl.org credentials
+--  login using XYZ credentials
+--  create local credential
+
+-- For auth.perl.org
+--- redirect the user to auth.perl.org wait till he logs in there (maybe even creates the new account)
+--- sets the preferences
+--- comes back
+--- we can fetch some of the information from that user
+--- we need to keep the user_id received from auth.perl.org for later identification of the user
+--- while we tell the user we would like to get the username/fullname/e-mail
+address from auth he might not want to give, for this case we should have our
+way to update the locally updated username, full name and validated e-mail
+address.
+  
+-- For local credentials we need the user to give us 
+username/password/fullname and validated e-mail address.
+
+
+We have to make sure that usernames which are displayed don't collide. Maybe we
+should use separate fields for usernames from various sources and when
+displayed we might prefix it auth:gabor, local:gabor etc.  Not nice, any better
+way ?
+
+- Reply within a thread
+
+When replying to a post within a thread we might want to open the editor window
+in the middle of the thread, just below the post I am responding to.
+
+
+In order to prepare a downloadable version of the database we need to hide the
+personal infromation:
+    update users set email = 'test_' || id || '@cpanforum.com' where id in(select id from users);
+    update users set password = 'testpw';
+    update users set username = 'test_' || id where id in(select id from users);
+    update users set fname='', lname='';
+
+    delete from sessions;
+
+    delete from configure;  -- ???
+    delete user_in_group;   -- ???
+
+    update posts set uid=myuid where (select users.uid myuid from users where posts.uid=users.username;
+    select posts.id pid, users.id uid, users.username from posts, users where posts.uid=users.username;
+
+
+
+Thinking aloud:
+what if instead of Parse::RecDescend I munge the submitted text to be XML and then
+run XML parser on it ?
+
+
+===============================================================
+text<b>HTML markup</b>more text<br />and even in a new line
+<code>
+Here I can type any while (<XX>) {} code till
+</code>
+more text
+===============================================================
+
+Add 
+<post><text>
+
+replace every <code.*?> with </text><code...><![CDATA[
+replace every </code> with   ]]></code>
+
+
+
+</post>
+
+
+
+Now in addition to the </code> endtag you cant use trhe CDATA and the ]]> thingy either
+within CODE.
+
+  In order to avoid accepting postings today that will break when we add more 
+  tags, we will reject any submission that is not correctly marked up.
+
+
+======================================================================
+
+
+  We will start to use a partial set of the BBCode but with a few restrictions.
+  In BBCode you can use a small set of markup such as
+    [b]text[/b] to make your text bold
+    [code]Some program[/code] to mark an are to be code.
+	http://forums.gentoo.org/faq.php?mode=bbcode
+
+  Because we don't use the <> marks for our mark up we can safely know that any <>
+  or any other funny character should be taken literally and turned into the 
+  appropriate HTML entity, except the [] markup.
+
+  In order to let us further expand our markup language we do not allow the user to
+  add the [ or ] characters to his text. This would of course create problems in Perl code
+  so within [code][/code] pair you can freely use any character (well, except [/code] itself),
+  and we'll show all this characters verbatim.
+
+
+  Allowed tags:
+  [code]CODE[/code]
+    CODE here can contain any character including <>[], the only thing it cannot include is
+    the [/code] substring. No markup is possible inside. CODE will be show in as it is typed.
+  [text]TEXT[/text]
+    Just like CODE , it can contain any character except [/text] 
+    It will be shown differently from code section. (Most likely different background color and 
+    different font. Otherwise it is still show as you type.
+
+  Free text which is not enclosed in any of the above section can contain some markup using
+    [ characters. If we encounter [ characters in any other situation we don't accept the
+    submission.
+		
+    [b]BOLD[/b]                     to show text bold
+    [url=http://blabla]Title[/url]  to create a link
+    [url]http://blabla[/url]        to create a link with the link being the title
+    [email=me@you.com]Title[/email]
+    [email]me@you.com[/email]
+
+    http://www.blabla.com           magic linking
+    me@you.com                      magic linking
+
+    [[]                             to show a [ character
+    []]                             to show a ] character
+
+
+  At this point we won't allow nesting of markups.
+  Again: any other use of the [ and ] characters will be rejected.
+
+  Additional markup I am thinking of:
+    [c][/c] the same as [code][/code] but usually used inline in Free text.
+
+    [search:Distro-Name] for a link to search.CPAN 
+	      (< href="http://search.cpan.org/dist/Distro-Name">Distro-Name</a> )
+    [forum:Distro-Name] to link to the relevant forum
+	      (<a href="/dist/Module-Name">Module::Name</a>)
+		  
+    [post:id][/post] to link to another post 
+	      (<a href="/posts/id">title of that post</a> 
+		  (one such could also fetch the subject of the appropriate message and insert here)
+
+    [code:a][/code:a]
+        Code with line numbering accross all the snippets with :a in the same post.
+		(a-z) can be used to have several code snippets with their own numbering.
+
+  Now you're probably asking How do I escape all of those pesky special characters? 
+  It's easy, you don't. We do it.
+  
+  Within the [code][/code] section people should paste in regular code without any 
+  changes and our display code should show it correctly.
+  Maybe we can even add a button for each message to "show source" that will try to display
+  the enry from the database as it is really in a <textarea>box</textarea>
+
+  E-mail rewrite: How should text show up in an e-mail message ?
+    Subjects show up as they were written.
+    Text fields remain as they are
+    markup: [b]text[/b] is turned into *text*
+    [url]http://bla[/url] - the URL is left, markup removed.
+    [url=http://bla]Title[/url] - the URL is left, (Title) added in parentheses
+    Same for e-mails
+    [[] - replaced by [
+    []] - replaced by ]
+    
+    [code][/code] ?
+    [text][/text] ?
+
+
+  Comments:
+    We could use something like this for markup <cpan:code></cpan:code> and it
+	would be more standart (XML with name space) but would be harder to type.
+
+
+
+- Create a separate authentication for module authors based on PAUSE id of the users and 
+	authentication agains pause.cpan.org - for this I'll have to setup ssl on the server
+	
+	Once authenticated the module author can setup special information about the module
+	such as 
+	- a link to the main web site of the module, (sourceforge or whatever)
+	- a link to the registration form of the main mailing list, 
+	
+	- ask to cross-post messages to the mailing list
+	add a "From:" field and e-mail address that will be used to to cross-post
+	add a "To:" address where to send each post.
+	Check-box to send 1) all posts or 2) only thread leading posts.
+
+	Module autoher, if you already have a mailing list and you would like to get
+	the postings that come here to be forwarded to the mailing list too, do the 
+	following.  (Hmm, I am not really sure this is a good idea because the mailing
+	list people will just answer on the mailing list which (curently) won't go back
+	to the web server. Later, I can include a mail gateway. Hmm.)
+	
+
+
+Q:- A good, clean layout that clearly shows the different topics available
+	for discussion, with easy access to each topic.
+
+A:- We cannot list the 7000 distros on the front page (that is 270KB data) and would be unusable.
+	We can put a search box to search for module names, I am not sure that's interesting.
+	We can put up a link that will lead to a form where we list somehow all the module names
+	( a pull down menu ?, real list ?)
+
+	I expect, at least at the beginning most of the people will arrive on links from seach.cpan.org
+	directly to the /dist/Module::Name page where the discussin regardin their module takes place.
+	Maybe I should add some explanation there too ?
+	
+
+* https access for authentication ? Sounds like too tight security for such a simple site
+
+
+* Add some connections to other modules which depend on the current module or on which this current
+  module depends. See Module::Depends
+
+
