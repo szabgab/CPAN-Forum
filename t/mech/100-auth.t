@@ -213,15 +213,15 @@ BEGIN {
 	$w_user->follow_link_ok( { text => 'CPAN::Forum' } );
 	$w_user->follow_link_ok( { text => 'mypan' } );
 	$w_user->content_like(qr{Personal configuration of}); # fname lname (username)
-	my ($sf, $form) = $w_user->forms;
+	ok(defined $w_user->form_name('subscriptions'), 'found subscriptions form');
+	my $form = $w_user->current_form;
 	isa_ok( $form, 'HTML::Form' );
 	is( $form->method, 'POST' );
 	is( $form->action, "$url/" );
 	check_form( $form, \@input_fields );
 
-	BEGIN { $tests += 6 + 1 + @input_fields * 2; }
+	BEGIN { $tests += 7 + 1 + @input_fields * 2; }
 }
-
 
 {
 
@@ -232,10 +232,11 @@ BEGIN {
 	$w_user->content_like(qr{Your subscriptions were successfully updated.});
 	$w_user->content_like(qr{You can look at them here:});
 	$w_user->follow_link_ok( { text => 'subscription information' } );
-	my ($sf, $form) = $w_user->forms;
+	my $form = $w_user->form_name('subscriptions');
+	ok(defined $form, 'found subscriptions form');
 	check_form( $form, \@input_fields );
 
-	BEGIN { $tests += 3 + 1 + @input_fields * 2 }
+	BEGIN { $tests += 4 + 1 + @input_fields * 2 }
 }
 
 # set the flags of all modules
@@ -250,13 +251,15 @@ foreach my $i ( 0 .. 2 ) {
 	$w_user->content_like(qr{You can look at them here:});
 	$w_user->follow_link_ok( { text => 'subscription information' } );
 	$w_user->content_unlike(qr{Acme-Bleach});
-	my ($sf, $form) = $w_user->forms;
+
+	my $form = $w_user->form_name('subscriptions');
+	ok(defined $form, 'found subscriptions form');
 	$input_fields[$i][3] = 'on';
 	check_form( $form, \@input_fields );
 
 	# TODO: check it in the database as well....
 
-	BEGIN { $tests += 3 * ( 4 + 1 + @input_fields * 2 ) }
+	BEGIN { $tests += 3 * ( 5 + 1 + @input_fields * 2 ) }
 }
 
 my @posts;
@@ -338,7 +341,8 @@ BEGIN {
 	$w_user->content_like(qr{Distribution: Acme-Bleach});
 	$w_user->content_unlike(qr{Password:}); # not a login form
 	$w_user->content_unlike(qr{Posted on});
-	my ( $sf, $post_form1 ) = $w_user->forms;
+	my $post_form1 = $w_user->form_name('editor');
+	ok(defined $post_form1, 'found editor form');
 
 	#$input_fields[$i][3] = undef;
 	check_form( $post_form1, \@post_preview_input_fields );
@@ -356,7 +360,8 @@ BEGIN {
 	#diag $w_user->content;
 	$w_user->content_like(qr{  Posted  \s+ on .* $year .* by .* $users[0]{username}  }sx);
 	$w_user->content_like(qr{<b>Preview</b>});
-	my ( $sf2, $post_form2 ) = $w_user->forms;
+	my $post_form2 = $w_user->form_name('editor');
+	ok(defined $post_form2, 'found editor form');
 	check_form( $post_form2, \@post_submit_input_fields );
 
 	is_deeply( \@CPAN::Forum::messages, [], 'no messages were sent so far' );
@@ -382,7 +387,7 @@ BEGIN {
 
 	# TODO check the e-mail message more in details!
 
-	BEGIN { $tests += 15 + 1 + @post_preview_input_fields * 2 + 1 + @post_submit_input_fields * 2 }
+	BEGIN { $tests += 17 + 1 + @post_preview_input_fields * 2 + 1 + @post_submit_input_fields * 2 }
 }
 
 #{
@@ -552,7 +557,8 @@ BEGIN {
 	$w_guest->get_ok("$url/dist/Acme-Bleach");
 	$w_guest->content_unlike(qr{Update my tags});
 
-	my ( $sf, $tags_form ) = $w_user->forms;
+	my $tags_form = $w_user->form_name('update_tags');
+	ok(defined $tags_form, 'found update_tags form');
 	check_form( $tags_form, \@update_tags );
 
 	$w_user->submit_form(
@@ -577,7 +583,7 @@ BEGIN {
 	$w_guest->back;
 	$w_guest->follow_link_ok( { text => 'two words' } );
 
-	BEGIN { $tests += 8 + 1 + @update_tags * 2 + 10; }
+	BEGIN { $tests += 9 + 1 + @update_tags * 2 + 10; }
 }
 
 
@@ -594,13 +600,14 @@ foreach my $i ( 0 .. 2 ) {
 	$w_user->content_like(qr{You can look at them here:});
 	$w_user->follow_link_ok( { text => 'subscription information' } );
 	$w_user->content_unlike(qr{Acme-Bleach});
-	my ($sf, $form) = $w_user->forms;
+	my $form = $w_user->form_name('subscriptions');
+	ok(defined $form, 'found subscriptions form');
 	$input_fields[$i][3] = undef;
 	check_form( $form, \@input_fields );
 
 	# TODO: check it in the database as well....
 
-	BEGIN { $tests += 1 + 3 * ( 4 + 1 + @input_fields * 2 ) }
+	BEGIN { $tests += 1 + 3 * ( 5 + 1 + @input_fields * 2 ) }
 }
 
 # We don't have free text form on the mypan page now
