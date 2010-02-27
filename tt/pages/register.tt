@@ -4,6 +4,9 @@
 %]
 [% INCLUDE incl/header.tt %]
 
+<div id="content_body">
+<div id="left_column">
+
 [% IF done %]
    Thank you for registering. You are going to get your password in your mailbox.<br />
    <a href="/login/">login</a>
@@ -37,5 +40,10 @@ If you have lost your password, you can <a href="/reset_password_request/">reset
 </p>
 
 [% END  %]
+
+
+</div>
+[% INCLUDE incl/right_side.tt %]
+</div>
 
 [% INCLUDE incl/footer.tt %]

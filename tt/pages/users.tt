@@ -4,25 +4,23 @@
 %]
 [% INCLUDE incl/header.tt %]
 
-<!--
-First name: [% fname %]<br />
-Last name: [% lname %]<br />
--->
-
-[% IF loggedin %]
-    | <a href="/selfconfig/">selfconfig</a>
-   [% IF admin %]
-       | <a href="/admin/">admin</a>
-	   <a href="/admin_edit_user/[% this_username %]">EDIT
-   [% END %]
-[% END %]
-
-
 <div id="content_body">
 <div id="left_column">
 
 <div class="blurb">
+<!--
+First name: [% fname %]<br />
+Last name: [% lname %]<br />
+-->
 Tags by <a href="/tags/user/[% this_username %]">[% this_username %]</a>
+
+[% IF loggedin %]
+   | <a href="/selfconfig/">selfconfig</a>
+   [% IF admin %]
+       | <a href="/admin/">admin</a>
+       | <a href="/admin_edit_user/[% this_username %]">EDIT</a>
+   [% END %]
+[% END %]
 </div>
 
 [% INCLUDE incl/listing.tt %]
