@@ -624,6 +624,29 @@ foreach my $i ( 0 .. 2 ) {
 	BEGIN { $tests += 2 }
 }
 
+{
+	diag("Start posting on the main page");
+
+	$w_user->get_ok($url);
+	$w_user->follow_link_ok( { text => 'New Post' } );
+	$w_user->content_like(qr{Please search for the name of a module});
+	my $module_search_form = $w_user->form_name('module_search');
+	$w_user->submit_form(
+		form_name => 'module_search',
+		fields => {
+			q => 'Acme',
+		},
+	);
+	my $module_select_form = $w_user->form_name('module_select');
+
+	# TODO check which modules are listed, select one of them
+	
+	# TODO test with 'acme' and then allow for that too to match
+
+	BEGIN { $tests += 3 }
+}
+
+
 #{
 #	diag('reset password');
 #	my $w_user2  = t::lib::CPAN::Forum::Test::get_mech();

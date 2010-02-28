@@ -15,9 +15,8 @@
 Please search for the name of a module.
 </p>
 
-<form method="post" action="/module_search/">
+<form method="post" action="/module_search/" name="module_search">
 <p>
-<input type="hidden" name="rm" value="module_search" />
 <input name="q" value="[% q %]" />
 <input type="submit" value="Search" />
 </p>

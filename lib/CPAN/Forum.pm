@@ -498,6 +498,7 @@ my @urls = qw(
 	reset_password_form_process
 	reset_password_request
 	reset_password_request_process
+	module_search
 );
 
 
