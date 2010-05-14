@@ -31,6 +31,15 @@ or <code>sudo yum install Acme-Dosomething</code>.
 Use ppm on the command line or with their GUI installer.
 </div>
 
+<div>
+The standard steps of installing a module are
+perl Makefile.PL
+make
+make test
+make install
+
+</div>
+
 
 [% INCLUDE incl/footer.tt %]
 
