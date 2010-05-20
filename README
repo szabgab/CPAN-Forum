@@ -520,3 +520,7 @@ A:- We cannot list the 7000 distros on the front page (that is 270KB data) and w
   module depends. See Module::Depends
 
 
+* dependencies
+  For each package guess if it needs C compiler and if it needs dependencies not on CPAN?
+  For each package show its dependency tree and if any of those require C compiler or non-CPAN dependency?
+  http://www.mail-archive.com/module-authors@perl.org/msg05228.html
