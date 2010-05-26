@@ -40,7 +40,7 @@ Usage: $0
 
       --mirror [cpan|mini|path/to/file]   # cpan mirror
 			                  # cpan = full (6.5 Gb)
-			                  # mino = using Mini::CPAN (1.4 Gb)
+			                  # mini = using Mini::CPAN (1.4 Gb)
                                           # list of Package::Names per line to mirror
    
       --process [all|new|path/to/file]    # which packages to process (need other flags to tell what to do)
