@@ -1,3 +1,4 @@
+[% UNLESS dev_server %]
 <div id="right_column">
 <center>
 <a href="http://bit.ly/davorg_training">
@@ -18,7 +19,5 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
 </script>
 </div>
 </center>
-
-[% UNLESS dev_server %]
-[% END %]
 </div>
+[% END %]
