@@ -581,7 +581,7 @@ sub setup {
 =head2 cgiapp_prerun
 
 We use it to change the run mode according to the requested URL.
-Maybe we should move his code to the mode_param method ?
+Maybe we should move this code to the mode_param method ?
 
 =cut
 
