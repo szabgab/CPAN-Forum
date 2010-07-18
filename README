@@ -524,3 +524,43 @@ A:- We cannot list the 7000 distros on the front page (that is 270KB data) and w
   For each package guess if it needs C compiler and if it needs dependencies not on CPAN?
   For each package show its dependency tree and if any of those require C compiler or non-CPAN dependency?
   http://www.mail-archive.com/module-authors@perl.org/msg05228.html
+
+
+Design Plans for CPAN::Forum
+
+
+CPAN::Forum http://cpanforum.com/
+will be a combination of several other services
+
+1) A web forum for Perl developers (enhancing its current situation)
+    See also http://perlmonks.org/ as the other forum the Perl community has
+    and http://stackoverflow.com/ that is a real good one
+
+2) CPAN Search engine replacing http://search.cpan.org/
+       and http://kobesearch.cpan.org/ 
+
+3) http://perldoc.perl.org/
+
+4) With user contributed examples as on http://php.net
+    (e.g. http://www.php.net/manual/en/language.functions.php )
+
+5) Including information from various other sources such as
+    http://deps.cpantesters.org/
+    http://deps.cpantesters.org/?module=CPAN::Forum
+
+   http://rt.cpan.org/
+   http://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Forum
+
+   http://www.cpantesters.org/
+   http://www.cpantesters.org/show/CPAN-Forum.html#CPAN-Forum-0.11
+
+   http://cpanratings.perl.org/
+   http://cpanratings.perl.org/d/CPAN-Forum
+
+   http://www.annocpan.org/
+   http://www.annocpan.org/~SZABGAB/CPAN-Forum-0.11/lib/CPAN/Forum.pm
+
+   http://cpants.perl.org/
+   http://cpants.perl.org/dist/overview/CPAN-Forum
+
+
