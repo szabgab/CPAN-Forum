@@ -6,7 +6,7 @@
     <meta name="description" content="[% description %]" />
 	<link rel="stylesheet" href="/style.css?[% version %]" type="text/css" />
 	[% IF rss_href %]
-    <link href="/rss/author/[% rss_href %]" rel="alternate" type="application/rss+xml" title ="[% rss_title %]" />
+    <link href="[% rss_href %]" rel="alternate" type="application/rss+xml" title ="[% rss_title %]" />
     [% END %]
 </head> 
 
