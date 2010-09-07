@@ -475,6 +475,7 @@ my @restricted_modes = qw(
 	module_search
 	selfconfig change_password change_info update_subscription
 	update
+	admin_del_posts
 );
 
 my @urls = qw(
@@ -499,6 +500,7 @@ my @urls = qw(
 	reset_password_request
 	reset_password_request_process
 	module_search
+	admin_del_posts
 );
 
 

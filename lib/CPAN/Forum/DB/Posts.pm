@@ -255,6 +255,25 @@ sub set_notified {
 	return;
 }
 
+sub delete_posts_of_users {
+	my ($self) = @_;
+
+	# temporarily hard-coded list of spammers:
+	my @users = qw(nationshoes njgoogle wowpowerlvl gdoit shoesgreat jordan2008 pickcounty cnbearing);
+	#push @users, qw(rainyjin angelae8654 nisha jojokinkaid billy001 papu);
+	#push @users, qw(bettytalk mcgaha digitss adam01 mili sales3 sindabearing dpibearing yangmayer);
+	#push @users, qw(salesplaza releasesoft overnightmoney);
+	push @users, qw(markettips1 jerseykl); 
+
+	my $sql = "DELETE FROM posts WHERE id in (SELECT posts.id FROM posts, users WHERE username ";
+	$sql   .= "IN(" . join ", ", map {"'$_'"} @users;
+	$sql   .=  ") and posts.uid=users.id)";
+
+	my $dbh = CPAN::Forum::DBI::db_Main();
+	$dbh->do($sql);
+	return;
+}
+
 
 1;
 

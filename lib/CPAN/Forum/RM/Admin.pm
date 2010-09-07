@@ -6,6 +6,7 @@ our $VERSION = '0.20';
 
 use CPAN::Forum::DB::Users ();
 use CPAN::Forum::DB::Configure ();
+use CPAN::Forum::DB::Posts ();
 
 sub admin_edit_user_process {
 	my ($self) = @_;
@@ -96,6 +97,21 @@ sub admin {
 	);
 	return $self->tt_process('pages/admin.tt', \%params);
 }
+
+# Temporary run-mode to delete posts of specific users
+sub admin_del_posts {
+	my ($self) = @_;
+	if ( not $self->session->param("admin") ) {
+		return $self->internal_error( "", "restricted_area" );
+	}
+	my $q = $self->query;
+
+	CPAN::Forum::DB::Posts::delete_posts_of_users();
+
+	my %params = ();
+	return $self->tt_process('pages/admin.tt', \%params);
+}
+
 
 1;
 

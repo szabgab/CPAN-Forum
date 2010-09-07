@@ -10,7 +10,7 @@
 
 [% IF admin %]
 <div class="admin_links">
-    <a href="/?rm=hide&amp;post=[% id %]">hide this post</a>
+    <a href="/admin_hide_post&amp;post=[% post.id %]">hide this post</a>
 </div>
 [% END %]
 
