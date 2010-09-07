@@ -564,3 +564,16 @@ will be a combination of several other services
    http://cpants.perl.org/dist/overview/CPAN-Forum
 
 
+RELEASE process
+====================
+Make sure the local git repository is up to date
+Update the version number in every .pm file!
+
+perl Build.PL
+perl Build
+perl Build test
+perl Build manifest   ????
+perl Build dist
+git tag -a v0.19  -m' version 0.19'
+git push --tags
+
