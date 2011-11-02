@@ -1,43 +1,11 @@
 [% UNLESS dev_server %]
 <div id="right_column">
 <center>
-<!--
-<a href="http://bit.ly/davorg_training">
-<img src="/img/extra/learnperl_in_london_160x480.png" width="160" height="480" border="0" />
-</a>
--->
-
-<form name="_xclick" action="https://www.paypal.com/cgi-bin/webscr" method="post">
-<input type="hidden" name="cmd" value="_xclick">
-<input type="hidden" name="business" value="gabor@cpanforum.com">
-<input type="hidden" name="item_name" value="CPAN::Forum development and maintenance">
-<select name="amount">
-<option value="5.00">5</option>
-<option value="25.00">25</option>
-<option value="100.00">100</option>
-</select>
-<select name="currency_code"> 
-<option value="EUR">EUR</option>
-<option value="USD">USD</option>
-</select>
-<br>
-<input type="image" src="http://www.paypal.com/en_US/i/btn/btn_donate_LG.gif" border="0" name="submit" alt="Make payments with PayPal - it's fast, free and secure!">
-</form>
-
-
-<div class="google_ad">
-<script type="text/javascript"><!--
-google_ad_client = "pub-7760157643054954";
-/* 120x240, created 2/21/10 */
-google_ad_slot = "6083897881";
-google_ad_width = 120;
-google_ad_height = 240;
-//-->
-</script>
-<script type="text/javascript"
-src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
-</script>
-</div>
+<a href="http://perlweekly.com/">Perl Weekly newsletter</a>
+<br />
+A free weekly newsletter for people who are busy to read all the blogs.
+<a href="http://perlweekly.com/">click here</a> to check it out.
 </center>
 </div>
+
 [% END %]

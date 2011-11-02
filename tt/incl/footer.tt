@@ -22,6 +22,16 @@
 </div> <!-- container -->
 
 [% UNLESS dev_server %]
+
+<!-- Clicky starts -->
+<script src="//static.getclicky.com/js" type="text/javascript"></script>
+
+<script type="text/javascript">try{ clicky.init(66498703); }catch(e){}</script>
+
+<noscript><p><img alt="Clicky" width="1" height="1" src="//in.getclicky.com/66498703ns.gif" /></p></noscript>
+<!-- Clicky ends -->
+
+
 <!-- Google Analytics -->
 <script type="text/javascript">
 var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");

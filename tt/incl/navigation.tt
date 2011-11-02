@@ -13,20 +13,4 @@
 <!-- | Ask for help on the Perl community IRC channel <a href="http://webchat.freenode.net/?channels=perl">#perl on irc.freenode.net</a> -->
 </div>
 
-[% UNLESS dev_server %]
-<!-- Google AdSense starts -->
-<script type="text/javascript"><!--
-google_ad_client = "pub-7760157643054954";
-/* 468x60, created 12/30/09 */
-google_ad_slot = "1789338915";
-google_ad_width = 468;
-google_ad_height = 60;
-//-->
-</script>
-<script type="text/javascript"
-src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
-</script>
-<!-- Google AdSense ends -->
-[% END %]
-
 </div>
