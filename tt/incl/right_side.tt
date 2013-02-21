@@ -1,11 +1,25 @@
 [% UNLESS dev_server %]
-<div id="right_column">
-<center>
-<a href="http://perlweekly.com/">Perl Weekly newsletter</a>
-<br />
-A free weekly newsletter for people who are busy to read all the blogs.
-<a href="http://perlweekly.com/">click here</a> to check it out.
-</center>
-</div>
+<style>
+.right_block {
+  margin-top: 20px;
+  margin-left: 20px;
+  text-align: left;
+  border: 0px solid;
+  background-color: #EEEEEE;
+  padding: 2px;
+}
 
+</style>
+<div id="right_column">
+  <div class="right_block">
+    <a href="http://perlweekly.com/">Perl Weekly newsletter</a>
+    <br />
+    A free weekly newsletter for people who are too busy to read all the blogs.
+  </div>
+
+  <div class="right_block">
+    Would you like to improve your Perl?<br>
+    Check out the <a href="http://perl5maven.com/perl-tutorial">Perl Tutorial</a> by Gabor Szabo.
+  </div>
+</div>
 [% END %]
