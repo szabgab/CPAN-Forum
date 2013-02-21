@@ -7,12 +7,13 @@
 	    <a href="/privacy_policy">Privacy Policy</a>
 	</div>
 	<div id="right_footer">
-	Maintained by <a href="http://szabgab.com/">Gabor Szabo</a> and hosted on the
-	servers of <a href="http://m5hosting.com/">M5 hosting</a>.<br />
-
-<a href="http://szabgab.com/perl_tutorial.html">Perl Tutorial</a>  and <a href="http://padre.perlide.org/">Perl editor</a><br />
-
+	Maintained by <a href="http://szabgab.com/">Gabor Szabo</a>.
 <!--
+ and hosted on the
+	servers of <a href="http://m5hosting.com/">M5 hosting</a>.<br />
+-->
+<!--
+<a href="http://szabgab.com/perl_tutorial.html">Perl Tutorial</a>  and <a href="http://padre.perlide.org/">Perl editor</a><br />
 	<a href="http://pti.co.il/"><img src="/img/pti-round-80.jpg" alt="Perl Training Israel" /></a>
 	See also <a href="http://perltraining.org/">World Wide Perl Training</a>
 -->
@@ -23,6 +24,7 @@
 
 [% UNLESS dev_server %]
 
+
 <!-- Clicky starts -->
 <script src="//static.getclicky.com/js" type="text/javascript"></script>
 
@@ -30,7 +32,6 @@
 
 <noscript><p><img alt="Clicky" width="1" height="1" src="//in.getclicky.com/66498703ns.gif" /></p></noscript>
 <!-- Clicky ends -->
-
 
 <!-- Google Analytics -->
 <script type="text/javascript">
