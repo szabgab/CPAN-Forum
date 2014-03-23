@@ -10,6 +10,7 @@
 }
 
 </style>
+<!--
 <div id="right_column">
   <div class="right_block">
     <a href="http://perlweekly.com/">Perl Weekly newsletter</a>
@@ -19,7 +20,8 @@
 
   <div class="right_block">
     Would you like to improve your Perl?<br>
-    Check out the <a href="http://perl5maven.com/perl-tutorial">Perl Tutorial</a> by Gabor Szabo.
+    Check out the <a href="http://perlmaven.com/perl-tutorial">Perl Tutorial</a> by Gabor Szabo.
   </div>
 </div>
+-->
 [% END %]

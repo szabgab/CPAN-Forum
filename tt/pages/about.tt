@@ -87,7 +87,7 @@
   <p class="about_title">Development</p>
   <div class="blurb">
    If you'd like to follow the development of this web site and the
-   <a href="http://search.cpan.org/dist/CPAN-Forum/">CPAN::Forum</a> distribution
+   <a href="http://metacpan.org/module/CPAN::Forum/">CPAN::Forum</a> distribution
    on CPAN you should know the following things:
   </div>
   <ul>

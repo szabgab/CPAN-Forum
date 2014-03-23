@@ -31,8 +31,10 @@
         <a href="/about/">about</a>
         <span class="lsep">|</span>
         <a href="/stats/">stats</a>
+<!--
         <span class="lsep">|</span>
         <a href="/search/">search</a>
+-->
       </div>
 <!--
       <div id="topsearch">
@@ -80,4 +82,23 @@
     </div>
   </div>
 
+<style>
+.topredirect {
+  background-color: orange;
+  margin-bottom: 10px;
+  padding-bottom: 15px;
+  padding-top: 15px;
+  padding-left: 100px;
+}
+</style>
+<div class="topredirect">
+I wanted to build an awesome place for people to discuss module specific issues, but I don't have any more time
+for this, and there are much better places to discuss Perl-related issues. I'd recommend asking your question on <a href="http://stackoverflow.com/">Stack Overflow</a> or
+on <a href="http://perlmonks.org/">Perl Monks</a>.
+<br>
+If you are looking for a <a href="http://perlmaven.com/perl-tutorial">Perl Programming tutorial</a> or <a href="http://perlweekly.com/">Perl-related news</a>,
+I hope these links will serve you well.
+</div>
+
+[% INCLUDE incl/adsense.tt %]
   

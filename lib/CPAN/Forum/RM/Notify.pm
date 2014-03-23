@@ -73,6 +73,7 @@ sub notify_admin {
 	my $msg = "\nUsername: " . $user->{username} . "\n";
 
 	# TODO: the admin should be able to configure if she wants to get messages on
+return;
 	# every new user (field update_on_new_user)
 	my $admin = CPAN::Forum::DB::Users->info_by( id => 1 );
 	my %mail = (

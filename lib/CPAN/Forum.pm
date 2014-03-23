@@ -609,12 +609,19 @@ sub cgiapp_prerun {
 
 	my $rm = $self->_set_run_mode();
 
+	if ($rm eq 'login') {
+		$self->prerun_mode('site_is_closed');
+		return;
+	}
 	if ( any { $rm eq $_ } @free_modes ) {
 		return;
 	}
 
 	# Redirect to login, if necessary
 	if ( not $self->session->param('loggedin') ) {
+		$self->prerun_mode('site_is_closed');
+		return;
+
 		$self->session->param( request => $rm );
 		if ( $rm eq 'new_post' ) {
 			my $group = ${ $self->param("path_parameters") }[0];

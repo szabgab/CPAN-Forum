@@ -37,7 +37,7 @@ sub dist {
 
 	my $gr = CPAN::Forum::DB::Groups->info_by( name => $group_name );
 	if ( not $gr ) {
-		$self->log->warning("Invalid group '$group_name'");
+		#$self->log->warning("Invalid group '$group_name'");
 		return $self->internal_error(
 			"",
 			"no_such_group",

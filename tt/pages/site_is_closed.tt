@@ -5,8 +5,12 @@
 [% INCLUDE incl/header.tt %]
 
 
+<h1>The site is closed. Please post your question on <a href="http://stackoverflow.com/">Stack Overflow</a> and use the <b>perl</b> tag.</h1>
+
 <p>
+<!--
 Temporarily the site is closed for upgrade. Please check back in a few minutes.
+-->
 </p>
 
 [% INCLUDE incl/footer.tt %]

@@ -1,11 +1,9 @@
 <div class="links">
     <b><a href="/dist/[% group %]">[% group %]</a></b>
     [<a href="http://metacpan.org/release/[% group %]">Meta CPAN</a>]
-    [<a href="http://search.cpan.org/dist/[% group %]">search.cpan.org</a>]
-    [<a href="http://cpan.uwinnipeg.ca/dist/[% group %]">Kobes search</a>]
+
 </div>
 <div class="links">
-
     [<a href="http://rt.cpan.org/NoAuth/Bugs.html?Dist=[% group %]">View and report bugs</a>]
     [<a href="http://cpanratings.perl.org/d/[% group %]">Ratings</a>
       [% IF rating %]
